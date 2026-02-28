@@ -25,6 +25,79 @@
   - `reports/release_reports/release_v3_latest.md`
   - `reports/release_reports/release_v3_latest.json`
 
+## 核心算法升级（2026-02-28）
+
+最新算法脚本位于：
+
+- `versions/v3_2026-02-27_latest_9k_cscw/scripts/cscw_dialogue_engine.py`
+- `versions/v3_2026-02-27_latest_9k_cscw/scripts/run_reverse_engineering_v2.py`
+- `versions/v3_2026-02-27_latest_9k_cscw/scripts/streaming_intent_engine.py`
+- `versions/v3_2026-02-27_latest_9k_cscw/scripts/benchmark_streaming_intent.py`
+- `versions/v3_2026-02-27_latest_9k_cscw/scripts/asr_stream_adapter.py`
+- `versions/v3_2026-02-27_latest_9k_cscw/scripts/incremental_renderer.py`
+- `versions/v3_2026-02-27_latest_9k_cscw/scripts/run_realtime_pipeline.py`
+- `versions/v3_2026-02-27_latest_9k_cscw/scripts/evaluate_realtime_pipeline.py`
+
+升级报告：
+
+- `versions/v3_2026-02-27_latest_9k_cscw/docs/CORE_ALGO_UPGRADE_REPORT_20260228_STEP1.md`
+- `versions/v3_2026-02-27_latest_9k_cscw/docs/CORE_ALGO_UPGRADE_REPORT_20260228_STEP2.md`
+
+## 端到端闭环（ASR -> 意图 -> 增量渲染）
+
+### 1) 运行实时流水线
+
+```bash
+python3 versions/v3_2026-02-27_latest_9k_cscw/scripts/run_realtime_pipeline.py \
+  --input /path/to/transcript.jsonl \
+  --realtime \
+  --time-scale 1.0 \
+  --output /tmp/realtime_pipeline_output.json
+```
+
+输入 transcript 支持字段：
+
+- `timestamp_ms` (int, 可选)
+- `text` (str, 必填)
+- `speaker` (str, 可选)
+- `is_final` (bool, 可选)
+- `expected_intent` (str, 可选，用于评测)
+
+### 2) 运行真实实时评测
+
+```bash
+python3 versions/v3_2026-02-27_latest_9k_cscw/scripts/evaluate_realtime_pipeline.py \
+  --input /path/to/transcript.jsonl \
+  --realtime \
+  --pipeline-output /tmp/realtime_pipeline_full.json \
+  --report-output /tmp/realtime_eval_report.json
+```
+
+评测输出包含：
+
+- 端到端延迟（P50/P95）
+- 意图识别准确率与 Macro-F1（当存在 `expected_intent` 标签）
+- 前端稳定性指标（`flicker_index`、`mental_map_score`）
+- 门槛检查结果（pass/fail）
+
+## 训练前统一评测体系
+
+在开始微调前，先统一评估数据与实时能力：
+
+```bash
+python3 tools/unified_pretrain_eval.py \
+  --dataset-dir versions/v3_2026-02-27_latest_9k_cscw/dataset/stream2graph_dataset/compliant_v3_repaired_20260228 \
+  --realtime-report /tmp/realtime_eval_report.json \
+  --output /tmp/unified_pretrain_eval.json
+```
+
+该报告会给出：
+
+- 数据就绪度（schema/编译/许可证/对话轮次/类型覆盖）
+- 实时评测融合结果（若提供 realtime report）
+- 综合 `overall_pretrain_readiness_score`
+- 是否建议进入微调阶段
+
 ## 数据说明
 
 - 本仓库是“按阶段归档”的工程仓库，不保证不同版本之间 schema 一致。
