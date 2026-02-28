@@ -98,6 +98,65 @@ python3 tools/unified_pretrain_eval.py \
 - 综合 `overall_pretrain_readiness_score`
 - 是否建议进入微调阶段
 
+## 现代前端工作台（Microsoft White 主题）
+
+已新增一个可直接对接当前后端算法的现代前端：
+
+- 前端目录: `frontend/realtime_ui/`
+- 启动服务: `tools/realtime_frontend_server.py`
+
+### 快速启动
+
+```bash
+python3 tools/realtime_frontend_server.py --host 127.0.0.1 --port 8088
+```
+
+打开：
+
+- `http://127.0.0.1:8088`
+
+### 已对接能力
+
+1. 端到端闭环：
+- `ASR transcript -> intent engine -> incremental renderer`
+
+2. 实时评测：
+- 在前端直接触发 `/api/pipeline/evaluate`
+- 返回延迟、意图准确率、稳定性指标
+
+3. 防闪烁指标可视化：
+- `flicker_index`
+- `mental_map_score`
+- displacement / drift 指标
+
+4. 训练前统一评测：
+- 前端可直接调用 `/api/pretrain/unified`
+- 输出 `overall_pretrain_readiness_score`
+
+### API 端点
+
+- `GET /api/health`
+- `GET /api/config`
+- `POST /api/pipeline/run`
+- `POST /api/pipeline/evaluate`
+- `POST /api/pretrain/unified`
+
+### Transcript 输入格式（前端文本框）
+
+每行支持：
+
+- `text`
+- `speaker|text`
+- `speaker|text|expected_intent`
+
+示例：
+
+```text
+expert|First define ingestion flow and source node.|sequential
+expert|Then route events to parser and validation service.|sequential
+expert|Gateway module connects auth service and data service.|structural
+```
+
 ## 数据说明
 
 - 本仓库是“按阶段归档”的工程仓库，不保证不同版本之间 schema 一致。

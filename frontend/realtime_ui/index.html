@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stream2Graph Realtime Studio</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-mark">S2G</div>
+          <div class="brand-text">
+            <h1>Realtime Visual Intent Studio</h1>
+            <p>ASR -> Intent -> Incremental Rendering</p>
+          </div>
+        </div>
+        <div class="top-actions">
+          <button id="btn-load-sample" class="btn secondary">加载示例</button>
+          <button id="btn-run-pipeline" class="btn primary">运行闭环</button>
+          <button id="btn-run-eval" class="btn primary">运行实时评测</button>
+        </div>
+      </header>
+
+      <main class="main-grid">
+        <section class="panel control-panel">
+          <h2>输入与参数</h2>
+          <label class="field">
+            <span>Transcript（每行 `speaker|text|expected_intent`）</span>
+            <textarea id="transcript-input" rows="14" spellcheck="false"></textarea>
+          </label>
+
+          <div class="field-row">
+            <label class="field">
+              <span>时间缩放</span>
+              <input id="time-scale" type="number" min="0.1" step="0.1" value="1.0" />
+            </label>
+            <label class="field">
+              <span>模式</span>
+              <select id="realtime-mode">
+                <option value="false" selected>离线回放</option>
+                <option value="true">实时回放</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="field-row">
+            <label class="field">
+              <span>Wait-k Base</span>
+              <input id="base-wait-k" type="number" min="1" max="8" value="2" />
+            </label>
+            <label class="field">
+              <span>Wait-k Max</span>
+              <input id="max-wait-k" type="number" min="1" max="12" value="4" />
+            </label>
+          </div>
+
+          <h3>统一训练前评测</h3>
+          <label class="field">
+            <span>Dataset 目录（仓库内绝对路径）</span>
+            <input
+              id="dataset-dir"
+              type="text"
+              value="/home/lin-server/stream2graph/versions/v3_2026-02-27_latest_9k_cscw/dataset/stream2graph_dataset/compliant_v3_repaired_20260228"
+            />
+          </label>
+          <label class="field">
+            <span>抽样文件数（0=全量）</span>
+            <input id="max-files" type="number" min="0" value="800" />
+          </label>
+          <button id="btn-unified-eval" class="btn secondary full">运行统一评测</button>
+        </section>
+
+        <section class="panel stage-panel">
+          <div class="stage-head">
+            <h2>实时增量成图舞台</h2>
+            <div class="stage-tools">
+              <button id="btn-play" class="btn ghost">播放</button>
+              <button id="btn-pause" class="btn ghost">暂停</button>
+              <button id="btn-reset" class="btn ghost">重置</button>
+            </div>
+          </div>
+          <div class="stage-canvas">
+            <svg id="graph-svg" viewBox="0 0 1200 680" preserveAspectRatio="xMidYMid meet"></svg>
+            <div class="orb orb-a"></div>
+            <div class="orb orb-b"></div>
+          </div>
+          <div class="timeline" id="timeline"></div>
+        </section>
+
+        <section class="panel metrics-panel">
+          <h2>指标与状态</h2>
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <span>E2E P95</span>
+              <strong id="m-e2e-p95">-</strong>
+            </div>
+            <div class="metric-card">
+              <span>Intent Acc</span>
+              <strong id="m-intent-acc">-</strong>
+            </div>
+            <div class="metric-card">
+              <span>Flicker Mean</span>
+              <strong id="m-flicker">-</strong>
+            </div>
+            <div class="metric-card">
+              <span>Mental Map</span>
+              <strong id="m-mental">-</strong>
+            </div>
+          </div>
+
+          <div class="block">
+            <h3>实时评测结论</h3>
+            <pre id="eval-summary" class="json-box"></pre>
+          </div>
+          <div class="block">
+            <h3>训练前统一评测</h3>
+            <pre id="unified-summary" class="json-box"></pre>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="toast" class="toast"></div>
+    <script src="./app.js"></script>
+  </body>
+</html>
