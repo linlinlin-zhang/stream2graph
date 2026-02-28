@@ -1,0 +1,139 @@
+{
+  "id": "aug_ot_stateDiagram_00052_IoT_2",
+  "source": "augmented_real_structure",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n\n    state ForkState <<fork>>\n    state JoinState <<join>>\n\n    GUIProcess: Process for displaying\n GUI is started\n    GUIInit: GUI initializes data interface\n and components\n    GUI: GUI is opened and shows\n list of stocks\n    ReadData: Data interface reads\n relevant pickle file\n    StockHandled: The data for the stock\n has been updated\n    FindStock: Find stock with mising data\n    DataGathererProcess: Process for gathering\n data is started\n    WriteData: Data is written to\n pickle file\n    DataGatherer: DataGatherer scrapes\n webpages\n    GatherData: Stock data is gathered\n\n    [IoT_Industrial_MQTT_Broker] --> ForkState: Program is started\n    ForkState --> GUIProcess\n    ForkState --> DataGathererProcess\n    GUIProcess --> JoinState\n    DataGathererProcess --> GatherData\n    GatherData --> WriteData\n    WriteData --> JoinState\n    JoinState --> GUIInit: Data exists in file\n    GUIInit --> ReadData: GUI requests data\n    ReadData --> GUI: Data interface returns data\n    GUI --> UpdateData: Every 500ms\n    GUI --> RefreshData: User requests data\n to be updated\n    GUI --> FilterData: User creates a filter\n    GUI --> SortData: User requests data\n to be sorted\n    GUI --> [IoT_Industrial_MQTT_Broker]: User closes GUI\n    StockHandled --> GUI: Tell the GUI that new\n data is available\n    RefreshButton --> GUI: Data interface\n returns data\n    Filter --> GUI: Data interface\n returns data\n    Sort --> GUI: Data interface\n returns data\n\n    state RefreshData {IoT_Industrial_PLC_Logic] --> RefreshButton\n    }\n\n    state SortData {IoT_Industrial_ActuatorController] --> Sort: Send column and sort direction\n to data interface\n    }\n\n    state FilterData {IoT_Industrial_EdgeNode] --> Filter: Send filter type to\n data interface\n    }\n\n    state UpdateData {IoT_Industrial_PLC_Logic] --> FindStock\n        FindStock --> [IoT_Industrial_ActuatorController]: No stock found\n        FindStock --> DataGatherer: Send stock to data\n gathering process\n        DataGatherer --> StockHandled\n    }",
+  "license": "other_source",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 IoT_Industrial_MQTT_Broker 和 IoT_Industrial_PLC_Logic 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'IoT_Industrial_MQTT_Broker 和 IoT_Industrial_PLC_Logic'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "gathered",
+        "RefreshData"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 IoT_Industrial_ActuatorController 和 IoT_Industrial_EdgeNode 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 IoT_Industrial_ActuatorController处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'IoT_Industrial_ActuatorController处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SortData",
+        "FilterData"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 IoT_Industrial_PLC_Logic 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'IoT_Industrial_PLC_Logic'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "UpdateData"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 13,
+    "repair_count": 1,
+    "grounding_acts_count": 6,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:05Z",
+  "extra": {
+    "source_type": "github_search_special",
+    "source_url": "https://github.com/timfornell/StockScreener/blob/c2207e1c48de8d77025e6ab50d872a68992d9f55/Doc/OverviewFlow.mmd",
+    "github_repo": "timfornell/StockScreener",
+    "seed_id": "ot_stateDiagram_00052",
+    "augmentation_domain": "IoT_Industrial",
+    "content_size": 2102,
+    "collected_at": "2026-02-06T10:37:16.280414",
+    "license_name": "Other Source (GitHub-based)"
+  }
+}

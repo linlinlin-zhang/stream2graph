@@ -1,0 +1,313 @@
+{
+  "id": "ot_stateDiagram_00345",
+  "source": "other",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    [*] --> CartCreated : Customer adds items\n    \n    state \"Shopping Cart\" as cart {\n        CartCreated --> ItemsAdded : add_item()\n        ItemsAdded --> ItemsAdded : add_item() / update_quantity()\n        ItemsAdded --> ItemsRemoved : remove_item()\n        ItemsRemoved --> ItemsAdded : add_item()\n        ItemsRemoved --> CartAbandoned : timeout(30min)\n        ItemsAdded --> CartAbandoned : timeout(30min)\n        \n        state ItemsAdded {\n            [*] --> ValidatingInventory\n            ValidatingInventory --> InStock : items_available\n            ValidatingInventory --> OutOfStock : items_unavailable\n            OutOfStock --> InStock : restock_notification\n            InStock --> PriceCalculated : calculate_total()\n        }\n    }\n    \n    cart --> CheckoutInitiated : checkout_clicked\n    CartAbandoned --> [*] : cleanup_cart()\n    \n    state \"Checkout Process\" as checkout {\n        CheckoutInitiated --> CustomerInfo : enter_details()\n        CustomerInfo --> PaymentInfo : validate_customer()\n        CustomerInfo --> CustomerInfo : validation_failed\n        \n        PaymentInfo --> PaymentValidation : submit_payment()\n        PaymentValidation --> PaymentApproved : payment_success\n        PaymentValidation --> PaymentDeclined : payment_failed\n        PaymentDeclined --> PaymentInfo : retry_payment\n        PaymentDeclined --> PaymentAbandoned : max_retries_reached\n        \n        PaymentApproved --> OrderConfirmed : create_order()\n    }\n    \n    checkout --> CartAbandoned : cancel_checkout\n    PaymentAbandoned --> CartAbandoned\n    \n    state \"Order Processing\" as processing {\n        OrderConfirmed --> InventoryReserved : reserve_items()\n        InventoryReserved --> InventoryConfirmed : inventory_check_passed\n        InventoryReserved --> InventoryFailed : inventory_insufficient\n        InventoryFailed --> OrderCancelled : refund_payment()\n        \n        InventoryConfirmed --> OrderQueued : add_to_fulfillment_queue()\n        OrderQueued --> OrderProcessing : worker_picks_order()\n        OrderProcessing --> ItemsPicked : pick_items()\n        ItemsPicked --> QualityCheck : quality_control()\n        \n        state QualityCheck {\n            [*] --> Inspecting\n            Inspecting --> QCPassed : items_ok\n            Inspecting --> QCFailed : items_defective\n            QCFailed --> ItemsReplaced : replace_items()\n            ItemsReplaced --> Inspecting\n            QCPassed --> [*]\n        }\n        \n        QualityCheck --> OrderPacked : items_approved\n        OrderPacked --> ShippingLabelCreated : generate_label()\n        ShippingLabelCreated --> ReadyForShipment : move_to_shipping_dock()\n    }\n    \n    state \"Shipping & Delivery\" as shipping {\n        ReadyForShipment --> InTransit : carrier_pickup()\n        \n        state InTransit {\n            [*] --> PickedUp\n            PickedUp --> InTransitToHub : scan_at_origin\n            InTransitToHub --> AtSortingFacility : arrive_at_hub\n            AtSortingFacility --> OutForDelivery : sorted_for_delivery\n            OutForDelivery --> AtDeliveryLocation : arrive_at_destination\n            \n            state \"Delivery Attempts\" as delivery_attempts {\n                AtDeliveryLocation --> DeliveryAttempt1 : first_attempt\n                DeliveryAttempt1 --> Delivered : successful_delivery\n                DeliveryAttempt1 --> DeliveryAttempt2 : delivery_failed\n                DeliveryAttempt2 --> Delivered : successful_delivery  \n                DeliveryAttempt2 --> DeliveryAttempt3 : delivery_failed\n                DeliveryAttempt3 --> Delivered : successful_delivery\n                DeliveryAttempt3 --> ReturnToSender : final_attempt_failed\n            }\n        }\n        \n        InTransit --> DeliveryException : package_damaged / lost\n        DeliveryException --> InvestigationStarted : file_claim()\n        InvestigationStarted --> RefundIssued : investigation_complete\n        InvestigationStarted --> ReplacementSent : send_replacement\n    }\n    \n    state \"Post-Delivery\" as post_delivery {\n        Delivered --> DeliveryConfirmed : customer_confirms\n        Delivered --> DeliveryDisputed : customer_disputes(48h)\n        \n        DeliveryConfirmed --> OrderCompleted : satisfaction_survey()\n        DeliveryDisputed --> InvestigationStarted : investigate_dispute()\n        \n        OrderCompleted --> ReturnRequested : return_window_open(30days)\n        ReturnRequested --> ReturnApproved : validate_return_request()\n        ReturnApproved --> ReturnInProgress : customer_ships_back()\n        ReturnInProgress --> ReturnReceived : package_received()\n        ReturnReceived --> RefundProcessed : inspect_returned_items()\n        ReturnReceived --> ReturnRejected : items_not_returnable()\n        \n        OrderCompleted --> ReviewSubmitted : customer_leaves_review()\n    }\n    \n    state \"Terminal States\" as terminal {\n        OrderCancelled --> [*] : order_cleanup()\n        RefundIssued --> [*] : case_closed()\n        RefundProcessed --> [*] : transaction_complete()\n        ReturnToSender --> [*] : return_to_inventory()\n        ReturnRejected --> [*] : return_shipped_back()\n        ReviewSubmitted --> [*] : order_archived()\n        ReplacementSent --> processing : create_replacement_order()\n    }\n    \n    %% Concurrent states for customer service\n    state CustomerService {\n        [*] --> Available\n        Available --> InquiryReceived : customer_contact()\n        InquiryReceived --> ResolvingIssue : agent_assigned()\n        ResolvingIssue --> IssueResolved : resolution_provided()\n        IssueResolved --> Available : case_closed()\n        ResolvingIssue --> EscalatedToManager : escalation_required()\n        EscalatedToManager --> ResolvingIssue : manager_provides_solution()\n    }\n    \n    %% Global transitions that can happen from multiple states\n    processing --> OrderCancelled : customer_cancels() [before_shipping]\n    shipping --> OrderCancelled : customer_cancels() [with_fee]\n    \n    %% Error handling\n    state ErrorHandling {\n        [*] --> SystemError\n        SystemError --> ErrorLogged : log_error()\n        ErrorLogged --> NotificationSent : alert_support()\n        NotificationSent --> [*] : error_resolved()\n    }\n    \n    %% Notes for complex transitions\n    note right of CartAbandoned\n        Cleanup occurs after 30min timeout\n        or explicit abandonment\n    end note\n    \n    note right of PaymentDeclined\n        Max 3 retry attempts allowed\n        Different decline reasons handled\n    end note\n    \n    note right of InTransit\n        Real-time tracking updates\n        Multiple carrier integrations\n    end note",
+  "license": "other_source",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 * 和 CartCreated --> ItemsAdded : add_item( 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '* 和 CartCreated --> ItemsAdded : add_item('，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2",
+        "cart"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 30min 和 30min 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '30min 和 30min'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "timeout",
+        "timeout"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 [* 和 CheckoutInitiated --> CustomerInfo : enter_details( 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '[* 和 CheckoutInitiated --> CustomerInfo : enter_details('，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ItemsAdded",
+        "checkout"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 OrderConfirmed --> InventoryReserved : reserve_items( 和 [*。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'OrderConfirmed --> InventoryReserved : reserve_items( 和 [*'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "processing",
+        "QualityCheck"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 ReadyForShipment --> InTransit : carrier_pickup( 和 [*。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'ReadyForShipment --> InTransit : carrier_pickup( 和 [*'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "shipping",
+        "InTransit"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 AtDeliveryLocation --> DeliveryAttempt1 : first_attempt\n                DeliveryAttempt1 --> Delivered : successful_delivery\n                DeliveryAttempt1 --> DeliveryAttempt2 : delivery_failed\n                DeliveryAttempt2 --> Delivered : successful_delivery  \n                DeliveryAttempt2 --> DeliveryAttempt3 : delivery_failed\n                DeliveryAttempt3 --> Delivered : successful_delivery\n                DeliveryAttempt3 --> ReturnToSender : final_attempt_failed\n             和 Delivered --> DeliveryConfirmed : customer_confirms\n        Delivered --> DeliveryDisputed : customer_disputes(48h 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 AtDeliveryLocation --> DeliveryAttempt1 : first_attempt\n                DeliveryAttempt1 --> Delivered : successful_delivery\n                DeliveryAttempt1 --> DeliveryAttempt2 : delivery_failed\n                DeliveryAttempt2 --> Delivered : successful_delivery  \n                DeliveryAttempt2 --> DeliveryAttempt3 : delivery_failed\n                DeliveryAttempt3 --> Delivered : successful_delivery\n                DeliveryAttempt3 --> ReturnToSender : final_attempt_failed\n            处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'AtDeliveryLocation --> DeliveryAttempt1 : first_attempt\n                DeliveryAttempt1 --> Delivered : successful_delivery\n                DeliveryAttempt1 --> DeliveryAttempt2 : delivery_failed\n                DeliveryAttempt2 --> Delivered : successful_delivery  \n                DeliveryAttempt2 --> DeliveryAttempt3 : delivery_failed\n                DeliveryAttempt3 --> Delivered : successful_delivery\n                DeliveryAttempt3 --> ReturnToSender : final_attempt_failed\n            处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "delivery_attempts",
+        "post_delivery"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 30days 和 OrderCancelled --> [* 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '30days 和 OrderCancelled --> [*'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "return_window_open",
+        "terminal"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 [* 和 [* 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '[* 和 [*'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CustomerService",
+        "ErrorHandling"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 33,
+    "repair_count": 1,
+    "grounding_acts_count": 16,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:08Z",
+  "extra": {
+    "source_type": "github_search_special",
+    "source_url": "https://github.com/song-rit/mermaid-example/blob/b7ac8de1e9803bd08d9c7c0e5bf71b2e329a6f44/mmd/state-diagram-ex-1.mmd",
+    "github_repo": "song-rit/mermaid-example",
+    "content_size": 6620,
+    "collected_at": "2026-02-06T10:40:59.598055",
+    "license_name": "Other Source (GitHub-based)"
+  }
+}

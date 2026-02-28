@@ -1,0 +1,59 @@
+{
+  "id": "aug_gl_sequence_00025_Hea_1",
+  "source": "augmented_real_structure",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    Git Client->>+LoadBalancer: HTTPS GET /\n    LoadBalancer->>+NGINX: HTTP(HealthTech_PatientRecords) GET /\n    NGINX->>+Workhorse: HTTP GET /\n    Workhorse->>+Puma: HTTP GET /\n    Puma->>-Workhorse: 200 OK\n    Workhorse->>+Gitaly: gRPC Request\n\n    Gitaly->>+Workhorse: Auth Verify\n    Workhorse->>+Puma: Auth Confirm\n    Puma->>-Workhorse: Auth OK\n    Workhorse->>-Gitaly: Auth OK\n\n    Gitaly->>-Workhorse: gRPC Response\n    Workhorse->>-NGINX: HTTP Response\n    NGINX->>-LoadBalancer: HTTP Response\n    LoadBalancer->>-Git Client: HTTP Response",
+  "license": "gitlab_repo",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 HealthTech_PatientRecords 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'HealthTech_PatientRecords'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "HTTP"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:04Z",
+  "extra": {
+    "source_url": "https://gitlab.com/WarheadsSE/gitlab-diagrams",
+    "seed_id": "gl_sequence_00025",
+    "augmentation_domain": "HealthTech",
+    "content_size": 542,
+    "collected_at": "2026-02-06T10:57:07.060524",
+    "license_name": "GitLab Repository (refer to project page)"
+  }
+}

@@ -1,0 +1,184 @@
+{
+  "id": "aug_gh_sequence_00242_Hea_1",
+  "source": "augmented_real_structure",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant TG as Telegram\n    participant Web as Webhook Server (HealthTech_PatientRecords)\n    participant App as UseCase: EvaluateMsg\n    participant LLM as LLM Client\n    participant MCP as MCP Client\n\n    TG->>Web: POST /webhook (HealthTech_EMR_Sync)\n    Web->>App: HandleUpdate(HealthTech_PatientRecords)\n    App->>App: Gate (HealthTech_HIPAA_Vault)\n    App->>App: RateLimit & Moderation check\n    alt Engine = LLM\n        App->>LLM: Analyze(HealthTech_HIPAA_Vault)\n        LLM-->>App: summary/eval\n    else Engine = MCP\n        App->>MCP: call tools (HealthTech_HIPAA_Vault)\n        MCP-->>App: tool results\n    else Engine = Hybrid\n        App->>MCP: context snippets\n        MCP-->>App: evidence\n        App->>LLM: Synthesize(HealthTech_DiagnosticEngine)\n        LLM-->>App: final answer\n    end\n    App-->>Web: reply text\n    Web-->>TG: sendMessage\n",
+  "license": "mit",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 HealthTech_PatientRecords 和 HealthTech_EMR_Sync 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'HealthTech_PatientRecords 和 HealthTech_EMR_Sync'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Server",
+        "webhook"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 HealthTech_PatientRecords 和 HealthTech_HIPAA_Vault。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'HealthTech_PatientRecords 和 HealthTech_HIPAA_Vault'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "HandleUpdate",
+        "Gate"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 HealthTech_HIPAA_Vault 和 HealthTech_HIPAA_Vault 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 HealthTech_HIPAA_Vault处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HealthTech_HIPAA_Vault处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Analyze",
+        "tools"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 HealthTech_DiagnosticEngine 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'HealthTech_DiagnosticEngine'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Synthesize"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 17,
+    "repair_count": 1,
+    "grounding_acts_count": 8,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:02Z",
+  "extra": {
+    "source_url": "https://github.com/nduyhai/valjean/blob/58e2110f3dd9143576c1eed46c36c4dabcca65b3/docs/req.mmd",
+    "github_repo": "nduyhai/valjean",
+    "github_file_path": "docs/req.mmd",
+    "seed_id": "gh_sequence_00242",
+    "augmentation_domain": "HealthTech",
+    "content_size": 795,
+    "collected_at": "2026-02-06T01:29:35.564444",
+    "license_name": "MIT License",
+    "license_url": "https://api.github.com/licenses/mit",
+    "repo_owner": "nduyhai",
+    "repo_name": "valjean",
+    "repo_stars": 4,
+    "repo_forks": 0,
+    "repo_topics": [],
+    "repo_language": "Go",
+    "repo_description": "valjean bot",
+    "repo_created_at": "2025-10-04T02:39:33Z",
+    "repo_updated_at": "2026-02-03T15:22:26Z"
+  }
+}

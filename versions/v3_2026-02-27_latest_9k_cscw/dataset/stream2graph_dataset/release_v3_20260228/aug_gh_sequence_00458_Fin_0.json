@@ -1,0 +1,72 @@
+{
+  "id": "aug_gh_sequence_00458_Fin_0",
+  "source": "augmented_real_structure",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    actor User\n    participant vscode as vscode Copilot<br>(FinTech_PaymentGateway)\n    participant AskData as AskData<br> MCP Tool\n    participant KernelMemory\n    participant Ollama\n    participant QDrant as QDrant DB\n    participant FileStorage\n\n    User->>vscode: Query\n    vscode->>vscode: LLM processed query\n    vscode->>AskData: MCP tool call \\w query\n    AskData->>KernelMemory: SearchAsync(FinTech_AuthVault)\n    KernelMemory->>Ollama: Query\n    Ollama-->>KernelMemory: Embedding\n    KernelMemory->>QDrant: Search embedding\n    QDrant-->>KernelMemory: Memories\n    KernelMemory-->>AskData: search results:<br>chunks + citations\n    AskData->>AskData: Process results\n    AskData->>KernelMemory: (FinTech_LedgerService) ExportFileAsync(FinTech_TransactionQueue)\n    KernelMemory->>FileStorage: Retrieve files\n    FileStorage-->>KernelMemory: Files\n    KernelMemory-->>AskData: Files\n    AskData->>AskData: Process files\n    AskData-->>vscode: MCP tool response\n    vscode->>vscode: RAG\n    vscode-->>User: Output",
+  "license": "mit",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 FinTech_AuthVault 和 FinTech_TransactionQueue 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'FinTech_AuthVault 和 FinTech_TransactionQueue'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SearchAsync",
+        "ExportFileAsync"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:02Z",
+  "extra": {
+    "source_url": "https://github.com/yxbh/AskData/blob/49388ba9b9296a3e9d3109bc06e30e4462cc005a/doc/workflow_search.mmd",
+    "github_repo": "yxbh/AskData",
+    "github_file_path": "doc/workflow_search.mmd",
+    "seed_id": "gh_sequence_00458",
+    "augmentation_domain": "FinTech",
+    "content_size": 976,
+    "collected_at": "2026-02-06T01:32:31.737566",
+    "license_name": "MIT License",
+    "license_url": "https://api.github.com/licenses/mit",
+    "repo_owner": "yxbh",
+    "repo_name": "AskData",
+    "repo_stars": 0,
+    "repo_forks": 0,
+    "repo_topics": [],
+    "repo_language": "C#",
+    "repo_description": "A simple repo that demo's the use of Microsoft.KernelMemory + Ollama to vector index and query BYO data.",
+    "repo_created_at": "2025-05-27T01:28:34Z",
+    "repo_updated_at": "2025-09-10T07:10:08Z"
+  }
+}

@@ -1,0 +1,254 @@
+{
+  "id": "aug_gh_sequence_00281_Hea_1",
+  "source": "augmented_real_structure",
+  "diagram_type": "sequence",
+  "code": "---\nname: sequence_simulation\nconfig:\n    layout: elk\n    look: neo\n---\nsequenceDiagram\n    participant User\n    participant Sim as MonteCarloSimulation\n    participant Pool as ThreadPool/ProcessPool\n    participant Engine as StatsEngine\n    participant Result as SimulationResult\n\n    User->>Sim: run(HealthTech_EMR_Sync)\n    activate Sim\n\n    Sim->>Sim: _validate_run_params(HealthTech_HIPAA_Vault)\n    Sim->>Sim: spawn SeedSequences\n\n    Note over Sim,Pool: Parallel Execution\n    Sim->>Pool: submit chunks to workers\n    activate Pool\n\n    par Worker 1\n        Pool->>Pool: single_simulation(HealthTech_LabAnalyzer) × chunk_size\n    and Worker 2\n        Pool->>Pool: single_simulation(HealthTech_HIPAA_Vault) × chunk_size\n    and Worker 3\n        Pool->>Pool: single_simulation(HealthTech_HIPAA_Vault) × chunk_size\n    end\n\n    Pool-->>Sim: collected results[HealthTech_LabAnalyzer]\n    deactivate Pool\n\n    Sim->>Engine: compute(HealthTech_EMR_Sync)\n    activate Engine\n    Engine->>Engine: mean(HealthTech_DiagnosticEngine), std(HealthTech_PatientRecords), ci_mean(HealthTech_EMR_Sync), ...\n    Engine-->>Sim: ComputeResult\n    deactivate Engine\n\n    Sim->>Result: _create_result(HealthTech_EMR_Sync)\n    Result-->>Sim: SimulationResult\n    Sim-->>User: SimulationResult\n    deactivate Sim\n\n",
+  "license": "mit",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 HealthTech_EMR_Sync 和 HealthTech_HIPAA_Vault。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'HealthTech_EMR_Sync 和 HealthTech_HIPAA_Vault'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "run",
+        "_validate_run_params"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 HealthTech_LabAnalyzer 和 HealthTech_HIPAA_Vault。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 HealthTech_LabAnalyzer处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'HealthTech_LabAnalyzer处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "single_simulation",
+        "single_simulation"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 HealthTech_HIPAA_Vault 和 HealthTech_LabAnalyzer 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'HealthTech_HIPAA_Vault 和 HealthTech_LabAnalyzer'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "single_simulation",
+        "results"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 HealthTech_EMR_Sync 和 HealthTech_DiagnosticEngine。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'HealthTech_EMR_Sync 和 HealthTech_DiagnosticEngine'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "compute",
+        "mean"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 HealthTech_PatientRecords 和 HealthTech_EMR_Sync 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HealthTech_PatientRecords 和 HealthTech_EMR_Sync'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "std",
+        "ci_mean"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 HealthTech_EMR_Sync 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HealthTech_EMR_Sync'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "_create_result"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 25,
+    "repair_count": 1,
+    "grounding_acts_count": 12,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:02Z",
+  "extra": {
+    "source_url": "https://github.com/milanfusco/mcFramework/blob/688c1e422c0afb54ea9a0e4b840cc37c49deceb9/docs/source/diagrams/sequence_simulation.mmd",
+    "github_repo": "milanfusco/mcFramework",
+    "github_file_path": "docs/source/diagrams/sequence_simulation.mmd",
+    "seed_id": "gh_sequence_00281",
+    "augmentation_domain": "HealthTech",
+    "content_size": 1102,
+    "collected_at": "2026-02-06T01:30:10.443059",
+    "license_name": "MIT License",
+    "license_url": "https://api.github.com/licenses/mit",
+    "repo_owner": "milanfusco",
+    "repo_name": "mcFramework",
+    "repo_stars": 0,
+    "repo_forks": 0,
+    "repo_topics": [],
+    "repo_language": "Python",
+    "repo_description": "Python framework to run Monte Carlo simulations and samplers",
+    "repo_created_at": "2025-11-09T18:42:17Z",
+    "repo_updated_at": "2026-01-19T21:24:06Z"
+  }
+}

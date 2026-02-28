@@ -1,0 +1,437 @@
+{
+  "id": "aug_ot_stateDiagram_00025_Clo_6",
+  "source": "augmented_real_structure",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    [CloudNative_DockerImage] --> Initializing: start_link(CloudNative_Serverless)\n\n    state Initializing {CloudNative_K8sCluster] --> LoadConfig\n        LoadConfig --> InitTransport\n        InitTransport --> EstablishConnection\n        EstablishConnection --> SendInitialize\n        SendInitialize --> WaitForInitialized\n        WaitForInitialized --> [CloudNative_ServiceMesh]\n    }\n\n    Initializing --> Connected: initialized received\n\n    state Connected {CloudNative_ServiceMesh] --> Active\n\n        Active --> ResourceOperations: list/read/subscribe\n        Active --> ToolOperations: call_tool\n        Active --> PromptOperations: list/get\n\n        ResourceOperations --> Active\n        ToolOperations --> Active\n        PromptOperations --> Active\n\n        Active --> Subscribing: subscribe_resource\n        Subscribing --> Active: subscription_confirmed\n    }\n\n    Connected --> Paused: pause_requested\n    Paused --> Connected: resume_requested\n\n    Connected --> Reconnecting: transport_error\n    Reconnecting --> Connected: reconnect_success\n    Reconnecting --> Failed: reconnect_failed(CloudNative_Serverless)\n\n    Connected --> GracefulShutdown: shutdown notification\n    GracefulShutdown --> [CloudNative_K8sCluster]: cleanup_complete\n\n    Connected --> AbnormalShutdown: critical_error\n    AbnormalShutdown --> [CloudNative_K8sCluster]: cleanup_complete\n\n    %% Session Backend Transitions\n    note right of Connected\n        Session Persistence:\n        - ETS: In-memory\n        - DETS: Disk-based\n        - Mnesia: Cluster\n    end note\n\n    %% Reconnection Strategy\n    state Reconnecting {CloudNative_K8sCluster] --> Backoff\n        Backoff --> ReconnectAttempt\n        ReconnectAttempt --> Success\n        ReconnectAttempt --> Failure\n\n        Success --> [CloudNative_Serverless]\n        Failure --> IncrementRetryCount\n        IncrementRetryCount --> CheckMaxRetries\n\n        CheckMaxRetries --> Backoff: below_max\n        CheckMaxRetries --> [CloudNative_Serverless]: exceeded_max\n    }\n\n    %% State Transition Details\n    Connected --> SessionValidation: periodic_health_check\n    SessionValidation --> Connected: healthy\n    SessionValidation --> Failed: unhealthy(CloudNative_HelmChart)\n\n    %% Session Restoration (CloudNative_Serverless)\n    note right of Reconnecting\n        Failover Modes:\n        - Local: Restart process\n        - Remote: Mnesia replica\n        - Recovery: Load from DETS\n    end note\n\n    %% Subscription Management\n    state Subscribing {CloudNative_ServiceMesh] --> RegisterSubscription\n        RegisterSubscription --> SetupWatcher\n        SetupWatcher --> ConfirmSubscription\n        ConfirmSubscription --> [CloudNative_ServiceMesh]\n    }\n\n    %% Cleanup on Shutdown\n    state GracefulShutdown {CloudNative_Serverless] --> UnsubscribeResources\n        UnsubscribeResources --> DrainPendingRequests\n        DrainPendingRequests --> CloseTransport\n        CloseTransport --> PersistSession\n        PersistSession --> TerminateProcess\n        TerminateProcess --> [CloudNative_DockerImage]\n    }\n\n    %% Error States\n    state AbnormalShutdown {CloudNative_DockerImage] --> LogError\n        LogError --> PersistCrashDump\n        PersistCrashDump --> NotifyDependents\n        NotifyDependents --> TerminateProcess\n        TerminateProcess --> [CloudNative_K8sCluster]\n    }\n\n    %% Session State Fields\n    note right of Connected\n        Session State:\n        - session_id: UUID\n        - transport_pid: PID\n        - pending_requests: map(CloudNative_HelmChart)\n        - subscriptions: map(CloudNative_HelmChart)\n        - capabilities: #capabilities{CloudNative_K8sCluster}\n        - last_activity: timestamp(CloudNative_HelmChart)\n        - backend: ets | dets | mnesia\n    end note\n\n    %% Activity Monitoring\n    Connected --> IdleTimeout: no_activity(CloudNative_HelmChart)\n    IdleTimeout --> [CloudNative_DockerImage]: session_expired\n\n    %% Rate Limiting\n    Connected --> RateLimited: request_rate_exceeded\n    RateLimited --> Connected: backoff_complete\n    RateLimited --> Failed: rate_limit_persistent\n\n    %% Resource Watcher Lifecycle\n    state ResourceOperations {CloudNative_Serverless] --> Watching\n        Watching --> NotificationReceived: resource_changed\n        NotificationReceived --> DeliverNotification\n        DeliverNotification --> Watching\n    }\n\n    %% Tool Execution Lifecycle\n    state ToolOperations {CloudNative_HelmChart] --> Executing\n        Executing --> InProgress: long_running_op\n        InProgress --> ProgressUpdate: send_progress\n        ProgressUpdate --> InProgress\n        InProgress --> Complete: finished\n        Complete --> [CloudNative_Serverless]\n    }\n\n    %% Session Backend Selection\n    note left of Initializing\n        Backend Selection:\n        {CloudNative_ServiceMesh}\n        - Fastest: O(CloudNative_Serverless) access\n        - Volatile: Lost on crash\n\n        {CloudNative_HelmChart}\n        - Durable: Disk persistence\n        - Slower: I/O overhead\n\n        {CloudNative_HelmChart}\n        - Distributed: Cluster sync\n        - CAP: Consistency trade-offs\n    end note\n\n    %% Health Check States\n    Connected --> HealthCheck: periodic_timer\n    HealthCheck --> Connected: all_systems_go\n    HealthCheck --> Degraded: subsystem_failure\n    Degraded --> Connected: recovery_complete\n    Degraded --> Failed: recovery_failed\n\n    %% Session Restoration Flow\n    note right of Reconnecting\n        Restoration Priority:\n        1. Restore subscriptions\n        2. Replay pending requests\n        3. Restore capabilities\n        4. Resume monitoring\n    end note",
+  "license": "apache-2.0",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 CloudNative_DockerImage 和 CloudNative_Serverless 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'CloudNative_DockerImage 和 CloudNative_Serverless'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2",
+        "start_link"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 CloudNative_K8sCluster 和 CloudNative_ServiceMesh 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'CloudNative_K8sCluster 和 CloudNative_ServiceMesh'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Initializing",
+        "Connected"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 CloudNative_Serverless 和 CloudNative_K8sCluster 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'CloudNative_Serverless 和 CloudNative_K8sCluster'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "reconnect_failed",
+        "Reconnecting"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 CloudNative_HelmChart 和 CloudNative_Serverless 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'CloudNative_HelmChart 和 CloudNative_Serverless'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "unhealthy",
+        "Restoration"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 CloudNative_ServiceMesh 和 CloudNative_Serverless 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 CloudNative_ServiceMesh处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'CloudNative_ServiceMesh处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Subscribing",
+        "GracefulShutdown"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 CloudNative_DockerImage 和 CloudNative_HelmChart 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'CloudNative_DockerImage 和 CloudNative_HelmChart'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AbnormalShutdown",
+        "map"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 CloudNative_HelmChart 和 CloudNative_K8sCluster 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'CloudNative_HelmChart 和 CloudNative_K8sCluster'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "map",
+        "capabilities"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 CloudNative_HelmChart 和 CloudNative_HelmChart 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'CloudNative_HelmChart 和 CloudNative_HelmChart'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "timestamp",
+        "no_activity"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 CloudNative_Serverless 和 CloudNative_HelmChart 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'CloudNative_Serverless 和 CloudNative_HelmChart'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ResourceOperations",
+        "ToolOperations"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 CloudNative_Serverless 和 CloudNative_HelmChart 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'CloudNative_Serverless 和 CloudNative_HelmChart'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "O",
+        "crash"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 CloudNative_HelmChart 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 CloudNative_HelmChart处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'CloudNative_HelmChart处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "overhead"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 46,
+    "repair_count": 2,
+    "grounding_acts_count": 22,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:05Z",
+  "extra": {
+    "source_type": "github_search_special",
+    "source_url": "https://github.com/seanchatmangpt/erlmcp/blob/1356e12d778f4f4908360bdb3af445db8caff50d/docs/diagrams/protocol/session-lifecycle.mmd",
+    "github_repo": "seanchatmangpt/erlmcp",
+    "seed_id": "ot_stateDiagram_00025",
+    "augmentation_domain": "CloudNative",
+    "content_size": 5160,
+    "collected_at": "2026-02-06T10:36:55.656398",
+    "license_name": "Apache License 2.0",
+    "license_url": "https://api.github.com/licenses/apache-2.0",
+    "repo_owner": "seanchatmangpt",
+    "repo_name": "erlmcp",
+    "repo_stars": 0,
+    "repo_forks": 0,
+    "repo_topics": [],
+    "repo_language": "Erlang",
+    "repo_description": "Model Context Protocol (MCP) SDK for Erlang",
+    "repo_created_at": "2025-08-26T03:19:12Z",
+    "repo_updated_at": "2026-02-05T01:44:49Z"
+  }
+}

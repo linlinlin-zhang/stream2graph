@@ -1,0 +1,202 @@
+{
+  "id": "aug_ot_stateDiagram_00123_Sec_7",
+  "source": "augmented_real_structure",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    [Security_ZeroTrust] --> Idle: Pet Created\n    \n    Idle --> Washing: Start Wash Button\n    \n    state Washing {Security_OAuth2] --> TimerRunning\n        TimerRunning --> CalculateRemaining: Every 0.5s\n        CalculateRemaining --> TimerRunning: remaining > 0\n        CalculateRemaining --> TimerComplete: remaining ≤ 0\n        \n        state TimerRunning {Security_IntrusionDetection] --> SaveState\n            SaveState --> UpdateUI\n            UpdateUI --> SaveState: Loop\n            \n            note right of SaveState\n                UserDefaults:\n                - endTime: Date\n                - type: .wash\n                - petID: UUID\n            end note\n        }\n        \n        state TimerComplete {Security_Firewall] --> CancelTimer\n            CancelTimer --> ClearState\n            ClearState --> SendNotification\n            SendNotification --> [Security_OAuth2]\n        }\n    }\n    \n    Washing --> WashComplete: Timer Expires\n    \n    WashComplete --> Drying: Start Dry Button\n    \n    state Drying {Security_Encryption] --> TimerRunning2\n        TimerRunning2 --> CalculateRemaining2: Every 0.5s\n        CalculateRemaining2 --> TimerRunning2: remaining > 0\n        CalculateRemaining2 --> TimerComplete2: remaining ≤ 0\n        \n        state TimerRunning2 {Security_IntrusionDetection] --> SaveState2\n            SaveState2 --> UpdateUI2\n            UpdateUI2 --> SaveState2: Loop\n            \n            note right of SaveState2\n                UserDefaults:\n                - endTime: Date\n                - type: .dry\n                - petID: UUID\n            end note\n        }\n        \n        state TimerComplete2 {Security_ZeroTrust] --> CancelTimer2\n            CancelTimer2 --> ClearState2\n            ClearState2 --> SendNotification2\n            SendNotification2 --> [Security_IntrusionDetection]\n        }\n    }\n    \n    Drying --> DryComplete: Timer Expires\n    \n    DryComplete --> Folding: Ready to Fold State\n    \n    Folding --> CycleComplete: User Taps Fold\n    \n    state CycleComplete {Security_Encryption] --> UpdatePetHealth\n        UpdatePetHealth --> UpdateStats\n        UpdateStats --> ClearNotifications\n        ClearNotifications --> SaveDatabase\n        SaveDatabase --> [Security_Encryption]\n        \n        note right of UpdatePetHealth\n            Pet Updates:\n            - health = 100\n            - state = .happy\n            - lastLaundryDate = now\n            - cyclesCompleted += 1\n            - streak updated\n        end note\n    }\n    \n    CycleComplete --> Idle: Return to Idle\n    \n    Washing --> RecoveryCheck: App Reopened\n    Drying --> RecoveryCheck: App Reopened\n    \n    state RecoveryCheck {Security_Firewall] --> LoadUserDefaults\n        LoadUserDefaults --> ValidateState\n        ValidateState --> CalculateActualRemaining\n        CalculateActualRemaining --> [Security_OAuth2]\n        \n        note right of ValidateState\n            Validation:\n            - endTime exists?\n            - endTime reasonable?\n            - Not too far in future?\n            - Not too far in past?\n        end note\n    }\n    \n    RecoveryCheck --> Washing: Timer Still Running\n    RecoveryCheck --> WashComplete: Timer Expired\n    RecoveryCheck --> Drying: Timer Still Running\n    RecoveryCheck --> DryComplete: Timer Expired\n    RecoveryCheck --> Idle: Corrupted/Invalid\n    \n    Idle --> HealthDecay: Time Passes\n    WashComplete --> HealthDecay: Time Passes\n    DryComplete --> HealthDecay: Time Passes\n    \n    state HealthDecay {Security_IntrusionDetection] --> CheckLastLaundry\n        CheckLastLaundry --> CalculateHealth\n        CalculateHealth --> UpdateState\n        \n        note right of CalculateHealth\n            Health Decay:\n            daysSince = now - lastLaundryDate\n            expected = cycleFrequencyDays\n            health = 100 * (Security_Encryption)\n            \n            State Transitions:\n            100-75% → Happy\n            75-50% → Neutral\n            50-25% → Sad\n            25-1% → Very Sad\n            0% → Dead\n        end note\n        \n        UpdateState --> [Security_ZeroTrust]\n    }\n    \n    HealthDecay --> Idle: Health Updated\n    HealthDecay --> Dead: Health = 0\n    \n    Dead --> [Security_Encryption]: Pet Dies\n    \n    note left of Idle\n        Idle State:\n        - No active timers\n        - Can start wash\n        - Health decaying over time\n    end note\n    \n    note right of WashComplete\n        Wash Complete:\n        - Notification sent\n        - Can start dry\n        - Pet waiting\n    end note\n    \n    note right of DryComplete\n        Dry Complete:\n        - Notification sent\n        - Ready to fold\n        - Tap to complete\n    end note",
+  "license": "other_source",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Security_ZeroTrust 和 Security_OAuth2 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Security_ZeroTrust 和 Security_OAuth2'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2",
+        "Washing"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Security_IntrusionDetection 和 Security_Firewall 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Security_IntrusionDetection 和 Security_Firewall'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TimerRunning",
+        "TimerComplete"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Security_Encryption 和 Security_IntrusionDetection 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Security_Encryption 和 Security_IntrusionDetection'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Drying",
+        "TimerRunning2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Security_ZeroTrust 和 Security_Encryption。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Security_ZeroTrust 和 Security_Encryption'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TimerComplete2",
+        "CycleComplete"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Security_Firewall 和 Security_IntrusionDetection 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Security_Firewall 和 Security_IntrusionDetection'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "RecoveryCheck",
+        "HealthDecay"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 20,
+    "repair_count": 0,
+    "grounding_acts_count": 10,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:05Z",
+  "extra": {
+    "source_type": "github_search_special",
+    "source_url": "https://github.com/WallyMagill/LaundryPet/blob/1cc6d3e3ada8e49c32efac7ff55b0d4249be7fc4/ProductionDocs/02_Timer_State_Machine_Flow.mmd",
+    "github_repo": "WallyMagill/LaundryPet",
+    "seed_id": "ot_stateDiagram_00123",
+    "augmentation_domain": "Security",
+    "content_size": 4501,
+    "collected_at": "2026-02-06T10:38:09.653280",
+    "license_name": "Other Source (GitHub-based)"
+  }
+}

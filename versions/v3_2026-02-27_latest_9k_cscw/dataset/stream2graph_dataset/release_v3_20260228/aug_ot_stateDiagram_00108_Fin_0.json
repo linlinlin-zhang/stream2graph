@@ -1,0 +1,200 @@
+{
+  "id": "aug_ot_stateDiagram_00108_Fin_0",
+  "source": "augmented_real_structure",
+  "diagram_type": "stateDiagram",
+  "code": "%%{FinTech_PaymentGateway}}}%%\nstateDiagram-v2\n    [FinTech_LedgerService] --> Created: Create Todo\n    Created --> InProgress: Start Work\n    Created --> Cancelled: Cancel\n    InProgress --> OnHold: Pause\n    InProgress --> Completed: Complete\n    InProgress --> Cancelled: Cancel\n    OnHold --> InProgress: Resume\n    OnHold --> Cancelled: Cancel\n    Completed --> [FinTech_FraudDetection]\n    Cancelled --> [FinTech_FraudDetection]\n\n    state Created {FinTech_FraudDetection] --> Draft\n        Draft --> ReadyToStart: Finalize\n        ReadyToStart --> [FinTech_PaymentGateway]\n    }\n\n    state InProgress {FinTech_FraudDetection] --> Started\n        Started --> InReview: Submit for Review\n        InReview --> Started: Request Changes\n        InReview --> [FinTech_TransactionQueue]: Approve\n    }\n\n    state OnHold {FinTech_FraudDetection] --> Blocked\n        [FinTech_AuthVault] --> Deferred\n        Blocked --> [FinTech_FraudDetection]: Unblock\n        Deferred --> [FinTech_PaymentGateway]: Prioritize\n    }\n\n    state Completed {FinTech_LedgerService] --> Done\n        [FinTech_TransactionQueue] --> PartiallyDone\n        Done --> [FinTech_PaymentGateway]\n        PartiallyDone --> [FinTech_AuthVault]\n    }",
+  "license": "apache-2.0",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 FinTech_LedgerService 和 FinTech_FraudDetection。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 FinTech_LedgerService处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'FinTech_LedgerService处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2",
+        "Created"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 FinTech_FraudDetection 和 FinTech_FraudDetection 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 FinTech_FraudDetection处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'FinTech_FraudDetection处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "InProgress",
+        "OnHold"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 FinTech_AuthVault 和 FinTech_LedgerService 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'FinTech_AuthVault 和 FinTech_LedgerService'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Blocked",
+        "Completed"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 FinTech_TransactionQueue 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 FinTech_TransactionQueue处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'FinTech_TransactionQueue处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Done"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 19,
+    "repair_count": 3,
+    "grounding_acts_count": 8,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:05Z",
+  "extra": {
+    "source_type": "github_search_special",
+    "source_url": "https://github.com/s-a-c/ai-guidelines/blob/9c092b8bf9684666244e7b97b87c962175bfbd95/100-laravel/700-r-and-d/E_L_A/illustrations/mermaid/light/todo-state-machine-light.mmd",
+    "github_repo": "s-a-c/ai-guidelines",
+    "seed_id": "ot_stateDiagram_00108",
+    "augmentation_domain": "FinTech",
+    "content_size": 1145,
+    "collected_at": "2026-02-06T10:37:59.203740",
+    "license_name": "Apache License 2.0",
+    "license_url": "https://api.github.com/licenses/apache-2.0",
+    "repo_owner": "s-a-c",
+    "repo_name": "ai-guidelines",
+    "repo_stars": 0,
+    "repo_forks": 0,
+    "repo_topics": [],
+    "repo_language": "PHP",
+    "repo_description": "AI guidelines for local projects",
+    "repo_created_at": "2025-08-28T16:05:57Z",
+    "repo_updated_at": "2025-12-12T23:58:22Z"
+  }
+}

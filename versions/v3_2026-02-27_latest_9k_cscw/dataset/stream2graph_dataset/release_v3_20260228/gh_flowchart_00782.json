@@ -1,0 +1,484 @@
+{
+  "id": "gh_flowchart_00782",
+  "source": "github",
+  "diagram_type": "flowchart",
+  "code": "flowchart TB\n    %% Authorization Boundary\n    subgraph boundary[\"<b>FedRAMP Authorization Boundary</b>\"]\n        direction TB\n\n        subgraph vpc[\"<b>VPC: fedramp-complex-vpc (10.30.0.0/16)</b>\"]\n            direction TB\n\n            %% Trust Zones\n            subgraph public[\"<b>Public Tier - SC-7</b>\"]\n                igw[[\"<img src='https://cdn.prod.website-files.com/5f05d5858fab461d0d08eaeb/635a1c060b1a32823c9159d0_internet_gateway_light.svg' width='40'/><br/>Internet Gateway\"]]\n                nat[[\"<img src='https://cdn.prod.website-files.com/5f05d5858fab461d0d08eaeb/6358cec281674a47f95c499b_nat_gateway_light.svg' width='40'/><br/>NAT Gateway\"]]\n                alb[[\"<img src='https://icon.icepanel.io/AWS/svg/Networking-Content-Delivery/Elastic-Load-Balancing.svg' width='40'/><br/>Application Load Balancer<br/>🔒 TLS 1.2+\"]]\n            end\n\n            subgraph app[\"<b>Application Tier - Private (AU-2)</b>\"]\n                ecs[[\"<img src='https://icon.icepanel.io/AWS/svg/Compute/ECS.svg' width='40'/><br/>ECS Service<br/>🔒 EBS‑CMK\"]]\n                efs[[\"<img src='https://icon.icepanel.io/AWS/svg/Storage/Elastic-File-System.svg' width='40'/><br/>EFS<br/>🔒 KMS\"]]\n                ssm[[\"<img src='https://icon.icepanel.io/AWS/svg/Management-Governance/Systems-Manager-Parameter-Store.svg' width='40'/><br/>SSM Parameter<br/>🔒 KMS\"]]\n                secret[[\"<img src='https://icon.icepanel.io/AWS/svg/Security-Identity-Compliance/Secrets-Manager.svg' width='40'/><br/>Secrets Manager<br/>🔒 KMS\"]]\n            end\n\n            subgraph data[\"<b>Data Tier - Encrypted (CM-2)</b>\"]\n                s3[[\"<img src='https://icon.icepanel.io/AWS/svg/Storage/Simple-Storage-Service.svg' width='40'/><br/>S3 Bucket<br/>🔒 KMS\"]]\n                sqs[[\"<img src='https://icon.icepanel.io/AWS/svg/Integration/Simple-Queue-Service.svg' width='40'/><br/>SQS Queue<br/>🔒 KMS\"]]\n                sns[[\"<img src='https://icon.icepanel.io/AWS/svg/Integration/Simple-Notification-Service.svg' width='40'/><br/>SNS Topic\"]]\n            end\n\n            %% Security & Compliance\n            subgraph security[\"<b>Security & Compliance - AC-6, AU-2</b>\"]\n                kms[[\"<img src='https://icon.icepanel.io/AWS/svg/Security-Identity-Compliance/Key-Management-Service.svg' width='40'/><br/>KMS CMK\"]]\n                cloudtrail[[\"<img src='https://icon.icepanel.io/AWS/svg/Management-Governance/CloudTrail.svg' width='40'/><br/>AWS CloudTrail\"]]\n                guardduty[[\"<img src='https://icon.icepanel.io/AWS/svg/Security-Identity-Compliance/GuardDuty.svg' width='40'/><br/>GuardDuty\"]]\n                config[[\"<img src='https://icon.icepanel.io/AWS/svg/Management-Governance/Config.svg' width='40'/><br/>AWS Config\"]]\n                vpcflow[[\"<img src='https://icon.icepanel.io/AWS/svg/Management-Governance/CloudWatch-Logs.svg' width='40'/><br/>VPC Flow Logs\"]]\n            end\n        end\n    end\n\n    %% Data Flow\n    internet[\"☁️ Internet\"] --> igw\n    igw --> alb\n    alb --> ecs\n    ecs --> efs\n    ecs --> s3\n    ecs --> sqs\n    ecs --> sns\n    ecs --> ssm\n    ecs --> secret\n\n    %% Security relations (no directional arrows required for compliance services)\n    kms -.-> efs\n    kms -.-> s3\n    kms -.-> ssm\n    kms -.-> secret\n    cloudtrail -.-> s3\n    guardduty -.-> vpcflow\n    config -.-> vpcflow\n    vpcflow -.-> kms\n\n    %% Styling\n    style boundary fill:#e3f2fd,stroke:#1976d2,stroke-width:4px,stroke-dasharray:10 5\n    style public fill:#fff9c4,stroke:#fbc02d,stroke-width:2px\n    style app fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px\n    style data fill:#bbdefb,stroke:#1565c0,stroke-width:2px\n    style security fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px\n",
+  "license": "mit",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"<b>FedRAMP Authorization Boundary</b>\" 和 \"<b>VPC: fedramp-complex-vpc (10.30.0.0/16 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"<b>FedRAMP Authorization Boundary</b>\" 和 \"<b>VPC: fedramp-complex-vpc (10.30.0.0/16'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "boundary",
+        "vpc"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"<b>Public Tier - SC-7</b>\" 和 [\"<img src='https://cdn.prod.website-files.com/5f05d5858fab461d0d08eaeb/635a1c060b1a32823c9159d0_internet_gateway_light.svg' width='40'/><br/>Internet Gateway\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"<b>Public Tier - SC-7</b>\" 和 [\"<img src='https://cdn.prod.website-files.com/5f05d5858fab461d0d08eaeb/635a1c060b1a32823c9159d0_internet_gateway_light.svg' width='40'/><br/>Internet Gateway\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "public",
+        "igw"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 [\"<img src='https://cdn.prod.website-files.com/5f05d5858fab461d0d08eaeb/6358cec281674a47f95c499b_nat_gateway_light.svg' width='40'/><br/>NAT Gateway\" 和 [\"<img src='https://icon.icepanel.io/AWS/svg/Networking-Content-Delivery/Elastic-Load-Balancing.svg' width='40'/><br/>Application Load Balancer<br/>🔒 TLS 1.2+\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 [\"<img src='https://cdn.prod.website-files.com/5f05d5858fab461d0d08eaeb/6358cec281674a47f95c499b_nat_gateway_light.svg' width='40'/><br/>NAT Gateway\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '[\"<img src='https://cdn.prod.website-files.com/5f05d5858fab461d0d08eaeb/6358cec281674a47f95c499b_nat_gateway_light.svg' width='40'/><br/>NAT Gateway\"处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "nat",
+        "alb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"<b>Application Tier - Private (AU-2 和 [\"<img src='https://icon.icepanel.io/AWS/svg/Compute/ECS.svg' width='40'/><br/>ECS Service<br/>🔒 EBS‑CMK\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"<b>Application Tier - Private (AU-2 和 [\"<img src='https://icon.icepanel.io/AWS/svg/Compute/ECS.svg' width='40'/><br/>ECS Service<br/>🔒 EBS‑CMK\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "app",
+        "ecs"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 [\"<img src='https://icon.icepanel.io/AWS/svg/Storage/Elastic-File-System.svg' width='40'/><br/>EFS<br/>🔒 KMS\" 和 [\"<img src='https://icon.icepanel.io/AWS/svg/Management-Governance/Systems-Manager-Parameter-Store.svg' width='40'/><br/>SSM Parameter<br/>🔒 KMS\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '[\"<img src='https://icon.icepanel.io/AWS/svg/Storage/Elastic-File-System.svg' width='40'/><br/>EFS<br/>🔒 KMS\" 和 [\"<img src='https://icon.icepanel.io/AWS/svg/Management-Governance/Systems-Manager-Parameter-Store.svg' width='40'/><br/>SSM Parameter<br/>🔒 KMS\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "efs",
+        "ssm"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 [\"<img src='https://icon.icepanel.io/AWS/svg/Security-Identity-Compliance/Secrets-Manager.svg' width='40'/><br/>Secrets Manager<br/>🔒 KMS\" 和 \"<b>Data Tier - Encrypted (CM-2 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 [\"<img src='https://icon.icepanel.io/AWS/svg/Security-Identity-Compliance/Secrets-Manager.svg' width='40'/><br/>Secrets Manager<br/>🔒 KMS\"处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '[\"<img src='https://icon.icepanel.io/AWS/svg/Security-Identity-Compliance/Secrets-Manager.svg' width='40'/><br/>Secrets Manager<br/>🔒 KMS\"处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "secret",
+        "data"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 [\"<img src='https://icon.icepanel.io/AWS/svg/Storage/Simple-Storage-Service.svg' width='40'/><br/>S3 Bucket<br/>🔒 KMS\" 和 [\"<img src='https://icon.icepanel.io/AWS/svg/Integration/Simple-Queue-Service.svg' width='40'/><br/>SQS Queue<br/>🔒 KMS\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '[\"<img src='https://icon.icepanel.io/AWS/svg/Storage/Simple-Storage-Service.svg' width='40'/><br/>S3 Bucket<br/>🔒 KMS\" 和 [\"<img src='https://icon.icepanel.io/AWS/svg/Integration/Simple-Queue-Service.svg' width='40'/><br/>SQS Queue<br/>🔒 KMS\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "s3",
+        "sqs"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 [\"<img src='https://icon.icepanel.io/AWS/svg/Integration/Simple-Notification-Service.svg' width='40'/><br/>SNS Topic\" 和 \"<b>Security & Compliance - AC-6, AU-2</b>\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 [\"<img src='https://icon.icepanel.io/AWS/svg/Integration/Simple-Notification-Service.svg' width='40'/><br/>SNS Topic\"处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '[\"<img src='https://icon.icepanel.io/AWS/svg/Integration/Simple-Notification-Service.svg' width='40'/><br/>SNS Topic\"处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sns",
+        "security"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 [\"<img src='https://icon.icepanel.io/AWS/svg/Security-Identity-Compliance/Key-Management-Service.svg' width='40'/><br/>KMS CMK\" 和 [\"<img src='https://icon.icepanel.io/AWS/svg/Management-Governance/CloudTrail.svg' width='40'/><br/>AWS CloudTrail\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '[\"<img src='https://icon.icepanel.io/AWS/svg/Security-Identity-Compliance/Key-Management-Service.svg' width='40'/><br/>KMS CMK\" 和 [\"<img src='https://icon.icepanel.io/AWS/svg/Management-Governance/CloudTrail.svg' width='40'/><br/>AWS CloudTrail\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "kms",
+        "cloudtrail"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 [\"<img src='https://icon.icepanel.io/AWS/svg/Security-Identity-Compliance/GuardDuty.svg' width='40'/><br/>GuardDuty\" 和 [\"<img src='https://icon.icepanel.io/AWS/svg/Management-Governance/Config.svg' width='40'/><br/>AWS Config\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '[\"<img src='https://icon.icepanel.io/AWS/svg/Security-Identity-Compliance/GuardDuty.svg' width='40'/><br/>GuardDuty\" 和 [\"<img src='https://icon.icepanel.io/AWS/svg/Management-Governance/Config.svg' width='40'/><br/>AWS Config\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "guardduty",
+        "config"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 [\"<img src='https://icon.icepanel.io/AWS/svg/Management-Governance/CloudWatch-Logs.svg' width='40'/><br/>VPC Flow Logs\" 和 \"☁️ Internet\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '[\"<img src='https://icon.icepanel.io/AWS/svg/Management-Governance/CloudWatch-Logs.svg' width='40'/><br/>VPC Flow Logs\" 和 \"☁️ Internet\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "vpcflow",
+        "internet"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 no directional arrows required for compliance services 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'no directional arrows required for compliance services'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "relations"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 51,
+    "repair_count": 3,
+    "grounding_acts_count": 24,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:06Z",
+  "extra": {
+    "source_url": "https://github.com/atelierlogos/hayashi/blob/dbbbe5c9d4e41adb9e10a268b1510a89cbd9bfa1/diagram.mmd",
+    "github_repo": "atelierlogos/hayashi",
+    "github_file_path": "diagram.mmd",
+    "content_size": 3692,
+    "collected_at": "2026-02-06T01:48:00.645146",
+    "license_name": "MIT License",
+    "license_url": "https://api.github.com/licenses/mit",
+    "repo_owner": "atelierlogos",
+    "repo_name": "hayashi",
+    "repo_stars": 9,
+    "repo_forks": 1,
+    "repo_topics": [
+      "architecture",
+      "compliance",
+      "diagrams-as-code",
+      "fedramp",
+      "government"
+    ],
+    "repo_language": "Rust",
+    "repo_description": " A Rust-based diagramming-as-code API that allows you to turn your .tfstate file into details architecture boundary diagrams. ",
+    "repo_created_at": "2025-10-04T05:56:14Z",
+    "repo_updated_at": "2026-01-11T15:38:01Z"
+  }
+}

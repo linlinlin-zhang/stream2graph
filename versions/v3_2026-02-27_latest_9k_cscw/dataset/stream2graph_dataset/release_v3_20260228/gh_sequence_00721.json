@@ -1,0 +1,75 @@
+{
+  "id": "gh_sequence_00721",
+  "source": "github",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n  participant User\n  participant API as API Gateway\n  participant Auth as Auth Controller\n  participant AuthSvc as Auth Service\n  participant Prisma as Database\n  participant Redis as Redis Blacklist\n\n  User->>API: POST /auth/login\n  API->>Auth: forward login\n  Auth->>AuthSvc: validate credentials\n  AuthSvc->>Prisma: find user\n  Prisma-->>AuthSvc: user ok\n  AuthSvc-->>Auth: issue access and refresh tokens\n  Auth-->>API: tokens\n  API-->>User: 200 with tokens\n\n  User->>API: GET /profile with JWT\n  API->>Auth: verify JWT\n  Auth->>Redis: check revoked\n  Redis-->>Auth: not revoked\n  Auth-->>API: ok\n  API-->>User: profile data\n\n  User->>API: POST /auth/logout\n  API->>Auth: revoke token\n  Auth->>Redis: add to blacklist\n  Redis-->>Auth: ok\n  Auth-->>API: 204\n  API-->>User: logged out\n",
+  "license": "mit",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 主架构。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '主架构'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "root"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:07Z",
+  "extra": {
+    "source_url": "https://github.com/andreibesleaga/nestjs-mstv/blob/7969ad599ffdbebf74be00456071e25e893fb8b5/diagrams/auth_jwt_flow.mmd",
+    "github_repo": "andreibesleaga/nestjs-mstv",
+    "github_file_path": "diagrams/auth_jwt_flow.mmd",
+    "content_size": 803,
+    "collected_at": "2026-02-06T01:36:08.470681",
+    "license_name": "MIT License",
+    "license_url": "https://api.github.com/licenses/mit",
+    "repo_owner": "andreibesleaga",
+    "repo_name": "nestjs-mstv",
+    "repo_stars": 0,
+    "repo_forks": 0,
+    "repo_topics": [
+      "backend",
+      "fastify",
+      "microservice",
+      "nestjs",
+      "nestjs-backend"
+    ],
+    "repo_language": "TypeScript",
+    "repo_description": "NestJs/Node.js backend template, multi-protocol and microservice design patterns support.",
+    "repo_created_at": "2025-08-10T21:29:37Z",
+    "repo_updated_at": "2026-02-04T09:42:43Z"
+  }
+}

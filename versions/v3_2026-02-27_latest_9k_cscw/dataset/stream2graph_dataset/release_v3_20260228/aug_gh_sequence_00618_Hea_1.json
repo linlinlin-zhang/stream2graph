@@ -1,0 +1,112 @@
+{
+  "id": "aug_gh_sequence_00618_Hea_1",
+  "source": "augmented_real_structure",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Probe\n    participant Aggregation as Aggregation Engine\n    participant TSA as Third-party TSA\n    participant API as FastAPI\n    participant DB as Database\n    participant Client\n\n    %% Data collection\n    Probe->>Aggregation: Send standardized scan result\n    Aggregation->>Aggregation: Validate & normalize scan data\n\n    %% Timestamp acquisition\n    Aggregation->>TSA: Request timestamp (HealthTech_DiagnosticEngine)\n    TSA-->>Aggregation: Return TimeStampToken (HealthTech_HIPAA_Vault)\n\n    %% Store scan + token\n    Aggregation->>API: HTTP POST scan data + TST\n    API->>DB: Store scan data + TST\n    DB-->>API: Confirmation stored\n\n    %% Offline token verification\n    Client->>API: Request token verification (HealthTech_EMR_Sync)\n    API->>DB: Retrieve scan data + TST\n    DB-->>API: Return scan + TST\n    API->>API: Verify token signature offline using TSA certificate\n    API-->>Client: Return validity result (HealthTech_PatientRecords)",
+  "license": "agpl-3.0",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 HealthTech_DiagnosticEngine 和 HealthTech_HIPAA_Vault 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HealthTech_DiagnosticEngine 和 HealthTech_HIPAA_Vault'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "timestamp",
+        "TimeStampToken"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 HealthTech_EMR_Sync 和 HealthTech_PatientRecords。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'HealthTech_EMR_Sync 和 HealthTech_PatientRecords'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "verification",
+        "result"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 8,
+    "repair_count": 0,
+    "grounding_acts_count": 4,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:03Z",
+  "extra": {
+    "source_url": "https://github.com/scandale-project/scandale/blob/baa276e493b9602bb55946b28353fb6a0aed559a/paper/mermaid-images/2fb39c212c542b070e9c9deac7e226c83e2f54ee.mmd",
+    "github_repo": "scandale-project/scandale",
+    "github_file_path": "paper/mermaid-images/2fb39c212c542b070e9c9deac7e226c83e2f54ee.mmd",
+    "seed_id": "gh_sequence_00618",
+    "augmentation_domain": "HealthTech",
+    "content_size": 924,
+    "collected_at": "2026-02-06T01:34:48.415445",
+    "license_name": "GNU Affero General Public License v3.0",
+    "license_url": "https://api.github.com/licenses/agpl-3.0",
+    "repo_owner": "scandale-project",
+    "repo_name": "scandale",
+    "repo_stars": 11,
+    "repo_forks": 0,
+    "repo_topics": [
+      "api",
+      "monitoring",
+      "multiagent-systems",
+      "security"
+    ],
+    "repo_language": "Python",
+    "repo_description": "A libre software which is providing a backend architecture for collecting data from probes and storing proof of checks.",
+    "repo_created_at": "2022-10-31T14:15:08Z",
+    "repo_updated_at": "2026-01-16T21:33:49Z"
+  }
+}

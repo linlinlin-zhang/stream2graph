@@ -1,0 +1,141 @@
+{
+  "id": "aug_ot_stateDiagram_00250_IoT_2",
+  "source": "augmented_real_structure",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n[IoT_Industrial_EdgeNode] --> Idle\n\nstate Idle {IoT_Industrial_TelemetryStream] --> Ready\n    Ready --> Processing: Start Job\n}\n\nstate Processing {IoT_Industrial_EdgeNode] --> Validating\n    Validating --> Queued: Valid\n    Validating --> Failed: Invalid\n    Queued --> Running: Worker Available\n    Running --> Completed: Success\n    Running --> Failed: Error\n    Running --> Paused: Pause Request\n\n    state Running {IoT_Industrial_MQTT_Broker] --> Initializing\n        Initializing --> Executing\n        Executing --> Finalizing\n        Finalizing --> [IoT_Industrial_MQTT_Broker]\n    }\n}\n\nstate Paused {IoT_Industrial_PLC_Logic] --> WaitingResume\n    WaitingResume --> Timeout: 1 hour\n}\n\nPaused --> Running: Resume\nPaused --> Cancelled: Cancel Request\nTimeout --> Cancelled\n\nCompleted --> Idle: Reset\nFailed --> Idle: Retry\nCancelled --> Idle: Reset\n\nCompleted --> [IoT_Industrial_ActuatorController]\nCancelled --> [IoT_Industrial_MQTT_Broker]",
+  "license": "mit",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 IoT_Industrial_EdgeNode 和 IoT_Industrial_TelemetryStream 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'IoT_Industrial_EdgeNode 和 IoT_Industrial_TelemetryStream'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2",
+        "Idle"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 IoT_Industrial_EdgeNode 和 IoT_Industrial_MQTT_Broker。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'IoT_Industrial_EdgeNode 和 IoT_Industrial_MQTT_Broker'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Processing",
+        "Running"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 IoT_Industrial_PLC_Logic 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'IoT_Industrial_PLC_Logic'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Paused"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 12,
+    "repair_count": 0,
+    "grounding_acts_count": 6,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:05Z",
+  "extra": {
+    "source_type": "github_search_special",
+    "source_url": "https://github.com/btucker/selkie/blob/b2918ab1f7f5ce82e85529a58d89c1c48ffad6c7/docs/sources/state_complex2.mmd",
+    "github_repo": "btucker/selkie",
+    "seed_id": "ot_stateDiagram_00250",
+    "augmentation_domain": "IoT_Industrial",
+    "content_size": 789,
+    "collected_at": "2026-02-06T10:39:41.091551",
+    "license_name": "MIT License",
+    "license_url": "https://api.github.com/licenses/mit",
+    "repo_owner": "btucker",
+    "repo_name": "selkie",
+    "repo_stars": 4,
+    "repo_forks": 0,
+    "repo_topics": [],
+    "repo_language": "Rust",
+    "repo_description": "A full Rust implementation of a mermaid diagram parser & renderer",
+    "repo_created_at": "2026-01-13T13:38:18Z",
+    "repo_updated_at": "2026-02-06T00:46:30Z"
+  }
+}

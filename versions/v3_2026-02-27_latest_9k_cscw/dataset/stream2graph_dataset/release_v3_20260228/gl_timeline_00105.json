@@ -1,0 +1,667 @@
+{
+  "id": "gl_timeline_00105",
+  "source": "gitlab",
+  "diagram_type": "timeline",
+  "code": "%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4a90d9', 'secondaryColor': '#f0f4f8', 'tertiaryColor': '#e8f4e8'}}}%%\nflowchart TB\n    subgraph Entry[\"Entry Points\"]\n        LAUNCHER[\"launch_codex_orchestrator_session.ts<br/><i>CLI launcher</i>\"]\n        ORCHESTRATOR[\"index.ts<br/><i>Main orchestrator</i>\"]\n        TIMELINE[\"dynamic_timeline.ts<br/><i>Status display</i>\"]\n    end\n\n    subgraph Config[\"Configuration Layer\"]\n        AGENTS_LARK[\"agents.lark<br/><i>DSL config file</i>\"]\n        AGENTLARK_COMPILER[\"agentlark (Rust)<br/><i>Compiles .lark to JSON</i>\"]\n        AGENTS_JSON[\"agents.out.json<br/><i>Compiled config</i>\"]\n        AGENTS_TS[\"agents.ts<br/><i>Config loader & types</i>\"]\n        CLI_ARGS[\"orchestrator_cli.ts<br/><i>CLI argument parser</i>\"]\n    end\n\n    subgraph AIBackends[\"AI Backend Layer\"]\n        AI_INDEX[\"ai/index.ts<br/><i>Backend factory</i>\"]\n        CODEX_CLIENT[\"ai/openai/<br/><i>Codex/OpenAI SDK</i>\"]\n        MINIMAX_CLIENT[\"ai/anthropic/<br/><i>MiniMax backend</i>\"]\n        AI_TOOLS[\"ai/tools/<br/><i>Tool definitions</i>\"]\n    end\n\n    subgraph Zellij[\"Zellij Integration\"]\n        ZELLIJ_CLIENT[\"zellij_client.ts<br/><i>Session management</i>\"]\n        ZELLIJ_CLI[\"zellij/cli.ts<br/><i>CLI wrapper</i>\"]\n        ZELLIJ_SESSIONS[\"zellij/sessions.ts<br/><i>Layout & KDL generation</i>\"]\n        ZELLIJ_TABS[\"zellij/tabs.ts<br/><i>Tab management</i>\"]\n        ZELLIJ_LAYOUTS[\"zellij/layouts.ts<br/><i>Layout builders</i>\"]\n    end\n\n    subgraph Persistence[\"Persistence & Logging\"]\n        MEMORY_STORE[\"memory_store.ts<br/><i>Artifact storage</i>\"]\n        PROGRESS_TRACKER[\"progress_tracker.ts<br/><i>Agent progress</i>\"]\n        AGENTFS[\"agentfs/<br/><i>FS logging system</i>\"]\n        LOG_FILES[\"logs/*.log<br/><i>Agent log files</i>\"]\n        MEMORY_DIR[\"memory/<br/><i>Memory artifacts</i>\"]\n    end\n\n    subgraph Orchestration[\"Orchestration Patterns\"]\n        direction TB\n        WORKFLOW[\"Workflow<br/><i>Sequential agents</i>\"]\n        PARALLEL[\"Parallel<br/><i>Concurrent execution</i>\"]\n        RELAY[\"Relay<br/><i>Graph-based routing</i>\"]\n        ROUTER[\"Router<br/><i>Dynamic routing</i>\"]\n        EVAL_OPT[\"Evaluator-Optimizer<br/><i>Iterative refinement</i>\"]\n    end\n\n    %% Entry flow\n    LAUNCHER -->|\"1. Parse args\"| CLI_ARGS\n    LAUNCHER -->|\"2. Compile config\"| AGENTLARK_COMPILER\n    AGENTLARK_COMPILER -->|\"Generates\"| AGENTS_JSON\n    LAUNCHER -->|\"3. Build layout\"| ZELLIJ_SESSIONS\n    LAUNCHER -->|\"4. Spawn\"| ORCHESTRATOR\n    LAUNCHER -->|\"5. Launch\"| ZELLIJ_CLIENT\n\n    %% Config loading\n    AGENTS_LARK -->|\"Input\"| AGENTLARK_COMPILER\n    AGENTS_JSON -->|\"Loaded by\"| AGENTS_TS\n    AGENTS_TS -->|\"Provides agents\"| ORCHESTRATOR\n    CLI_ARGS -->|\"Options\"| ORCHESTRATOR\n\n    %% Orchestrator main flow\n    ORCHESTRATOR -->|\"Creates client\"| AI_INDEX\n    AI_INDEX -->|\"Codex backend\"| CODEX_CLIENT\n    AI_INDEX -->|\"MiniMax backend\"| MINIMAX_CLIENT\n    ORCHESTRATOR -->|\"Uses tools\"| AI_TOOLS\n\n    %% Orchestration patterns\n    ORCHESTRATOR -->|\"Executes\"| WORKFLOW\n    ORCHESTRATOR -->|\"Executes\"| PARALLEL\n    ORCHESTRATOR -->|\"Executes\"| RELAY\n    ORCHESTRATOR -->|\"Executes\"| ROUTER\n    ORCHESTRATOR -->|\"Executes\"| EVAL_OPT\n\n    %% Persistence\n    ORCHESTRATOR -->|\"Records progress\"| PROGRESS_TRACKER\n    ORCHESTRATOR -->|\"Stores artifacts\"| MEMORY_STORE\n    ORCHESTRATOR -->|\"Logs actions\"| AGENTFS\n    ORCHESTRATOR -->|\"Writes\"| LOG_FILES\n    MEMORY_STORE -->|\"Persists to\"| MEMORY_DIR\n    PROGRESS_TRACKER -->|\"Writes to\"| MEMORY_DIR\n\n    %% Timeline\n    TIMELINE -->|\"Reads\"| LOG_FILES\n    TIMELINE -->|\"Reads\"| PROGRESS_TRACKER\n    TIMELINE -->|\"Reads\"| MEMORY_STORE\n\n    %% Zellij internals\n    ZELLIJ_CLIENT --> ZELLIJ_CLI\n    ZELLIJ_CLIENT --> ZELLIJ_TABS\n    ZELLIJ_SESSIONS --> ZELLIJ_LAYOUTS\n\n    classDef entry fill:#4a90d9,stroke:#2e5d8a,color:#fff\n    classDef config fill:#f4a460,stroke:#cd853f,color:#000\n    classDef ai fill:#9370db,stroke:#6a5acd,color:#fff\n    classDef zellij fill:#20b2aa,stroke:#008b8b,color:#fff\n    classDef persist fill:#3cb371,stroke:#2e8b57,color:#fff\n    classDef pattern fill:#ff69b4,stroke:#c71585,color:#fff\n\n    class LAUNCHER,ORCHESTRATOR,TIMELINE entry\n    class AGENTS_LARK,AGENTLARK_COMPILER,AGENTS_JSON,AGENTS_TS,CLI_ARGS config\n    class AI_INDEX,CODEX_CLIENT,MINIMAX_CLIENT,AI_TOOLS ai\n    class ZELLIJ_CLIENT,ZELLIJ_CLI,ZELLIJ_SESSIONS,ZELLIJ_TABS,ZELLIJ_LAYOUTS zellij\n    class MEMORY_STORE,PROGRESS_TRACKER,AGENTFS,LOG_FILES,MEMORY_DIR persist\n    class WORKFLOW,PARALLEL,RELAY,ROUTER,EVAL_OPT pattern\n",
+  "license": "mit",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Entry Points\" 和 \"launch_codex_orchestrator_session.ts<br/><i>CLI launcher</i>\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"Entry Points\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Entry Points\"处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Entry",
+        "LAUNCHER"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"index.ts<br/><i>Main orchestrator</i>\" 和 \"dynamic_timeline.ts<br/><i>Status display</i>\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"index.ts<br/><i>Main orchestrator</i>\" 和 \"dynamic_timeline.ts<br/><i>Status display</i>\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ORCHESTRATOR",
+        "TIMELINE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Configuration Layer\" 和 \"agents.lark<br/><i>DSL config file</i>\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Configuration Layer\" 和 \"agents.lark<br/><i>DSL config file</i>\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Config",
+        "AGENTS_LARK"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"agentlark (Rust 和 \"agents.out.json<br/><i>Compiled config</i>\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"agentlark (Rust 和 \"agents.out.json<br/><i>Compiled config</i>\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AGENTLARK_COMPILER",
+        "AGENTS_JSON"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"agents.ts<br/><i>Config loader & types</i>\" 和 \"orchestrator_cli.ts<br/><i>CLI argument parser</i>\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 \"agents.ts<br/><i>Config loader & types</i>\"处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"agents.ts<br/><i>Config loader & types</i>\"处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AGENTS_TS",
+        "CLI_ARGS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"AI Backend Layer\" 和 \"ai/index.ts<br/><i>Backend factory</i>\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"AI Backend Layer\" 和 \"ai/index.ts<br/><i>Backend factory</i>\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AIBackends",
+        "AI_INDEX"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"ai/openai/<br/><i>Codex/OpenAI SDK</i>\" 和 \"ai/anthropic/<br/><i>MiniMax backend</i>\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"ai/openai/<br/><i>Codex/OpenAI SDK</i>\" 和 \"ai/anthropic/<br/><i>MiniMax backend</i>\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CODEX_CLIENT",
+        "MINIMAX_CLIENT"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"ai/tools/<br/><i>Tool definitions</i>\" 和 \"Zellij Integration\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"ai/tools/<br/><i>Tool definitions</i>\" 和 \"Zellij Integration\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AI_TOOLS",
+        "Zellij"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"zellij_client.ts<br/><i>Session management</i>\" 和 \"zellij/cli.ts<br/><i>CLI wrapper</i>\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"zellij_client.ts<br/><i>Session management</i>\" 和 \"zellij/cli.ts<br/><i>CLI wrapper</i>\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ZELLIJ_CLIENT",
+        "ZELLIJ_CLI"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"zellij/sessions.ts<br/><i>Layout & KDL generation</i>\" 和 \"zellij/tabs.ts<br/><i>Tab management</i>\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"zellij/sessions.ts<br/><i>Layout & KDL generation</i>\" 和 \"zellij/tabs.ts<br/><i>Tab management</i>\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ZELLIJ_SESSIONS",
+        "ZELLIJ_TABS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"zellij/layouts.ts<br/><i>Layout builders</i>\" 和 \"Persistence & Logging\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"zellij/layouts.ts<br/><i>Layout builders</i>\" 和 \"Persistence & Logging\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ZELLIJ_LAYOUTS",
+        "Persistence"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"memory_store.ts<br/><i>Artifact storage</i>\" 和 \"progress_tracker.ts<br/><i>Agent progress</i>\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"memory_store.ts<br/><i>Artifact storage</i>\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"memory_store.ts<br/><i>Artifact storage</i>\"处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MEMORY_STORE",
+        "PROGRESS_TRACKER"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"agentfs/<br/><i>FS logging system</i>\" 和 \"logs/*.log<br/><i>Agent log files</i>\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"agentfs/<br/><i>FS logging system</i>\" 和 \"logs/*.log<br/><i>Agent log files</i>\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AGENTFS",
+        "LOG_FILES"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"memory/<br/><i>Memory artifacts</i>\" 和 \"Orchestration Patterns\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"memory/<br/><i>Memory artifacts</i>\" 和 \"Orchestration Patterns\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MEMORY_DIR",
+        "Orchestration"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Workflow<br/><i>Sequential agents</i>\" 和 \"Parallel<br/><i>Concurrent execution</i>\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 \"Workflow<br/><i>Sequential agents</i>\"处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 62,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Workflow<br/><i>Sequential agents</i>\"处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "WORKFLOW",
+        "PARALLEL"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Relay<br/><i>Graph-based routing</i>\" 和 \"Router<br/><i>Dynamic routing</i>\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Relay<br/><i>Graph-based routing</i>\" 和 \"Router<br/><i>Dynamic routing</i>\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "RELAY",
+        "ROUTER"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Evaluator-Optimizer<br/><i>Iterative refinement</i>\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Evaluator-Optimizer<br/><i>Iterative refinement</i>\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EVAL_OPT"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 72,
+    "repair_count": 4,
+    "grounding_acts_count": 34,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:07Z",
+  "extra": {
+    "source_url": "https://github.com/aaronlifton/orchestrated-codex/blob/6d2077253d96831dd42ccd30c3c50faec022c936/docs/architecture.mmd",
+    "github_repo": "aaronlifton/orchestrated-codex",
+    "content_size": 4558,
+    "collected_at": "2026-02-06T14:02:46.514707",
+    "license_name": "MIT License",
+    "license_url": "https://api.github.com/licenses/mit",
+    "repo_owner": "aaronlifton",
+    "repo_name": "orchestrated-codex",
+    "repo_stars": 0,
+    "repo_forks": 0,
+    "repo_topics": [
+      "agent-configuration",
+      "agent-orchestration",
+      "agentic-workflow",
+      "codex",
+      "zellij"
+    ],
+    "repo_language": "TypeScript",
+    "repo_description": "a multi-agent orchestration framework that autonomously decomposes complex prompts into actionable tasks through a specialized hierarchy of user-definable agents, orchestrating them across Zellij term",
+    "repo_created_at": "2025-11-30T02:10:44Z",
+    "repo_updated_at": "2026-01-18T04:47:43Z",
+    "source_note": "collected_from_github_additional"
+  }
+}

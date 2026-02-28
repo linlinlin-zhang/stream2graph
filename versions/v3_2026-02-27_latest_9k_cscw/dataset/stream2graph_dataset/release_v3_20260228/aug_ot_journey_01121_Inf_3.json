@@ -1,0 +1,131 @@
+{
+  "id": "aug_ot_journey_01121_Inf_3",
+  "source": "augmented_real_structure",
+  "diagram_type": "journey",
+  "code": "sequenceDiagram\n    actor User\n    participant Browser\n    participant NextServer as \"Next.js Server\"\n    participant Solr as \"Solr\"\n    participant Mongo as \"MongoDB\"\n    participant ES as \"Elasticsearch\"\n\n    User->>Browser: Enters search query and submits\n    Browser->>+NextServer: GET /api/[Infra_IngressController]/artworks?q=...\n    NextServer->>+Solr: searchArtworks(Infra_WorkerNode)\n    Solr-->>-NextServer: Return search results\n    NextServer-->>-Browser: Return JSON with artwork list\n    Browser->>User: Display search results\n\n    User->>Browser: Clicks on an artwork\n    Browser->>+NextServer: GET /[Infra_RedisCache]/artworks/[Infra_RedisCache] (Infra_RedisCache)\n    NextServer->>+Mongo: getArtworkById(Infra_EtcdCluster)\n    Mongo-->>-NextServer: Return full artwork document\n    NextServer-->>-Browser: Return HTML page with artwork details\n    Browser->>User: Display artwork detail page\n\n    User->>Browser: Asks question about artwork\n    Browser->>+NextServer: POST /api/[Infra_EtcdCluster]/rag/answer/artwork/[Infra_LoadBalancer]\n    NextServer->>+OpenAI: Generate embedding for query\n    OpenAI-->>-NextServer: Return query embedding\n    NextServer->>+ES: hybridSearch(Infra_LoadBalancer)\n    ES-->>-NextServer: Return relevant chunks\n    NextServer->>+OpenAI: Generate answer with LLM (Infra_RedisCache)\n    OpenAI-->>-NextServer: Return generated answer\n    NextServer-->>-Browser: Return answer with citations\n    Browser->>User: Display chatbot response\n\n    %% Notes\n    %% - This diagram shows a typical user journey: searching for an item, viewing its detail page, and asking questions.\n    %% - The initial search is powered by Solr.\n    %% - The detail page view fetches the complete, authoritative data from MongoDB.\n    %% - The RAG chatbot uses OpenAI for both embedding generation and LLM-based answer synthesis.\n    %% - Elasticsearch performs hybrid search (Infra_LoadBalancer) to find relevant information chunks.\n    %% - The Next.js server handles both data fetching via API routes and server-side rendering of pages.",
+  "license": "other_source",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Infra_WorkerNode 和 Infra_EtcdCluster 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Infra_WorkerNode 和 Infra_EtcdCluster'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "searchArtworks",
+        "getArtworkById"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Infra_LoadBalancer 和 Infra_RedisCache 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Infra_LoadBalancer 和 Infra_RedisCache'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "hybridSearch",
+        "LLM"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Infra_LoadBalancer 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Infra_LoadBalancer'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "search"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 12,
+    "repair_count": 0,
+    "grounding_acts_count": 6,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:05Z",
+  "extra": {
+    "source_type": "github_search",
+    "source_url": "https://github.com/rtyx/project-module-apr2025/blob/dc1d9e46f8d5b5f2e8fe98b37a25825f031df456/docs/diagrams/images/component-interaction-main.mmd",
+    "github_repo": "rtyx/project-module-apr2025",
+    "seed_id": "ot_journey_01121",
+    "augmentation_domain": "Infra",
+    "content_size": 1945,
+    "collected_at": "2026-02-06T11:05:14.489046",
+    "license_name": "Other Source (GitHub-based)"
+  }
+}

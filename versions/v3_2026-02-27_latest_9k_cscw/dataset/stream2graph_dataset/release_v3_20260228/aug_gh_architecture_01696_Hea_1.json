@@ -1,0 +1,1060 @@
+{
+  "id": "aug_gh_architecture_01696_Hea_1",
+  "source": "augmented_real_structure",
+  "diagram_type": "architecture",
+  "code": "graph TD\n    %% Subgraphs: Organized by Functional Role\n\n    %% Thalamus\n    subgraph Thalamus[HealthTech_HIPAA_Vault]\n        sovl_main[HealthTech_EMR_Sync]\n        sovl_conductor[HealthTech_EMR_Sync]\n        sovl_events[HealthTech_EMR_Sync]\n    end\n\n    %% Cerebellum\n    subgraph Cerebellum[HealthTech_HIPAA_Vault]\n        sovl_monitor[HealthTech_EMR_Sync]\n        sovl_memory[HealthTech_PatientRecords]\n        sovl_resource[HealthTech_HIPAA_Vault]\n        sovl_cli[HealthTech_LabAnalyzer]\n    end\n\n    %% Reticular Formation\n    subgraph Reticular_Formation[HealthTech_DiagnosticEngine]\n        sovl_processor[HealthTech_LabAnalyzer]\n        sovl_utils[HealthTech_PatientRecords]\n        sovl_io[HealthTech_DiagnosticEngine]\n    end\n\n    %% Ganglia\n    subgraph Ganglia[HealthTech_LabAnalyzer]\n        sovl_config[HealthTech_DiagnosticEngine]\n        sovl_schema[HealthTech_DiagnosticEngine]\n    end\n\n    %% Cerebral Cortex \n    subgraph Cerebral_Cortex[HealthTech_HIPAA_Vault]\n        sovl_generation[HealthTech_PatientRecords]\n        sovl_primer[HealthTech_EMR_Sync]\n    end\n\n    %% Limbic System\n    subgraph Limbic_System[HealthTech_HIPAA_Vault]\n        sovl_curiosity[HealthTech_DiagnosticEngine]\n        sovl_temperament[HealthTech_DiagnosticEngine]\n        sovl_confidence[HealthTech_PatientRecords]\n        sovl_bonder[HealthTech_PatientRecords]\n        sovl_meditator[HealthTech_DiagnosticEngine]\n        sovl_viber[HealthTech_DiagnosticEngine]\n        sovl_striver[HealthTech_HIPAA_Vault]\n    end\n\n    %% Hippocampus\n    subgraph Hippocampus[HealthTech_DiagnosticEngine]\n        sovl_scaffold[HealthTech_PatientRecords]\n        sovl_engram[HealthTech_PatientRecords]\n        sovl_manager[HealthTech_DiagnosticEngine]\n        sovl_recaller[HealthTech_EMR_Sync]\n    end\n\n    %% Insula\n    subgraph Insula[HealthTech_DiagnosticEngine]\n        sovl_trainer[HealthTech_EMR_Sync]\n        sovl_queue[HealthTech_HIPAA_Vault]\n        sovl_scribe[HealthTech_LabAnalyzer]\n    end\n\n    %% Motor Cortex\n    subgraph Motor_Cortex[HealthTech_PatientRecords]\n        sovl_volition[HealthTech_EMR_Sync]\n        sovl_gate[HealthTech_DiagnosticEngine]\n    end\n\n    %% Pineal Gland \n    subgraph Pineal_Gland[HealthTech_PatientRecords]\n        sovl_printer[HealthTech_EMR_Sync]\n        sovl_fuser[HealthTech_LabAnalyzer]\n    end\n\n    %% Broca\n    subgraph Broca[HealthTech_HIPAA_Vault]\n        sovl_swarm[HealthTech_LabAnalyzer]\n    end\n\n    %% Hypothalamus\n    subgraph Hypothalamus[HealthTech_LabAnalyzer]\n        sovl_error[HealthTech_PatientRecords]\n        sovl_logger[HealthTech_HIPAA_Vault]\n        sovl_records[HealthTech_HIPAA_Vault]\n    end\n\n    %% Glial Network\n    subgraph Glial_Network[HealthTech_EMR_Sync]\n        sovl_interfaces[HealthTech_PatientRecords]\n        sovl_hardware[HealthTech_PatientRecords]\n        sovl_data[HealthTech_LabAnalyzer]\n        sovl_state[HealthTech_HIPAA_Vault]\n    end\n\n    %% Janus\n    subgraph Janus[HealthTech_HIPAA_Vault]\n        run_sovl[HealthTech_LabAnalyzer]\n    end\n\n    %% Data Store\n    subgraph Data_Store[HealthTech_PatientRecords]\n        chronicle[HealthTech_HIPAA_Vault]\n    end\n\n    %% Flows: Grouped by Function\n    %% 1. Entry and Orchestration\n    run_sovl --> sovl_main\n    run_sovl --> sovl_cli\n    sovl_main <--> sovl_conductor\n    sovl_main <--> sovl_events\n\n    %% 2. Configuration\n    sovl_schema --> sovl_config\n    sovl_config --> sovl_main\n    sovl_config --> sovl_generation\n    sovl_config --> sovl_trainer\n\n    %% 3. Sensory and Support\n    sovl_monitor --> sovl_main\n    sovl_memory --> sovl_main\n    sovl_resource --> sovl_main\n    sovl_cli --> sovl_main\n    sovl_monitor --> sovl_cli\n    sovl_processor --> sovl_main\n    sovl_utils --> sovl_main\n    sovl_io --> sovl_main\n    sovl_processor --> sovl_generation\n    sovl_utils --> sovl_generation\n    sovl_io --> sovl_generation\n    sovl_processor --> sovl_trainer\n    sovl_utils --> sovl_trainer\n    sovl_io --> sovl_trainer\n\n    %% 4. Emotional and Cognitive Processing\n    sovl_curiosity --> sovl_primer\n    sovl_temperament --> sovl_primer\n    sovl_confidence --> sovl_primer\n    sovl_bonder --> sovl_primer\n    sovl_meditator --> sovl_primer\n    sovl_primer --> sovl_generation\n    sovl_cli -->|Talk| sovl_main --> sovl_generation\n    sovl_curiosity --> sovl_viber\n    sovl_temperament --> sovl_viber\n    sovl_viber --> sovl_primer\n    sovl_viber <--> sovl_recaller\n    sovl_striver --> sovl_primer\n\n    %% 5. Memory and Learning\n    sovl_engram <--> sovl_scaffold\n    sovl_manager --> sovl_scaffold\n    sovl_recaller --> sovl_generation\n    sovl_scaffold --> sovl_main\n    sovl_queue --> sovl_scribe\n    sovl_scribe --> sovl_trainer\n    sovl_scribe --> sovl_scaffold\n    sovl_swarm --> sovl_scaffold\n    sovl_swarm --> sovl_engram\n    sovl_scribe -- creates --> chronicle\n    chronicle -- used by --> sovl_trainer\n    sovl_recaller --> sovl_generation\n\n    %% 6. Action and Output\n    sovl_volition <--> sovl_main\n    sovl_gate --> sovl_volition\n    sovl_main <--> sovl_printer\n    sovl_main --> sovl_fuser\n\n    %% 7. Regulation\n    sovl_main --> sovl_error\n    sovl_generation --> sovl_error\n    sovl_trainer --> sovl_error\n    sovl_main --> sovl_logger\n    sovl_generation --> sovl_logger\n    sovl_trainer --> sovl_logger\n    sovl_memory --> sovl_hardware\n    sovl_main --> sovl_interfaces\n    sovl_state --> sovl_interfaces\n    sovl_conductor --> sovl_interfaces\n\n    %% 8. State\n    sovl_state --> sovl_data\n    sovl_main --> sovl_state\n    sovl_bonder --> sovl_state\n",
+  "license": "mit",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 HealthTech_HIPAA_Vault 和 HealthTech_EMR_Sync 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HealthTech_HIPAA_Vault 和 HealthTech_EMR_Sync'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Thalamus",
+        "sovl_main"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 HealthTech_EMR_Sync 和 HealthTech_EMR_Sync 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 HealthTech_EMR_Sync处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HealthTech_EMR_Sync处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sovl_conductor",
+        "sovl_events"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 HealthTech_HIPAA_Vault 和 HealthTech_EMR_Sync 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'HealthTech_HIPAA_Vault 和 HealthTech_EMR_Sync'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Cerebellum",
+        "sovl_monitor"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 HealthTech_PatientRecords 和 HealthTech_HIPAA_Vault 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'HealthTech_PatientRecords 和 HealthTech_HIPAA_Vault'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sovl_memory",
+        "sovl_resource"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 HealthTech_LabAnalyzer 和 HealthTech_DiagnosticEngine 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'HealthTech_LabAnalyzer 和 HealthTech_DiagnosticEngine'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sovl_cli",
+        "Reticular_Formation"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 HealthTech_LabAnalyzer 和 HealthTech_PatientRecords 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'HealthTech_LabAnalyzer 和 HealthTech_PatientRecords'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sovl_processor",
+        "sovl_utils"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 HealthTech_DiagnosticEngine 和 HealthTech_LabAnalyzer 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'HealthTech_DiagnosticEngine 和 HealthTech_LabAnalyzer'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sovl_io",
+        "Ganglia"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 HealthTech_DiagnosticEngine 和 HealthTech_DiagnosticEngine 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HealthTech_DiagnosticEngine 和 HealthTech_DiagnosticEngine'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sovl_config",
+        "sovl_schema"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 HealthTech_HIPAA_Vault 和 HealthTech_PatientRecords 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HealthTech_HIPAA_Vault 和 HealthTech_PatientRecords'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Cerebral_Cortex",
+        "sovl_generation"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 HealthTech_EMR_Sync 和 HealthTech_HIPAA_Vault 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HealthTech_EMR_Sync 和 HealthTech_HIPAA_Vault'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sovl_primer",
+        "Limbic_System"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 HealthTech_DiagnosticEngine 和 HealthTech_DiagnosticEngine。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'HealthTech_DiagnosticEngine 和 HealthTech_DiagnosticEngine'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sovl_curiosity",
+        "sovl_temperament"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 HealthTech_PatientRecords 和 HealthTech_PatientRecords。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'HealthTech_PatientRecords 和 HealthTech_PatientRecords'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sovl_confidence",
+        "sovl_bonder"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 HealthTech_DiagnosticEngine 和 HealthTech_DiagnosticEngine。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'HealthTech_DiagnosticEngine 和 HealthTech_DiagnosticEngine'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sovl_meditator",
+        "sovl_viber"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 HealthTech_HIPAA_Vault 和 HealthTech_DiagnosticEngine 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'HealthTech_HIPAA_Vault 和 HealthTech_DiagnosticEngine'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sovl_striver",
+        "Hippocampus"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 HealthTech_PatientRecords 和 HealthTech_PatientRecords 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 HealthTech_PatientRecords处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 60,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'HealthTech_PatientRecords处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sovl_scaffold",
+        "sovl_engram"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 HealthTech_DiagnosticEngine 和 HealthTech_EMR_Sync 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'HealthTech_DiagnosticEngine 和 HealthTech_EMR_Sync'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sovl_manager",
+        "sovl_recaller"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 HealthTech_DiagnosticEngine 和 HealthTech_EMR_Sync 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HealthTech_DiagnosticEngine 和 HealthTech_EMR_Sync'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Insula",
+        "sovl_trainer"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 HealthTech_HIPAA_Vault 和 HealthTech_LabAnalyzer 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'HealthTech_HIPAA_Vault 和 HealthTech_LabAnalyzer'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 73,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 74,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sovl_queue",
+        "sovl_scribe"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 75,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 HealthTech_PatientRecords 和 HealthTech_EMR_Sync。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 76,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'HealthTech_PatientRecords 和 HealthTech_EMR_Sync'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 77,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 78,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Motor_Cortex",
+        "sovl_volition"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 79,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 HealthTech_DiagnosticEngine 和 HealthTech_PatientRecords。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 80,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'HealthTech_DiagnosticEngine 和 HealthTech_PatientRecords'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 81,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 82,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sovl_gate",
+        "Pineal_Gland"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 83,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 HealthTech_EMR_Sync 和 HealthTech_LabAnalyzer 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 84,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'HealthTech_EMR_Sync 和 HealthTech_LabAnalyzer'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 85,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 86,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sovl_printer",
+        "sovl_fuser"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 87,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 HealthTech_HIPAA_Vault 和 HealthTech_LabAnalyzer 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 88,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'HealthTech_HIPAA_Vault 和 HealthTech_LabAnalyzer'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 89,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 90,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Broca",
+        "sovl_swarm"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 91,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 HealthTech_LabAnalyzer 和 HealthTech_PatientRecords 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 92,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'HealthTech_LabAnalyzer 和 HealthTech_PatientRecords'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 93,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 94,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Hypothalamus",
+        "sovl_error"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 95,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 HealthTech_HIPAA_Vault 和 HealthTech_HIPAA_Vault 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 96,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'HealthTech_HIPAA_Vault 和 HealthTech_HIPAA_Vault'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 97,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 98,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sovl_logger",
+        "sovl_records"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 99,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 HealthTech_EMR_Sync 和 HealthTech_PatientRecords。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 100,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'HealthTech_EMR_Sync 和 HealthTech_PatientRecords'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 101,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 102,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Glial_Network",
+        "sovl_interfaces"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 103,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 HealthTech_PatientRecords 和 HealthTech_LabAnalyzer 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 104,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'HealthTech_PatientRecords 和 HealthTech_LabAnalyzer'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 105,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 106,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sovl_hardware",
+        "sovl_data"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 107,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 HealthTech_HIPAA_Vault 和 HealthTech_HIPAA_Vault 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 108,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HealthTech_HIPAA_Vault 和 HealthTech_HIPAA_Vault'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 109,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 110,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sovl_state",
+        "Janus"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 111,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 HealthTech_LabAnalyzer 和 HealthTech_PatientRecords 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 112,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'HealthTech_LabAnalyzer 和 HealthTech_PatientRecords'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 113,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 114,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "run_sovl",
+        "Data_Store"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 115,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 HealthTech_HIPAA_Vault 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 116,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'HealthTech_HIPAA_Vault'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 117,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 118,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "chronicle"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 118,
+    "repair_count": 2,
+    "grounding_acts_count": 58,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:01Z",
+  "extra": {
+    "source_url": "https://github.com/oppolla/Self-Organizing-Virtual-Lifeform/blob/6eea78411a123f1413e5fdde5418dae6421cb07f/structure.mmd",
+    "github_repo": "oppolla/Self-Organizing-Virtual-Lifeform",
+    "github_file_path": "structure.mmd",
+    "seed_id": "gh_architecture_01696",
+    "augmentation_domain": "HealthTech",
+    "content_size": 4827,
+    "collected_at": "2026-02-06T02:02:14.953901",
+    "license_name": "MIT License",
+    "license_url": "https://api.github.com/licenses/mit",
+    "repo_stars": 8,
+    "repo_forks": 2
+  }
+}

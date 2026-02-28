@@ -1,0 +1,468 @@
+{
+  "id": "gl_packet-beta_00467",
+  "source": "gitlab",
+  "diagram_type": "packet-beta",
+  "code": "graph TB\n    subgraph \"monbus_axil_group\"\n        subgraph \"Monitor Bus Input\"\n            MON_IN[monbus_valid<br/>monbus_packet<br/>64-bit] --> PARSE[Packet Parser<br/>pkt_type, protocol<br/>event_code]\n        end\n\n        subgraph \"Per-Protocol Filtering\"\n            PARSE --> FILTER[Filter Logic]\n            AXI_MASK[cfg_axi_pkt_mask<br/>cfg_axi_err_select] --> FILTER\n            AXIS_MASK[cfg_axis_*_mask] --> FILTER\n            CORE_MASK[cfg_core_*_mask] --> FILTER\n        end\n\n        subgraph \"Routing Decision\"\n            FILTER --> DROP{Drop?<br/>pkt_mask bit set}\n            DROP --> |No| ERR_CHK{Error<br/>Select?}\n            DROP --> |Yes| DISCARD[Discard<br/>Packet]\n            ERR_CHK --> |Yes| ERR_PATH[Error Path]\n            ERR_CHK --> |No| WR_PATH[Write Path]\n        end\n\n        subgraph \"Error/Interrupt Path\"\n            ERR_PATH --> ERR_FIFO[Error FIFO<br/>Depth: 64]\n            ERR_FIFO --> AXIL_S[AXI-Lite Slave<br/>Read Interface]\n            ERR_FIFO --> IRQ[irq_out<br/>FIFO not empty]\n        end\n\n        subgraph \"Master Write Path\"\n            WR_PATH --> WR_FIFO[Write FIFO<br/>Depth: 32]\n            WR_FIFO --> ADDR_GEN[Address Generator<br/>Wrap: base→limit]\n            CFG_BASE[cfg_base_addr<br/>cfg_limit_addr] --> ADDR_GEN\n            ADDR_GEN --> AXIL_M[AXI-Lite Master<br/>Write Interface]\n        end\n    end\n\n    AXIL_S --> S_AR[s_axil_ar*]\n    AXIL_S --> S_R[s_axil_r*]\n    AXIL_M --> M_AW[m_axil_aw*]\n    AXIL_M --> M_W[m_axil_w*]\n    AXIL_M --> M_B[m_axil_b*]\n\n    style FILTER fill:#bbf,stroke:#333,stroke-width:2px\n    style ERR_FIFO fill:#fbb,stroke:#333,stroke-width:3px\n    style WR_FIFO fill:#bfb,stroke:#333,stroke-width:3px\n    style ADDR_GEN fill:#ffb,stroke:#333,stroke-width:2px\n    style IRQ fill:#f9f,stroke:#333,stroke-width:3px\n",
+  "license": "mit",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 monbus_valid<br/>monbus_packet<br/>64-bit 和 Packet Parser<br/>pkt_type, protocol<br/>event_code 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'monbus_valid<br/>monbus_packet<br/>64-bit 和 Packet Parser<br/>pkt_type, protocol<br/>event_code'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MON_IN",
+        "PARSE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Filter Logic 和 cfg_axi_pkt_mask<br/>cfg_axi_err_select 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Filter Logic 和 cfg_axi_pkt_mask<br/>cfg_axi_err_select'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "FILTER",
+        "AXI_MASK"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 cfg_axis_*_mask 和 cfg_core_*_mask 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'cfg_axis_*_mask 和 cfg_core_*_mask'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AXIS_MASK",
+        "CORE_MASK"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Drop?<br/>pkt_mask bit set 和 Error<br/>Select? 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Drop?<br/>pkt_mask bit set 和 Error<br/>Select?'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DROP",
+        "ERR_CHK"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Discard<br/>Packet 和 Error Path。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Discard<br/>Packet 和 Error Path'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DISCARD",
+        "ERR_PATH"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Write Path 和 Error FIFO<br/>Depth: 64 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Write Path 和 Error FIFO<br/>Depth: 64'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "WR_PATH",
+        "ERR_FIFO"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 AXI-Lite Slave<br/>Read Interface 和 irq_out<br/>FIFO not empty 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 AXI-Lite Slave<br/>Read Interface处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'AXI-Lite Slave<br/>Read Interface处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AXIL_S",
+        "IRQ"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Write FIFO<br/>Depth: 32 和 Address Generator<br/>Wrap: base→limit 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Write FIFO<br/>Depth: 32 和 Address Generator<br/>Wrap: base→limit'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "WR_FIFO",
+        "ADDR_GEN"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 cfg_base_addr<br/>cfg_limit_addr 和 AXI-Lite Master<br/>Write Interface。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'cfg_base_addr<br/>cfg_limit_addr 和 AXI-Lite Master<br/>Write Interface'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CFG_BASE",
+        "AXIL_M"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 s_axil_ar* 和 s_axil_r* 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 's_axil_ar* 和 s_axil_r*'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "S_AR",
+        "S_R"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 m_axil_aw* 和 m_axil_w* 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'm_axil_aw* 和 m_axil_w*'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "M_AW",
+        "M_W"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 m_axil_b* 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'm_axil_b*'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "M_B"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 49,
+    "repair_count": 1,
+    "grounding_acts_count": 24,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:07Z",
+  "extra": {
+    "source_url": "https://github.com/sean-galloway/RTLDesignSherpa/blob/47f8a16641658f570a69c3af3c9724b29ea39187/projects/components/stream/docs/stream_mas/assets/mermaid/16_monbus_axil_group_block.mmd",
+    "github_repo": "sean-galloway/RTLDesignSherpa",
+    "content_size": 1801,
+    "collected_at": "2026-02-06T14:10:17.639470",
+    "license_name": "MIT License",
+    "license_url": "https://api.github.com/licenses/mit",
+    "repo_owner": "sean-galloway",
+    "repo_name": "RTLDesignSherpa",
+    "repo_stars": 8,
+    "repo_forks": 1,
+    "repo_topics": [
+      "amba-apb",
+      "amba-axi",
+      "cocotb",
+      "crossbar",
+      "dma"
+    ],
+    "repo_language": "C++",
+    "repo_description": "This site is hopefully a springboard for others to learn about coding in System Verilog and experimenting with FPGAs.",
+    "repo_created_at": "2023-06-15T21:56:48Z",
+    "repo_updated_at": "2026-02-06T00:19:01Z",
+    "source_note": "collected_from_github_additional"
+  }
+}

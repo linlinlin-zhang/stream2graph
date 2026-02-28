@@ -1,0 +1,142 @@
+{
+  "id": "aug_gh_sequence_00486_IoT_2",
+  "source": "augmented_real_structure",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Client\n    participant Filter as FeatureFlagFilter\n    participant FFS as FeatureFlagService\n    participant Controller as TransactionController\n    participant MA as MetricsAspect\n    participant Service as CreateTransactionService\n    participant Adapter as TransactionRepositoryAdapter\n    participant DB as H2 Database\n    participant Domain as Transaction Domain\n    \n    Client->>Filter: POST /transactions<br/>{IoT_Industrial_EdgeNode}\n    \n    Note over Filter: Feature Flag Check\n    Filter->>FFS: Check \"create-transaction\" flag\n    FFS-->>Filter: ✓ Feature enabled\n    Filter->>Controller: Forward request\n    \n    Note over Controller: Metrics Tracking\n    Controller->>MA: Track \"transactions.created\"\n    MA-->>Controller: ✓ Metric recorded\n    \n    Note over Controller: DTO to Domain Mapping\n    Controller->>Domain: new Transaction(IoT_Industrial_PLC_Logic)\n    Domain->>Domain: Validate amount > 0\n    Domain->>Domain: Validate description not empty\n    Domain->>Domain: Generate UUID\n    Domain->>Domain: Set current timestamp\n    Domain-->>Controller: ✓ Transaction created\n    \n    Note over Controller: Business Logic\n    Controller->>Service: create(IoT_Industrial_ActuatorController)\n    Service->>Adapter: save(IoT_Industrial_ActuatorController)\n    \n    Note over Adapter: Domain to Entity Mapping\n    Adapter->>Adapter: mapToEntity(IoT_Industrial_EdgeNode)\n    Adapter->>DB: save(IoT_Industrial_PLC_Logic)\n    DB-->>Adapter: ✓ Entity saved\n    \n    Note over Adapter: Entity to Domain Mapping\n    Adapter->>Adapter: mapToDomain(IoT_Industrial_PLC_Logic)\n    Adapter-->>Service: Transaction domain object\n    Service-->>Controller: Transaction\n    Controller-->>Filter: Transaction\n    Filter-->>Client: HTTP 200<br/>{IoT_Industrial_EdgeNode}\n",
+  "license": "mit",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 IoT_Industrial_PLC_Logic 和 IoT_Industrial_ActuatorController 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'IoT_Industrial_PLC_Logic 和 IoT_Industrial_ActuatorController'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Transaction",
+        "create"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 IoT_Industrial_ActuatorController 和 IoT_Industrial_EdgeNode 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'IoT_Industrial_ActuatorController 和 IoT_Industrial_EdgeNode'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "save",
+        "mapToEntity"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 IoT_Industrial_PLC_Logic 和 IoT_Industrial_PLC_Logic 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'IoT_Industrial_PLC_Logic 和 IoT_Industrial_PLC_Logic'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "save",
+        "mapToDomain"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 12,
+    "repair_count": 0,
+    "grounding_acts_count": 6,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:02Z",
+  "extra": {
+    "source_url": "https://github.com/noyqdave/accounting-ledger-service/blob/046cced0c1a13ed177e216d1e028e3baea512856/docs/diagrams/use-case-creation.mmd",
+    "github_repo": "noyqdave/accounting-ledger-service",
+    "github_file_path": "docs/diagrams/use-case-creation.mmd",
+    "seed_id": "gh_sequence_00486",
+    "augmentation_domain": "IoT_Industrial",
+    "content_size": 1847,
+    "collected_at": "2026-02-06T01:32:58.334759",
+    "license_name": "MIT License",
+    "license_url": "https://api.github.com/licenses/mit",
+    "repo_owner": "noyqdave",
+    "repo_name": "accounting-ledger-service",
+    "repo_stars": 0,
+    "repo_forks": 0,
+    "repo_topics": [],
+    "repo_language": "Java",
+    "repo_description": "A Java microservice for managing expense and revenue ledger using Hexagonal Architecture",
+    "repo_created_at": "2025-03-22T14:40:58Z",
+    "repo_updated_at": "2025-12-23T14:28:24Z"
+  }
+}

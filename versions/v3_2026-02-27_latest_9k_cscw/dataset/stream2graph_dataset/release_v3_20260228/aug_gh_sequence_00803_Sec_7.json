@@ -1,0 +1,106 @@
+{
+  "id": "aug_gh_sequence_00803_Sec_7",
+  "source": "augmented_real_structure",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant awf as Agent Workflow\n    participant sthd as Steps Handler<br/>(Security_Encryption)\n    participant csthd as Steps Handler<br/>(Security_OAuth2)\n    participant xyzhd as APT Handler<br/>SWUpdate Handler<br/>Script Handler<br/>Steps Handler, etc.\n    participant comenum as Component Enumerator\n\n    Note over awf, sthd : Note: Simplified diagram <br/>Extension Manager is hidden\n    awf-->>+sthd: loads handler<br/>for Parent Update<br/>(Security_Encryption)\n    awf->>+sthd:  'download'\n    loop foreach step\n    Note over sthd, csthd : Note: For demo purposes,<br/>all Parent's step are 'Reference Step'\n    sthd-->>csthd: loads handler<br/>for Child Update<br/>(Security_Encryption)\n    sthd->>+csthd: 'download'\n    loop foreach step\n    csthd-->>xyzhd:  loads handler<br/>for {Security_Firewall}\n    csthd->>+xyzhd: 'download'\n    xyzhd->>xyzhd: performs<br/>download task\n    xyzhd-->>-csthd: returns ADUC_Result\n    end\n    csthd-->>-sthd: returns ADUC_Result\n    end\n    sthd->>-awf: return ADUC_Result\n\n\n    awf->>+sthd:  'install'\n\n    Note over sthd, comenum : Note: Enumerate compatible component.<br/>If Component Enuemrator is not available, the following loop will be process only once,<br/>and assumed target is a Host Device.\n    sthd->>+comenum: 'select components'\n    comenum-->>-sthd: returns 'selected components'\n\n\n    \n    loop for each selected component\n        sthd->>sthd: sets current component<br/>as Child Workflow's selectedComponents\n        \n        Note over sthd, xyzhd: For each component, perform every step in sequence.<br/>All steps must be completed successfully before continue with the next component.\n        loop for each step\n        sthd-->>csthd: loads handler<br/>for Child Update<br/>(Security_Encryption)\n\n        Note over sthd, xyzhd: For each step, perform both 'install' and 'apply' task<br/>to ensure that an Update is installed and applied onto<br/>current component, before move on to the next one.\n\n        sthd->>+csthd: 'install'\n\n        loop foreach step\n        csthd-->>xyzhd:  loads handler<br/>for {Security_OAuth2}\n        csthd->>+xyzhd: 'install'\n        xyzhd->>xyzhd: performs<br/>install task\n        Note over xyzhd,csthd: Note: a device or DU Agent restart request can be encoded<br/>in ADUC_Result if needed.\n        xyzhd-->>-csthd: returns ADUC_Result\n        end\n        csthd-->>-sthd: returns ADUC_Result\n\n        sthd->>+csthd: 'apply'\n        loop foreach step\n        csthd-->>xyzhd:  loads handler<br/>for {Security_Encryption}\n        csthd->>+xyzhd: 'apply'\n        xyzhd->>xyzhd: performs<br/>apply task\n        Note over xyzhd,csthd: Note: a device or DU Agent restart request can be encoded<br/>in ADUC_Result if needed.\n        xyzhd-->>-csthd: returns ADUC_Result\n        end\n        csthd-->>-sthd: returns ADUC_Result\n        end\n    end\n    sthd->>-awf: return ADUC_Result\n\n    awf->>+sthd:  'apply'\n    loop foreach step\n    Note over sthd, csthd : Note: For demo purposes,<br/>all Parent's step are 'Reference Step'\n    sthd-->>csthd: loads handler<br/>for Child Update<br/>(Security_Firewall)\n    sthd->>+csthd: 'apply'\n    Note over csthd : Since 'apply' task was completed as part of 'install' above, <br/> always return success here.\n    csthd-->>-sthd: returns ADUC_Result\n    end\n    sthd->>-awf: return ADUC_Result\n  \n            \n",
+  "license": "mit",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Security_Firewall 和 Security_OAuth2 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Security_Firewall 和 Security_OAuth2'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "for",
+        "for"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Security_Encryption 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Security_Encryption'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "for"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 8,
+    "repair_count": 0,
+    "grounding_acts_count": 4,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:03Z",
+  "extra": {
+    "source_url": "https://github.com/Azure/iot-hub-device-update/blob/6fd5b7539afc014b29dc2a69e0c46652cfe1765c/src/extensions/update_manifest_handlers/steps_handler/assets/steps-handler-child-update-sequence-overview.mmd",
+    "github_repo": "Azure/iot-hub-device-update",
+    "github_file_path": "src/extensions/update_manifest_handlers/steps_handler/assets/steps-handler-child-update-sequence-overview.mmd",
+    "seed_id": "gh_sequence_00803",
+    "augmentation_domain": "Security",
+    "content_size": 3343,
+    "collected_at": "2026-02-06T01:37:17.544865",
+    "license_name": "MIT License",
+    "license_url": "https://api.github.com/licenses/mit",
+    "repo_owner": "Azure",
+    "repo_name": "iot-hub-device-update",
+    "repo_stars": 60,
+    "repo_forks": 46,
+    "repo_topics": [],
+    "repo_language": "C",
+    "repo_description": "Device Update for IoT Hub agent",
+    "repo_created_at": "2021-02-08T23:13:36Z",
+    "repo_updated_at": "2026-01-26T18:14:09Z"
+  }
+}

@@ -1,0 +1,60 @@
+{
+  "id": "ot_journey_01063",
+  "source": "other",
+  "diagram_type": "journey",
+  "code": "sequenceDiagram\n    participant S as Student\n    participant API as AttachUpload Handler\n    participant S3 as S3 Storage\n    participant DB as PostgreSQL\n    participant N as NotifyAdvisors\n    participant A as Advisor\n\n    S->>API: POST /journey/nodes/:id/uploads/presign\n    API->>S3: PresignPut(objectKey)\n    S3-->>API: Signed URL\n    API-->>S: {presign_url, object_key}\n    \n    S->>S3: PUT file to presigned URL\n    S3-->>S: 200 OK + ETag\n    \n    S->>API: POST /journey/nodes/:id/uploads/attach\n    API->>DB: Begin transaction\n    API->>DB: INSERT document_versions\n    API->>DB: INSERT node_instance_slot_attachments\n    API->>DB: UPDATE node_instances.state = 'submitted'\n    API->>DB: Commit transaction\n    API-->>N: NotifyAdvisorsOnSubmission (async)\n    N->>DB: Get advisors for student\n    N->>DB: INSERT admin_notifications\n    API-->>S: 200 OK\n    \n    A->>API: PATCH /admin/attachments/:id/review\n    API->>DB: Verify advisor assigned to student\n    API->>DB: UPDATE attachment.status\n    API->>DB: UPDATE node_instances.state\n    API-->>A: 200 OK",
+  "license": "other_source",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 objectKey 和 async。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'objectKey 和 async'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PresignPut",
+        "NotifyAdvisorsOnSubmission"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:07Z",
+  "extra": {
+    "source_type": "github_search",
+    "source_url": "https://github.com/AlmatJuvashev/phd-students-portal/blob/b88b252ccf22627eafd166ab2c48dbd64fab7deb/docs/diagrams/01_document_approval.mmd",
+    "github_repo": "AlmatJuvashev/phd-students-portal",
+    "content_size": 1066,
+    "collected_at": "2026-02-06T11:02:44.926104",
+    "license_name": "Other Source (GitHub-based)"
+  }
+}

@@ -1,0 +1,192 @@
+{
+  "id": "aug_ot_stateDiagram_00178_Fin_0",
+  "source": "augmented_real_structure",
+  "diagram_type": "stateDiagram",
+  "code": "%%{FinTech_LedgerService}}}%%\nstateDiagram-v2\n    [FinTech_AuthVault] --> Created: Create Todo\n    Created --> InProgress: Start Work\n    Created --> Cancelled: Cancel\n    InProgress --> OnHold: Pause\n    InProgress --> Completed: Complete\n    InProgress --> Cancelled: Cancel\n    OnHold --> InProgress: Resume\n    OnHold --> Cancelled: Cancel\n    Completed --> [FinTech_PaymentGateway]\n    Cancelled --> [FinTech_AuthVault]\n\n    state Created {FinTech_PaymentGateway] --> Draft\n        Draft --> ReadyToStart: Finalize\n        ReadyToStart --> [FinTech_AuthVault]\n    }\n\n    state InProgress {FinTech_TransactionQueue] --> Started\n        Started --> InReview: Submit for Review\n        InReview --> Started: Request Changes\n        InReview --> [FinTech_FraudDetection]: Approve\n    }\n\n    state OnHold {FinTech_FraudDetection] --> Blocked\n        [FinTech_TransactionQueue] --> Deferred\n        Blocked --> [FinTech_FraudDetection]: Unblock\n        Deferred --> [FinTech_PaymentGateway]: Prioritize\n    }\n\n    state Completed {FinTech_AuthVault] --> Done\n        [FinTech_AuthVault] --> PartiallyDone\n        Done --> [FinTech_AuthVault]\n        PartiallyDone --> [FinTech_FraudDetection]\n    }",
+  "license": "mit",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 FinTech_AuthVault 和 FinTech_PaymentGateway。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 FinTech_AuthVault处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'FinTech_AuthVault处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2",
+        "Created"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 FinTech_TransactionQueue 和 FinTech_FraudDetection 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 FinTech_TransactionQueue处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'FinTech_TransactionQueue处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "InProgress",
+        "OnHold"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 FinTech_TransactionQueue 和 FinTech_AuthVault 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'FinTech_TransactionQueue 和 FinTech_AuthVault'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Blocked",
+        "Completed"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 FinTech_AuthVault 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'FinTech_AuthVault'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Done"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 18,
+    "repair_count": 2,
+    "grounding_acts_count": 8,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:05Z",
+  "extra": {
+    "source_type": "github_search_special",
+    "source_url": "https://github.com/db4rnR/aureuserp/blob/8b84a2cc2e9ad02d6cc71e7a52b367f3539ba896/.ai/100-laravel/700-r-and-d/E_L_A/illustrations/mermaid/light/todo-state-machine-light.mmd",
+    "github_repo": "db4rnR/aureuserp",
+    "seed_id": "ot_stateDiagram_00178",
+    "augmentation_domain": "FinTech",
+    "content_size": 1145,
+    "collected_at": "2026-02-06T10:38:47.428668",
+    "license_name": "MIT License",
+    "license_url": "https://api.github.com/licenses/mit",
+    "repo_owner": "db4rnR",
+    "repo_name": "aureuserp",
+    "repo_stars": 1,
+    "repo_forks": 0,
+    "repo_topics": [],
+    "repo_language": "PHP",
+    "repo_description": "Free and Open Source ERP platform",
+    "repo_created_at": "2025-06-12T15:33:39Z",
+    "repo_updated_at": "2025-12-12T11:51:30Z"
+  }
+}

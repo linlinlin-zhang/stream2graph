@@ -1,0 +1,210 @@
+{
+  "id": "gh_er_02356",
+  "source": "github",
+  "diagram_type": "er",
+  "code": "%% Mermaid ER Diagram - Database Schema\nerDiagram\n  direction LR\n  RESTAURANTS {\n    string restaurant_id PK\n    bigint max_capacity\n    bigint curr_load\n    bigint parallelization_factor\n    timestamptz created_at\n    timestamptz updated_at\n  }\n  RESTAURANTITEMS {\n    string sku PK\n    string restaurant_id PK, FK\n    bigint quantity\n    bigint prep_time\n  }\n  ORDERS {\n    string id PK\n    string customer_id\n    string restaurant_id FK\n    bigint amount_cents\n    string currency\n    enum status\n    string cancelation_reason\n    timestamptz created_at\n    timestamptz updated_at\n  }\n  ORDERITEMS {\n    string sku PK\n    string orderId PK, FK\n    bigint quantity\n  }\n  RESERVATIONS {\n    string order_id PK, FK\n    string customer_id\n    string restaurant_id FK\n    enum status\n    timestamptz created_at\n  }\n  RESERVEDITEMS {\n    string sku PK\n    string order_id PK, FK\n    bigint quantity\n  }\n  PAYMENTS {\n    string order_id PK, FK\n    string customer_id\n    bigint amount\n    string currency\n    string pm_id\n    string transaction_id\n    timestamptz created_at\n  }\n  TICKETS {\n    string order_id PK, FK\n    string restaurant_id FK\n    bigint eta_minutes\n    timestamptz accepted_at\n    enum status\n  }\n  OUTBOX {\n    string id PK\n    string key\n    string event_type\n    string topic\n    jsonb payload\n    boolean published\n    timestamptz created_at\n  }\n\n  RESTAURANTS ||--o{ RESTAURANTITEMS : has\n  RESTAURANTS ||--o{ ORDERS : receives\n  ORDERS ||--o{ ORDERITEMS : contains\n  ORDERS ||--|| RESERVATIONS : holds\n  RESERVATIONS ||--o{ RESERVEDITEMS : includes\n  ORDERS ||--|| PAYMENTS : paid_by\n  ORDERS ||--|| TICKETS : scheduled_by\n  ORDERS }o..o{ OUTBOX : emits",
+  "license": "mit",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 string restaurant_id PK\n    bigint max_capacity\n    bigint curr_load\n    bigint parallelization_factor\n    timestamptz created_at\n    timestamptz updated_at\n   和 string sku PK\n    string restaurant_id PK, FK\n    bigint quantity\n    bigint prep_time\n   的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'string restaurant_id PK\n    bigint max_capacity\n    bigint curr_load\n    bigint parallelization_factor\n    timestamptz created_at\n    timestamptz updated_at\n   和 string sku PK\n    string restaurant_id PK, FK\n    bigint quantity\n    bigint prep_time\n  '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "RESTAURANTS",
+        "RESTAURANTITEMS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 string id PK\n    string customer_id\n    string restaurant_id FK\n    bigint amount_cents\n    string currency\n    enum status\n    string cancelation_reason\n    timestamptz created_at\n    timestamptz updated_at\n   和 string sku PK\n    string orderId PK, FK\n    bigint quantity\n   的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'string id PK\n    string customer_id\n    string restaurant_id FK\n    bigint amount_cents\n    string currency\n    enum status\n    string cancelation_reason\n    timestamptz created_at\n    timestamptz updated_at\n   和 string sku PK\n    string orderId PK, FK\n    bigint quantity\n  '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ORDERS",
+        "ORDERITEMS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 string order_id PK, FK\n    string customer_id\n    string restaurant_id FK\n    enum status\n    timestamptz created_at\n   和 string sku PK\n    string order_id PK, FK\n    bigint quantity\n   这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'string order_id PK, FK\n    string customer_id\n    string restaurant_id FK\n    enum status\n    timestamptz created_at\n   和 string sku PK\n    string order_id PK, FK\n    bigint quantity\n  '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "RESERVATIONS",
+        "RESERVEDITEMS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 string order_id PK, FK\n    string customer_id\n    bigint amount\n    string currency\n    string pm_id\n    string transaction_id\n    timestamptz created_at\n   和 string order_id PK, FK\n    string restaurant_id FK\n    bigint eta_minutes\n    timestamptz accepted_at\n    enum status\n   这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'string order_id PK, FK\n    string customer_id\n    bigint amount\n    string currency\n    string pm_id\n    string transaction_id\n    timestamptz created_at\n   和 string order_id PK, FK\n    string restaurant_id FK\n    bigint eta_minutes\n    timestamptz accepted_at\n    enum status\n  '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PAYMENTS",
+        "TICKETS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 string id PK\n    string key\n    string event_type\n    string topic\n    jsonb payload\n    boolean published\n    timestamptz created_at\n   和 RESTAURANTITEMS : has\n  RESTAURANTS ||--o{ ORDERS : receives\n  ORDERS ||--o{ ORDERITEMS : contains\n  ORDERS ||--|| RESERVATIONS : holds\n  RESERVATIONS ||--o{ RESERVEDITEMS : includes\n  ORDERS ||--|| PAYMENTS : paid_by\n  ORDERS ||--|| TICKETS : scheduled_by\n  ORDERS  这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'string id PK\n    string key\n    string event_type\n    string topic\n    jsonb payload\n    boolean published\n    timestamptz created_at\n   和 RESTAURANTITEMS : has\n  RESTAURANTS ||--o{ ORDERS : receives\n  ORDERS ||--o{ ORDERITEMS : contains\n  ORDERS ||--|| RESERVATIONS : holds\n  RESERVATIONS ||--o{ RESERVEDITEMS : includes\n  ORDERS ||--|| PAYMENTS : paid_by\n  ORDERS ||--|| TICKETS : scheduled_by\n  ORDERS '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OUTBOX",
+        "o"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 20,
+    "repair_count": 0,
+    "grounding_acts_count": 10,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:06Z",
+  "extra": {
+    "source_url": "https://github.com/SotirisKavv/food-delivery-saga/blob/2f417a425309d6dc37523d495e4d2c5af46b4ed4/charts/er.mmd",
+    "github_repo": "SotirisKavv/food-delivery-saga",
+    "github_file_path": "charts/er.mmd",
+    "content_size": 1675,
+    "collected_at": "2026-02-06T02:11:42.596623",
+    "license_name": "MIT License",
+    "license_url": "https://api.github.com/licenses/mit",
+    "repo_owner": "SotirisKavv",
+    "repo_name": "food-delivery-saga",
+    "repo_stars": 0,
+    "repo_forks": 0,
+    "repo_topics": [],
+    "repo_language": "Go",
+    "repo_description": "Production‑style reference implementation of an event‑driven food ordering platform in Go. It demonstrates the Saga pattern (choreography) across microservices with Kafka, Postgres, Redis, and an Outb",
+    "repo_created_at": "2025-09-30T11:12:37Z",
+    "repo_updated_at": "2025-10-23T13:59:21Z"
+  }
+}

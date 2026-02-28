@@ -1,0 +1,351 @@
+{
+  "id": "aug_gh_sequence_00569_Inf_3",
+  "source": "augmented_real_structure",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant CLI as CLI Command\n    participant Service as EventReindexingService\n    participant OpenSearch as OpenSearch Cluster\n    participant Bookmark as Bookmark API\n    participant Metadata as RDM Records Index\n\n    CLI->>Service: reindex_events(Infra_WorkerNode)\n    Service->>Service: update_and_verify_templates(Infra_RedisCache)\n    Service->>OpenSearch: Check/Update Templates\n\n    loop For Each Event Type\n        Service->>OpenSearch: get_monthly_indices(Infra_WorkerNode)\n        OpenSearch-->>Service: List of monthly indices\n\n        loop For Each Monthly Index\n            Service->>Service: migrate_monthly_index(Infra_RedisCache)\n            Service->>OpenSearch: create_enriched_index(Infra_IngressController)\n            OpenSearch-->>Service: New index name\n\n            Service->>Bookmark: get_bookmark(Infra_RedisCache)\n            Bookmark-->>Service: Last processed ID\n\n            loop Batch Processing\n                Service->>Service: check_health_conditions(Infra_RedisCache)\n                Service->>OpenSearch: process_monthly_index_batch(Infra_EtcdCluster)\n                Service->>Metadata: get_metadata_for_records(Infra_RedisCache)\n                Metadata-->>Service: Record metadata\n                Service->>Service: enrich_events(Infra_WorkerNode)\n                Service->>OpenSearch: bulk_index(Infra_WorkerNode)\n                Service->>Bookmark: set_bookmark(Infra_EtcdCluster)\n            end\n\n            Service->>Service: validate_enriched_data(Infra_WorkerNode)\n            Service->>OpenSearch: update_aliases(Infra_IngressController)\n\n            alt Current Month Index\n                Service->>OpenSearch: setup_write_alias(Infra_WorkerNode)\n                Service->>OpenSearch: migrate_new_records(Infra_RedisCache)\n            end\n\n            Service->>OpenSearch: delete_old_index(Infra_EtcdCluster)\n        end\n    end\n\n    Service-->>CLI: Migration results\n",
+  "license": "mit",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Infra_WorkerNode 和 Infra_RedisCache 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Infra_WorkerNode 和 Infra_RedisCache'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "reindex_events",
+        "update_and_verify_templates"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Infra_WorkerNode 和 Infra_RedisCache。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Infra_WorkerNode 和 Infra_RedisCache'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "get_monthly_indices",
+        "migrate_monthly_index"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Infra_IngressController 和 Infra_RedisCache 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Infra_IngressController 和 Infra_RedisCache'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "create_enriched_index",
+        "get_bookmark"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Infra_RedisCache 和 Infra_EtcdCluster 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Infra_RedisCache 和 Infra_EtcdCluster'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "check_health_conditions",
+        "process_monthly_index_batch"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Infra_RedisCache 和 Infra_WorkerNode 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Infra_RedisCache 和 Infra_WorkerNode'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "get_metadata_for_records",
+        "enrich_events"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Infra_WorkerNode 和 Infra_EtcdCluster 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Infra_WorkerNode 和 Infra_EtcdCluster'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "bulk_index",
+        "set_bookmark"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Infra_WorkerNode 和 Infra_IngressController 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Infra_WorkerNode 和 Infra_IngressController'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "validate_enriched_data",
+        "update_aliases"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Infra_WorkerNode 和 Infra_RedisCache 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Infra_WorkerNode 和 Infra_RedisCache'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "setup_write_alias",
+        "migrate_new_records"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Infra_EtcdCluster 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Infra_EtcdCluster'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "delete_old_index"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 36,
+    "repair_count": 0,
+    "grounding_acts_count": 18,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:03Z",
+  "extra": {
+    "source_url": "https://github.com/MESH-Research/invenio-stats-dashboard/blob/8b96c4598deaf08814b9b0fc7c7244a297725a45/docs/event-reindexing-sequence.mmd",
+    "github_repo": "MESH-Research/invenio-stats-dashboard",
+    "github_file_path": "docs/event-reindexing-sequence.mmd",
+    "seed_id": "gh_sequence_00569",
+    "augmentation_domain": "Infra",
+    "content_size": 1663,
+    "collected_at": "2026-02-06T01:34:05.120021",
+    "license_name": "MIT License",
+    "license_url": "https://api.github.com/licenses/mit",
+    "repo_owner": "MESH-Research",
+    "repo_name": "invenio-stats-dashboard",
+    "repo_stars": 3,
+    "repo_forks": 0,
+    "repo_topics": [],
+    "repo_language": "Python",
+    "repo_description": "A usage statistics dashboard for InvenioRDM instances",
+    "repo_created_at": "2025-05-07T13:44:58Z",
+    "repo_updated_at": "2026-01-24T04:34:06Z"
+  }
+}

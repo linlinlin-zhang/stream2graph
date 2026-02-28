@@ -48,8 +48,27 @@
   - 完成 9k 合并与 CSCW 对话逆向工程批处理
   - 这是当前最应优先使用的版本
 
+### 4) v3 清洗发布集（2026-02-28）
+
+- 路径:
+  - `versions/v3_2026-02-27_latest_9k_cscw/dataset/stream2graph_dataset/release_v3_20260228`
+- 构建脚本:
+  - `tools/build_release_v3.py`
+- 核心筛选条件:
+  - 编译状态必须为 `success`
+  - 许可证必须有效（排除 `none/error/unknown/rate_limited`）
+  - `cscw_dialogue` 轮次在 `4~120`
+- 构建结果:
+  - 输入: 9000
+  - 通过: 4709
+  - 拒绝: 4291
+  - 拒绝原因 Top3: `compilation_not_success`, `invalid_or_missing_license`, `dialogue_turns_out_of_range`
+- 统计报告:
+  - `reports/release_reports/release_v3_latest.md`
+  - `reports/release_reports/release_v3_latest.json`
+
 ## 推荐使用顺序
 
-1. 训练/实验优先: `v3_2026-02-27_latest_9k_cscw`
+1. 训练/实验优先: `v3_2026-02-27_latest_9k_cscw/release_v3_20260228`
 2. 许可证审计追溯: `v2_2026-02-08_real_100percent_license_fix`
 3. 方法学复盘: `v1_2026-02-05_legacy_8k_pipeline`

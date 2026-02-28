@@ -1,0 +1,1055 @@
+{
+  "id": "gh_architecture_01564",
+  "source": "github",
+  "diagram_type": "architecture",
+  "code": "%%{init: {\n  'theme': 'base',\n  'themeVariables': {\n    'primaryColor': '#003366',\n    'primaryTextColor': '#ffffff',\n    'primaryBorderColor': '#002244',\n    'secondaryColor': '#4a90d9',\n    'secondaryTextColor': '#ffffff',\n    'tertiaryColor': '#f0f4f8',\n    'tertiaryTextColor': '#333333',\n    'lineColor': '#003366',\n    'fontFamily': 'Inter, system-ui, sans-serif',\n    'fontSize': '14px'\n  }\n}}%%\n\nflowchart TB\n    subgraph USER[\"👤 User Layer\"]\n        direction LR\n        BROWSER[\"🌐 Web Browser\"]\n        WALLET[\"🦊 MetaMask / Web3 Wallet\"]\n    end\n\n    subgraph FRONTEND[\"⚛️ Frontend (React + Vite)\"]\n        direction TB\n\n        subgraph PROVIDERS[\"Providers\"]\n            WEB3P[\"Web3Provider<br/><i>wagmi + RainbowKit</i>\"]\n            AUTHP[\"AuthProvider<br/><i>JWT State</i>\"]\n            TOASTP[\"ToastProvider\"]\n        end\n\n        subgraph PAGES[\"Pages\"]\n            HOME[\"HomePage\"]\n            PASSPORTS[\"PassportsPage\"]\n            MINT[\"MintPage\"]\n            DETAILS[\"PassportDetailsPage\"]\n        end\n\n        subgraph HOOKS[\"Hooks\"]\n            API_HOOKS[\"📡 /hooks/api/<br/><i>TanStack Query</i>\"]\n            CONTRACT_HOOKS[\"⛓️ /hooks/contracts/<br/><i>wagmi hooks</i>\"]\n        end\n\n        subgraph COMPONENTS[\"Components\"]\n            PASSPORT_COMP[\"PassportCard<br/>MintForm<br/>TransferForm\"]\n            EVENT_COMP[\"EventTimeline<br/>RecordEventForm\"]\n            VERIFY_COMP[\"VerificationBadge<br/>VerificationDetails\"]\n        end\n    end\n\n    subgraph BACKEND[\"🖥️ Backend (Hono.js)\"]\n        direction TB\n\n        subgraph MIDDLEWARE[\"Middleware\"]\n            CORS[\"CORS\"]\n            AUTH_MW[\"authMiddleware<br/><i>JWT Verify</i>\"]\n            FLEX_MW[\"flexibleAuthMiddleware<br/><i>JWT or Oracle Key</i>\"]\n        end\n\n        subgraph ROUTES[\"REST API Routes\"]\n            AUTH_R[\"/api/auth<br/><i>nonce, verify, me</i>\"]\n            ASSET_R[\"/api/assets<br/><i>CRUD operations</i>\"]\n            EVIDENCE_R[\"/api/evidence<br/><i>hash, create, query</i>\"]\n            PROVIDER_R[\"/api/provider<br/><i>service records</i>\"]\n        end\n\n        subgraph SERVICES[\"Services\"]\n            AUTH_S[\"AuthService\"]\n            ASSET_S[\"AssetService\"]\n            EVIDENCE_S[\"EvidenceService\"]\n            HASH_S[\"HashService<br/><i>keccak256</i>\"]\n        end\n    end\n\n    subgraph DATABASE[\"🗄️ PostgreSQL\"]\n        direction LR\n        ASSETS_T[(\"assets\")]\n        EVIDENCE_T[(\"evidence\")]\n        SERVICE_T[(\"service_records<br/>_provider_a\")]\n        PROCESSED_T[(\"processed_<br/>service_records\")]\n        NONCES_T[(\"auth_nonces\")]\n    end\n\n    subgraph ORACLE[\"🔮 Oracle Worker\"]\n        direction TB\n        POLLER[\"Polling Service<br/><i>every 15-30s</i>\"]\n        VERIFIER[\"Verifier<br/><i>validate & sign</i>\"]\n        BC_CLIENT[\"Blockchain Client<br/><i>ethers.js</i>\"]\n    end\n\n    subgraph BLOCKCHAIN[\"⛓️ Ethereum Blockchain\"]\n        direction TB\n\n        subgraph CONTRACTS[\"Smart Contracts\"]\n            PASSPORT_C[\"📜 AssetPassport<br/><i>ERC-721 NFT</i>\"]\n            REGISTRY_C[\"📜 EventRegistry<br/><i>Lifecycle Events</i>\"]\n        end\n\n        subgraph ON_CHAIN[\"On-Chain Data\"]\n            NFT_DATA[\"Token Ownership<br/>Metadata Hash<br/>Mint Timestamp\"]\n            EVENT_DATA[\"Event Records<br/>Data Hashes<br/>Oracle Signatures\"]\n        end\n    end\n\n    subgraph SHARED[\"📦 shared/\"]\n        ABI[\"Contract ABIs<br/><i>AssetPassport.json</i><br/><i>EventRegistry.json</i>\"]\n        TYPES[\"TypeScript Types<br/><i>AssetInfo, EventType</i>\"]\n    end\n\n    %% User connections\n    BROWSER <--> FRONTEND\n    WALLET <--> WEB3P\n\n    %% Frontend internal\n    PROVIDERS --> PAGES\n    PAGES --> COMPONENTS\n    COMPONENTS --> HOOKS\n\n    %% Frontend to Backend\n    API_HOOKS <-->|\"REST API<br/>JWT Auth\"| ROUTES\n\n    %% Frontend to Blockchain\n    CONTRACT_HOOKS <-->|\"JSON-RPC<br/>Web3\"| CONTRACTS\n\n    %% Backend internal\n    MIDDLEWARE --> ROUTES\n    ROUTES --> SERVICES\n\n    %% Backend to Database\n    SERVICES <-->|\"Drizzle ORM\"| DATABASE\n\n    %% Oracle connections\n    POLLER -->|\"Poll unprocessed\"| DATABASE\n    POLLER --> VERIFIER\n    VERIFIER -->|\"Sign & Submit\"| BC_CLIENT\n    BC_CLIENT <-->|\"recordVerifiedEvent\"| REGISTRY_C\n    BC_CLIENT -->|\"Update status\"| PROCESSED_T\n\n    %% Blockchain internal\n    PASSPORT_C --> NFT_DATA\n    REGISTRY_C --> EVENT_DATA\n    PASSPORT_C <-.->|\"validates asset\"| REGISTRY_C\n\n    %% Shared usage\n    SHARED -.->|\"import\"| CONTRACT_HOOKS\n    SHARED -.->|\"import\"| BC_CLIENT\n\n    %% Styling\n    classDef userStyle fill:#e8f4fd,stroke:#003366,stroke-width:2px,color:#003366\n    classDef frontendStyle fill:#4a90d9,stroke:#003366,stroke-width:2px,color:#fff\n    classDef backendStyle fill:#2d6a4f,stroke:#1b4332,stroke-width:2px,color:#fff\n    classDef dbStyle fill:#7c3aed,stroke:#5b21b6,stroke-width:2px,color:#fff\n    classDef oracleStyle fill:#d97706,stroke:#92400e,stroke-width:2px,color:#fff\n    classDef blockchainStyle fill:#003366,stroke:#001a33,stroke-width:2px,color:#fff\n    classDef sharedStyle fill:#6b7280,stroke:#374151,stroke-width:2px,color:#fff\n\n    class USER userStyle\n    class FRONTEND,PROVIDERS,PAGES,HOOKS,COMPONENTS frontendStyle\n    class BACKEND,MIDDLEWARE,ROUTES,SERVICES backendStyle\n    class DATABASE,ASSETS_T,EVIDENCE_T,SERVICE_T,PROCESSED_T,NONCES_T dbStyle\n    class ORACLE,POLLER,VERIFIER,BC_CLIENT oracleStyle\n    class BLOCKCHAIN,CONTRACTS,ON_CHAIN,PASSPORT_C,REGISTRY_C,NFT_DATA,EVENT_DATA blockchainStyle\n    class SHARED,ABI,TYPES sharedStyle\n",
+  "license": "mit",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"👤 User Layer\" 和 \"🌐 Web Browser\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"👤 User Layer\" 和 \"🌐 Web Browser\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "USER",
+        "BROWSER"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"🦊 MetaMask / Web3 Wallet\" 和 \"⚛️ Frontend (React + Vite 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"🦊 MetaMask / Web3 Wallet\" 和 \"⚛️ Frontend (React + Vite'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "WALLET",
+        "FRONTEND"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Providers\" 和 \"Web3Provider<br/><i>wagmi + RainbowKit</i>\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Providers\" 和 \"Web3Provider<br/><i>wagmi + RainbowKit</i>\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PROVIDERS",
+        "WEB3P"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"AuthProvider<br/><i>JWT State</i>\" 和 \"ToastProvider\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"AuthProvider<br/><i>JWT State</i>\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"AuthProvider<br/><i>JWT State</i>\"处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AUTHP",
+        "TOASTP"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Pages\" 和 \"HomePage\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Pages\" 和 \"HomePage\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PAGES",
+        "HOME"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"PassportsPage\" 和 \"MintPage\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 \"PassportsPage\"处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"PassportsPage\"处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PASSPORTS",
+        "MINT"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"PassportDetailsPage\" 和 \"Hooks\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"PassportDetailsPage\" 和 \"Hooks\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DETAILS",
+        "HOOKS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"📡 /hooks/api/<br/><i>TanStack Query</i>\" 和 \"⛓️ /hooks/contracts/<br/><i>wagmi hooks</i>\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"📡 /hooks/api/<br/><i>TanStack Query</i>\" 和 \"⛓️ /hooks/contracts/<br/><i>wagmi hooks</i>\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "API_HOOKS",
+        "CONTRACT_HOOKS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Components\" 和 \"PassportCard<br/>MintForm<br/>TransferForm\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Components\" 和 \"PassportCard<br/>MintForm<br/>TransferForm\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "COMPONENTS",
+        "PASSPORT_COMP"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"EventTimeline<br/>RecordEventForm\" 和 \"VerificationBadge<br/>VerificationDetails\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"EventTimeline<br/>RecordEventForm\" 和 \"VerificationBadge<br/>VerificationDetails\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EVENT_COMP",
+        "VERIFY_COMP"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"🖥️ Backend (Hono.js 和 \"Middleware\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"🖥️ Backend (Hono.js 和 \"Middleware\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BACKEND",
+        "MIDDLEWARE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"CORS\" 和 \"authMiddleware<br/><i>JWT Verify</i>\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"CORS\" 和 \"authMiddleware<br/><i>JWT Verify</i>\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CORS",
+        "AUTH_MW"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"flexibleAuthMiddleware<br/><i>JWT or Oracle Key</i>\" 和 \"REST API Routes\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"flexibleAuthMiddleware<br/><i>JWT or Oracle Key</i>\" 和 \"REST API Routes\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "FLEX_MW",
+        "ROUTES"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"/api/auth<br/><i>nonce, verify, me</i>\" 和 \"/api/assets<br/><i>CRUD operations</i>\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"/api/auth<br/><i>nonce, verify, me</i>\" 和 \"/api/assets<br/><i>CRUD operations</i>\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AUTH_R",
+        "ASSET_R"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"/api/evidence<br/><i>hash, create, query</i>\" 和 \"/api/provider<br/><i>service records</i>\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 \"/api/evidence<br/><i>hash, create, query</i>\"处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 61,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"/api/evidence<br/><i>hash, create, query</i>\"处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EVIDENCE_R",
+        "PROVIDER_R"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Services\" 和 \"AuthService\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Services\" 和 \"AuthService\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SERVICES",
+        "AUTH_S"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"AssetService\" 和 \"EvidenceService\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"AssetService\" 和 \"EvidenceService\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ASSET_S",
+        "EVIDENCE_S"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"HashService<br/><i>keccak256</i>\" 和 \"🗄️ PostgreSQL\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 73,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"HashService<br/><i>keccak256</i>\" 和 \"🗄️ PostgreSQL\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 74,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 75,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "HASH_S",
+        "DATABASE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 76,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 (\"assets\" 和 (\"evidence\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 77,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '(\"assets\" 和 (\"evidence\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 78,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 79,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ASSETS_T",
+        "EVIDENCE_T"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 80,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 (\"service_records<br/>_provider_a\" 和 (\"processed_<br/>service_records\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 81,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '(\"service_records<br/>_provider_a\" 和 (\"processed_<br/>service_records\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 82,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 83,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SERVICE_T",
+        "PROCESSED_T"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 84,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 (\"auth_nonces\" 和 \"🔮 Oracle Worker\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 85,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '(\"auth_nonces\" 和 \"🔮 Oracle Worker\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 86,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 87,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "NONCES_T",
+        "ORACLE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 88,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Polling Service<br/><i>every 15-30s</i>\" 和 \"Verifier<br/><i>validate & sign</i>\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 89,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 \"Polling Service<br/><i>every 15-30s</i>\"处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 90,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Polling Service<br/><i>every 15-30s</i>\"处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 91,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 92,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "POLLER",
+        "VERIFIER"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 93,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Blockchain Client<br/><i>ethers.js</i>\" 和 \"⛓️ Ethereum Blockchain\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 94,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Blockchain Client<br/><i>ethers.js</i>\" 和 \"⛓️ Ethereum Blockchain\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 95,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 96,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BC_CLIENT",
+        "BLOCKCHAIN"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 97,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Smart Contracts\" 和 \"📜 AssetPassport<br/><i>ERC-721 NFT</i>\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 98,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Smart Contracts\" 和 \"📜 AssetPassport<br/><i>ERC-721 NFT</i>\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 99,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 100,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CONTRACTS",
+        "PASSPORT_C"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 101,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"📜 EventRegistry<br/><i>Lifecycle Events</i>\" 和 \"On-Chain Data\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 102,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"📜 EventRegistry<br/><i>Lifecycle Events</i>\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 103,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"📜 EventRegistry<br/><i>Lifecycle Events</i>\"处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 104,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 105,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "REGISTRY_C",
+        "ON_CHAIN"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 106,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Token Ownership<br/>Metadata Hash<br/>Mint Timestamp\" 和 \"Event Records<br/>Data Hashes<br/>Oracle Signatures\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 107,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Token Ownership<br/>Metadata Hash<br/>Mint Timestamp\" 和 \"Event Records<br/>Data Hashes<br/>Oracle Signatures\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 108,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 109,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "NFT_DATA",
+        "EVENT_DATA"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 110,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"📦 shared/\" 和 \"Contract ABIs<br/><i>AssetPassport.json</i><br/><i>EventRegistry.json</i>\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 111,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"📦 shared/\" 和 \"Contract ABIs<br/><i>AssetPassport.json</i><br/><i>EventRegistry.json</i>\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 112,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 113,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SHARED",
+        "ABI"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 114,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"TypeScript Types<br/><i>AssetInfo, EventType</i>\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 115,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"TypeScript Types<br/><i>AssetInfo, EventType</i>\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 116,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"TypeScript Types<br/><i>AssetInfo, EventType</i>\"处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 117,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 118,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TYPES"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 118,
+    "repair_count": 6,
+    "grounding_acts_count": 56,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:06Z",
+  "extra": {
+    "source_url": "https://github.com/IrfanMusthofa/veripass/blob/22c4b762707548cfdc7305441f00632cbc960b27/docs/diagrams/architecture-overview.mmd",
+    "github_repo": "IrfanMusthofa/veripass",
+    "github_file_path": "docs/diagrams/architecture-overview.mmd",
+    "content_size": 5461,
+    "collected_at": "2026-02-06T01:47:57.419020",
+    "license_name": "MIT License",
+    "license_url": "https://api.github.com/licenses/mit",
+    "repo_stars": 0,
+    "repo_forks": 1
+  }
+}

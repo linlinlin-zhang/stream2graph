@@ -1,0 +1,627 @@
+{
+  "id": "ot_pie_00835",
+  "source": "other",
+  "diagram_type": "pie",
+  "code": "graph TD;\n    classDef auto fill:#f9f,stroke:#333,stroke-width:4px;\n    createraml[Create RAML in Design Center]-->RAML-Design-Review;\n    RAML-Design-Review[RAML Design Review]-->ADO-Pipeline-to-Create-New-Project-Repo;\n    ADO-Pipeline-to-Create-New-Project-Repo[ADO Pipeline - Create New Mule Project]-->Repo-Generated;\n%% ADO does not like ::: class shorthand\n    class Repo-Generated auto;\n    Repo-Generated[Git Repo Generated]-->Manually-Create-Pipeline-for-repo;\n    Manually-Create-Pipeline-for-repo[Create pipeline from azure-pipelines.yml already in repo]-->set-branch-policies;\n    set-branch-policies[Set branch policies]-->Clone-Repo-Locally;\n    Clone-Repo-Locally[Clone repo to local machine]-->Create-Feature-Branch;\n    Create-Feature-Branch[Create Feature Branch for story]-->Import;\n    Import[Import project in Studio]-->tests;\n    subgraph story_cycle[Story cycle]\n      tests[Write tests for piece of funtionality]-->impl[Write implementation]\n      impl-->commit[Commit code]\n      commit-->push[Push code to ADO]\n      push-->build[ADO runs build]\n      %% ADO does not like ::: class shorthand\n      class build auto;\n      build-->tests\n    end\n    tests-->PR[Author creates pull request]\n    PR-->work_item[Author links work item/story to PR for traceability]\n    work_item-->comments\n    subgraph pr_review[PR Code Review]\n      comments[Reviewers make comments]-->approved\n      approved{Approved?}-->|No|commit_fixes[Commit fixes]\n      commit_fixes-->comments\n      approved-->|Yes|completed[PR completed]\n    end\n    completed-->merged[Branch merged to master];\n    %% ADO does not like ::: class shorthand\n    class merged auto;\n    merged-->master_build_runs[ADO pipeline - run master branch];\n    %% ADO does not like ::: class shorthand\n    class master_build_runs auto;\n    master_build_runs-->dev_deploy[DEV Deploy starts];\n    %% ADO does not like ::: class shorthand\n    class dev_deploy auto;\n    dev_deploy-->dc_current{Is Design Center master current?}\n    %% ADO does not like ::: class shorthand\n    class dc_current auto;\n    dc_current-->|No|update_design_center[Update Design Center]\n    %% ADO does not like ::: class shorthand\n    class update_design_center auto;\n    update_design_center-->exchange_push[Push to Exchange]\n    %% ADO does not like ::: class shorthand\n    class exchange_push auto;\n    exchange_push-->api_def\n    dc_current-->|Yes|api_def\n    %% ADO does not like ::: class shorthand\n    class api_def auto;\n    api_def[Ensure API Manager definition is current]-->sync_policy\n    sync_policy[Sync policies]-->deploy\n    %% ADO does not like ::: class shorthand\n    class sync_policy auto;\n    deploy[Deploy to CloudHub]-->wait\n    %% ADO does not like ::: class shorthand\n    class deploy auto;\n    wait[Wait for app to start]-->smoke_test[Smoke test in DEV environment]\n    %% ADO does not like ::: class shorthand\n    class wait auto;",
+  "license": "other_source",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Create RAML in Design Center 和 RAML Design Review 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Create RAML in Design Center 和 RAML Design Review'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "createraml",
+        "Review"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 ADO Pipeline - Create New Mule Project 和 Git Repo Generated 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'ADO Pipeline - Create New Mule Project 和 Git Repo Generated'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Repo",
+        "Generated"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Create pipeline from azure-pipelines.yml already in repo 和 Set branch policies 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Create pipeline from azure-pipelines.yml already in repo 和 Set branch policies'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "repo",
+        "policies"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Clone repo to local machine 和 Create Feature Branch for story 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Clone repo to local machine 和 Create Feature Branch for story'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Locally",
+        "Branch"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Import project in Studio 和 Story cycle 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Import project in Studio 和 Story cycle'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Import",
+        "story_cycle"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Write tests for piece of funtionality 和 Write implementation 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Write tests for piece of funtionality 和 Write implementation'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "tests",
+        "impl"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Commit code 和 Push code to ADO 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Commit code 和 Push code to ADO'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "commit",
+        "push"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 ADO runs build 和 Author creates pull request 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'ADO runs build 和 Author creates pull request'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "build",
+        "PR"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Author links work item/story to PR for traceability 和 PR Code Review 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Author links work item/story to PR for traceability 和 PR Code Review'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "work_item",
+        "pr_review"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Reviewers make comments 和 Approved? 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 Reviewers make comments处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Reviewers make comments处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "comments",
+        "approved"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Commit fixes 和 PR completed 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Commit fixes 和 PR completed'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "commit_fixes",
+        "completed"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Branch merged to master 和 ADO pipeline - run master branch 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Branch merged to master 和 ADO pipeline - run master branch'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "merged",
+        "master_build_runs"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 DEV Deploy starts 和 Is Design Center master current?。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'DEV Deploy starts 和 Is Design Center master current?'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "dev_deploy",
+        "dc_current"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Update Design Center 和 Push to Exchange。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Update Design Center 和 Push to Exchange'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "update_design_center",
+        "exchange_push"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Ensure API Manager definition is current 和 Sync policies 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Ensure API Manager definition is current 和 Sync policies'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "api_def",
+        "sync_policy"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Deploy to CloudHub 和 Wait for app to start 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Deploy to CloudHub 和 Wait for app to start'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "deploy",
+        "wait"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Smoke test in DEV environment 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Smoke test in DEV environment'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "smoke_test"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 69,
+    "repair_count": 1,
+    "grounding_acts_count": 34,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:07Z",
+  "extra": {
+    "source_type": "github_search_special",
+    "source_url": "https://github.com/avioconsulting/mule-deploy-library/blob/3e81ea467f286fdd88e3081f124b8a21a362a8e2/deployment.mmd",
+    "github_repo": "avioconsulting/mule-deploy-library",
+    "content_size": 2905,
+    "collected_at": "2026-02-06T10:47:38.374826",
+    "license_name": "Other Source (GitHub-based)"
+  }
+}

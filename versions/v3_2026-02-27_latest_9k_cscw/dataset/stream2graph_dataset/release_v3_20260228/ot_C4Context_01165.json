@@ -1,0 +1,462 @@
+{
+  "id": "ot_C4Context_01165",
+  "source": "other",
+  "diagram_type": "C4Context",
+  "code": "%%{init:{'theme':'base','themeVariables':{'primaryColor':'#f1f8e9','primaryTextColor':'#1b5e20'}}}%%\nC4Context\n    title Lab-Verse Enhanced Production System\n\n    Person(user, \"User\", \"Generates video / TTS\")\n    System_Boundary(labverse, \"Lab-Verse Core\") {\n        System(gateway, \"API Gateway\", \"Express + Helmet + RL + JWT\")\n        System(auth, \"Auth Service\", \"JWT stub (Passport ready)\")\n        System(video, \"Video Service\", \"Google AI Studio\")\n        System(tts, \"TTS Service\", \"ElevenLabs\")\n        System(alert, \"Alert Manager\", \"BullMQ + Slack webhook\")\n        SystemDb(redis, \"Redis\", \"Cache + Queues + Rate-Limit\")\n        SystemDb(storage, \"Local Volume\", \"Videos / Audio\")\n    }\n    System_Ext(google, \"Google AI Studio\", \"Generative Video\")\n    System_Ext(eleven, \"ElevenLabs\", \"TTS API\")\n    System_Ext(slack, \"Slack\", \"Alerts\")\n\n    Rel(user, gateway, \"HTTPS\")\n    Rel(gateway, auth, \"Validate JWT\")\n    Rel(gateway, video, \"Generate\")\n    Rel(gateway, tts, \"Synthesise\")\n    Rel(gateway, alert, \"Notify\")\n    Rel(video, google, \"Fetch\")\n    Rel(tts, eleven, \"Fetch\")\n    Rel(alert, slack, \"Webhook\")\n    Rel(video, redis, \"Cache\")\n    Rel(tts, redis, \"Cache\")\n    Rel(video, storage, \"Save file\")",
+  "license": "mit",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 user, \"User\", \"Generates video / TTS\" 和 labverse, \"Lab-Verse Core\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'user, \"User\", \"Generates video / TTS\" 和 labverse, \"Lab-Verse Core\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Person",
+        "System_Boundary"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 gateway, \"API Gateway\", \"Express + Helmet + RL + JWT\" 和 auth, \"Auth Service\", \"JWT stub (Passport ready 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'gateway, \"API Gateway\", \"Express + Helmet + RL + JWT\" 和 auth, \"Auth Service\", \"JWT stub (Passport ready'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "System",
+        "System"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 video, \"Video Service\", \"Google AI Studio\" 和 tts, \"TTS Service\", \"ElevenLabs\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'video, \"Video Service\", \"Google AI Studio\" 和 tts, \"TTS Service\", \"ElevenLabs\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "System",
+        "System"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 alert, \"Alert Manager\", \"BullMQ + Slack webhook\" 和 redis, \"Redis\", \"Cache + Queues + Rate-Limit\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 alert, \"Alert Manager\", \"BullMQ + Slack webhook\"处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'alert, \"Alert Manager\", \"BullMQ + Slack webhook\"处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "System",
+        "SystemDb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 storage, \"Local Volume\", \"Videos / Audio\" 和 google, \"Google AI Studio\", \"Generative Video\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'storage, \"Local Volume\", \"Videos / Audio\" 和 google, \"Google AI Studio\", \"Generative Video\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SystemDb",
+        "System_Ext"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 eleven, \"ElevenLabs\", \"TTS API\" 和 slack, \"Slack\", \"Alerts\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'eleven, \"ElevenLabs\", \"TTS API\" 和 slack, \"Slack\", \"Alerts\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "System_Ext",
+        "System_Ext"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 user, gateway, \"HTTPS\" 和 gateway, auth, \"Validate JWT\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'user, gateway, \"HTTPS\" 和 gateway, auth, \"Validate JWT\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Rel",
+        "Rel"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 gateway, video, \"Generate\" 和 gateway, tts, \"Synthesise\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'gateway, video, \"Generate\" 和 gateway, tts, \"Synthesise\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Rel",
+        "Rel"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 gateway, alert, \"Notify\" 和 video, google, \"Fetch\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'gateway, alert, \"Notify\" 和 video, google, \"Fetch\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Rel",
+        "Rel"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 tts, eleven, \"Fetch\" 和 alert, slack, \"Webhook\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'tts, eleven, \"Fetch\" 和 alert, slack, \"Webhook\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Rel",
+        "Rel"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 video, redis, \"Cache\" 和 tts, redis, \"Cache\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'video, redis, \"Cache\" 和 tts, redis, \"Cache\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Rel",
+        "Rel"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 video, storage, \"Save file\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'video, storage, \"Save file\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Rel"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 49,
+    "repair_count": 1,
+    "grounding_acts_count": 24,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:07Z",
+  "extra": {
+    "source_type": "github_search",
+    "source_url": "https://github.com/deedk822-lang/The-lab-verse-monitoring-/blob/aa0069f1335fa855ba8806a225cb98876f8e9142/architecture-enhanced.mmd",
+    "github_repo": "deedk822-lang/The-lab-verse-monitoring-",
+    "content_size": 1219,
+    "collected_at": "2026-02-06T11:06:35.058148",
+    "license_name": "MIT License",
+    "license_url": "https://api.github.com/licenses/mit",
+    "repo_owner": "deedk822-lang",
+    "repo_name": "The-lab-verse-monitoring-",
+    "repo_stars": 1,
+    "repo_forks": 0,
+    "repo_topics": [],
+    "repo_language": "Python",
+    "repo_description": "A Node.js server that runs multiple AI and payment agents, including WhatsApp, M-Pesa, Stability AI, and ElevenLabs.",
+    "repo_created_at": "2025-10-08T23:00:08Z",
+    "repo_updated_at": "2026-02-06T09:24:05Z"
+  }
+}

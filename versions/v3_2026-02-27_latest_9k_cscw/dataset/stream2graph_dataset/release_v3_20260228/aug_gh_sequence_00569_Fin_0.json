@@ -1,0 +1,367 @@
+{
+  "id": "aug_gh_sequence_00569_Fin_0",
+  "source": "augmented_real_structure",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant CLI as CLI Command\n    participant Service as EventReindexingService\n    participant OpenSearch as OpenSearch Cluster\n    participant Bookmark as Bookmark API\n    participant Metadata as RDM Records Index\n\n    CLI->>Service: reindex_events(FinTech_PaymentGateway)\n    Service->>Service: update_and_verify_templates(FinTech_FraudDetection)\n    Service->>OpenSearch: Check/Update Templates\n\n    loop For Each Event Type\n        Service->>OpenSearch: get_monthly_indices(FinTech_LedgerService)\n        OpenSearch-->>Service: List of monthly indices\n\n        loop For Each Monthly Index\n            Service->>Service: migrate_monthly_index(FinTech_TransactionQueue)\n            Service->>OpenSearch: create_enriched_index(FinTech_LedgerService)\n            OpenSearch-->>Service: New index name\n\n            Service->>Bookmark: get_bookmark(FinTech_LedgerService)\n            Bookmark-->>Service: Last processed ID\n\n            loop Batch Processing\n                Service->>Service: check_health_conditions(FinTech_LedgerService)\n                Service->>OpenSearch: process_monthly_index_batch(FinTech_AuthVault)\n                Service->>Metadata: get_metadata_for_records(FinTech_FraudDetection)\n                Metadata-->>Service: Record metadata\n                Service->>Service: enrich_events(FinTech_TransactionQueue)\n                Service->>OpenSearch: bulk_index(FinTech_PaymentGateway)\n                Service->>Bookmark: set_bookmark(FinTech_LedgerService)\n            end\n\n            Service->>Service: validate_enriched_data(FinTech_PaymentGateway)\n            Service->>OpenSearch: update_aliases(FinTech_LedgerService)\n\n            alt Current Month Index\n                Service->>OpenSearch: setup_write_alias(FinTech_FraudDetection)\n                Service->>OpenSearch: migrate_new_records(FinTech_FraudDetection)\n            end\n\n            Service->>OpenSearch: delete_old_index(FinTech_PaymentGateway)\n        end\n    end\n\n    Service-->>CLI: Migration results\n",
+  "license": "mit",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 FinTech_PaymentGateway 和 FinTech_FraudDetection 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'FinTech_PaymentGateway 和 FinTech_FraudDetection'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "reindex_events",
+        "update_and_verify_templates"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 FinTech_LedgerService 和 FinTech_TransactionQueue。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'FinTech_LedgerService 和 FinTech_TransactionQueue'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "get_monthly_indices",
+        "migrate_monthly_index"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 FinTech_LedgerService 和 FinTech_LedgerService 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'FinTech_LedgerService 和 FinTech_LedgerService'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "create_enriched_index",
+        "get_bookmark"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 FinTech_LedgerService 和 FinTech_AuthVault 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 FinTech_LedgerService处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'FinTech_LedgerService处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "check_health_conditions",
+        "process_monthly_index_batch"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 FinTech_FraudDetection 和 FinTech_TransactionQueue 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 FinTech_FraudDetection处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'FinTech_FraudDetection处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "get_metadata_for_records",
+        "enrich_events"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 FinTech_PaymentGateway 和 FinTech_LedgerService 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'FinTech_PaymentGateway 和 FinTech_LedgerService'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "bulk_index",
+        "set_bookmark"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 FinTech_PaymentGateway 和 FinTech_LedgerService 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'FinTech_PaymentGateway 和 FinTech_LedgerService'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "validate_enriched_data",
+        "update_aliases"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 FinTech_FraudDetection 和 FinTech_FraudDetection。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'FinTech_FraudDetection 和 FinTech_FraudDetection'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "setup_write_alias",
+        "migrate_new_records"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 FinTech_PaymentGateway 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'FinTech_PaymentGateway'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "delete_old_index"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 38,
+    "repair_count": 2,
+    "grounding_acts_count": 18,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:03Z",
+  "extra": {
+    "source_url": "https://github.com/MESH-Research/invenio-stats-dashboard/blob/8b96c4598deaf08814b9b0fc7c7244a297725a45/docs/event-reindexing-sequence.mmd",
+    "github_repo": "MESH-Research/invenio-stats-dashboard",
+    "github_file_path": "docs/event-reindexing-sequence.mmd",
+    "seed_id": "gh_sequence_00569",
+    "augmentation_domain": "FinTech",
+    "content_size": 1663,
+    "collected_at": "2026-02-06T01:34:05.120021",
+    "license_name": "MIT License",
+    "license_url": "https://api.github.com/licenses/mit",
+    "repo_owner": "MESH-Research",
+    "repo_name": "invenio-stats-dashboard",
+    "repo_stars": 3,
+    "repo_forks": 0,
+    "repo_topics": [],
+    "repo_language": "Python",
+    "repo_description": "A usage statistics dashboard for InvenioRDM instances",
+    "repo_created_at": "2025-05-07T13:44:58Z",
+    "repo_updated_at": "2026-01-24T04:34:06Z"
+  }
+}

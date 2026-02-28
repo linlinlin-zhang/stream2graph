@@ -1,0 +1,398 @@
+{
+  "id": "gl_block-beta_00333",
+  "source": "gitlab",
+  "diagram_type": "block-beta",
+  "code": "graph TB\n    subgraph AWS[\"AWS Account\"]\n        subgraph Region[\"US East 1 (N. Virginia)\"]\n            subgraph VPC[\"myVpc - CIDR: 10.0.0.0/16\"]\n                subgraph AZ1[\"us-east-1a\"]\n                    subgraph PublicSubnet[\"myPublicSubnet - CIDR: 10.0.1.0/24<br/>mapPublicIpOnLaunch: true\"]\n                        EC2[\"myInstance<br/>Type: t2.micro<br/>AMI: Latest Amazon Linux 2<br/>Public IP: Auto-assigned<br/>User Data: Creates index.html + starts Python server\"]\n                        \n                        subgraph Storage[\"Block Storage\"]\n                            EBS[\"Root EBS Volume<br/>Type: gp2 (default)<br/>Size: 8GB<br/>Mount: / (root filesystem)<br/>Contains: OS + index.html\"]\n                        end\n                    end\n                end\n                \n                IGW[\"myInternetGateway<br/>Provides internet connectivity<br/>Attached to VPC\"]\n                \n                RT[\"myRouteTable<br/>Default route: 0.0.0.0/0 → IGW<br/>Associated with myPublicSubnet<br/>Enables internet access\"]\n                \n                SG[\"mySecurityGroup<br/>Attached to myInstance<br/>Ingress Rules:<br/>• HTTP (80/tcp) from allowed IP range<br/>• SSH (22/tcp) from allowed IP range<br/>Egress: All traffic allowed<br/>IP-based access control\"]\n                \n                RTA[\"myRouteTableAssociation<br/>Links route table to subnet<br/>Enables routing rules\"]\n            end\n        end\n    end\n    \n    WEB_USER[\"Web Users<br/>HTTP Access (allowed IP range)<br/>Web Browsers\"]\n    ADMIN_USER[\"Admin Users<br/>SSH Access (allowed IP range)<br/>Terminal/SSH Clients\"]\n    BLOCKED[\"Blocked Traffic<br/>All Other IP Addresses<br/>Access Denied by Security Group\"]\n    \n    %% Web Traffic Flow\n    WEB_USER -->|HTTP GET Requests<br/>Port 80/TCP from allowed IP range| IGW\n    \n    %% Admin Traffic Flow  \n    ADMIN_USER -->|SSH Connections<br/>Port 22/TCP from allowed IP range| IGW\n    IGW -->|Ingress Traffic<br/>NAT & Routing| RT\n    RT -->|Subnet Routing<br/>10.0.1.0/24| PublicSubnet\n    PublicSubnet -->|Instance Access<br/>Security Group Filter| EC2\n    EC2 -->|HTTP Responses<br/>Serves index.html| WEB_USER\n    EC2 -->|SSH Shell Access<br/>Remote Administration| ADMIN_USER\n    \n    %% Blocked Traffic Flow\n    BLOCKED -.->|Access Denied<br/>All other IPs blocked| SG\n    SG -.->|Firewall Rules<br/>All other IPs blocked| BLOCKED\n    \n    %% Infrastructure Relationships  \n    RT -.->|Association| RTA\n    RTA -.->|Links to| PublicSubnet\n    SG -->|Network Security<br/>Firewall Rules| EC2\n    EC2 -->|Block Storage<br/>Root Volume| EBS\n    \n    %% User Data Process Flow\n    EC2 -.->|Boot Script Execution| UserData[\"User Data Script<br/>1. echo 'Hello, World!' > index.html<br/>2. nohup python -m SimpleHTTPServer 80 &\"]\n    UserData -.->|Creates Content| EBS\n    UserData -.->|Starts Web Server| PythonProcess[\"Python HTTP Server<br/>Process on port 80<br/>Serves files from /\"]\n    \n    %% Styling\n    classDef vpc fill:#e1f5fe,stroke:#0277bd,stroke-width:2px\n    classDef subnet fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px\n    classDef ec2 fill:#fff3e0,stroke:#f57c00,stroke-width:2px\n    classDef network fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px\n    classDef storage fill:#fce4ec,stroke:#c2185b,stroke-width:2px\n    classDef internet fill:#e3f2fd,stroke:#1976d2,stroke-width:2px\n    classDef process fill:#f1f8e9,stroke:#689f38,stroke-width:2px\n    classDef blocked fill:#ffebee,stroke:#d32f2f,stroke-width:2px\n    \n    class VPC vpc\n    class PublicSubnet subnet\n    class EC2 ec2\n    class EBS storage\n    class IGW,RT,SG,RTA network\n    class WEB_USER,ADMIN_USER internet\n    class BLOCKED blocked\n    class UserData,PythonProcess process",
+  "license": "apache-2.0",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"AWS Account\" 和 \"US East 1 (N. Virginia 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"AWS Account\" 和 \"US East 1 (N. Virginia'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AWS",
+        "Region"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"myVpc - CIDR: 10.0.0.0/16\" 和 \"us-east-1a\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 \"myVpc - CIDR: 10.0.0.0/16\"处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"myVpc - CIDR: 10.0.0.0/16\"处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "VPC",
+        "AZ1"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"myPublicSubnet - CIDR: 10.0.1.0/24<br/>mapPublicIpOnLaunch: true\" 和 \"myInstance<br/>Type: t2.micro<br/>AMI: Latest Amazon Linux 2<br/>Public IP: Auto-assigned<br/>User Data: Creates index.html + starts Python server\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"myPublicSubnet - CIDR: 10.0.1.0/24<br/>mapPublicIpOnLaunch: true\" 和 \"myInstance<br/>Type: t2.micro<br/>AMI: Latest Amazon Linux 2<br/>Public IP: Auto-assigned<br/>User Data: Creates index.html + starts Python server\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PublicSubnet",
+        "EC2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Block Storage\" 和 \"Root EBS Volume<br/>Type: gp2 (default。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Block Storage\" 和 \"Root EBS Volume<br/>Type: gp2 (default'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Storage",
+        "EBS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"myInternetGateway<br/>Provides internet connectivity<br/>Attached to VPC\" 和 \"myRouteTable<br/>Default route: 0.0.0.0/0 → IGW<br/>Associated with myPublicSubnet<br/>Enables internet access\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"myInternetGateway<br/>Provides internet connectivity<br/>Attached to VPC\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"myInternetGateway<br/>Provides internet connectivity<br/>Attached to VPC\"处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "IGW",
+        "RT"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"mySecurityGroup<br/>Attached to myInstance<br/>Ingress Rules:<br/>• HTTP (80/tcp 和 22/tcp 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 \"mySecurityGroup<br/>Attached to myInstance<br/>Ingress Rules:<br/>• HTTP (80/tcp处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"mySecurityGroup<br/>Attached to myInstance<br/>Ingress Rules:<br/>• HTTP (80/tcp处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SG",
+        "SSH"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"myRouteTableAssociation<br/>Links route table to subnet<br/>Enables routing rules\" 和 \"Web Users<br/>HTTP Access (allowed IP range 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 \"myRouteTableAssociation<br/>Links route table to subnet<br/>Enables routing rules\"处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"myRouteTableAssociation<br/>Links route table to subnet<br/>Enables routing rules\"处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "RTA",
+        "WEB_USER"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Admin Users<br/>SSH Access (allowed IP range 和 \"Blocked Traffic<br/>All Other IP Addresses<br/>Access Denied by Security Group\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 \"Admin Users<br/>SSH Access (allowed IP range处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Admin Users<br/>SSH Access (allowed IP range处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ADMIN_USER",
+        "BLOCKED"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"User Data Script<br/>1. echo 'Hello, World!' > index.html<br/>2. nohup python -m SimpleHTTPServer 80 &\" 和 \"Python HTTP Server<br/>Process on port 80<br/>Serves files from /\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"User Data Script<br/>1. echo 'Hello, World!' > index.html<br/>2. nohup python -m SimpleHTTPServer 80 &\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"User Data Script<br/>1. echo 'Hello, World!' > index.html<br/>2. nohup python -m SimpleHTTPServer 80 &\"处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "UserData",
+        "PythonProcess"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 42,
+    "repair_count": 6,
+    "grounding_acts_count": 18,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:07Z",
+  "extra": {
+    "source_url": "https://github.com/pulumi-demos/examples/blob/5ee70f4155dc93719da00a9f616c0bfce257178d/diagrams/claude-and-mermaid-generation/diagrams/aws-infrastructure.mmd",
+    "github_repo": "pulumi-demos/examples",
+    "content_size": 3709,
+    "collected_at": "2026-02-06T14:07:26.733321",
+    "license_name": "Apache License 2.0",
+    "license_url": "https://api.github.com/licenses/apache-2.0",
+    "repo_owner": "pulumi-demos",
+    "repo_name": "examples",
+    "repo_stars": 1,
+    "repo_forks": 0,
+    "repo_topics": [],
+    "repo_language": "Python",
+    "repo_description": "Examples used in Pulumi demos.",
+    "repo_created_at": "2022-11-04T14:44:56Z",
+    "repo_updated_at": "2025-09-15T19:47:02Z",
+    "source_note": "collected_from_github_additional"
+  }
+}

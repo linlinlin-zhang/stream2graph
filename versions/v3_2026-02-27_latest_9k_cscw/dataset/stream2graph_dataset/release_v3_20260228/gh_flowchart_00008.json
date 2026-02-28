@@ -1,0 +1,899 @@
+{
+  "id": "gh_flowchart_00008",
+  "source": "github",
+  "diagram_type": "flowchart",
+  "code": "---\nconfig:\n  theme: redux\n---\nflowchart TD\n    A1[\"Start: Entry point to exuecution loop\"] --> A[\"Beginning of the CPU Execution Cycle\"]\n    A --> B[\"Fetch opcode from memory - PC address\"]\n    B -- Memory read successful --> C[\"Increment PC by 1\"]\n    B -- Memory access error --> D[\"Handle error - e.g., invalid address\"]\n    D --> E[\"Log error - debug output\"]\n    E --> F[\"End: Cycle aborted\"]\n    C --> G{\"Valid opcode?\"}\n    G -- Yes --> H[\"Decode opcode\"]\n    G -- No --> I[\"Handle illegal opcode - e.g., NOP or halt\"]\n    I --> J[\"Log illegal opcode - debug output\"]\n    J --> K[\"Advance CPU cycles - typically 2\"]\n    K --> A\n    H --> L{\"Addressing mode?\"}\n    L -- Immediate, Implied, Accumulator --> M[\"Fetch no additional bytes\"]\n    L -- Zero Page, Indexed, Absolute --> N[\"Fetch 1-2 bytes from memory - PC\"]\n    L -- Indirect, Relative --> O[\"Fetch 2 bytes - resolve indirect address\"]\n    M --> P[\"Increment PC by 0\"]\n    N --> Q[\"Increment PC by 1 or 2\"]\n    O --> R[\"Increment PC by 2\"]\n    P --> S[\"Execute instruction\"]\n    Q --> S\n    R --> S\n    S --> T{\"Instruction type?\"}\n    T -- \"Arithmetic/Logical - e.g., ADC, AND\" --> U[\"Perform operation - update registers, flags\"]\n    T -- \"Load/Store - e.g., LDA, STA\" --> V[\"Read/write memory - update registers\"]\n    T -- \"Branch - e.g., BEQ, JMP\" --> W[\"Update PC if condition met\"]\n    T -- \"Stack - e.g., PHA, RTS\" --> X[\"Push/pull stack - update SP, PC\"]\n    T -- \"System - e.g., BRK, RTI\" --> Y[\"Handle system operation - e.g., trigger interrupt\"]\n    U --> Z[\"Update status flags - e.g., Zero, Carry\"]\n    V --> Z\n    W --> AA[\"Check branch condition\"]\n    X --> Z\n    Y --> AB[\"Process interrupt or return\"]\n    AA -- Met --> AC[\"Set PC to branch target\"]\n    AA --  Not mett --> AD[\"No PC change\"]\n    AC --> Z\n    AD --> Z\n    AB -- Interrupt triggered --> AE[\"Push PC, status to stack - set interrupt vector\"]\n    AB -- Return from interrupt --> AF[\"Pull PC, status from stack\"]\n    AE --> AG[\"Set PC to interrupt vector - e.g., NMI at 0xFFFA\"]\n    AF --> Z\n    Z --> AH[\"Advance CPU cycles - based on instruction\"]\n    AG --> AH\n    AH --> AI{\"Check interruption\"}\n    AI -- \"NMI pending - e.g., PPU VBlank\" --> AJ[\"Set NMI flag - prepare interrupt\"]\n    AI -- \"IRQ pending - e.g., mapper, APU\" --> AK[\"Set IRQ flag - if not disabled\"]\n    AI -- No interrupts --> AL[\"No action\"]\n    AJ --> AM[\"Handle NMI - save state, jump to 0xFFFA\"]\n    AK --> AN[\"Handle IRQ - save state, jump to 0xFFFE\"]\n    AL --> AO[\"Prepare next cycle\"]\n    AM --> AO\n    AN --> AO\n    AO --> AP{\"Sync with PPU, APU?\"}\n    AP -- Yes --> AQ[\"Update PPU - 3 PPU cycles per CPU cycle\"]\n    AQ --> AR[\"Update APU - generate audio\"]\n    AR --> AS[\"Read controller input - 0x4016/0x4017\"]\n    AS --> AT[\"Check DMA - e.g., OAM transfer\"]\n    AT --> AU[\"End: Cycle complete - return to Start\"]\n    AP -- No --> AU\n    AU --> A\n    style AI stroke:#000000\n",
+  "license": "mit",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Start: Entry point to exuecution loop\" 和 \"Beginning of the CPU Execution Cycle\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Start: Entry point to exuecution loop\" 和 \"Beginning of the CPU Execution Cycle\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "A1",
+        "A"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Fetch opcode from memory - PC address\" 和 \"Increment PC by 1\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Fetch opcode from memory - PC address\" 和 \"Increment PC by 1\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "B",
+        "C"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Handle error - e.g., invalid address\" 和 \"Log error - debug output\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Handle error - e.g., invalid address\" 和 \"Log error - debug output\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "D",
+        "E"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"End: Cycle aborted\" 和 \"Valid opcode?\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"End: Cycle aborted\" 和 \"Valid opcode?\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "F",
+        "G"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Decode opcode\" 和 \"Handle illegal opcode - e.g., NOP or halt\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Decode opcode\" 和 \"Handle illegal opcode - e.g., NOP or halt\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "H",
+        "I"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Log illegal opcode - debug output\" 和 \"Advance CPU cycles - typically 2\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Log illegal opcode - debug output\" 和 \"Advance CPU cycles - typically 2\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "J",
+        "K"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Addressing mode?\" 和 \"Fetch no additional bytes\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Addressing mode?\" 和 \"Fetch no additional bytes\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "L",
+        "M"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Fetch 1-2 bytes from memory - PC\" 和 \"Fetch 2 bytes - resolve indirect address\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"Fetch 1-2 bytes from memory - PC\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Fetch 1-2 bytes from memory - PC\"处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "N",
+        "O"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Increment PC by 0\" 和 \"Increment PC by 1 or 2\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Increment PC by 0\" 和 \"Increment PC by 1 or 2\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "P",
+        "Q"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Increment PC by 2\" 和 \"Execute instruction\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Increment PC by 2\" 和 \"Execute instruction\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "R",
+        "S"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Instruction type?\" 和 \"Perform operation - update registers, flags\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Instruction type?\" 和 \"Perform operation - update registers, flags\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "T",
+        "U"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Read/write memory - update registers\" 和 \"Update PC if condition met\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"Read/write memory - update registers\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Read/write memory - update registers\"处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "V",
+        "W"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Push/pull stack - update SP, PC\" 和 \"Handle system operation - e.g., trigger interrupt\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Push/pull stack - update SP, PC\" 和 \"Handle system operation - e.g., trigger interrupt\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "X",
+        "Y"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Update status flags - e.g., Zero, Carry\" 和 \"Check branch condition\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Update status flags - e.g., Zero, Carry\" 和 \"Check branch condition\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Z",
+        "AA"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Process interrupt or return\" 和 \"Set PC to branch target\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 \"Process interrupt or return\"处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 61,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Process interrupt or return\"处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AB",
+        "AC"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"No PC change\" 和 \"Push PC, status to stack - set interrupt vector\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"No PC change\" 和 \"Push PC, status to stack - set interrupt vector\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AD",
+        "AE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Pull PC, status from stack\" 和 \"Set PC to interrupt vector - e.g., NMI at 0xFFFA\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Pull PC, status from stack\" 和 \"Set PC to interrupt vector - e.g., NMI at 0xFFFA\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AF",
+        "AG"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Advance CPU cycles - based on instruction\" 和 \"Check interruption\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 73,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Advance CPU cycles - based on instruction\" 和 \"Check interruption\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 74,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 75,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AH",
+        "AI"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 76,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Set NMI flag - prepare interrupt\" 和 \"Set IRQ flag - if not disabled\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 77,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Set NMI flag - prepare interrupt\" 和 \"Set IRQ flag - if not disabled\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 78,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 79,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AJ",
+        "AK"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 80,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"No action\" 和 \"Handle NMI - save state, jump to 0xFFFA\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 81,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"No action\" 和 \"Handle NMI - save state, jump to 0xFFFA\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 82,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 83,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AL",
+        "AM"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 84,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Handle IRQ - save state, jump to 0xFFFE\" 和 \"Prepare next cycle\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 85,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Handle IRQ - save state, jump to 0xFFFE\" 和 \"Prepare next cycle\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 86,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 87,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AN",
+        "AO"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 88,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Sync with PPU, APU?\" 和 \"Update PPU - 3 PPU cycles per CPU cycle\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 89,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Sync with PPU, APU?\" 和 \"Update PPU - 3 PPU cycles per CPU cycle\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 90,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 91,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AP",
+        "AQ"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 92,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Update APU - generate audio\" 和 \"Read controller input - 0x4016/0x4017\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 93,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Update APU - generate audio\" 和 \"Read controller input - 0x4016/0x4017\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 94,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 95,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AR",
+        "AS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 96,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Check DMA - e.g., OAM transfer\" 和 \"End: Cycle complete - return to Start\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 97,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Check DMA - e.g., OAM transfer\" 和 \"End: Cycle complete - return to Start\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 98,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 99,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AT",
+        "AU"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 99,
+    "repair_count": 3,
+    "grounding_acts_count": 48,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:06Z",
+  "extra": {
+    "source_url": "https://github.com/WKosikowski/wojo-nes-emulator/blob/12a769acf1b44135a883681e60987768c2a8c1aa/UML/CPU_Cycle.mmd",
+    "github_repo": "WKosikowski/wojo-nes-emulator",
+    "github_file_path": "UML/CPU_Cycle.mmd",
+    "content_size": 2904,
+    "collected_at": "2026-02-06T01:41:19.629099",
+    "license_name": "MIT License",
+    "license_url": "https://api.github.com/licenses/mit",
+    "repo_owner": "WKosikowski",
+    "repo_name": "wojo-nes-emulator",
+    "repo_stars": 1,
+    "repo_forks": 0,
+    "repo_topics": [],
+    "repo_language": "Swift",
+    "repo_description": "A Nintendo Entertainment System Emulator written in Swift",
+    "repo_created_at": "2025-05-11T14:35:51Z",
+    "repo_updated_at": "2026-01-11T20:44:05Z"
+  }
+}

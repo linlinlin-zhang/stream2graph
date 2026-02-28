@@ -1,0 +1,72 @@
+{
+  "id": "aug_ot_stateDiagram_00343_Fin_0",
+  "source": "augmented_real_structure",
+  "diagram_type": "stateDiagram",
+  "code": "%% Parser State Machine\n%% Shows how the scanner maintains state while processing directives\n\nstateDiagram-v2\n    [FinTech_PaymentGateway] --> Idle: Start scanning\n\n    Idle --> Idle: Non-doc line\n    Idle --> CollectingDocs: ## directive\n\n    CollectingDocs --> CollectingDocs: ## doc line\n    CollectingDocs --> CollectingDocs: ## !var\n    CollectingDocs --> CollectingDocs: ## !alias\n    CollectingDocs --> CategorySet: ## !category\n    CollectingDocs --> FileDoc: ## !file\n    CollectingDocs --> Idle: target line\n\n    CategorySet --> CollectingDocs: ## doc line\n    CategorySet --> CategorySet: ## !category\n    CategorySet --> Idle: target line\n\n    FileDoc --> Idle: content line\n    FileDoc --> CollectingDocs: ## doc line\n\n    note right of CollectingDocs\n        Pending state includes\n        pendingDocs, pendingVars,\n        pendingAliases, and\n        currentCategory (FinTech_FraudDetection)\n    end note\n\n    note right of CategorySet\n        Category is STICKY and\n        applies to all subsequent\n        targets until changed\n    end note\n",
+  "license": "apache-2.0",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 FinTech_PaymentGateway 和 FinTech_FraudDetection 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'FinTech_PaymentGateway 和 FinTech_FraudDetection'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2",
+        "currentCategory"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:05Z",
+  "extra": {
+    "source_type": "github_search_special",
+    "source_url": "https://github.com/sdlcforge/make-help/blob/348126c2607025cc04b01916f85ca669357d6a30/docs/architecture/diagrams/parser-state-machine.mmd",
+    "github_repo": "sdlcforge/make-help",
+    "seed_id": "ot_stateDiagram_00343",
+    "augmentation_domain": "FinTech",
+    "content_size": 1022,
+    "collected_at": "2026-02-06T10:40:58.284443",
+    "license_name": "Apache License 2.0",
+    "license_url": "https://api.github.com/licenses/apache-2.0",
+    "repo_owner": "sdlcforge",
+    "repo_name": "make-help",
+    "repo_stars": 0,
+    "repo_forks": 0,
+    "repo_topics": [],
+    "repo_language": "Go",
+    "repo_description": "undefined",
+    "repo_created_at": "2025-11-27T18:05:38Z",
+    "repo_updated_at": "2026-01-12T22:28:56Z"
+  }
+}

@@ -8,5 +8,20 @@
   - `v3_verified_final` + `v4_industrial_source` + `v5_augmented`
   - `final_v2_9k`（9k 合并结果）
   - `cscw_dialogue_dataset`（9000 条对话增强结果）
+  - `release_v3_20260228`（清洗后的可发布数据子集，4709 条）
 
 说明: 这是当前最接近“可训练可复现”的版本。
+
+## 发布子集说明
+
+- 构建脚本: `../../tools/build_release_v3.py`
+- 输入: `cscw_dialogue_dataset`（9000）
+- 输出: `release_v3_20260228`（4709）
+- 过滤规则:
+  - `compilation_status == success`
+  - 许可证有效
+  - 对话轮次范围 `4~120`
+
+报告文件:
+- `../../reports/release_reports/release_v3_latest.md`
+- `../../reports/release_reports/release_v3_latest.json`

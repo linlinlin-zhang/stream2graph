@@ -1,0 +1,682 @@
+{
+  "id": "gh_architecture_01470",
+  "source": "github",
+  "diagram_type": "architecture",
+  "code": "%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4a90d9'}}}%%\n\nflowchart TB\n    START([🎯 User Query]) --> CLASSIFY\n\n    subgraph CLASSIFICATION[\"1️⃣ Task Classification\"]\n        CLASSIFY[\"classify_task(query)\"]\n        CLASSIFY --> TASK_TYPE{\"Task Type?\"}\n        \n        TASK_TYPE -->|workflow| TT_WF[\"WORKFLOW<br/>generate, pipeline, RNA-seq...\"]\n        TASK_TYPE -->|diagnosis| TT_DIAG[\"DIAGNOSIS<br/>error, fail, debug...\"]\n        TASK_TYPE -->|data| TT_DATA[\"DATA<br/>scan, search, download...\"]\n        TASK_TYPE -->|job| TT_JOB[\"JOB<br/>submit, status, cancel...\"]\n        TASK_TYPE -->|education| TT_EDU[\"EDUCATION<br/>explain, what is, help...\"]\n        TASK_TYPE -->|system| TT_SYS[\"SYSTEM<br/>health, vllm, restart...\"]\n        TASK_TYPE -->|general| TT_GEN[\"GENERAL<br/>other queries\"]\n    end\n\n    TT_WF & TT_DIAG & TT_DATA & TT_JOB & TT_EDU & TT_SYS & TT_GEN --> DETECT\n\n    subgraph DETECTION[\"2️⃣ Tool Detection\"]\n        DETECT[\"tools.detect_tool(query)\"]\n        DETECT --> TOOL_FOUND{\"Tool<br/>Detected?\"}\n        \n        TOOL_FOUND -->|Yes| SPECIFIC[\"Specific Tool<br/>e.g., GENERATE_WORKFLOW\"]\n        TOOL_FOUND -->|No| GENERAL_HANDLER[\"General Handler<br/>Route by TaskType\"]\n    end\n\n    SPECIFIC --> PERM_CHECK\n    GENERAL_HANDLER --> DEFAULT_TOOL[\"Select Default Tool<br/>for TaskType\"]\n    DEFAULT_TOOL --> PERM_CHECK\n\n    subgraph PERMISSION[\"3️⃣ Permission Check\"]\n        PERM_CHECK[\"check_tool_permission(tool)\"]\n        PERM_CHECK --> PERM_MAP[\"Map Tool → Permission<br/>read/write/execute/delete\"]\n        PERM_MAP --> LEVEL_CHECK{\"Allowed at<br/>Current Level?\"}\n        \n        LEVEL_CHECK -->|Denied| PERM_DENIED[\"❌ Permission Denied<br/>Return Error Response\"]\n        LEVEL_CHECK -->|Needs Approval| APPROVAL[\"🔔 Request Approval<br/>NEEDS_APPROVAL response\"]\n        LEVEL_CHECK -->|Allowed| EXTRACT\n    end\n\n    PERM_DENIED --> RESPONSE\n    APPROVAL --> RESPONSE\n\n    subgraph EXECUTION[\"4️⃣ Tool Execution\"]\n        EXTRACT[\"_extract_parameters(query, tool)\"]\n        EXTRACT --> EXEC[\"execute_tool(tool, **params)\"]\n        \n        EXEC --> AUDIT_LOG[\"📝 AuditLogger<br/>log_tool_call()\"]\n        AUDIT_LOG --> TOOL_HANDLER[\"Tool Handler<br/>Actual Implementation\"]\n        TOOL_HANDLER --> RESULT[\"ToolResult<br/>success/error + data\"]\n        RESULT --> AUDIT_RESULT[\"📝 AuditLogger<br/>log_tool_result()\"]\n    end\n\n    AUDIT_RESULT --> BUILD\n\n    subgraph RESPONSE_BUILD[\"5️⃣ Response Building\"]\n        BUILD[\"_build_response()\"]\n        BUILD --> COMBINE[\"Combine:<br/>• Messages<br/>• Data<br/>• Suggestions\"]\n        COMBINE --> AGENT_RESP[\"AgentResponse<br/>━━━━━━━━━━━━━━<br/>success: bool<br/>message: str<br/>task_type: TaskType<br/>tool_executions: list<br/>data: dict<br/>suggestions: list\"]\n    end\n\n    AGENT_RESP --> HISTORY[\"Save to _history\"]\n    HISTORY --> RESPONSE([📤 Return AgentResponse])\n\n    %% Styling\n    classDef startEnd fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px\n    classDef process fill:#e3f2fd,stroke:#1976d2,stroke-width:2px\n    classDef decision fill:#fff3e0,stroke:#f57c00,stroke-width:2px\n    classDef error fill:#ffcdd2,stroke:#c62828,stroke-width:2px\n    classDef approval fill:#fff9c4,stroke:#f9a825,stroke-width:2px\n\n    class START,RESPONSE startEnd\n    class CLASSIFY,DETECT,PERM_CHECK,EXTRACT,EXEC,BUILD process\n    class TASK_TYPE,TOOL_FOUND,LEVEL_CHECK decision\n    class PERM_DENIED error\n    class APPROVAL approval\n",
+  "license": "mit",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 [🎯 User Query 和 \"1️⃣ Task Classification\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 [🎯 User Query处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '[🎯 User Query处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "START",
+        "CLASSIFICATION"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"classify_task(query 和 \"Task Type?\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"classify_task(query 和 \"Task Type?\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CLASSIFY",
+        "TASK_TYPE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"WORKFLOW<br/>generate, pipeline, RNA-seq...\" 和 \"DIAGNOSIS<br/>error, fail, debug...\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"WORKFLOW<br/>generate, pipeline, RNA-seq...\" 和 \"DIAGNOSIS<br/>error, fail, debug...\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TT_WF",
+        "TT_DIAG"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"DATA<br/>scan, search, download...\" 和 \"JOB<br/>submit, status, cancel...\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"DATA<br/>scan, search, download...\" 和 \"JOB<br/>submit, status, cancel...\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TT_DATA",
+        "TT_JOB"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"EDUCATION<br/>explain, what is, help...\" 和 \"SYSTEM<br/>health, vllm, restart...\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"EDUCATION<br/>explain, what is, help...\" 和 \"SYSTEM<br/>health, vllm, restart...\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TT_EDU",
+        "TT_SYS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"GENERAL<br/>other queries\" 和 \"2️⃣ Tool Detection\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"GENERAL<br/>other queries\" 和 \"2️⃣ Tool Detection\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TT_GEN",
+        "DETECTION"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"tools.detect_tool(query 和 \"Tool<br/>Detected?\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 \"tools.detect_tool(query处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"tools.detect_tool(query处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DETECT",
+        "TOOL_FOUND"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Specific Tool<br/>e.g., GENERATE_WORKFLOW\" 和 \"General Handler<br/>Route by TaskType\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Specific Tool<br/>e.g., GENERATE_WORKFLOW\" 和 \"General Handler<br/>Route by TaskType\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SPECIFIC",
+        "GENERAL_HANDLER"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Select Default Tool<br/>for TaskType\" 和 \"3️⃣ Permission Check\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Select Default Tool<br/>for TaskType\" 和 \"3️⃣ Permission Check\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DEFAULT_TOOL",
+        "PERMISSION"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"check_tool_permission(tool 和 \"Map Tool → Permission<br/>read/write/execute/delete\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"check_tool_permission(tool 和 \"Map Tool → Permission<br/>read/write/execute/delete\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PERM_CHECK",
+        "PERM_MAP"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Allowed at<br/>Current Level?\" 和 \"❌ Permission Denied<br/>Return Error Response\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Allowed at<br/>Current Level?\" 和 \"❌ Permission Denied<br/>Return Error Response\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "LEVEL_CHECK",
+        "PERM_DENIED"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"🔔 Request Approval<br/>NEEDS_APPROVAL response\" 和 \"4️⃣ Tool Execution\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"🔔 Request Approval<br/>NEEDS_APPROVAL response\" 和 \"4️⃣ Tool Execution\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "APPROVAL",
+        "EXECUTION"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"_extract_parameters(query, tool 和 \"execute_tool(tool, **params 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"_extract_parameters(query, tool 和 \"execute_tool(tool, **params'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EXTRACT",
+        "EXEC"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"📝 AuditLogger<br/>log_tool_call( 和 \"Tool Handler<br/>Actual Implementation\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 \"📝 AuditLogger<br/>log_tool_call(处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 57,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"📝 AuditLogger<br/>log_tool_call(处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AUDIT_LOG",
+        "TOOL_HANDLER"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"ToolResult<br/>success/error + data\" 和 \"📝 AuditLogger<br/>log_tool_result( 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"ToolResult<br/>success/error + data\" 和 \"📝 AuditLogger<br/>log_tool_result('？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "RESULT",
+        "AUDIT_RESULT"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"5️⃣ Response Building\" 和 \"_build_response( 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"5️⃣ Response Building\" 和 \"_build_response('，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "RESPONSE_BUILD",
+        "BUILD"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Combine:<br/>• Messages<br/>• Data<br/>• Suggestions\" 和 \"AgentResponse<br/>━━━━━━━━━━━━━━<br/>success: bool<br/>message: str<br/>task_type: TaskType<br/>tool_executions: list<br/>data: dict<br/>suggestions: list\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Combine:<br/>• Messages<br/>• Data<br/>• Suggestions\" 和 \"AgentResponse<br/>━━━━━━━━━━━━━━<br/>success: bool<br/>message: str<br/>task_type: TaskType<br/>tool_executions: list<br/>data: dict<br/>suggestions: list\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "COMBINE",
+        "AGENT_RESP"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Save to _history\" 和 [📤 Return AgentResponse。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 73,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Save to _history\" 和 [📤 Return AgentResponse'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 74,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 75,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "HISTORY",
+        "RESPONSE"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 75,
+    "repair_count": 3,
+    "grounding_acts_count": 36,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:06Z",
+  "extra": {
+    "source_url": "https://github.com/sdodlapati3/BioPipelines/blob/7bb603ade88cc7f3f8800fb72a7201db77b3b939/docs/diagrams/unified_agent_flow.mmd",
+    "github_repo": "sdodlapati3/BioPipelines",
+    "github_file_path": "docs/diagrams/unified_agent_flow.mmd",
+    "content_size": 3428,
+    "collected_at": "2026-02-06T01:46:38.777602",
+    "license_name": "MIT License",
+    "license_url": "https://api.github.com/licenses/mit",
+    "repo_stars": 0,
+    "repo_forks": 0
+  }
+}

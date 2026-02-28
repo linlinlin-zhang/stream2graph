@@ -1,0 +1,611 @@
+{
+  "id": "gh_flowchart_00219",
+  "source": "github",
+  "diagram_type": "flowchart",
+  "code": "flowchart LR\n  %% Client\n  subgraph Client\n    direction TB\n    A[User Browser / Mobile App] -->|\"HTTP / WebSocket LiveView\"| Endpoint[Phoenix Endpoint]\n    Atrium[Atrium Patron Portal] -->|\"HTTP / WS\"| Endpoint\n  end\n\n  %% Phoenix App\n  subgraph WebLayer[Phoenix App]\n    direction TB\n    Endpoint --> Router[Router & Pipelines]\n    Router --> LiveView[LiveView / LiveComponents]\n    Router --> Controllers[Controllers / API Controllers]\n    LiveView --> UI[Core Components / Forms / Streams]\n    Controllers --> Contexts[Contexts business logic]\n    Contexts --> Repo[(Ecto.Repo / Postgres)]\n    Contexts --> AttachmentMgr[Attachment Manager / Presigner]\n    Contexts --> Auth[\"Auth & Session / RBAC (phx.gen.auth)\"]\n    LiveView -->|\"pubsub events\"| PubSub[(Phoenix.PubSub)]\n  end\n\n  %% Storage & Attachment flow\n  subgraph Storage\n    direction TB\n    AttachmentMgr --> Presigner[Presigner Service]\n    Presigner --> ObjectStorage[(S3-compatible Object Storage)]\n    ObjectStorage --> AttachmentWorker[\"Attachment Processor (background job)\"]\n    AttachmentWorker --> Repo\n  end\n\n  %% Background processing\n  subgraph Background\n    direction TB\n    Queue[Oban / Background Queue] --> AttachmentWorker\n    Queue --> FineBot[Fine Bot / Scheduler]\n    FineBot --> Repo\n    FineBot --> Notifier[\"Notification System (Email/SMS)\"]\n    Notifier --> ExternalMail[(SMTP / Gmail API)]\n  end\n\n  %% Infrastructure & integrations (project-specific)\n  subgraph Infra\n    direction TB\n    Repo --> Postgres[(Postgres DB)]\n    Assets[_build/esbuild & tailwind] --> Static[Static Assets Served]\n    Container[\"Podman / Containerfile & Containerfile.dev\"] --> Image[Podman Image]\n    Scripts[\"./scripts/deploy.sh, ./scripts/manage.sh, mix precommit\"] --> Container\n    ExternalAPI[\"Third-party APIs (Payment, Xendit, Gmail API, etc.)\"]\n  end\n\n  %% cross connections\n  Endpoint -->|\"on_mount/fetch\"| Auth\n  Contexts -->|\"enqueue jobs\"| Queue\n  Contexts -->|\"http\"| Req[Req HTTP client]\n  Notifier -->|\"send\"| ExternalMail\n  Image -->|\"deploy via podman\"| ImageDeployed[\"Deployed Instance (host)\"]\n\n  %% styling\n  classDef client fill:#fef3c7,stroke:#f59e0b\n  classDef web fill:#eef2ff,stroke:#4338ca\n  classDef storage fill:#ecfeff,stroke:#0891b2\n  classDef infra fill:#f0f9ff,stroke:#0ea5a4\n\n  class A,Atrium client\n  class Endpoint,Router,LiveView,Controllers,UI,Contexts,Auth,PubSub web\n  class Presigner,ObjectStorage,AttachmentWorker,AttachmentMgr storage\n  class Repo,Postgres,Assets,Container,Image,Scripts,ExternalAPI,Req infra\n\n  %% short legend\n  subgraph Legend\n    direction LR\n    L1[HTTP / WS flows] --> L2[Background / Async flows]\n  end\n",
+  "license": "apache-2.0",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 User Browser / Mobile App 和 Phoenix Endpoint。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'User Browser / Mobile App 和 Phoenix Endpoint'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "A",
+        "Endpoint"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Atrium Patron Portal 和 Phoenix App 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Atrium Patron Portal 和 Phoenix App'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Atrium",
+        "WebLayer"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Router & Pipelines 和 LiveView / LiveComponents。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 Router & Pipelines处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Router & Pipelines处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Router",
+        "LiveView"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Controllers / API Controllers 和 Core Components / Forms / Streams 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Controllers / API Controllers 和 Core Components / Forms / Streams'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Controllers",
+        "UI"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Contexts business logic 和 (Ecto.Repo / Postgres 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Contexts business logic 和 (Ecto.Repo / Postgres'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Contexts",
+        "Repo"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Attachment Manager / Presigner 和 \"Auth & Session / RBAC (phx.gen.auth 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Attachment Manager / Presigner 和 \"Auth & Session / RBAC (phx.gen.auth'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AttachmentMgr",
+        "Auth"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 (Phoenix.PubSub 和 Presigner Service 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '(Phoenix.PubSub 和 Presigner Service'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PubSub",
+        "Presigner"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 (S3-compatible Object Storage 和 \"Attachment Processor (background job 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '(S3-compatible Object Storage 和 \"Attachment Processor (background job'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ObjectStorage",
+        "AttachmentWorker"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Oban / Background Queue 和 Fine Bot / Scheduler 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Oban / Background Queue 和 Fine Bot / Scheduler'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Queue",
+        "FineBot"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Notification System (Email/SMS 和 (SMTP / Gmail API 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Notification System (Email/SMS 和 (SMTP / Gmail API'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Notifier",
+        "ExternalMail"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 project-specific 和 (Postgres DB 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'project-specific 和 (Postgres DB'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "integrations",
+        "Postgres"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 _build/esbuild & tailwind 和 Static Assets Served 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 _build/esbuild & tailwind处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '_build/esbuild & tailwind处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Assets",
+        "Static"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Podman / Containerfile & Containerfile.dev\" 和 Podman Image 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Podman / Containerfile & Containerfile.dev\" 和 Podman Image'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Container",
+        "Image"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"./scripts/deploy.sh, ./scripts/manage.sh, mix precommit\" 和 \"Third-party APIs (Payment, Xendit, Gmail API, etc.。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"./scripts/deploy.sh, ./scripts/manage.sh, mix precommit\" 和 \"Third-party APIs (Payment, Xendit, Gmail API, etc.'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Scripts",
+        "ExternalAPI"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Req HTTP client 和 \"Deployed Instance (host 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Req HTTP client 和 \"Deployed Instance (host'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Req",
+        "ImageDeployed"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 HTTP / WS flows 和 Background / Async flows 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'HTTP / WS flows 和 Background / Async flows'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "L1",
+        "L2"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 66,
+    "repair_count": 2,
+    "grounding_acts_count": 32,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:06Z",
+  "extra": {
+    "source_url": "https://github.com/curatorian/voile/blob/b80ea51e93e2eb3038fb0d4eae73f0102228663e/docs/architecture.mmd",
+    "github_repo": "curatorian/voile",
+    "github_file_path": "docs/architecture.mmd",
+    "content_size": 2640,
+    "collected_at": "2026-02-06T01:42:44.954102",
+    "license_name": "No License",
+    "license_url": "",
+    "repo_owner": "curatorian",
+    "repo_name": "voile",
+    "repo_stars": 0,
+    "repo_forks": 0,
+    "repo_topics": [],
+    "repo_language": "Elixir",
+    "repo_description": "Voile, the Magic Library",
+    "repo_created_at": "2025-02-25T03:35:19Z",
+    "repo_updated_at": "2026-02-04T16:38:51Z"
+  }
+}

@@ -1,0 +1,61 @@
+{
+  "id": "aug_ot_stateDiagram_00336_Inf_3",
+  "source": "augmented_real_structure",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    [Infra_IngressController] --> AppLaunch\n    AppLaunch --> Loading\n    Loading --> MainMenu : App ready\n    Loading --> Error : Initialization failed\n    \n    MainMenu --> GameSession : Start new game\n    MainMenu --> LoadSession : Load saved game\n    MainMenu --> Settings : Open settings\n    \n    GameSession --> ActiveSession : Game started\n    LoadSession --> ActiveSession : Game loaded\n    \n    ActiveSession --> PausedSession : App paused\n    ActiveSession --> BackgroundSession : App backgrounded\n    ActiveSession --> SaveSession : Auto save\n    ActiveSession --> GameComplete : Game finished\n    \n    PausedSession --> ActiveSession : Resume game\n    PausedSession --> BackgroundSession : App backgrounded\n    \n    BackgroundSession --> ActiveSession : App foregrounded\n    BackgroundSession --> TerminatedSession : App killed\n    \n    SaveSession --> ActiveSession : Save complete\n    \n    GameComplete --> MainMenu : Return to menu\n    GameComplete --> [Infra_WorkerNode] : Exit app\n    \n    TerminatedSession --> [Infra_IngressController] : App closed\n    \n    Error --> MainMenu : Retry\n    Error --> [Infra_WorkerNode] : Exit app\n    \n    Settings --> MainMenu : Back to menu",
+  "license": "other_source",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Infra_IngressController 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Infra_IngressController'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:05Z",
+  "extra": {
+    "source_type": "github_search_special",
+    "source_url": "https://github.com/Angel-Energy/diplom-/blob/46161d4a394c3998e736b6cebddfa2ec15067d01/public/diagrams/lifecycle/session-lifecycle.mmd",
+    "github_repo": "Angel-Energy/diplom-",
+    "seed_id": "ot_stateDiagram_00336",
+    "augmentation_domain": "Infra",
+    "content_size": 1136,
+    "collected_at": "2026-02-06T10:40:53.081885",
+    "license_name": "Other Source (GitHub-based)"
+  }
+}

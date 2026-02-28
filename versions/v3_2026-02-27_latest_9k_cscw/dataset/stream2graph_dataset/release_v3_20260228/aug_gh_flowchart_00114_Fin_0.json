@@ -1,0 +1,542 @@
+{
+  "id": "aug_gh_flowchart_00114_Fin_0",
+  "source": "augmented_real_structure",
+  "diagram_type": "flowchart",
+  "code": "%%{FinTech_PaymentGateway}}}%%\nflowchart TB\n    subgraph Client [FinTech_PaymentGateway]\n        Browser[FinTech_PaymentGateway]\n        MobileApp[FinTech_FraudDetection]\n        Echo[FinTech_AuthVault]\n    end\n\n    subgraph WebSocket [FinTech_FraudDetection]\n        Reverb[FinTech_PaymentGateway]\n        Channels[FinTech_FraudDetection]\n        \n        subgraph ChannelTypes [FinTech_AuthVault]\n            Private[FinTech_PaymentGateway]\n            Presence[FinTech_PaymentGateway]\n            Public[FinTech_LedgerService]\n        end\n    end\n\n    subgraph Application [FinTech_LedgerService]\n        subgraph EventSourcing [FinTech_PaymentGateway]\n            Aggregates[FinTech_TransactionQueue]\n            Events[FinTech_LedgerService]\n            Reactors[FinTech_TransactionQueue]\n        end\n        \n        subgraph Broadcasting [FinTech_LedgerService]\n            BroadcastEvents[FinTech_PaymentGateway]\n            Queue[FinTech_AuthVault]\n        end\n        \n        subgraph Models [FinTech_AuthVault]\n            Comment[FinTech_FraudDetection]\n            Message[FinTech_LedgerService]\n            Todo[FinTech_AuthVault]\n        end\n    end\n\n    subgraph Infrastructure [FinTech_LedgerService]\n        Redis[FinTech_TransactionQueue]\n        EventStore[FinTech_LedgerService]\n        Database[FinTech_FraudDetection]\n    end\n    \n    %% Client connections\n    Browser --> Echo\n    MobileApp --> Echo\n    Echo --> Reverb\n    \n    %% WebSocket connections\n    Reverb --> Channels\n    Channels --> ChannelTypes\n    \n    %% Event flow\n    Aggregates --> Events\n    Events --> Reactors\n    Events --> EventStore\n    \n    %% Reactor actions\n    Reactors --> BroadcastEvents\n    Reactors --> Models\n    \n    %% Broadcasting flow\n    BroadcastEvents --> Queue\n    Queue --> Redis\n    \n    %% WebSocket server connections\n    Redis --> Reverb\n    \n    %% Model persistence\n    Models --> Database\n    \n    %% Channel examples\n    Private --> |\"commentable.Post.{FinTech_TransactionQueue}\"| Comment\n    Private --> |\"todo.{FinTech_FraudDetection}\"| Todo\n    Presence --> |\"conversation.{FinTech_TransactionQueue}\"| Message\n    \n    %% Add notes\n    classDef note fill:#fff,stroke:#999,stroke-width:1px,color:#333\n    \n    class Client,WebSocket,Application,Infrastructure,EventSourcing,Broadcasting,Models,ChannelTypes note\n    \n    %% Add styling\n    classDef clientLayer fill:#e1f5fe,stroke:#81d4fa,stroke-width:2px\n    classDef wsLayer fill:#e8f5e9,stroke:#a5d6a7,stroke-width:2px\n    classDef appLayer fill:#fff3e0,stroke:#ffe0b2,stroke-width:2px\n    classDef infraLayer fill:#f3e5f5,stroke:#e1bee7,stroke-width:2px\n    \n    class Client clientLayer\n    class WebSocket,Reverb,Channels,ChannelTypes,Private,Presence,Public wsLayer\n    class Application,EventSourcing,Broadcasting,Models,Aggregates,Events,Reactors,BroadcastEvents,Queue,Comment,Message,Todo appLayer\n    class Infrastructure,Redis,EventStore,Database infraLayer",
+  "license": "apache-2.0",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 FinTech_PaymentGateway 和 FinTech_PaymentGateway 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'FinTech_PaymentGateway 和 FinTech_PaymentGateway'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Client",
+        "Browser"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 FinTech_FraudDetection 和 FinTech_AuthVault 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'FinTech_FraudDetection 和 FinTech_AuthVault'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MobileApp",
+        "Echo"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 FinTech_FraudDetection 和 FinTech_PaymentGateway。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 FinTech_FraudDetection处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'FinTech_FraudDetection处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "WebSocket",
+        "Reverb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 FinTech_FraudDetection 和 FinTech_AuthVault。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'FinTech_FraudDetection 和 FinTech_AuthVault'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Channels",
+        "ChannelTypes"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 FinTech_PaymentGateway 和 FinTech_PaymentGateway。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'FinTech_PaymentGateway 和 FinTech_PaymentGateway'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Private",
+        "Presence"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 FinTech_LedgerService 和 FinTech_LedgerService 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'FinTech_LedgerService 和 FinTech_LedgerService'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Public",
+        "Application"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 FinTech_PaymentGateway 和 FinTech_TransactionQueue 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'FinTech_PaymentGateway 和 FinTech_TransactionQueue'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EventSourcing",
+        "Aggregates"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 FinTech_LedgerService 和 FinTech_TransactionQueue 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'FinTech_LedgerService 和 FinTech_TransactionQueue'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Events",
+        "Reactors"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 FinTech_LedgerService 和 FinTech_PaymentGateway 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'FinTech_LedgerService 和 FinTech_PaymentGateway'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Broadcasting",
+        "BroadcastEvents"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 FinTech_AuthVault 和 FinTech_AuthVault 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 FinTech_AuthVault处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'FinTech_AuthVault处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Queue",
+        "Models"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 FinTech_FraudDetection 和 FinTech_LedgerService。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'FinTech_FraudDetection 和 FinTech_LedgerService'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Comment",
+        "Message"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 FinTech_AuthVault 和 FinTech_LedgerService。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'FinTech_AuthVault 和 FinTech_LedgerService'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Todo",
+        "Infrastructure"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 FinTech_TransactionQueue 和 FinTech_LedgerService。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'FinTech_TransactionQueue 和 FinTech_LedgerService'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Redis",
+        "EventStore"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 FinTech_FraudDetection 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'FinTech_FraudDetection'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Database"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 58,
+    "repair_count": 2,
+    "grounding_acts_count": 28,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:01Z",
+  "extra": {
+    "source_url": "https://github.com/s-a-c/ai-guidelines/blob/9c092b8bf9684666244e7b97b87c962175bfbd95/100-laravel/700-r-and-d/E_L_A/illustrations/mermaid/light/realtime-architecture-light.mmd",
+    "github_repo": "s-a-c/ai-guidelines",
+    "github_file_path": "100-laravel/700-r-and-d/E_L_A/illustrations/mermaid/light/realtime-architecture-light.mmd",
+    "seed_id": "gh_flowchart_00114",
+    "augmentation_domain": "FinTech",
+    "content_size": 2912,
+    "collected_at": "2026-02-06T01:42:01.316722",
+    "license_name": "Apache License 2.0",
+    "license_url": "https://api.github.com/licenses/apache-2.0",
+    "repo_owner": "s-a-c",
+    "repo_name": "ai-guidelines",
+    "repo_stars": 0,
+    "repo_forks": 0,
+    "repo_topics": [],
+    "repo_language": "PHP",
+    "repo_description": "AI guidelines for local projects",
+    "repo_created_at": "2025-08-28T16:05:57Z",
+    "repo_updated_at": "2025-12-12T23:58:22Z"
+  }
+}

@@ -1,0 +1,477 @@
+{
+  "id": "gl_requirementDiagram_00501",
+  "source": "gitlab",
+  "diagram_type": "requirementDiagram",
+  "code": "erDiagram\n  schema_migrations {\n    integer version PK\n    timestamp inserted_at\n  }\n  audit_logs {\n    integer id PK\n    varchar user_agent\n    varchar remote_ip\n    varchar action\n    jsonb params\n    integer user_id\n    integer organization_id\n    integer key_id\n    timestamp inserted_at\n  }\n  emails {\n    integer id PK\n    varchar email\n    boolean verified\n    boolean primary\n    boolean public\n    boolean gravatar\n    varchar verification_key\n    timestamp verification_expiry\n    integer user_id\n    timestamp inserted_at\n    timestamp updated_at\n  }\n  keys {\n    integer id PK\n    varchar name\n    varchar secret_first\n    varchar secret_second\n    boolean public\n    timestamp revoke_at\n    timestamp inserted_at\n    timestamp updated_at\n    jsonb last_use\n    integer user_id\n    integer organization_id\n    jsonb permissions\n  }\n  organizations {\n    integer id PK\n    varchar name\n    boolean billing_active\n    boolean billing_override\n    timestamp trial_end\n    timestamp inserted_at\n    timestamp updated_at\n  }\n  organization_users {\n    integer id PK\n    varchar role\n    integer organization_id\n    integer user_id\n    timestamp inserted_at\n    timestamp updated_at\n  }\n  password_resets {\n    integer id PK\n    varchar key\n    varchar primary_email\n    integer user_id\n    timestamp inserted_at\n  }\n  sessions {\n    integer id PK\n    bytea token\n    jsonb data\n    timestamp inserted_at\n    timestamp updated_at\n  }\n  users {\n    integer id PK\n    varchar username\n    varchar full_name\n    varchar password\n    boolean service\n    timestamp deactivated_at\n    varchar role\n    timestamp inserted_at\n    timestamp updated_at\n    jsonb handles\n    jsonb tfa\n    integer organization_id\n  }\n  blocked_addresses {\n    integer id PK\n    varchar ip\n    varchar comment\n  }\n  downloads {\n    integer id PK\n    integer package_id\n    integer release_id\n    integer downloads\n    date day\n  }\n  installs {\n    integer id PK\n    varchar hex\n    array elixirs\n  }\n  packages {\n    integer id PK\n    varchar name\n    timestamp docs_updated_at\n    timestamp inserted_at\n    timestamp updated_at\n    integer repository_id\n    jsonb meta\n  }\n  package_dependants {\n    integer id PK\n    integer package_id\n    varchar name\n    varchar repo\n  }\n  package_downloads {\n    integer package_id\n    varchar view\n    integer downloads\n  }\n  package_owners {\n    integer id PK\n    varchar level\n    integer package_id\n    integer user_id\n    timestamp inserted_at\n    timestamp updated_at\n  }\n  package_reports {\n    integer id PK\n    varchar state\n    varchar description\n    integer author_id\n    integer package_id\n    timestamp inserted_at\n    timestamp updated_at\n  }\n  package_report_comments {\n    integer id PK\n    varchar text\n    timestamp inserted_at\n    timestamp updated_at\n    integer package_report_id\n    integer author_id\n  }\n  package_report_releases {\n    integer id PK\n    integer release_id\n    integer package_report_id\n    timestamp inserted_at\n    timestamp updated_at\n  }\n  releases {\n    integer id PK\n    varchar version\n    bytea inner_checksum\n    bytea outer_checksum\n    boolean has_docs\n    timestamp inserted_at\n    timestamp updated_at\n    integer package_id\n    integer publisher_id\n    jsonb meta\n    jsonb retirement\n  }\n  release_downloads {\n    integer package_id\n    integer release_id\n    integer downloads\n  }\n  repositories {\n    integer id PK\n    varchar name\n    timestamp inserted_at\n    timestamp updated_at\n    integer organization_id\n  }\n  requirements {\n    integer id PK\n    varchar app\n    varchar requirement\n    boolean optional\n    integer release_id\n    integer dependency_id\n  }\n  short_urls {\n    integer id PK\n    varchar url\n    varchar short_code\n    timestamp inserted_at\n  }\n  keys ||--|{ audit_logs : \"\"\n  organizations ||--|{ audit_logs : \"\"\n  organizations ||--|{ keys : \"\"\n  organizations ||--|{ organization_users : \"\"\n  organizations ||--o| repositories : \"\"\n  organizations ||--o| users : \"\"\n  package_reports ||--|{ package_report_comments : \"\"\n  package_reports ||--|{ package_report_releases : \"\"\n  packages ||--|{ downloads : \"\"\n  packages ||--|{ package_dependants : \"\"\n  packages ||--|{ package_downloads : \"\"\n  packages ||--|{ package_owners : \"\"\n  packages ||--|{ package_reports : \"\"\n  packages ||--|{ release_downloads : \"\"\n  packages ||--|{ releases : \"\"\n  packages ||--|{ requirements : \"\"\n  releases ||--|{ downloads : \"\"\n  releases ||--|{ package_report_releases : \"\"\n  releases ||--o| release_downloads : \"\"\n  releases ||--|{ requirements : \"\"\n  repositories ||--|{ packages : \"\"\n  users ||--|{ audit_logs : \"\"\n  users ||--|{ emails : \"\"\n  users ||--|{ keys : \"\"\n  users ||--|{ organization_users : \"\"\n  users ||--|{ package_owners : \"\"\n  users ||--|{ package_report_comments : \"\"\n  users ||--|{ package_reports : \"\"\n  users ||--|{ password_resets : \"\"\n  users ||--|{ releases : \"\"\n",
+  "license": "apache-2.0",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 integer version PK\n    timestamp inserted_at\n   和 integer id PK\n    varchar user_agent\n    varchar remote_ip\n    varchar action\n    jsonb params\n    integer user_id\n    integer organization_id\n    integer key_id\n    timestamp inserted_at\n   的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'integer version PK\n    timestamp inserted_at\n   和 integer id PK\n    varchar user_agent\n    varchar remote_ip\n    varchar action\n    jsonb params\n    integer user_id\n    integer organization_id\n    integer key_id\n    timestamp inserted_at\n  '。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "schema_migrations",
+        "audit_logs"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 integer id PK\n    varchar email\n    boolean verified\n    boolean primary\n    boolean public\n    boolean gravatar\n    varchar verification_key\n    timestamp verification_expiry\n    integer user_id\n    timestamp inserted_at\n    timestamp updated_at\n   和 integer id PK\n    varchar name\n    varchar secret_first\n    varchar secret_second\n    boolean public\n    timestamp revoke_at\n    timestamp inserted_at\n    timestamp updated_at\n    jsonb last_use\n    integer user_id\n    integer organization_id\n    jsonb permissions\n   的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'integer id PK\n    varchar email\n    boolean verified\n    boolean primary\n    boolean public\n    boolean gravatar\n    varchar verification_key\n    timestamp verification_expiry\n    integer user_id\n    timestamp inserted_at\n    timestamp updated_at\n   和 integer id PK\n    varchar name\n    varchar secret_first\n    varchar secret_second\n    boolean public\n    timestamp revoke_at\n    timestamp inserted_at\n    timestamp updated_at\n    jsonb last_use\n    integer user_id\n    integer organization_id\n    jsonb permissions\n  '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "emails",
+        "keys"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 integer id PK\n    varchar name\n    boolean billing_active\n    boolean billing_override\n    timestamp trial_end\n    timestamp inserted_at\n    timestamp updated_at\n   和 integer id PK\n    varchar role\n    integer organization_id\n    integer user_id\n    timestamp inserted_at\n    timestamp updated_at\n   的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 integer id PK\n    varchar name\n    boolean billing_active\n    boolean billing_override\n    timestamp trial_end\n    timestamp inserted_at\n    timestamp updated_at\n  处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'integer id PK\n    varchar name\n    boolean billing_active\n    boolean billing_override\n    timestamp trial_end\n    timestamp inserted_at\n    timestamp updated_at\n  处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "organizations",
+        "organization_users"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 integer id PK\n    varchar key\n    varchar primary_email\n    integer user_id\n    timestamp inserted_at\n   和 integer id PK\n    bytea token\n    jsonb data\n    timestamp inserted_at\n    timestamp updated_at\n  。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'integer id PK\n    varchar key\n    varchar primary_email\n    integer user_id\n    timestamp inserted_at\n   和 integer id PK\n    bytea token\n    jsonb data\n    timestamp inserted_at\n    timestamp updated_at\n  '。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "password_resets",
+        "sessions"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 integer id PK\n    varchar username\n    varchar full_name\n    varchar password\n    boolean service\n    timestamp deactivated_at\n    varchar role\n    timestamp inserted_at\n    timestamp updated_at\n    jsonb handles\n    jsonb tfa\n    integer organization_id\n   和 integer id PK\n    varchar ip\n    varchar comment\n   的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'integer id PK\n    varchar username\n    varchar full_name\n    varchar password\n    boolean service\n    timestamp deactivated_at\n    varchar role\n    timestamp inserted_at\n    timestamp updated_at\n    jsonb handles\n    jsonb tfa\n    integer organization_id\n   和 integer id PK\n    varchar ip\n    varchar comment\n  '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "users",
+        "blocked_addresses"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 integer id PK\n    integer package_id\n    integer release_id\n    integer downloads\n    date day\n   和 integer id PK\n    varchar hex\n    array elixirs\n  。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 integer id PK\n    integer package_id\n    integer release_id\n    integer downloads\n    date day\n  处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'integer id PK\n    integer package_id\n    integer release_id\n    integer downloads\n    date day\n  处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "downloads",
+        "installs"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 integer id PK\n    varchar name\n    timestamp docs_updated_at\n    timestamp inserted_at\n    timestamp updated_at\n    integer repository_id\n    jsonb meta\n   和 integer id PK\n    integer package_id\n    varchar name\n    varchar repo\n  。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'integer id PK\n    varchar name\n    timestamp docs_updated_at\n    timestamp inserted_at\n    timestamp updated_at\n    integer repository_id\n    jsonb meta\n   和 integer id PK\n    integer package_id\n    varchar name\n    varchar repo\n  '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "packages",
+        "package_dependants"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 integer package_id\n    varchar view\n    integer downloads\n   和 integer id PK\n    varchar level\n    integer package_id\n    integer user_id\n    timestamp inserted_at\n    timestamp updated_at\n   的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'integer package_id\n    varchar view\n    integer downloads\n   和 integer id PK\n    varchar level\n    integer package_id\n    integer user_id\n    timestamp inserted_at\n    timestamp updated_at\n  '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "package_downloads",
+        "package_owners"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 integer id PK\n    varchar state\n    varchar description\n    integer author_id\n    integer package_id\n    timestamp inserted_at\n    timestamp updated_at\n   和 integer id PK\n    varchar text\n    timestamp inserted_at\n    timestamp updated_at\n    integer package_report_id\n    integer author_id\n   的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'integer id PK\n    varchar state\n    varchar description\n    integer author_id\n    integer package_id\n    timestamp inserted_at\n    timestamp updated_at\n   和 integer id PK\n    varchar text\n    timestamp inserted_at\n    timestamp updated_at\n    integer package_report_id\n    integer author_id\n  '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "package_reports",
+        "package_report_comments"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 integer id PK\n    integer release_id\n    integer package_report_id\n    timestamp inserted_at\n    timestamp updated_at\n   和 integer id PK\n    varchar version\n    bytea inner_checksum\n    bytea outer_checksum\n    boolean has_docs\n    timestamp inserted_at\n    timestamp updated_at\n    integer package_id\n    integer publisher_id\n    jsonb meta\n    jsonb retirement\n   的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'integer id PK\n    integer release_id\n    integer package_report_id\n    timestamp inserted_at\n    timestamp updated_at\n   和 integer id PK\n    varchar version\n    bytea inner_checksum\n    bytea outer_checksum\n    boolean has_docs\n    timestamp inserted_at\n    timestamp updated_at\n    integer package_id\n    integer publisher_id\n    jsonb meta\n    jsonb retirement\n  '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "package_report_releases",
+        "releases"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 integer package_id\n    integer release_id\n    integer downloads\n   和 integer id PK\n    varchar name\n    timestamp inserted_at\n    timestamp updated_at\n    integer organization_id\n   的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'integer package_id\n    integer release_id\n    integer downloads\n   和 integer id PK\n    varchar name\n    timestamp inserted_at\n    timestamp updated_at\n    integer organization_id\n  '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "release_downloads",
+        "repositories"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 integer id PK\n    varchar app\n    varchar requirement\n    boolean optional\n    integer release_id\n    integer dependency_id\n   和 integer id PK\n    varchar url\n    varchar short_code\n    timestamp inserted_at\n   的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'integer id PK\n    varchar app\n    varchar requirement\n    boolean optional\n    integer release_id\n    integer dependency_id\n   和 integer id PK\n    varchar url\n    varchar short_code\n    timestamp inserted_at\n  '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "requirements",
+        "short_urls"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 50,
+    "repair_count": 2,
+    "grounding_acts_count": 24,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "normalized_at": "2026-02-28T13:21:07Z",
+  "extra": {
+    "source_url": "https://github.com/fuelen/ecto_erd/blob/da71179f04c3f5422e4181d64b49fcc9427c2db5/examples/mermaid/hexpm/Default.mmd",
+    "github_repo": "fuelen/ecto_erd",
+    "content_size": 4869,
+    "collected_at": "2026-02-06T14:11:11.443380",
+    "license_name": "Apache License 2.0",
+    "license_url": "https://api.github.com/licenses/apache-2.0",
+    "repo_owner": "fuelen",
+    "repo_name": "ecto_erd",
+    "repo_stars": 239,
+    "repo_forks": 18,
+    "repo_topics": [
+      "dbml",
+      "ecto",
+      "elixir",
+      "erd",
+      "graphviz"
+    ],
+    "repo_language": "Elixir",
+    "repo_description": "A mix task for generating Entity Relationship Diagram from Ecto schemas available in your project.",
+    "repo_created_at": "2021-08-22T13:03:34Z",
+    "repo_updated_at": "2025-12-02T23:07:13Z",
+    "source_note": "collected_from_github_additional"
+  }
+}
