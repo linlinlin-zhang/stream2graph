@@ -124,6 +124,7 @@ python3 tools/realtime_frontend_server.py --host 127.0.0.1 --port 8088
 2. 实时评测：
 - 在前端直接触发 `/api/pipeline/evaluate`
 - 返回延迟、意图准确率、稳定性指标
+  - 支持活跃会话快照评测（不中断会话）
 
 3. 防闪烁指标可视化：
 - `flicker_index`
@@ -134,6 +135,14 @@ python3 tools/realtime_frontend_server.py --host 127.0.0.1 --port 8088
 - 前端可直接调用 `/api/pretrain/unified`
 - 输出 `overall_pretrain_readiness_score`
 
+5. 实验报告落盘：
+- 前端支持一键保存当前实验状态到仓库：
+  - `reports/experiment_reports/EXPERIMENT_REPORT_*.json`
+  - `reports/experiment_reports/EXPERIMENT_REPORT_*.md`
+- 同时维护：
+  - `reports/experiment_reports/EXPERIMENT_REPORT_LATEST.json`
+  - `reports/experiment_reports/EXPERIMENT_REPORT_LATEST.md`
+
 ### API 端点
 
 - `GET /api/health`
@@ -142,7 +151,10 @@ python3 tools/realtime_frontend_server.py --host 127.0.0.1 --port 8088
 - `POST /api/session/create`
 - `POST /api/session/chunk`
 - `POST /api/session/flush`
+- `POST /api/session/snapshot`
 - `POST /api/session/close`
+- `GET /api/report/list`
+- `POST /api/report/save`
 - `POST /api/pipeline/run`
 - `POST /api/pipeline/evaluate`
 - `POST /api/pretrain/unified`
@@ -160,6 +172,7 @@ python3 tools/realtime_frontend_server.py --host 127.0.0.1 --port 8088
 
 - 该模式依赖浏览器语音识别能力，不依赖额外 Python ASR 包。
 - 若浏览器不支持 Web Speech API，仍可使用 transcript 文本模式。
+- 可在会话过程中点击 `会话快照` 获取当前评测结果；完成后点击 `保存实验报告` 固化本次实验。
 
 ### Transcript 输入格式（前端文本框）
 

@@ -2,6 +2,7 @@ const state = {
   pipelineResult: null,
   evaluationResult: null,
   unifiedResult: null,
+  reportList: [],
   playbackTimer: null,
   playbackIndex: 0,
   graph: {
@@ -31,6 +32,9 @@ const refs = {
   timeline: document.getElementById("timeline"),
   evalSummary: document.getElementById("eval-summary"),
   unifiedSummary: document.getElementById("unified-summary"),
+  reportSummary: document.getElementById("report-summary"),
+  reportTitle: document.getElementById("report-title"),
+  reportNotes: document.getElementById("report-notes"),
   toast: document.getElementById("toast"),
   svg: document.getElementById("graph-svg"),
   mE2EP95: document.getElementById("m-e2e-p95"),
@@ -107,6 +111,15 @@ async function apiPost(path, payload) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
+  const data = await resp.json();
+  if (!resp.ok || !data.ok) {
+    throw new Error(data.error || `HTTP ${resp.status}`);
+  }
+  return data;
+}
+
+async function apiGet(path) {
+  const resp = await fetch(path);
   const data = await resp.json();
   if (!resp.ok || !data.ok) {
     throw new Error(data.error || `HTTP ${resp.status}`);
@@ -330,6 +343,35 @@ function appendEventsAndRender(events) {
   renderTimeline(state.pipelineResult.events, active);
 }
 
+function setReportSummary(payload) {
+  refs.reportSummary.textContent = pretty(payload || {});
+}
+
+function buildReportSavePayload() {
+  return {
+    title: (refs.reportTitle.value || "").trim() || "realtime_ui_run",
+    notes: (refs.reportNotes.value || "").trim(),
+    session_id: state.live.sessionId || null,
+    pipeline_result: state.pipelineResult,
+    realtime_evaluation: state.evaluationResult,
+    unified_evaluation: state.unifiedResult,
+    latency_p95_threshold_ms: 2000,
+    flicker_mean_threshold: 6.0,
+    mental_map_min: 0.85,
+    intent_accuracy_threshold: 0.8,
+  };
+}
+
+async function refreshReportList(limit = 8) {
+  const data = await apiGet(`/api/report/list?limit=${encodeURIComponent(limit)}`);
+  state.reportList = data.reports || [];
+  const latest = state.reportList[0] || null;
+  setReportSummary({
+    latest,
+    report_count: data.count || state.reportList.length,
+  });
+}
+
 async function runPipelineAndRender() {
   const chunks = parseTranscriptLines(refs.transcriptInput.value);
   if (!chunks.length) {
@@ -355,6 +397,11 @@ async function runPipelineAndRender() {
   });
   resetPlayback();
   updateMetricCards();
+  setReportSummary({
+    status: "result_ready_not_saved",
+    source: "pipeline_run",
+    updates_emitted: state.pipelineResult.summary?.updates_emitted,
+  });
   showToast("闭环执行完成，开始播放");
   startPlayback();
 }
@@ -383,6 +430,11 @@ async function runRealtimeEvaluation() {
   refs.evalSummary.textContent = pretty(state.evaluationResult);
   resetPlayback();
   updateMetricCards();
+  setReportSummary({
+    status: "result_ready_not_saved",
+    source: "realtime_eval",
+    realtime_eval_pass: state.evaluationResult?.realtime_eval_pass,
+  });
   startPlayback();
   showToast(`评测完成: ${state.evaluationResult.realtime_eval_pass ? "PASS" : "未通过"}`);
 }
@@ -401,6 +453,12 @@ async function runUnifiedEval() {
   const data = await apiPost("/api/pretrain/unified", payload);
   state.unifiedResult = data;
   refs.unifiedSummary.textContent = pretty(state.unifiedResult);
+  setReportSummary({
+    status: "result_ready_not_saved",
+    source: "unified_eval",
+    recommendation: data.pretrain_readiness?.recommendation,
+    score: data.pretrain_readiness?.overall_pretrain_readiness_score,
+  });
   showToast(`统一评测完成: ${data.pretrain_readiness?.recommendation || "ok"}`);
 }
 
@@ -527,9 +585,9 @@ async function startMicrophoneCapture() {
   }
 }
 
-function stopMicrophoneCapture() {
+function stopMicrophoneCapture(silent = false) {
   if (!state.live.micActive) {
-    showToast("麦克风未运行");
+    if (!silent) showToast("麦克风未运行");
     return;
   }
   state.live.micActive = false;
@@ -549,7 +607,7 @@ async function flushLiveSessionAndEvaluate() {
     showToast("没有活跃会话");
     return;
   }
-  stopMicrophoneCapture();
+  stopMicrophoneCapture(true);
   await state.live.sendQueue;
   showToast("正在结束会话并评测...");
 
@@ -571,8 +629,53 @@ async function flushLiveSessionAndEvaluate() {
   updateMetricCards();
   setSessionStatus("未启动");
   state.live.sessionId = null;
+  setReportSummary({
+    status: "result_ready_not_saved",
+    source: "live_session_flush",
+    realtime_eval_pass: state.evaluationResult?.realtime_eval_pass,
+  });
 
   showToast(`实时会话评测完成: ${state.evaluationResult?.realtime_eval_pass ? "PASS" : "未通过"}`);
+}
+
+async function snapshotLiveSession() {
+  if (!state.live.sessionId) {
+    showToast("当前没有活跃会话");
+    return;
+  }
+  await state.live.sendQueue;
+  const data = await apiPost("/api/session/snapshot", {
+    session_id: state.live.sessionId,
+    include_evaluation: true,
+    latency_p95_threshold_ms: 2000,
+    flicker_mean_threshold: 6.0,
+    mental_map_min: 0.85,
+    intent_accuracy_threshold: 0.8,
+  });
+  state.pipelineResult = data.pipeline;
+  state.evaluationResult = data.evaluation;
+  refs.evalSummary.textContent = pretty(state.evaluationResult || {});
+  updateMetricCards();
+  showToast("会话快照已刷新");
+}
+
+async function saveExperimentReport() {
+  if (!state.pipelineResult && !state.live.sessionId) {
+    showToast("暂无可保存的结果，请先运行闭环或实时会话");
+    return;
+  }
+  if (state.live.sessionId && !state.evaluationResult) {
+    await snapshotLiveSession();
+  }
+  const payload = buildReportSavePayload();
+  const data = await apiPost("/api/report/save", payload);
+  setReportSummary({
+    saved: true,
+    files: data.files,
+    summary: data.report?.summary || {},
+  });
+  await refreshReportList(8);
+  showToast("实验报告已保存");
 }
 
 function bindEvents() {
@@ -619,6 +722,20 @@ function bindEvents() {
       showToast(`结束会话失败: ${err.message}`);
     }
   });
+  document.getElementById("btn-live-snapshot").addEventListener("click", async () => {
+    try {
+      await snapshotLiveSession();
+    } catch (err) {
+      showToast(`会话快照失败: ${err.message}`);
+    }
+  });
+  document.getElementById("btn-save-report").addEventListener("click", async () => {
+    try {
+      await saveExperimentReport();
+    } catch (err) {
+      showToast(`保存报告失败: ${err.message}`);
+    }
+  });
 
   document.getElementById("btn-play").addEventListener("click", startPlayback);
   document.getElementById("btn-pause").addEventListener("click", stopPlayback);
@@ -630,6 +747,7 @@ async function boot() {
   refs.transcriptInput.value = sampleTranscript;
   refs.evalSummary.textContent = "{}";
   refs.unifiedSummary.textContent = "{}";
+  refs.reportSummary.textContent = "{}";
   refs.liveTranscriptLog.value = "";
   setSessionStatus("未启动");
   bindEvents();
@@ -642,6 +760,11 @@ async function boot() {
     }
   } catch (_err) {
     showToast("配置读取失败，使用默认参数");
+  }
+  try {
+    await refreshReportList(8);
+  } catch (_err) {
+    setReportSummary({ warning: "report_list_unavailable" });
   }
   window.requestAnimationFrame(animateNodes);
 }

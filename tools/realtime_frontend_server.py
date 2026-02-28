@@ -17,16 +17,18 @@ import threading
 import time
 import uuid
 from dataclasses import asdict, dataclass, field
+from datetime import datetime, timezone
 from http import HTTPStatus
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from statistics import mean, median
 from typing import Dict, List, Optional, Sequence, Tuple
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS_DIR = REPO_ROOT / "versions" / "v3_2026-02-27_latest_9k_cscw" / "scripts"
 FRONTEND_DIR = REPO_ROOT / "frontend" / "realtime_ui"
+EXPERIMENT_REPORTS_DIR = REPO_ROOT / "reports" / "experiment_reports"
 
 if str(SCRIPTS_DIR) not in sys.path:
     sys.path.insert(0, str(SCRIPTS_DIR))
@@ -42,6 +44,95 @@ from unified_pretrain_eval import evaluate_dataset, merge_scores  # noqa: E402
 
 SESSION_LOCK = threading.Lock()
 SESSIONS: Dict[str, "SessionState"] = {}
+
+
+def _utc_iso() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _utc_tag() -> str:
+    return datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+
+
+def _evaluate_with_thresholds(pipeline: Dict, payload: Dict) -> Dict:
+    return evaluate_payload(
+        payload=pipeline,
+        latency_p95_threshold_ms=float(payload.get("latency_p95_threshold_ms", 2000.0)),
+        flicker_mean_threshold=float(payload.get("flicker_mean_threshold", 6.0)),
+        mental_map_min=float(payload.get("mental_map_min", 0.85)),
+        intent_acc_threshold=float(payload.get("intent_accuracy_threshold", 0.8)),
+    )
+
+
+def _extract_summary(
+    pipeline: Optional[Dict],
+    realtime_eval: Optional[Dict],
+    unified_eval: Optional[Dict],
+) -> Dict:
+    p_summary = (pipeline or {}).get("summary", {}) if isinstance(pipeline, dict) else {}
+    p_stability = p_summary.get("renderer_stability", {}) if isinstance(p_summary, dict) else {}
+    r_metrics = (realtime_eval or {}).get("metrics", {}) if isinstance(realtime_eval, dict) else {}
+
+    readiness = {}
+    if isinstance(unified_eval, dict):
+        if isinstance(unified_eval.get("pretrain_readiness"), dict):
+            readiness = unified_eval.get("pretrain_readiness", {})
+        else:
+            readiness = unified_eval
+
+    return {
+        "updates_emitted": p_summary.get("updates_emitted"),
+        "latency_e2e_p95_ms": r_metrics.get("e2e_latency_p95_ms", p_summary.get("latency_e2e_ms", {}).get("p95")),
+        "intent_accuracy": r_metrics.get("intent_accuracy", p_summary.get("intent_labeled_accuracy")),
+        "flicker_mean": r_metrics.get(
+            "flicker_index_mean",
+            (p_stability.get("flicker_index", {}) if isinstance(p_stability, dict) else {}).get("mean"),
+        ),
+        "mental_map_mean": r_metrics.get(
+            "mental_map_score_mean",
+            (p_stability.get("mental_map_score", {}) if isinstance(p_stability, dict) else {}).get("mean"),
+        ),
+        "realtime_eval_pass": (realtime_eval or {}).get("realtime_eval_pass"),
+        "overall_pretrain_readiness_score": readiness.get("overall_pretrain_readiness_score"),
+        "pretrain_recommendation": readiness.get("recommendation"),
+    }
+
+
+def _build_experiment_report_md(report: Dict) -> str:
+    checks = {}
+    if isinstance(report.get("realtime_evaluation"), dict):
+        checks = report["realtime_evaluation"].get("checks", {}) or {}
+
+    summary = report.get("summary", {}) if isinstance(report.get("summary"), dict) else {}
+    lines = [
+        "# Experiment Report",
+        "",
+        f"- Generated at (UTC): {report.get('generated_at_utc')}",
+        f"- Title: {report.get('title') or 'Untitled'}",
+        f"- Session ID: {report.get('session_id') or '-'}",
+        "",
+        "## Summary",
+        "",
+        f"- Updates emitted: {summary.get('updates_emitted')}",
+        f"- E2E P95 (ms): {summary.get('latency_e2e_p95_ms')}",
+        f"- Intent accuracy: {summary.get('intent_accuracy')}",
+        f"- Flicker mean: {summary.get('flicker_mean')}",
+        f"- Mental map mean: {summary.get('mental_map_mean')}",
+        f"- Realtime pass: {summary.get('realtime_eval_pass')}",
+        f"- Pretrain readiness score: {summary.get('overall_pretrain_readiness_score')}",
+        f"- Pretrain recommendation: {summary.get('pretrain_recommendation')}",
+        "",
+    ]
+    if checks:
+        lines.extend(["## Realtime Checks", ""])
+        for key in sorted(checks.keys()):
+            val = checks.get(key)
+            lines.append(f"- {key}: {'PASS' if val else 'FAIL'}")
+        lines.append("")
+    notes = str(report.get("notes", "")).strip()
+    if notes:
+        lines.extend(["## Notes", "", notes, ""])
+    return "\n".join(lines) + "\n"
 
 
 def _pctl(values: List[float], p: float) -> float:
@@ -336,6 +427,7 @@ class RealtimeUIHandler(SimpleHTTPRequestHandler):
                         "intent_accuracy_threshold": 0.8,
                     },
                     "speech_recognition_hint": "browser_web_speech_api",
+                    "experiment_report_dir": str(EXPERIMENT_REPORTS_DIR),
                 },
             )
             return
@@ -353,6 +445,40 @@ class RealtimeUIHandler(SimpleHTTPRequestHandler):
                     key=lambda x: x["session_id"],
                 )
             _json_response(self, {"ok": True, "sessions": items})
+            return
+        if parsed.path == "/api/report/list":
+            query = parse_qs(parsed.query)
+            try:
+                limit = int(query.get("limit", ["20"])[0])
+            except Exception:
+                limit = 20
+            limit = max(1, min(limit, 100))
+
+            EXPERIMENT_REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+            items: List[Dict] = []
+            files = sorted(
+                [
+                    p
+                    for p in EXPERIMENT_REPORTS_DIR.glob("EXPERIMENT_REPORT_*.json")
+                    if p.name != "EXPERIMENT_REPORT_LATEST.json"
+                ],
+                reverse=True,
+            )
+            for p in files[:limit]:
+                try:
+                    raw = json.loads(p.read_text(encoding="utf-8"))
+                    items.append(
+                        {
+                            "filename": p.name,
+                            "generated_at_utc": raw.get("generated_at_utc"),
+                            "title": raw.get("title"),
+                            "session_id": raw.get("session_id"),
+                            "summary": raw.get("summary"),
+                        }
+                    )
+                except Exception:
+                    items.append({"filename": p.name})
+            _json_response(self, {"ok": True, "count": len(items), "reports": items})
             return
         if parsed.path in {"/", "/index.html"}:
             self.path = "/index.html"
@@ -447,13 +573,7 @@ class RealtimeUIHandler(SimpleHTTPRequestHandler):
             with sess.lock:
                 emitted = sess.flush()
                 pipeline = sess.pipeline_payload(mode="live_session")
-                evaluation = evaluate_payload(
-                    payload=pipeline,
-                    latency_p95_threshold_ms=float(payload.get("latency_p95_threshold_ms", 2000.0)),
-                    flicker_mean_threshold=float(payload.get("flicker_mean_threshold", 6.0)),
-                    mental_map_min=float(payload.get("mental_map_min", 0.85)),
-                    intent_acc_threshold=float(payload.get("intent_accuracy_threshold", 0.8)),
-                )
+                evaluation = _evaluate_with_thresholds(pipeline, payload)
 
             if bool(payload.get("close_after_flush", True)):
                 with SESSION_LOCK:
@@ -468,6 +588,32 @@ class RealtimeUIHandler(SimpleHTTPRequestHandler):
                     "pipeline": pipeline,
                     "evaluation": evaluation,
                     "closed": bool(payload.get("close_after_flush", True)),
+                },
+            )
+            return
+
+        if parsed.path == "/api/session/snapshot":
+            session_id = str(payload.get("session_id", "")).strip()
+            if not session_id:
+                _json_response(self, {"ok": False, "error": "session_id required"}, status=400)
+                return
+            with SESSION_LOCK:
+                sess = SESSIONS.get(session_id)
+            if sess is None:
+                _json_response(self, {"ok": False, "error": "session not found"}, status=404)
+                return
+
+            include_eval = bool(payload.get("include_evaluation", True))
+            with sess.lock:
+                pipeline = sess.pipeline_payload(mode="live_session")
+                evaluation = _evaluate_with_thresholds(pipeline, payload) if include_eval else None
+            _json_response(
+                self,
+                {
+                    "ok": True,
+                    "session_id": session_id,
+                    "pipeline": pipeline,
+                    "evaluation": evaluation,
                 },
             )
             return
@@ -522,13 +668,7 @@ class RealtimeUIHandler(SimpleHTTPRequestHandler):
                 config=config,
             )
 
-            eval_result = evaluate_payload(
-                payload=pipeline_result,
-                latency_p95_threshold_ms=float(payload.get("latency_p95_threshold_ms", 2000.0)),
-                flicker_mean_threshold=float(payload.get("flicker_mean_threshold", 6.0)),
-                mental_map_min=float(payload.get("mental_map_min", 0.85)),
-                intent_acc_threshold=float(payload.get("intent_accuracy_threshold", 0.8)),
-            )
+            eval_result = _evaluate_with_thresholds(pipeline_result, payload)
             _json_response(self, {"ok": True, "pipeline": pipeline_result, "evaluation": eval_result})
             return
 
@@ -568,6 +708,72 @@ class RealtimeUIHandler(SimpleHTTPRequestHandler):
                     "dataset_evaluation": dataset_eval,
                     "realtime_evaluation": realtime_eval,
                     "pretrain_readiness": merged,
+                },
+            )
+            return
+
+        if parsed.path == "/api/report/save":
+            EXPERIMENT_REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+
+            session_id = str(payload.get("session_id", "")).strip() or None
+            title = str(payload.get("title", "")).strip() or "stream2graph_experiment"
+            notes = str(payload.get("notes", "")).strip()
+
+            pipeline = payload.get("pipeline_result")
+            if not isinstance(pipeline, dict):
+                pipeline = payload.get("pipeline")
+            realtime_eval = payload.get("realtime_evaluation")
+            if not isinstance(realtime_eval, dict):
+                realtime_eval = payload.get("evaluation")
+            unified_eval = payload.get("unified_evaluation")
+            if not isinstance(unified_eval, dict):
+                unified_eval = payload.get("pretrain_readiness")
+
+            if session_id and not isinstance(pipeline, dict):
+                with SESSION_LOCK:
+                    sess = SESSIONS.get(session_id)
+                if sess is not None:
+                    with sess.lock:
+                        pipeline = sess.pipeline_payload(mode="live_session")
+
+            if isinstance(pipeline, dict) and not isinstance(realtime_eval, dict):
+                realtime_eval = _evaluate_with_thresholds(pipeline, payload)
+
+            report = {
+                "generated_at_utc": _utc_iso(),
+                "title": title,
+                "session_id": session_id,
+                "notes": notes,
+                "summary": _extract_summary(pipeline, realtime_eval, unified_eval),
+                "pipeline_result": pipeline,
+                "realtime_evaluation": realtime_eval,
+                "unified_evaluation": unified_eval,
+            }
+
+            ts = _utc_tag()
+            json_path = EXPERIMENT_REPORTS_DIR / f"EXPERIMENT_REPORT_{ts}.json"
+            md_path = EXPERIMENT_REPORTS_DIR / f"EXPERIMENT_REPORT_{ts}.md"
+            latest_json = EXPERIMENT_REPORTS_DIR / "EXPERIMENT_REPORT_LATEST.json"
+            latest_md = EXPERIMENT_REPORTS_DIR / "EXPERIMENT_REPORT_LATEST.md"
+
+            json_text = json.dumps(report, ensure_ascii=False, indent=2)
+            md_text = _build_experiment_report_md(report)
+            json_path.write_text(json_text, encoding="utf-8")
+            md_path.write_text(md_text, encoding="utf-8")
+            latest_json.write_text(json_text, encoding="utf-8")
+            latest_md.write_text(md_text, encoding="utf-8")
+
+            _json_response(
+                self,
+                {
+                    "ok": True,
+                    "report": report,
+                    "files": {
+                        "json": str(json_path.relative_to(REPO_ROOT)),
+                        "md": str(md_path.relative_to(REPO_ROOT)),
+                        "latest_json": str(latest_json.relative_to(REPO_ROOT)),
+                        "latest_md": str(latest_md.relative_to(REPO_ROOT)),
+                    },
                 },
             )
             return
