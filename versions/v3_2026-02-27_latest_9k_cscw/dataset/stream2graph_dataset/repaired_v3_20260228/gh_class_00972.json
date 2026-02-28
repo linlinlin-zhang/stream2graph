@@ -1,0 +1,255 @@
+{
+  "id": "gh_class_00972",
+  "source": "github",
+  "source_url": "https://github.com/HisQu/buildben/blob/69268401dc27009fa81be7c649b244c74f900462/assets/old/classdiagram.mmd",
+  "github_repo": "HisQu/buildben",
+  "github_file_path": "assets/old/classdiagram.mmd",
+  "diagram_type": "class",
+  "code": "---\nconfig:\n    title: build-ben runtime helpers\n    theme: base\n    themeVariables:\n        fontSize: 20px\n        \n        # Nodes\n        primaryTextColor: \"#000000\"      # Black\n        primaryColor: \"#999999\"          # Grey\n        primaryBorderColor: \"#00000099\"  # Black transparent\n        \n        # Links\n        lineColor: \"#0e467bee\"        # Dark Blue transparent\n        secondaryColor: \"#0e467b03\"   # Dark Blue transparent\n        \n        # Subgraphs\n        tertiaryTextColor: \"#ffffff\"  # White\n        tertiaryColor: \"#99999999\"    # Grey transparent\n        tertiaryBorderColor: \"#00000000\" # Fully transparent\n---\n\n\n\nclassDiagram\n    %% ───────────────────────────  Classes  ───────────────────────────\n    \n    subgraph globalenvironment\n        class buildben{\n            +templates for justfile, .dot_envrc, \n            +init-project()\n            +add-experiment()\n            ...\n            }\n\n        class direnv{\n            +layout python()\n            +exec()\n        }\n\n        class pip_or_pipx{\n            +install()\n        }\n\n        class just{\n            +recipes()\n            +variables()\n        }\n    \n    end\n    \n        \n    namespace virtual_environment{\n        class pip-tools{\n            +pip-compile()\n            +pip-sync()\n        }\n\n        class python_dependencies{\n        }\n        \n    }\n    \n    namespace project_directory{\n        class venv{\n        }\n        class justfile{\n            +reset-venv()\n            +install-deps()\n        }\n        \n        class dot_envrc{\n        }\n        \n        class requirements_txt{\n        }\n        \n    }\n    \n\n\n    %% ─────────────────────────── Relationships ───────────────────────\n    \n    %% ## Connections\n    %% > Inheritance: \"is-a\", Empty arrow: <|--, Points towards the parent\n    %% > Composition: \"part-of\", Filled diamond: --*, Points towards the whole\n    %% > Aggregation: \"used-by\", Open diamond: --o, Points towards the user\n    %% > Dependency: \"depends-on\", Dotted line: ..>, Points from the dependent to the supplier (supplier=dependency)\n    \n    %% BuildBen uses each helper\n    %% pip_or_pipx <.. buildben : \"installed by\"\n    %% pip_or_pipx <.. buildben : \"installed by\"\n    %% buildben ..> direnv : \n    dot_envrc <.. venv : \"auto-creates and activates\"\n    %% buildben ..> just : \n    %% buildben ..> pip-tools : \n    \n    \n    %% dot_envrc ..> direnv\n    %% venv o-- pip-tools\n    \n\n    %% just ..> direnv : \"recipes call direnv exec\"\n    %% just <.. justfile\n    %% justfile ..> direnv\n    %% justfile ..> pip-tools\n\n    \n    %% requirements_txt ..> justfile : created by\n\n\n    %% relationships\n    buildben ..> direnv\n    buildben ..> just\n    pip_or_pipx  ..> buildben : \"installed by\"\n\n    %% direnv ..> virtual_environment.Venv : \"creates/activates\"\n    %% project_directory -->* virtual_environment.Venv : \".direnv/\"\n    %% venv *-- pip-tools\n    %% venv *-- python_dependencies\n\n    dot_envrc ..> direnv\n    justfile ..> direnv\n    justfile ..> pip-tools\n    dot_envrc <.. pip-tools : \"installed by\"\n    just <.. justfile\n    requirements_txt ..> justfile : \"generated from\"",
+  "content_size": 3124,
+  "collected_at": "2026-02-06T01:39:30.553468",
+  "compilation_status": "success",
+  "compilation_error": "",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 +templates for justfile, .dot_envrc, \n            +init-project( 和 +layout python( 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 +templates for justfile, .dot_envrc, \n            +init-project(处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '+templates for justfile, .dot_envrc, \n            +init-project(处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "buildben",
+        "direnv"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 +install( 和 +recipes( 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '+install( 和 +recipes('。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "pip_or_pipx",
+        "just"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 class pip-tools{\n            +pip-compile( 和   的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'class pip-tools{\n            +pip-compile( 和  '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "virtual_environment",
+        "python_dependencies"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 class venv{\n         和 +reset-venv( 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 class venv{\n        处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'class venv{\n        处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "project_directory",
+        "justfile"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到   和  。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '  和  '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "dot_envrc",
+        "requirements_txt"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 supplier=dependency 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'supplier=dependency'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "supplier"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 26,
+    "repair_count": 2,
+    "grounding_acts_count": 12,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:21Z"
+}

@@ -1,0 +1,99 @@
+{
+  "id": "gh_sequence_00336",
+  "source": "github",
+  "source_url": "https://github.com/DamienReichhart/DockerWebInterface/blob/d5f29f636f5667b7f66c8963826694cea2309dab/documentation/technique/diagrammes/sequence/php_request_lifecycle.mmd",
+  "github_repo": "DamienReichhart/DockerWebInterface",
+  "github_file_path": "documentation/technique/diagrammes/sequence/php_request_lifecycle.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    title PHP Application Request Lifecycle\n    \n    participant Client as Client Browser\n    participant Apache as Apache Server\n    participant PHP as PHP-FPM\n    participant index as index.php\n    participant Request as HttpRequest\n    participant Response as HttpResponse\n    participant Session as Session\n    participant Router as Router\n    participant Route as Route\n    participant Middleware as Middlewares\n    participant Controller as Controller\n    participant Model as Model\n    participant DB as Database\n    \n    Client->>Apache: HTTP Request\n    Apache->>PHP: Forward to PHP-FPM via socket\n    PHP->>index: Execute index.php\n    \n    index->>index: Load autoloader\n    index->>index: Load environment variables\n    index->>Session: Create Session\n    Session->>Session: Start session\n    index->>Request: Create HttpRequest\n    Request->>Request: Parse request data\n    index->>Response: Create HttpResponse\n    index->>Router: Create Router(request, response, session)\n    \n    Router->>Router: Load routes from routes.json\n    index->>Router: route()\n    \n    Router->>Router: Get request method & URI\n    Router->>Router: searchRoute(URI, method)\n    Router->>Route: Create Route object\n    Route->>Route: Parse route parameters\n    Route->>Route: Load middlewares\n    \n    alt Route Found\n        Router->>Middleware: Call entry middlewares\n        Middleware->>Middleware: Execute pre-controller logic\n        \n        Router->>Controller: Instantiate controller\n        Controller->>Controller: Initialize Twig\n        Router->>Controller: Call action method\n        \n        Controller->>Model: Interact with model(s)\n        Model->>DB: Execute SQL queries\n        DB->>Model: Return data\n        Model->>Controller: Return processed data\n        \n        Controller->>Controller: Render template\n        Controller->>Response: Append rendered content\n        \n        Router->>Middleware: Call exit middlewares\n        Middleware->>Middleware: Execute post-controller logic\n        \n        Router->>Response: send()\n        Response->>PHP: Output HTTP response\n    else Route Not Found\n        Router->>Controller: Create ErrorController\n        Controller->>Controller: error404()\n        Controller->>Response: Append error page\n        Router->>Response: send()\n        Response->>PHP: Output HTTP response\n    end\n    \n    PHP->>Apache: Return response\n    Apache->>Client: HTTP Response ",
+  "content_size": 2435,
+  "collected_at": "2026-02-06T01:30:51.616066",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 request, response, session 和 URI, method 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'request, response, session 和 URI, method'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Router",
+        "searchRoute"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 s 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 's'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "model"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 8,
+    "repair_count": 0,
+    "grounding_acts_count": 4,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:23Z"
+}

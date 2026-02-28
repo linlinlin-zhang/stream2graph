@@ -1,0 +1,834 @@
+{
+  "id": "ot_journey_01017",
+  "source": "other",
+  "source_url": "https://github.com/isnot/mermaid2django/blob/ec735cff25dd5a9d1424ba7390cdcd3cb1239bc4/examples/plan.mmd",
+  "source_type": "github_search",
+  "github_repo": "isnot/mermaid2django",
+  "diagram_type": "journey",
+  "code": "%%{init:{'theme':'forest'}}%%\n\nerDiagram\n    series |o--o{ comic : \"シリーズ名\"\n    %% magazine 雑誌に載らないストーリー、掲載がない号もある 雑誌連載はWeb連載時には分割されている\n    magazine |o--o| story : \"初出の掲載誌\"\n    %% story Web掲載された単話、「単行本に未収録」もあり\n    story |o--|{ web_comic : \"分割\"\n    %% web_comic ストーリー以外のWeb連載に登場した絵\n    web_comic |o--o{ fragment : \"その他の絵\"\n    comic |o--|{ story : \"収録された巻\"\n    %% journey 第〇旅が前後編に分割されるケース 同じ場所が複数の旅に登場する場合あり\n    journey ||--|{ story : \"前後編\"\n    %% story その他雑多な絵に関連する単話\n    story |o--o{ fragment : \"関連する絵\"\n    story |o--o{ scene : \"\"\n    story }|--|{ venue : \"ストーリー登場地点\"\n    %% camera_center_place ストーリー登場地点を含む領域(四角形)の中心座標\n    place |o--|{ story : \"領域\"\n    %% story 単話に登場する地点をルートとして表現する\n    story }|--|{ route : \"複数あり\"\n    place ||--|{ step : \"訪問\"\n    route ||--|{ step : \"順列あり\"\n    venue ||--|{ place : \"\"\n    place |o--o{ fragment : \"\"\n    place |o--o{ scene : \"\"\n    step |o--o{ tweet : \"\"\n    step |o--o{ photo : \"\"\n    character }|--o{ fragment : \"\"\n    %% character 登場するキャラクター\n    character }|--o{ scene : \"登場\"\n    person |o--o{ tweet : \"\"\n    person |o--o{ photo : \"\"\n    %% user \"認証情報とユーザー情報の紐付け\"\n    user |o--o| person : \"\"\n    type_master |o--o{ character : \"\"\n    type_master |o--o{ fragment : \"\"\n    type_master |o--o{ journey : \"\"\n    type_master |o--o{ person : \"\"\n    type_master |o--o{ photo : \"\"\n    type_master |o--o{ route : \"\"\n    type_master |o--o{ scene : \"\"\n    type_master |o--o{ story : \"\"\n    type_master |o--o{ tweet : \"\"\n    type_master |o--o{ venue : \"\"\n\n\n%% ざつ旅 鈴ヶ森ちか短編集(仮)\n\n%% series 正シリーズと番外シリーズは、別々に登録する ※巻数が自然数の順列になる [リソース]\nseries {\n    serial id PK\n    %% 正確な作品の名称\n    char title \"作品名\"\n    %% 略称や通称で代表的なもの\n    char short_title \"略称\"\n    %% 著者複数名の場合は、代表者をカンマ区切りで列挙する\n    char author \"著者名\"\n    %% 出版社 例：KADOKAWA\n    char publisher \"出版社\"\n    %% コミック・シリーズのレーベル名称 例：電撃コミックスNEXT\n    char label \"レーベル\"\n    %% 雑誌連載の誌名か、Web連載のレーベル名称\n    char magazine_title \"連載誌\"\n    %% 公式サイトや他のWebサイトから代表するものを1件\n    url site \"代表(公式)サイト\"\n    %% モデルにはあえてリレーションを定義せず (単方向リスト)\n    int rel_series_id \"関係シリーズ\"\n}\n\n%% comic 単行本 1巻、2巻、…。単巻のみの場合はseries=NULL [リソース]\ncomic {\n    serial id PK\n    rel series FK\n    %% 第n巻 入力するのは数字のみ\n    int number \"巻数\"\n    %% 例：ざつ旅-That's Journey- 1。※巻数の表記は作品毎に呼び方のバリエーションがある\n    char title \"各巻タイトル\"\n    %% 特徴的な帯の文言\n    char obi \"オビ\"\n    %% 巻末の奥付にある、初版発行日\n    date issued \"発行日\"\n    date released \"書店発売日\"\n    %% 版元ドットコムの書誌情報DBより\n    url cover_image \"書影url\"\n    char isbn \"ISBN13\"\n    text memo \"編集メモ\"\n}\n\n%% web_comic Web連載 第1旅(1)、番外旅、一枚モノ、… [リソース]\nweb_comic {\n    serial id PK\n    rel story FK\n    char title \"各話の名前\"\n    int part_number \"分割の順列\"\n    int pages \"ページ数\"\n    url cw_url \"Comic Walkerリンク\"\n    date cw_published \"CW公開日\"\n    url nico_url \"ニコニコ静画リンク\"\n    date nico_published \"nico公開日\"\n    text memo \"編集メモ\"\n}\n\n%% magazine 雑誌連載 マオウ [イベント]\nmagazine {\n    serial id PK\n    %% 雑誌のタイトル 例：電撃マオウ 2020年1月号\n    char title \"タイトル\"\n    %% 書店等での発売日 ※タイトルの月の2か月前27日前後\n    date released \"発売日\"\n    %% 表紙や付録になった号、などを表すタグ\n    char tag_line \"管理用タグ\"\n    %% 例: https://dengekimaoh.jp/magazine/magazine-nnnnn.html\n    url site \"雑誌リンク\"\n    %% 例: https://dengekimaoh.jp/archives/008/202208/xxxxxxxx.jpg\n    url cover_image \"雑誌表紙\"\n    text memo \"編集メモ\"\n}\n\n%% type_master 分類型の項目の選択肢マスター [リソース]\ntype_master {\n    serial id PK\n    char name \"参照名\"\n    char key \"属性\"\n    char value \"値\"\n}\n\n%% fragment その他媒体 表紙カラー、店舗特典、ポスター、別冊、雑誌付録。コミック収録と未収録がある [リソース]\nfragment {\n    serial id PK\n    rel story FK\n    rel web_comic FK\n    rel character FK\n    rel place FK\n    %% type_master fragment\n    rel type_master FK \"分類\"\n    char title \"名前\"\n    url url \"参照URL/リンク\"\n    text memo \"編集メモ\"\n}\n\n%% journey 第〇旅、番外旅 [イベント]\njourney {\n    serial id PK\n    %% type_master journey\n    rel type_master FK \"分類\"\n    %% 入力は数字のみ\n    int number \"第〇旅\"\n    char key \"記号\"\n    text memo \"編集メモ\"\n}\n\n%% story 単行本の単話 第〇旅前編、第〇旅後編。コミック未収録もある [イベント]\nstory {\n    serial id PK\n    rel magazine FK\n    rel comic FK\n    rel journey FK\n    %% type_master story\n    rel type_master FK \"分類\"\n    char title \"単話タイトル\"\n    char subtitle \"サブタイトル\"\n    %% place story このストーリーに登場する主な地点をすべて包含するような範囲(四角形)の中心\n    rel camera_center_place FK \"(領域設定用)\"\n    int camera_zoom_level \"(領域設定用)zoom\"\n}\n\n%% route 経路 placeを組み合わせて経路とする [リソース]\nroute {\n    serial id PK\n    rel story FK\n    %% type_master route\n    rel type_master FK \"分類\"\n    char name \"名前\"\n    text memo \"編集メモ\"\n}\n\n%% venue 目的地 会津、松島、那須、… [リソース]\nvenue {\n    serial id PK\n    rel story FK\n    %% type_master venue\n    rel type_master FK \"分類\"\n    char name \"名称\"\n}\n\n%% place 場所 東京駅の顔出しパネル、登場店舗、宿泊場所、観光名所、施設、交通拠点 [リソース]\nplace {\n    serial id PK\n    rel venue FK\n    char name \"地点名\"\n    char address \"住所\"\n    decimal latitude \"緯度\"\n    decimal longitude \"経度\"\n    decimal altitude \"高度\"\n    text memo \"編集メモ\"\n}\n\n%% step 訪問 routeに含まれる地点を訪れた日時 [イベント]\nstep {\n    serial id PK\n    rel route FK\n    rel place FK\n    int number \"順番\"\n    datetime datetime \"日時\"\n    %% \"zoom=14, pitch=60, bearing=0\"\n}\n\n%% scene シーン 名シーン、ざつ旅ARのマーカー [イベント]\nscene {\n    serial id PK\n    rel story FK\n    rel place FK\n    rel character FK\n    %% type_master scene\n    rel type_master FK \"分類\"\n    %% コミック掲載ページ\n    int page \"ページ\"\n    text memo \"編集メモ\"\n}\n\n%% character キャラクター 主要5人、編集部、他 [リソース]\ncharacter {\n    serial id PK\n    %% type_master character\n    rel type_master FK \"分類\"\n    char name \"名前\"\n    text description \"紹介文\"\n}\n\n%% photo flickr (google place photo api有料) [リソース]\nphoto {\n    serial id PK\n    rel step FK\n    rel person FK\n    %% type_master photo\n    rel type_master FK \"分類\"\n    char title \"タイトル\"\n    url link \"参照ページURL\"\n    url image_src \"画像URL\"\n    %% 参照先固有の、撮影者を識別する情報\n    char username \"撮影者\"\n    int width \"画像幅\"\n    int height \"画像高さ\"\n}\n\n%% tweet Twitter 石坂さん、鈴ヶ森さん、読者等、無関係 [リソース]\ntweet {\n    serial id PK\n    rel person FK\n    rel step FK\n    %% type_master tweet\n    rel type_master FK \"分類\"\n    url url \"固定URL\"\n    %% 桁数が大きいため、JSON等では数値型で扱えないことに注意\n    char tweet_id \"Tweet ID\"\n    %% @username は変わる可能性があることに注意\n    char username \"ツイ主の@username\"\n    text description \"内容\"\n}\n\n%% person コンテンツの作者 ツイート/写真を撮影した人 [リソース]\nperson {\n    serial id PK\n    rel user FK\n    %% type_master person\n    rel type_master FK \"分類\"\n    char name \"名前\"\n    text memo \"編集メモ\"\n}\n\n%% user ユーザー 利用者 [リソース]\nuser {\n    serial id PK\n    char username\n    char last_name\n    char first_name\n    char email\n    datetime date_joined\n}\n\n%% role [リソース]\n%% permission 権限 [イベント]\n",
+  "content_size": 6317,
+  "collected_at": "2026-02-06T11:02:04.680280",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "repo_owner": "isnot",
+  "repo_name": "mermaid2django",
+  "repo_description": " entity-relationship Diagram that is written with mermaid's syntax convert into Django model class",
+  "repo_language": "Python",
+  "repo_topics": [],
+  "repo_created_at": "2023-08-24T14:48:26Z",
+  "repo_updated_at": "2023-08-24T16:58:52Z",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 comic : \"シリーズ名\"\n    %% magazine 雑誌に載らないストーリー、掲載がない号もある 雑誌連載はWeb連載時には分割されている\n    magazine |o--o| story : \"初出の掲載誌\"\n    %% story Web掲載された単話、「単行本に未収録」もあり\n    story |o--|{ web_comic : \"分割\"\n    %% web_comic ストーリー以外のWeb連載に登場した絵\n    web_comic |o--o{ fragment : \"その他の絵\"\n    comic |o--|{ story : \"収録された巻\"\n    %% journey 第〇旅が前後編に分割されるケース 同じ場所が複数の旅に登場する場合あり\n    journey ||--|{ story : \"前後編\"\n    %% story その他雑多な絵に関連する単話\n    story |o--o{ fragment : \"関連する絵\"\n    story |o--o{ scene : \"\"\n    story  和 四角形 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'comic : \"シリーズ名\"\n    %% magazine 雑誌に載らないストーリー、掲載がない号もある 雑誌連載はWeb連載時には分割されている\n    magazine |o--o| story : \"初出の掲載誌\"\n    %% story Web掲載された単話、「単行本に未収録」もあり\n    story |o--|{ web_comic : \"分割\"\n    %% web_comic ストーリー以外のWeb連載に登場した絵\n    web_comic |o--o{ fragment : \"その他の絵\"\n    comic |o--|{ story : \"収録された巻\"\n    %% journey 第〇旅が前後編に分割されるケース 同じ場所が複数の旅に登場する場合あり\n    journey ||--|{ story : \"前後編\"\n    %% story その他雑多な絵に関連する単話\n    story |o--o{ fragment : \"関連する絵\"\n    story |o--o{ scene : \"\"\n    story  和 四角形'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "o",
+        "ストーリー登場地点を含む領域"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 fragment : \"\"\n    place |o--o{ scene : \"\"\n    step |o--o{ tweet : \"\"\n    step |o--o{ photo : \"\"\n    character  和 fragment : \"\"\n    %% character 登場するキャラクター\n    character  的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 fragment : \"\"\n    place |o--o{ scene : \"\"\n    step |o--o{ tweet : \"\"\n    step |o--o{ photo : \"\"\n    character 处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'fragment : \"\"\n    place |o--o{ scene : \"\"\n    step |o--o{ tweet : \"\"\n    step |o--o{ photo : \"\"\n    character 处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "o",
+        "o"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 scene : \"登場\"\n    person |o--o{ tweet : \"\"\n    person |o--o{ photo : \"\"\n    %% user \"認証情報とユーザー情報の紐付け\"\n    user |o--o| person : \"\"\n    type_master |o--o{ character : \"\"\n    type_master |o--o{ fragment : \"\"\n    type_master |o--o{ journey : \"\"\n    type_master |o--o{ person : \"\"\n    type_master |o--o{ photo : \"\"\n    type_master |o--o{ route : \"\"\n    type_master |o--o{ scene : \"\"\n    type_master |o--o{ story : \"\"\n    type_master |o--o{ tweet : \"\"\n    type_master |o--o{ venue : \"\"\n\n\n%% ざつ旅 鈴ヶ森ちか短編集(仮 和 リソース 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'scene : \"登場\"\n    person |o--o{ tweet : \"\"\n    person |o--o{ photo : \"\"\n    %% user \"認証情報とユーザー情報の紐付け\"\n    user |o--o| person : \"\"\n    type_master |o--o{ character : \"\"\n    type_master |o--o{ fragment : \"\"\n    type_master |o--o{ journey : \"\"\n    type_master |o--o{ person : \"\"\n    type_master |o--o{ photo : \"\"\n    type_master |o--o{ route : \"\"\n    type_master |o--o{ scene : \"\"\n    type_master |o--o{ story : \"\"\n    type_master |o--o{ tweet : \"\"\n    type_master |o--o{ venue : \"\"\n\n\n%% ざつ旅 鈴ヶ森ちか短編集(仮 和 リソース'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "o",
+        "巻数が自然数の順列になる"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 serial id PK\n    %% 正確な作品の名称\n    char title \"作品名\"\n    %% 略称や通称で代表的なもの\n    char short_title \"略称\"\n    %% 著者複数名の場合は、代表者をカンマ区切りで列挙する\n    char author \"著者名\"\n    %% 出版社 例：KADOKAWA\n    char publisher \"出版社\"\n    %% コミック・シリーズのレーベル名称 例：電撃コミックスNEXT\n    char label \"レーベル\"\n    %% 雑誌連載の誌名か、Web連載のレーベル名称\n    char magazine_title \"連載誌\"\n    %% 公式サイトや他のWebサイトから代表するものを1件\n    url site \"代表(公式 和 単方向リスト。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'serial id PK\n    %% 正確な作品の名称\n    char title \"作品名\"\n    %% 略称や通称で代表的なもの\n    char short_title \"略称\"\n    %% 著者複数名の場合は、代表者をカンマ区切りで列挙する\n    char author \"著者名\"\n    %% 出版社 例：KADOKAWA\n    char publisher \"出版社\"\n    %% コミック・シリーズのレーベル名称 例：電撃コミックスNEXT\n    char label \"レーベル\"\n    %% 雑誌連載の誌名か、Web連載のレーベル名称\n    char magazine_title \"連載誌\"\n    %% 公式サイトや他のWebサイトから代表するものを1件\n    url site \"代表(公式 和 単方向リスト'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "series",
+        "モデルにはあえてリレーションを定義せず"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 リソース 和 serial id PK\n    rel series FK\n    %% 第n巻 入力するのは数字のみ\n    int number \"巻数\"\n    %% 例：ざつ旅-That's Journey- 1。※巻数の表記は作品毎に呼び方のバリエーションがある\n    char title \"各巻タイトル\"\n    %% 特徴的な帯の文言\n    char obi \"オビ\"\n    %% 巻末の奥付にある、初版発行日\n    date issued \"発行日\"\n    date released \"書店発売日\"\n    %% 版元ドットコムの書誌情報DBより\n    url cover_image \"書影url\"\n    char isbn \"ISBN13\"\n    text memo \"編集メモ\"\n 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'リソース 和 serial id PK\n    rel series FK\n    %% 第n巻 入力するのは数字のみ\n    int number \"巻数\"\n    %% 例：ざつ旅-That's Journey- 1。※巻数の表記は作品毎に呼び方のバリエーションがある\n    char title \"各巻タイトル\"\n    %% 特徴的な帯の文言\n    char obi \"オビ\"\n    %% 巻末の奥付にある、初版発行日\n    date issued \"発行日\"\n    date released \"書店発売日\"\n    %% 版元ドットコムの書誌情報DBより\n    url cover_image \"書影url\"\n    char isbn \"ISBN13\"\n    text memo \"編集メモ\"\n'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "NULL",
+        "comic"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 1 和 serial id PK\n    rel story FK\n    char title \"各話の名前\"\n    int part_number \"分割の順列\"\n    int pages \"ページ数\"\n    url cw_url \"Comic Walkerリンク\"\n    date cw_published \"CW公開日\"\n    url nico_url \"ニコニコ静画リンク\"\n    date nico_published \"nico公開日\"\n    text memo \"編集メモ\"\n 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '1 和 serial id PK\n    rel story FK\n    char title \"各話の名前\"\n    int part_number \"分割の順列\"\n    int pages \"ページ数\"\n    url cw_url \"Comic Walkerリンク\"\n    date cw_published \"CW公開日\"\n    url nico_url \"ニコニコ静画リンク\"\n    date nico_published \"nico公開日\"\n    text memo \"編集メモ\"\n'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "第1旅",
+        "web_comic"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 イベント 和 serial id PK\n    %% 雑誌のタイトル 例：電撃マオウ 2020年1月号\n    char title \"タイトル\"\n    %% 書店等での発売日 ※タイトルの月の2か月前27日前後\n    date released \"発売日\"\n    %% 表紙や付録になった号、などを表すタグ\n    char tag_line \"管理用タグ\"\n    %% 例: https://dengekimaoh.jp/magazine/magazine-nnnnn.html\n    url site \"雑誌リンク\"\n    %% 例: https://dengekimaoh.jp/archives/008/202208/xxxxxxxx.jpg\n    url cover_image \"雑誌表紙\"\n    text memo \"編集メモ\"\n。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'イベント 和 serial id PK\n    %% 雑誌のタイトル 例：電撃マオウ 2020年1月号\n    char title \"タイトル\"\n    %% 書店等での発売日 ※タイトルの月の2か月前27日前後\n    date released \"発売日\"\n    %% 表紙や付録になった号、などを表すタグ\n    char tag_line \"管理用タグ\"\n    %% 例: https://dengekimaoh.jp/magazine/magazine-nnnnn.html\n    url site \"雑誌リンク\"\n    %% 例: https://dengekimaoh.jp/archives/008/202208/xxxxxxxx.jpg\n    url cover_image \"雑誌表紙\"\n    text memo \"編集メモ\"\n'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "マオウ",
+        "magazine"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 リソース 和 serial id PK\n    char name \"参照名\"\n    char key \"属性\"\n    char value \"値\"\n 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'リソース 和 serial id PK\n    char name \"参照名\"\n    char key \"属性\"\n    char value \"値\"\n'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "分類型の項目の選択肢マスター",
+        "type_master"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 リソース 和 serial id PK\n    rel story FK\n    rel web_comic FK\n    rel character FK\n    rel place FK\n    %% type_master fragment\n    rel type_master FK \"分類\"\n    char title \"名前\"\n    url url \"参照URL/リンク\"\n    text memo \"編集メモ\"\n 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'リソース 和 serial id PK\n    rel story FK\n    rel web_comic FK\n    rel character FK\n    rel place FK\n    %% type_master fragment\n    rel type_master FK \"分類\"\n    char title \"名前\"\n    url url \"参照URL/リンク\"\n    text memo \"編集メモ\"\n'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "コミック収録と未収録がある",
+        "fragment"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 イベント 和 serial id PK\n    %% type_master journey\n    rel type_master FK \"分類\"\n    %% 入力は数字のみ\n    int number \"第〇旅\"\n    char key \"記号\"\n    text memo \"編集メモ\"\n 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'イベント 和 serial id PK\n    %% type_master journey\n    rel type_master FK \"分類\"\n    %% 入力は数字のみ\n    int number \"第〇旅\"\n    char key \"記号\"\n    text memo \"編集メモ\"\n'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "番外旅",
+        "journey"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 イベント 和 serial id PK\n    rel magazine FK\n    rel comic FK\n    rel journey FK\n    %% type_master story\n    rel type_master FK \"分類\"\n    char title \"単話タイトル\"\n    char subtitle \"サブタイトル\"\n    %% place story このストーリーに登場する主な地点をすべて包含するような範囲(四角形。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'イベント 和 serial id PK\n    rel magazine FK\n    rel comic FK\n    rel journey FK\n    %% type_master story\n    rel type_master FK \"分類\"\n    char title \"単話タイトル\"\n    char subtitle \"サブタイトル\"\n    %% place story このストーリーに登場する主な地点をすべて包含するような範囲(四角形'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "コミック未収録もある",
+        "story"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 リソース 和 serial id PK\n    rel story FK\n    %% type_master route\n    rel type_master FK \"分類\"\n    char name \"名前\"\n    text memo \"編集メモ\"\n 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'リソース 和 serial id PK\n    rel story FK\n    %% type_master route\n    rel type_master FK \"分類\"\n    char name \"名前\"\n    text memo \"編集メモ\"\n'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "placeを組み合わせて経路とする",
+        "route"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 serial id PK\n    rel story FK\n    %% type_master venue\n    rel type_master FK \"分類\"\n    char name \"名称\"\n 和 リソース 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'serial id PK\n    rel story FK\n    %% type_master venue\n    rel type_master FK \"分類\"\n    char name \"名称\"\n 和 リソース'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "venue",
+        "交通拠点"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 serial id PK\n    rel venue FK\n    char name \"地点名\"\n    char address \"住所\"\n    decimal latitude \"緯度\"\n    decimal longitude \"経度\"\n    decimal altitude \"高度\"\n    text memo \"編集メモ\"\n 和 イベント 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 serial id PK\n    rel venue FK\n    char name \"地点名\"\n    char address \"住所\"\n    decimal latitude \"緯度\"\n    decimal longitude \"経度\"\n    decimal altitude \"高度\"\n    text memo \"編集メモ\"\n处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'serial id PK\n    rel venue FK\n    char name \"地点名\"\n    char address \"住所\"\n    decimal latitude \"緯度\"\n    decimal longitude \"経度\"\n    decimal altitude \"高度\"\n    text memo \"編集メモ\"\n处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "place",
+        "routeに含まれる地点を訪れた日時"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 serial id PK\n    rel route FK\n    rel place FK\n    int number \"順番\"\n    datetime datetime \"日時\"\n    %% \"zoom=14, pitch=60, bearing=0\"\n 和 イベント 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 serial id PK\n    rel route FK\n    rel place FK\n    int number \"順番\"\n    datetime datetime \"日時\"\n    %% \"zoom=14, pitch=60, bearing=0\"\n处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 61,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'serial id PK\n    rel route FK\n    rel place FK\n    int number \"順番\"\n    datetime datetime \"日時\"\n    %% \"zoom=14, pitch=60, bearing=0\"\n处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "step",
+        "ざつ旅ARのマーカー"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 serial id PK\n    rel story FK\n    rel place FK\n    rel character FK\n    %% type_master scene\n    rel type_master FK \"分類\"\n    %% コミック掲載ページ\n    int page \"ページ\"\n    text memo \"編集メモ\"\n 和 リソース 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'serial id PK\n    rel story FK\n    rel place FK\n    rel character FK\n    %% type_master scene\n    rel type_master FK \"分類\"\n    %% コミック掲載ページ\n    int page \"ページ\"\n    text memo \"編集メモ\"\n 和 リソース'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "scene",
+        "他"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 serial id PK\n    %% type_master character\n    rel type_master FK \"分類\"\n    char name \"名前\"\n    text description \"紹介文\"\n 和 google place photo api有料 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'serial id PK\n    %% type_master character\n    rel type_master FK \"分類\"\n    char name \"名前\"\n    text description \"紹介文\"\n 和 google place photo api有料'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "character",
+        "flickr"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 serial id PK\n    rel step FK\n    rel person FK\n    %% type_master photo\n    rel type_master FK \"分類\"\n    char title \"タイトル\"\n    url link \"参照ページURL\"\n    url image_src \"画像URL\"\n    %% 参照先固有の、撮影者を識別する情報\n    char username \"撮影者\"\n    int width \"画像幅\"\n    int height \"画像高さ\"\n 和 リソース。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 73,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'serial id PK\n    rel step FK\n    rel person FK\n    %% type_master photo\n    rel type_master FK \"分類\"\n    char title \"タイトル\"\n    url link \"参照ページURL\"\n    url image_src \"画像URL\"\n    %% 参照先固有の、撮影者を識別する情報\n    char username \"撮影者\"\n    int width \"画像幅\"\n    int height \"画像高さ\"\n 和 リソース'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 74,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 75,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "photo",
+        "無関係"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 76,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 serial id PK\n    rel person FK\n    rel step FK\n    %% type_master tweet\n    rel type_master FK \"分類\"\n    url url \"固定URL\"\n    %% 桁数が大きいため、JSON等では数値型で扱えないことに注意\n    char tweet_id \"Tweet ID\"\n    %% @username は変わる可能性があることに注意\n    char username \"ツイ主の@username\"\n    text description \"内容\"\n 和 リソース 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 77,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'serial id PK\n    rel person FK\n    rel step FK\n    %% type_master tweet\n    rel type_master FK \"分類\"\n    url url \"固定URL\"\n    %% 桁数が大きいため、JSON等では数値型で扱えないことに注意\n    char tweet_id \"Tweet ID\"\n    %% @username は変わる可能性があることに注意\n    char username \"ツイ主の@username\"\n    text description \"内容\"\n 和 リソース'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 78,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 79,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "tweet",
+        "写真を撮影した人"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 80,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 serial id PK\n    rel user FK\n    %% type_master person\n    rel type_master FK \"分類\"\n    char name \"名前\"\n    text memo \"編集メモ\"\n 和 リソース。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 81,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'serial id PK\n    rel user FK\n    %% type_master person\n    rel type_master FK \"分類\"\n    char name \"名前\"\n    text memo \"編集メモ\"\n 和 リソース'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 82,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 83,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "person",
+        "利用者"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 84,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 serial id PK\n    char username\n    char last_name\n    char first_name\n    char email\n    datetime date_joined\n 和 リソース 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 85,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 serial id PK\n    char username\n    char last_name\n    char first_name\n    char email\n    datetime date_joined\n处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 86,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'serial id PK\n    char username\n    char last_name\n    char first_name\n    char email\n    datetime date_joined\n处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 87,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 88,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "user",
+        "role"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 89,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 イベント。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 90,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'イベント'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 91,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 92,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "権限"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 92,
+    "repair_count": 4,
+    "grounding_acts_count": 44,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repaired_at": "2026-02-28T13:41:41Z"
+}

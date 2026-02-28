@@ -1,0 +1,63 @@
+{
+  "id": "gl_packet-beta_00366",
+  "source": "gitlab",
+  "source_url": "https://github.com/ArgOsciProyect/ARG_OSCI_APP/blob/5b219c846361cf23dbe85c073aba8d9146c704d5/diagrams/DATA_ACQ_ALG.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "ArgOsciProyect/ARG_OSCI_APP",
+  "diagram_type": "packet-beta",
+  "code": "sequenceDiagram\n    participant Device\n    participant Socket\n    participant ProcessingIsolate\n    participant DataService\n    participant Provider\n    participant ChartService\n    participant Chart\n\n    loop While acquisition active\n        Device->>Socket: Send binary data packet\n        Socket->>ProcessingIsolate: Forward raw data\n        \n        ProcessingIsolate->>ProcessingIsolate: Parse binary format\n        ProcessingIsolate->>ProcessingIsolate: Apply bit masks\n        ProcessingIsolate->>ProcessingIsolate: Extract values & channels\n        ProcessingIsolate->>ProcessingIsolate: Convert to voltage\n        \n        alt With trigger detection\n            ProcessingIsolate->>ProcessingIsolate: Run trigger detection algorithm\n        end\n        \n        ProcessingIsolate->>DataService: Send processed DataPoints\n        DataService->>DataService: Update metrics (frequency, max value)\n        DataService->>Provider: Update data streams\n        \n        alt Oscilloscope Mode\n            Provider->>ChartService: Forward time-domain data\n            ChartService->>ChartService: Apply active filters\n            \n            alt Filter enabled\n                ChartService->>ChartService: Apply selected filter (MA, Exp, LP)\n                \n                alt Zero-Phase enabled\n                    ChartService->>ChartService: Apply forward-backward filtering\n                end\n            end\n            \n            ChartService->>Chart: Update waveform display\n        else FFT Mode\n            Provider->>ChartService: Forward time-domain data\n            ChartService->>ChartService: Buffer points until blockSize reached\n            ChartService->>ChartService: Perform FFT computation\n            ChartService->>Chart: Update frequency spectrum display\n        end\n    end",
+  "content_size": 1803,
+  "collected_at": "2026-02-06T14:08:20.778991",
+  "compilation_status": "success",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 frequency, max value 和 MA, Exp, LP 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'frequency, max value 和 MA, Exp, LP'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "metrics",
+        "filter"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:33Z"
+}

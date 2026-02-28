@@ -1,0 +1,535 @@
+{
+  "id": "gh_sequence_00951",
+  "source": "github",
+  "source_url": "https://github.com/jackwillis/attack-kg/blob/ad9435c5d2729a11dffd53bc059b3a1026b9b788/docs/architecture/data-flow.mmd",
+  "github_repo": "jackwillis/attack-kg",
+  "github_file_path": "docs/architecture/data-flow.mmd",
+  "diagram_type": "sequence",
+  "code": "%%{init: {'theme': 'base'}}%%\n\nsequenceDiagram\n    autonumber\n    participant User\n    participant CLI as CLI (main.py)\n    participant Router as FindingRouter\n    participant Hybrid as HybridQueryEngine\n    participant Vectors as ChromaDB\n    participant BM25 as KeywordSearch\n    participant Graph as Oxigraph\n    participant LLM as LLM Backend\n\n    Note over User,LLM: Query Flow: \"Found password spraying attack on Windows domain\"\n\n    User->>CLI: analyze \"Found password spraying attack on Windows domain\"\n    CLI->>Hybrid: query(finding, top_k=5)\n\n    rect rgb(240, 230, 255)\n        Note over Hybrid,Router: Step 1: Finding-Type Router (Deterministic)\n        Hybrid->>Router: route_finding(text)\n        Router-->>Hybrid: RoutingDecision<br/>type=attack_narrative, confidence=0.85<br/>platforms=[Windows], signals=[password, domain]\n        Note over Hybrid: Router adjusts retrieval weights:<br/>attack_narrative → co-occurrence ON, CWE boost 1.4x<br/>vulnerability → co-occurrence OFF, CWE boost 2.0x\n    end\n\n    rect rgb(230, 245, 255)\n        Note over Hybrid,BM25: Step 2: Hybrid Retrieval (RRF Fusion)<br/>Includes ATT&CK + LOLBAS + GTFOBins + CAPEC\n        Hybrid->>Vectors: embed(finding) via ATT&CK BERT\n        Vectors-->>Hybrid: semantic candidates + similarity scores\n        Hybrid->>BM25: tokenize + search(finding)\n        BM25-->>Hybrid: keyword candidates + BM25 scores\n        Note over Hybrid: Reciprocal Rank Fusion<br/>score = Σ 1/(k + rank)\n        Hybrid->>Graph: get_cooccurring_techniques(top_3)\n        Graph-->>Hybrid: co-occurring techniques (campaigns 1.5x, groups 1.0x)\n        Note over Hybrid: Boost by weighted co-occurrence<br/>with time-decay on campaign age\n        Hybrid-->>Hybrid: re-ranked candidates [T1110.003, T1078, ...]\n    end\n\n    rect rgb(255, 245, 230)\n        Note over Hybrid,Graph: Step 3: CWE/CAPEC + Vuln Keyword Injection\n        Hybrid->>Hybrid: Detect CWE-nnn patterns in finding text\n        Hybrid->>Graph: get_techniques_for_cwe(CWE-nnn)\n        Graph-->>Hybrid: CWE → CAPEC → ATT&CK techniques\n        Hybrid->>Hybrid: Match vuln keywords (39 patterns)<br/>e.g. \"authentication bypass\" → T1190, T1556\n        Note over Hybrid: CAPEC patterns also matched<br/>semantically via ChromaDB embeddings\n    end\n\n    rect rgb(244, 248, 255)\n        Note over Hybrid: Step 4: Platform Boosting\n        Note over Hybrid: Detected platforms: [Windows]<br/>Boost matching techniques by 1.2x\n    end\n\n    rect rgb(230, 255, 230)\n        Note over Hybrid,Graph: Step 5: Symbolic Enrichment (SPARQL)\n        loop For each candidate technique\n            Hybrid->>Graph: get_technique(id)\n            Graph-->>Hybrid: technique details + tactics\n            Hybrid->>Graph: get_software_for_technique(id)\n            Graph-->>Hybrid: [Cobalt Strike, Mimikatz, ...]\n            Hybrid->>Graph: get_mitigations_with_inheritance(id)\n            Graph-->>Hybrid: [M1032, M1027, ...] (direct + inherited)\n            Hybrid->>Graph: get_d3fend_for_technique(id)\n            Graph-->>Hybrid: [D3-MFA, D3-IOPR, ...]\n            Hybrid->>Graph: get_detection_strategies(id)\n            Hybrid->>Graph: get_data_sources(id)\n            Graph-->>Hybrid: detection approaches + data source names\n        end\n    end\n\n    Hybrid-->>CLI: EnrichedTechnique[]\n\n    rect rgb(255, 230, 230)\n        Note over CLI,LLM: Step 6: Single-Stage LLM Analysis\n        CLI->>CLI: Prune context (focus mitigations on top 3 techniques)\n        CLI->>CLI: Encode context (XML default, TOON, or JSON)<br/>Skip software for vulnerability findings\n        CLI->>LLM: analyze(finding, encoded_context)\n        Note right of LLM: Classify techniques + write remediation<br/>Constrained to provided candidates<br/>Output: techniques, mitigations, D3FEND, detections\n        LLM-->>CLI: AnalysisResult JSON\n        CLI->>CLI: Validate IDs + data source names<br/>against retrieval set\n    end\n\n    CLI-->>User: AnalysisResult<br/>{techniques, remediations, detections, d3fend}\n",
+  "content_size": 3995,
+  "collected_at": "2026-02-06T01:51:09.098117",
+  "compilation_status": "success",
+  "license": "none",
+  "license_name": "No License (Assumed)",
+  "license_url": null,
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "repo_owner": "jackwillis",
+  "repo_name": "attack-kg",
+  "repo_description": "Query the MITRE ATT&CK framework from the command line.",
+  "repo_language": "Python",
+  "repo_topics": [],
+  "repo_created_at": "2026-01-29T01:33:31Z",
+  "repo_updated_at": "2026-02-05T17:09:59Z",
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 main.py 和 finding, top_k=5 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'main.py 和 finding, top_k=5'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CLI",
+        "query"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 240, 230, 255 和 Deterministic 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '240, 230, 255 和 Deterministic'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "rgb",
+        "Router"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 text 和 230, 245, 255 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'text 和 230, 245, 255'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "route_finding",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 RRF Fusion 和 finding。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'RRF Fusion 和 finding'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Retrieval",
+        "embed"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 finding 和 top_3 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'finding 和 top_3'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "search",
+        "get_cooccurring_techniques"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 campaigns 1.5x, groups 1.0x 和 T1110.003, T1078, ... 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'campaigns 1.5x, groups 1.0x 和 T1110.003, T1078, ...'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "techniques",
+        "candidates"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 255, 245, 230 和 CWE-nnn 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '255, 245, 230 和 CWE-nnn'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "rgb",
+        "get_techniques_for_cwe"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 39 patterns 和 244, 248, 255 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '39 patterns 和 244, 248, 255'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "keywords",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 230, 255, 230 和 SPARQL 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '230, 255, 230 和 SPARQL'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "rgb",
+        "Enrichment"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 id 和 id。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'id 和 id'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "get_technique",
+        "get_software_for_technique"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 id 和 id 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 id处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'id处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "get_mitigations_with_inheritance",
+        "get_d3fend_for_technique"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 id 和 id 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'id 和 id'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "get_detection_strategies",
+        "get_data_sources"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 255, 230, 230 和 focus mitigations on top 3 techniques 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '255, 230, 230 和 focus mitigations on top 3 techniques'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "rgb",
+        "context"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 XML default, TOON, or JSON 和 finding, encoded_context 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'XML default, TOON, or JSON 和 finding, encoded_context'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "context",
+        "analyze"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 57,
+    "repair_count": 1,
+    "grounding_acts_count": 28,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:21Z"
+}

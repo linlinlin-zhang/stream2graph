@@ -1,0 +1,570 @@
+{
+  "id": "gh_architecture_01807",
+  "source": "github",
+  "source_url": "https://github.com/c3g/GenPipes/blob/fc0760d2b774e6b345a1a7e9a73eea257be090a6/resources/workflows/mmd/src/dnaseq.som.fastpass.mmd",
+  "github_repo": "c3g/GenPipes",
+  "github_file_path": "resources/workflows/mmd/src/dnaseq.som.fastpass.mmd",
+  "diagram_type": "architecture",
+  "code": "%%{init: {'theme': 'base', 'themeVariables': { 'lineColor': '#404040'}}}%%\n\n        %% GenPipes Schema for dnaseq.py\n        %% Ref: https://bitbucket.org/mugqic/genpipes/src/master/pipelines/dnaseq/\n        %% Author Shaloo Shalini <shalz@hotmail.com>\n        %% -t somatic_fastpass\n\n        graph LR\n        Node1{{ 1.<br/> GATK<br/>SAM<br/>to FASTQ }}:::nodefill\n        Node2{{ 2.<br/> Trim<br/>FastP }}:::nodefill\n        Node3{{ 3.<br/> BWA<br/>Mem2<br/>SAM Tools<br/>Sort }}:::nodefill\n        Node4{{ 4.<br/> GATK<br/>Mark<br/>Duplicates }}:::nodefillblack\n        Node5{{ 5.<br/> Set<br/>Interval List }}:::nodefill\n        Node6{{ 6.<br/> Sequenza }}:::nodefill\n        Node7{{ 7.<br/> Raw MPileup }}:::nodefill\n        Node8{{ 8.<br/> Paired<br/>Varscan2 }}:::nodefill\n        Node9{{ 9.<br/> Merge<br/>Varscan2 }}:::nodefill\n        Node10{{ 10.<br/> Preprocess<br/>VCF }}:::nodefill\n        Node11{{ 11.<br/> CNVKit<br/>Batch }}:::nodefill\n        Node12{{ 12.<br/> Filter<br/>Germline }}:::nodefill\n        Node13{{ 13.<br/> Report CPSR }}:::nodefill\n        Node14{{ 14.<br/> Filter Somatic }}:::nodefill      \n        Node15{{ 15.<br/> Report PCGR }}:::nodefill\n        Node16{{ 16.<br/> Conpair<br/>Concordance<br/>Contamination }}:::nodefill\n        Node17{{ 17.<br/> Metrics<br/>DNA<br/>Picard }}:::nodefill\n        Node18{{ 18.<br/> DNA Sample <br/> MosDepth Metrics }}:::nodefill\n        Node19{{ 19.<br/> Run<br/>MultiQC }}:::nodefill\n        Node20{{ 20.<br/> Sym Link<br/>Report }}:::nodefill\n        Node21{{ 21.<br/> Sym Link<br/>FastQ Pair }}:::nodefill\n        Node22{{ 22.<br/> Sym Link<br/>Panel }}:::nodefill\n        Node23{{ 23.<br/> Cram<br/>Output  }}:::nodefill\n\n        Input1[[fa:fa-file-archive-o .BAM]]\n        Input2[[fa:fa-file-archive-o .FASTQ]]\n\n   \n        MultiQCOP([fa:fa-sticky-note-o Report ])\n        CramOP([fa:fa-sticky-note-o Report ])\n\n        Input1 --> Node1\n        Input2 --> Node2\n\n        Node1 -.-> Node2 & Node21\n        Node2 -.-> Node3 -.-> Node4\n        Node4 -.-> Node5 & Node6 & Node7 & Node11 & Node16 & Node17 & Node18 & Node23\n        Node7 -.-> Node8 -.-> Node9 -.-> Node10\n        Node9 -.-> Node11 & Node14\n        Node10 -.-> Node12 -.-> Node13\n        Node11 & Node13 & Node14 -.-> Node15\n        Node2 & Node4 & Node16 & Node17 & Node18 -.-> Node19\n        Node19 -.-> Node20\n        Node9 & Node12 & Node13 & Node14 & Node15 -.-> Node22\n\n        Node19 --> MultiQCOP\n        Node23 --> CramOP\n\n        subgraph readSetSteps[\" \"]\n          Node1\n          Node2\n          Node3\n          MTSOutput\n        end\n        subgraph sampleSetSteps[\" \"]\n          Node5\n          Node6\n          Node7\n          Node8\n          Node9\n          Node10\n          Node11\n          Node12\n          Node13\n          Node14\n          Node15\n          Node16\n          Node17\n          Node18\n          Node19\n          Node20\n          Node21\n          Node22\n          Node23\n          MultiQCOP\n          CramOP\n        end\n\n        classDef greenRect fill:#E4FBF4,stroke:white\n        class readSetSteps greenRect\n        classDef blueRect fill:#DEF6FC,stroke:white\n        class sampleSetSteps blueRect\n        classDef nodefill fill:#ffffff,stroke:gray,stroke-width:2px\n        classDef nodefillblack fill:black,stroke:black,color:white,stroke-width:2px\n",
+  "content_size": 3322,
+  "collected_at": "2026-02-06T02:03:36.562990",
+  "compilation_status": "success",
+  "compilation_error": "",
+  "license": "lgpl-3.0",
+  "license_name": "GNU Lesser General Public License v3.0",
+  "license_url": "https://api.github.com/licenses/lgpl-3.0",
+  "repo_stars": 8,
+  "repo_forks": 1,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 { 1.<br/> GATK<br/>SAM<br/>to FASTQ  和 { 2.<br/> Trim<br/>FastP  的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '{ 1.<br/> GATK<br/>SAM<br/>to FASTQ  和 { 2.<br/> Trim<br/>FastP '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Node1",
+        "Node2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 { 3.<br/> BWA<br/>Mem2<br/>SAM Tools<br/>Sort  和 { 4.<br/> GATK<br/>Mark<br/>Duplicates 。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '{ 3.<br/> BWA<br/>Mem2<br/>SAM Tools<br/>Sort  和 { 4.<br/> GATK<br/>Mark<br/>Duplicates '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Node3",
+        "Node4"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 { 5.<br/> Set<br/>Interval List  和 { 6.<br/> Sequenza 。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '{ 5.<br/> Set<br/>Interval List  和 { 6.<br/> Sequenza '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Node5",
+        "Node6"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 { 7.<br/> Raw MPileup  和 { 8.<br/> Paired<br/>Varscan2  的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '{ 7.<br/> Raw MPileup  和 { 8.<br/> Paired<br/>Varscan2 '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Node7",
+        "Node8"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 { 9.<br/> Merge<br/>Varscan2  和 { 10.<br/> Preprocess<br/>VCF  的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '{ 9.<br/> Merge<br/>Varscan2  和 { 10.<br/> Preprocess<br/>VCF '。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Node9",
+        "Node10"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 { 11.<br/> CNVKit<br/>Batch  和 { 12.<br/> Filter<br/>Germline  这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '{ 11.<br/> CNVKit<br/>Batch  和 { 12.<br/> Filter<br/>Germline '。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Node11",
+        "Node12"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 { 13.<br/> Report CPSR  和 { 14.<br/> Filter Somatic  的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 { 13.<br/> Report CPSR 处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '{ 13.<br/> Report CPSR 处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Node13",
+        "Node14"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 { 15.<br/> Report PCGR  和 { 16.<br/> Conpair<br/>Concordance<br/>Contamination 。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '{ 15.<br/> Report PCGR  和 { 16.<br/> Conpair<br/>Concordance<br/>Contamination '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Node15",
+        "Node16"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 { 17.<br/> Metrics<br/>DNA<br/>Picard  和 { 18.<br/> DNA Sample <br/> MosDepth Metrics  的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '{ 17.<br/> Metrics<br/>DNA<br/>Picard  和 { 18.<br/> DNA Sample <br/> MosDepth Metrics '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Node17",
+        "Node18"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 { 19.<br/> Run<br/>MultiQC  和 { 20.<br/> Sym Link<br/>Report  这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '{ 19.<br/> Run<br/>MultiQC  和 { 20.<br/> Sym Link<br/>Report '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Node19",
+        "Node20"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 { 21.<br/> Sym Link<br/>FastQ Pair  和 { 22.<br/> Sym Link<br/>Panel  的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '{ 21.<br/> Sym Link<br/>FastQ Pair  和 { 22.<br/> Sym Link<br/>Panel '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Node21",
+        "Node22"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 { 23.<br/> Cram<br/>Output   和 [fa:fa-file-archive-o .BAM 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '{ 23.<br/> Cram<br/>Output   和 [fa:fa-file-archive-o .BAM'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Node23",
+        "Input1"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 [fa:fa-file-archive-o .FASTQ 和 [fa:fa-sticky-note-o Report  的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '[fa:fa-file-archive-o .FASTQ 和 [fa:fa-sticky-note-o Report '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Input2",
+        "MultiQCOP"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 [fa:fa-sticky-note-o Report  和 \" \" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '[fa:fa-sticky-note-o Report  和 \" \"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CramOP",
+        "readSetSteps"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \" \" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 \" \"处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 60,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\" \"处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sampleSetSteps"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 62,
+    "repair_count": 2,
+    "grounding_acts_count": 30,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:29Z"
+}

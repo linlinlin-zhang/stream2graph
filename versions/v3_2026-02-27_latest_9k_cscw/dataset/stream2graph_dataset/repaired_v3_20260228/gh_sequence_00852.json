@@ -1,0 +1,169 @@
+{
+  "id": "gh_sequence_00852",
+  "source": "github",
+  "source_url": "https://github.com/stephenbessey/CardFlow/blob/d110a2ae251de114598be30d3420d9fea0ad519c/SequenceDiagram.mmd",
+  "github_repo": "stephenbessey/CardFlow",
+  "github_file_path": "SequenceDiagram.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Merchant\n    participant Processor as Payment Processor\n    participant MerchantDB as Merchant DB\n    participant Bank as Bank API\n    participant TransactionDB as Transaction Log\n    \n    Merchant->>Processor: send_payment_request(merchant_data)\n    activate Processor\n    Processor->>Processor: validate_request_parameters()\n    \n    alt Invalid Request Parameters\n        Processor-->>Merchant: return 400 Bad Request\n    else Valid Request Parameters\n        Processor->>MerchantDB: get_merchant_authorization(merchant_name, token)\n        activate MerchantDB\n        MerchantDB-->>Processor: return merchant_data\n        deactivate MerchantDB\n        \n        alt Merchant Not Authorized\n            Processor->>TransactionDB: log_transaction(unauthorized)\n            Processor-->>Merchant: return 401 Unauthorized\n        else Merchant Authorized\n            alt Bank Not Supported\n                Processor->>TransactionDB: log_transaction(unsupported_bank)\n                Processor-->>Merchant: return 400 Bank Not Supported\n            else Bank Supported\n                Processor->>Bank: process_bank_transaction(cc_number, amount)\n                activate Bank\n                \n                alt Transaction Succeeds\n                    Bank-->>Processor: return success\n                    Processor->>TransactionDB: log_transaction(success)\n                    Processor-->>Merchant: return 200 Success\n                else Transaction Fails\n                    Bank-->>Processor: return error\n                    Processor->>TransactionDB: log_transaction(error)\n                    Processor-->>Merchant: return appropriate error code\n                end\n                deactivate Bank\n            end\n        end\n    end\n    \n    deactivate Processor\n",
+  "content_size": 1805,
+  "collected_at": "2026-02-06T01:49:58.009634",
+  "compilation_status": "success",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 merchant_data 和 merchant_name, token 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'merchant_data 和 merchant_name, token'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "send_payment_request",
+        "get_merchant_authorization"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 unauthorized 和 unsupported_bank 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'unauthorized 和 unsupported_bank'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "log_transaction",
+        "log_transaction"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 cc_number, amount 和 success 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'cc_number, amount 和 success'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "process_bank_transaction",
+        "log_transaction"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 error。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'error'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "log_transaction"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 16,
+    "repair_count": 0,
+    "grounding_acts_count": 8,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:17Z"
+}

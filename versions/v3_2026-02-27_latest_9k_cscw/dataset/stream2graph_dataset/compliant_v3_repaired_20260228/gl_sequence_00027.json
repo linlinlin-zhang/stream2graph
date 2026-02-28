@@ -1,0 +1,56 @@
+{
+  "id": "gl_sequence_00027",
+  "source": "gitlab",
+  "source_url": "https://gitlab.com/WarheadsSE/gitlab-diagrams",
+  "gitlab_project": "WarheadsSE/gitlab-diagrams",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    Client->>+LoadBalancer: SSH\n    LoadBalancer->>+NGINX: SSH\n    loop route\n        NGINX ->> NGINX: Route based on TCP ConfigMap\n    end\n    NGINX->>+GitLab Shell: SSH\n    GitLab Shell ->>+ Webservice: HTTP GET /API\n    Webservice ->>- GitLab Shell: HTTP 401/200\n    GitLab Shell ->>+ Gitaly: gRPC\n    Gitaly ->>+ Webservice: HTTP GET /API\n    Webservice ->>- Gitaly: HTTP 401/200\n    Gitaly ->>- GitLab Shell: gRPC\n    GitLab Shell ->>- NGINX: SSH\n    NGINX->>-LoadBalancer: SSH\n    LoadBalancer->>-Client: SSH",
+  "content_size": 531,
+  "collected_at": "2026-02-06T10:57:07.829226",
+  "compilation_status": "success",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository (refer to project page)",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 主架构。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '主架构'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "root"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repaired_at": "2026-02-28T13:41:28Z"
+}

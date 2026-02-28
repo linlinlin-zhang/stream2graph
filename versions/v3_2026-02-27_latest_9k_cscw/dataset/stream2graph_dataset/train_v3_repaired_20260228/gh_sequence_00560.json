@@ -1,0 +1,65 @@
+{
+  "id": "gh_sequence_00560",
+  "source": "github",
+  "source_url": "https://github.com/arnald/forum/blob/5966a5d6ea82a15cc2098be9f4cbd91e43bf4113/docs/diagrams/user_login_flow.mmd",
+  "github_repo": "arnald/forum",
+  "github_file_path": "docs/diagrams/user_login_flow.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant User\n    participant Frontend\n    participant AuthService\n    participant Database\n    \n    User->>Frontend: Submit login credentials\n    Frontend->>AuthService: POST /sessions (email, password)\n    AuthService->>Database: Get user by email\n    alt Email not found\n        Database-->>AuthService: Not found\n        AuthService-->>Frontend: 401 Unauthorized\n        Frontend-->>User: Show error\n    else Email found\n        AuthService->>AuthService: Verify password hash\n        alt Password invalid\n            AuthService-->>Frontend: 401 Unauthorized\n            Frontend-->>User: Show error\n        else Password valid\n            AuthService->>Database: Create session (UUID)\n            AuthService-->>Frontend: 201 Created + Set-Cookie\n            Frontend-->>User: Redirect to dashboard\n        end\n    end",
+  "content_size": 847,
+  "collected_at": "2026-02-06T01:33:57.898437",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 email, password 和 UUID 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'email, password 和 UUID'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sessions",
+        "session"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:37Z"
+}

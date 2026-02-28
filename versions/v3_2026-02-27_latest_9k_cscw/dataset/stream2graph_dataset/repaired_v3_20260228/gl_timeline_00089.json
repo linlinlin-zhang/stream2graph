@@ -1,0 +1,359 @@
+{
+  "id": "gl_timeline_00089",
+  "source": "gitlab",
+  "source_url": "https://github.com/developer-jutra/dj-course/blob/521f7ffbc19450d8a3b52098f5c36b6a6d159874/M8/modelling/tms-er-diagram.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "developer-jutra/dj-course",
+  "diagram_type": "timeline",
+  "code": "erDiagram\n    %% MODUŁ ZASOBÓW I DOSTĘPNOŚCI\n    RESOURCE ||--o{ RESOURCE_AVAILABILITY : \"timeline\"\n    RESOURCE ||--o{ TRANSPORT_RESOURCE : \"assigned_to\"\n    \n    %% MODUŁ KADROWY (HR)\n    HR_DRIVER ||--o{ DRIVER_DOCUMENT : \"holds\"\n    HR_DRIVER |o--o| RESOURCE : \"represents_as_resource\"\n    \n    %% MODUŁ FLOTY (FLEET)\n    FLEET_VEHICLE ||--o{ RESOURCE : \"represents_as_resource\"\n    VEHICLE_CATEGORY ||--o{ FLEET_VEHICLE : \"defines\"\n    \n    %% MODUŁ ZAMÓWIEŃ (SALES)\n    CONTRAHENT ||--o{ ADDRESS : \"manages\"\n    CONTRAHENT ||--o{ ORDER : \"places\"\n    ORDER_STATUS ||--o{ ORDER : \"defines\"\n    ORDER ||--|{ SHIPMENT : \"consists_of\"\n    \n    %% MODUŁ TRANSPORTU (OPERATIONS)\n    TRANSPORT ||--o{ TRANSPORT_RESOURCE : \"uses\"\n    TRANSPORT ||--o{ MANIFEST_ITEM : \"executes\"\n    SHIPMENT ||--o{ MANIFEST_ITEM : \"included_in\"\n\n    CONTRAHENT {\n        int id PK\n        string name\n        string tax_id\n        string internal_code\n        jsonb contact_details\n    }\n\n    ADDRESS {\n        int id PK\n        int contrahent_id FK\n        string label\n        jsonb full_address_data \"city, street, post_code, country, contact_person, phone\"\n    }\n\n    ORDER {\n        int id PK\n        int contrahent_id FK\n        int status_id FK\n        string customer_ref \"Numer zamówienia klienta\"\n        datetime created_at\n        datetime deadline \"Termin realizacji całości\"\n        decimal total_agreed_price \"Kwota netto\"\n        string currency\n        text internal_notes\n    }\n\n    ORDER_STATUS {\n        int id PK\n        string code \"DRAFT, CONFIRMED, IN_PROGRESS, COMPLETED, CANCELLED\"\n        string display_name\n    }\n\n    SHIPMENT {\n        int id PK\n        int order_id FK\n        jsonb pickup_address_snapshot \"Snapshot z ADDRESS\"\n        jsonb delivery_address_snapshot \"Snapshot z ADDRESS\"\n        decimal weight\n        int pallets_count\n        string goods_description\n        jsonb requirements \"np. temperatura, ADR\"\n    }\n\n    TRANSPORT {\n        int id PK\n        int transport_status_id \"1:DRAFT, 2:READY, 3:IN_TRANSIT, 4:COMPLETED\"\n        tsrange scheduled_range\n        string route_notes\n        decimal estimated_km\n    }\n\n    TRANSPORT_RESOURCE {\n        int id PK\n        int transport_id FK\n        int resource_id FK\n        string role \"PRIMARY_DRIVER, SUPPORT_DRIVER, VEHICLE, TRAILER\"\n    }\n\n    RESOURCE {\n        int id PK\n        string resource_type \"DRIVER / VEHICLE / WAREHOUSE\"\n        jsonb metadata \"Snapshot dla dyspozytora\"\n        int external_id \"FK do HR_DRIVER lub FLEET_VEHICLE\"\n    }\n\n    RESOURCE_AVAILABILITY {\n        int id PK\n        int resource_id FK\n        tsrange busy_range \"GiST Index\"\n        string reason \"TRANSPORT / MAINTENANCE / HOLIDAY\"\n        int reference_transport_id \"Opcjonalne powiązanie z TRANSPORT.id\"\n    }\n\n    HR_DRIVER {\n        int id PK\n        string first_name\n        string last_name\n        string employee_id\n        jsonb contact_info\n    }\n\n    DRIVER_DOCUMENT {\n        int id PK\n        int driver_id FK\n        string doc_type\n        string doc_number\n        date expiry_date\n        jsonb metadata \"np. kategorie prawa jazdy\"\n    }\n\n    FLEET_VEHICLE {\n        int id PK\n        int category_id FK\n        string plates\n        string vin\n        jsonb technical_specs\n    }\n\n    VEHICLE_CATEGORY {\n        int id PK\n        string name\n        string code\n    }\n\n    MANIFEST_ITEM {\n        int id PK\n        int shipment_id FK\n        int transport_id FK\n        int sequence_order\n        string action_type \"LOAD / UNLOAD\"\n        datetime actual_time \"Rzeczywisty czas operacji\"\n    }",
+  "content_size": 3585,
+  "collected_at": "2026-02-06T14:02:32.928603",
+  "compilation_status": "success",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 RESOURCE_AVAILABILITY : \"timeline\"\n    RESOURCE ||--o{ TRANSPORT_RESOURCE : \"assigned_to\"\n    \n    %% MODUŁ KADROWY (HR 和 DRIVER_DOCUMENT : \"holds\"\n    HR_DRIVER |o--o| RESOURCE : \"represents_as_resource\"\n    \n    %% MODUŁ FLOTY (FLEET 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 RESOURCE_AVAILABILITY : \"timeline\"\n    RESOURCE ||--o{ TRANSPORT_RESOURCE : \"assigned_to\"\n    \n    %% MODUŁ KADROWY (HR处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'RESOURCE_AVAILABILITY : \"timeline\"\n    RESOURCE ||--o{ TRANSPORT_RESOURCE : \"assigned_to\"\n    \n    %% MODUŁ KADROWY (HR处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "o",
+        "o"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 RESOURCE : \"represents_as_resource\"\n    VEHICLE_CATEGORY ||--o{ FLEET_VEHICLE : \"defines\"\n    \n    %% MODUŁ ZAMÓWIEŃ (SALES 和 ADDRESS : \"manages\"\n    CONTRAHENT ||--o{ ORDER : \"places\"\n    ORDER_STATUS ||--o{ ORDER : \"defines\"\n    ORDER ||--|{ SHIPMENT : \"consists_of\"\n    \n    %% MODUŁ TRANSPORTU (OPERATIONS 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'RESOURCE : \"represents_as_resource\"\n    VEHICLE_CATEGORY ||--o{ FLEET_VEHICLE : \"defines\"\n    \n    %% MODUŁ ZAMÓWIEŃ (SALES 和 ADDRESS : \"manages\"\n    CONTRAHENT ||--o{ ORDER : \"places\"\n    ORDER_STATUS ||--o{ ORDER : \"defines\"\n    ORDER ||--|{ SHIPMENT : \"consists_of\"\n    \n    %% MODUŁ TRANSPORTU (OPERATIONS'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "o",
+        "o"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 TRANSPORT_RESOURCE : \"uses\"\n    TRANSPORT ||--o{ MANIFEST_ITEM : \"executes\"\n    SHIPMENT ||--o{ MANIFEST_ITEM : \"included_in\"\n\n    CONTRAHENT {\n        int id PK\n        string name\n        string tax_id\n        string internal_code\n        jsonb contact_details\n     和 int id PK\n        int contrahent_id FK\n        string label\n        jsonb full_address_data \"city, street, post_code, country, contact_person, phone\"\n     的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'TRANSPORT_RESOURCE : \"uses\"\n    TRANSPORT ||--o{ MANIFEST_ITEM : \"executes\"\n    SHIPMENT ||--o{ MANIFEST_ITEM : \"included_in\"\n\n    CONTRAHENT {\n        int id PK\n        string name\n        string tax_id\n        string internal_code\n        jsonb contact_details\n     和 int id PK\n        int contrahent_id FK\n        string label\n        jsonb full_address_data \"city, street, post_code, country, contact_person, phone\"\n    '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "o",
+        "ADDRESS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 int id PK\n        int contrahent_id FK\n        int status_id FK\n        string customer_ref \"Numer zamówienia klienta\"\n        datetime created_at\n        datetime deadline \"Termin realizacji całości\"\n        decimal total_agreed_price \"Kwota netto\"\n        string currency\n        text internal_notes\n     和 int id PK\n        string code \"DRAFT, CONFIRMED, IN_PROGRESS, COMPLETED, CANCELLED\"\n        string display_name\n     的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'int id PK\n        int contrahent_id FK\n        int status_id FK\n        string customer_ref \"Numer zamówienia klienta\"\n        datetime created_at\n        datetime deadline \"Termin realizacji całości\"\n        decimal total_agreed_price \"Kwota netto\"\n        string currency\n        text internal_notes\n     和 int id PK\n        string code \"DRAFT, CONFIRMED, IN_PROGRESS, COMPLETED, CANCELLED\"\n        string display_name\n    '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ORDER",
+        "ORDER_STATUS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 int id PK\n        int order_id FK\n        jsonb pickup_address_snapshot \"Snapshot z ADDRESS\"\n        jsonb delivery_address_snapshot \"Snapshot z ADDRESS\"\n        decimal weight\n        int pallets_count\n        string goods_description\n        jsonb requirements \"np. temperatura, ADR\"\n     和 int id PK\n        int transport_status_id \"1:DRAFT, 2:READY, 3:IN_TRANSIT, 4:COMPLETED\"\n        tsrange scheduled_range\n        string route_notes\n        decimal estimated_km\n     的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'int id PK\n        int order_id FK\n        jsonb pickup_address_snapshot \"Snapshot z ADDRESS\"\n        jsonb delivery_address_snapshot \"Snapshot z ADDRESS\"\n        decimal weight\n        int pallets_count\n        string goods_description\n        jsonb requirements \"np. temperatura, ADR\"\n     和 int id PK\n        int transport_status_id \"1:DRAFT, 2:READY, 3:IN_TRANSIT, 4:COMPLETED\"\n        tsrange scheduled_range\n        string route_notes\n        decimal estimated_km\n    '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SHIPMENT",
+        "TRANSPORT"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 int id PK\n        int transport_id FK\n        int resource_id FK\n        string role \"PRIMARY_DRIVER, SUPPORT_DRIVER, VEHICLE, TRAILER\"\n     和 int id PK\n        string resource_type \"DRIVER / VEHICLE / WAREHOUSE\"\n        jsonb metadata \"Snapshot dla dyspozytora\"\n        int external_id \"FK do HR_DRIVER lub FLEET_VEHICLE\"\n     的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 int id PK\n        int transport_id FK\n        int resource_id FK\n        string role \"PRIMARY_DRIVER, SUPPORT_DRIVER, VEHICLE, TRAILER\"\n    处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'int id PK\n        int transport_id FK\n        int resource_id FK\n        string role \"PRIMARY_DRIVER, SUPPORT_DRIVER, VEHICLE, TRAILER\"\n    处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TRANSPORT_RESOURCE",
+        "RESOURCE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 int id PK\n        int resource_id FK\n        tsrange busy_range \"GiST Index\"\n        string reason \"TRANSPORT / MAINTENANCE / HOLIDAY\"\n        int reference_transport_id \"Opcjonalne powiązanie z TRANSPORT.id\"\n     和 int id PK\n        string first_name\n        string last_name\n        string employee_id\n        jsonb contact_info\n     的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'int id PK\n        int resource_id FK\n        tsrange busy_range \"GiST Index\"\n        string reason \"TRANSPORT / MAINTENANCE / HOLIDAY\"\n        int reference_transport_id \"Opcjonalne powiązanie z TRANSPORT.id\"\n     和 int id PK\n        string first_name\n        string last_name\n        string employee_id\n        jsonb contact_info\n    '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "RESOURCE_AVAILABILITY",
+        "HR_DRIVER"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 int id PK\n        int driver_id FK\n        string doc_type\n        string doc_number\n        date expiry_date\n        jsonb metadata \"np. kategorie prawa jazdy\"\n     和 int id PK\n        int category_id FK\n        string plates\n        string vin\n        jsonb technical_specs\n     的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'int id PK\n        int driver_id FK\n        string doc_type\n        string doc_number\n        date expiry_date\n        jsonb metadata \"np. kategorie prawa jazdy\"\n     和 int id PK\n        int category_id FK\n        string plates\n        string vin\n        jsonb technical_specs\n    '。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DRIVER_DOCUMENT",
+        "FLEET_VEHICLE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 int id PK\n        string name\n        string code\n     和 int id PK\n        int shipment_id FK\n        int transport_id FK\n        int sequence_order\n        string action_type \"LOAD / UNLOAD\"\n        datetime actual_time \"Rzeczywisty czas operacji\"\n     这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'int id PK\n        string name\n        string code\n     和 int id PK\n        int shipment_id FK\n        int transport_id FK\n        int sequence_order\n        string action_type \"LOAD / UNLOAD\"\n        datetime actual_time \"Rzeczywisty czas operacji\"\n    '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "VEHICLE_CATEGORY",
+        "MANIFEST_ITEM"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 38,
+    "repair_count": 2,
+    "grounding_acts_count": 18,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:50Z"
+}

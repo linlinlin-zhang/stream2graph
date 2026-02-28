@@ -1,0 +1,690 @@
+{
+  "id": "gl_timeline_00128",
+  "source": "gitlab",
+  "source_url": "https://github.com/AlexandreAlface/Bibliotecario/blob/96b71c98def257ee4ff843f8f55bc9d372b3b7d6/dbDiagram.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "AlexandreAlface/Bibliotecario",
+  "diagram_type": "timeline",
+  "code": "erDiagram\n  %% =========================\n  %% ENTIDADES (principais)\n  %% =========================\n  Role {\n    INT id PK\n    STRING name UK\n  }\n\n  User {\n    INT id PK\n    STRING fullName\n    STRING email UK\n    STRING phone\n    STRING citizenCard\n    STRING address\n    STRING postalCode\n    STRING passwordHash\n  }\n\n  UserRole {\n    INT userId PK,FK\n    INT roleId PK,FK\n  }\n\n  Library {\n    INT id PK\n    STRING name\n    STRING address\n    STRING contact\n  }\n\n  UserLibrary {\n    INT userId PK,FK\n    INT libraryId PK,FK\n  }\n\n  FeedRss {\n    INT id PK\n    INT libraryId FK\n    STRING url\n    DATETIME lastBuildDate\n    INT ttl\n  }\n\n  CsvSource {\n    INT id PK\n    STRING name UK\n    STRING filePath\n    DATETIME importDate\n  }\n\n  Book {\n    STRING isbn PK\n    STRING title\n    STRING author\n    INT publicationYear\n    STRING collection\n    STRING category\n    STRING cdu\n    STRING ageRange\n    STRING coverUrl\n  }\n\n  Origin {\n    INT id PK\n    STRING description UK\n  }\n\n  BookOrigin {\n    STRING bookIsbn PK,FK\n    INT originId PK,FK\n  }\n\n  Child {\n    INT id PK\n    STRING name\n    DATETIME birthDate\n    STRING gender\n    STRING readerProfile\n  }\n\n  ChildPreference {\n    INT childId PK,FK\n    STRING profileText\n    BYTES embedding\n    DATETIME updatedAt\n  }\n\n  ChildFamily {\n    INT childId PK,FK\n    INT familyId PK,FK\n  }\n\n  Reading {\n    INT id PK\n    INT childId FK\n    STRING bookIsbn FK\n    DATETIME startedAt\n    DATETIME finishedAt\n    INT reservationId FK\n  }\n\n  Rating {\n    INT id PK\n    INT userId FK\n    INT childId FK\n    STRING bookIsbn FK\n    INT readingId FK\n    INT stars\n    STRING comment\n    DATETIME ratedAt\n  }\n\n  Badge {\n    INT id PK\n    STRING name UK\n    STRING type\n    STRING criteria\n  }\n\n  BadgeAssignment {\n    INT childId PK,FK\n    INT badgeId PK,FK\n    DATETIME assignedAt\n  }\n\n  PointsHistory {\n    INT id PK\n    INT userId FK\n    STRING action\n    FLOAT points\n    DATETIME actionDate\n  }\n\n  Consultation {\n    INT id PK\n    INT familyId FK\n    INT librarianId FK\n    INT childId FK\n    INT libraryId FK\n    STRING title\n    STRING purpose\n    STRING description\n    STRING meetingUrl\n    STRING meetingNotes\n    STRING mode\n    STRING location\n    DATETIME requestedAt\n    DATETIME startAt\n    DATETIME endAt\n    STRING status\n    INT slotId UK,FK\n    STRING notes\n    DATETIME createdAt\n    DATETIME updatedAt\n  }\n\n  ConsultationBook {\n    INT consultationId PK,FK\n    STRING bookIsbn PK,FK\n    DATETIME addedAt\n  }\n\n  ConsultationMicroContent {\n    INT consultationId PK,FK\n    INT microContentId PK,FK\n    DATETIME addedAt\n  }\n\n  ConsultationCulturalEvent {\n    INT consultationId PK,FK\n    INT eventId PK,FK\n    DATETIME addedAt\n  }\n\n  ConsultationEvent {\n    INT id PK\n    INT consultationId FK\n    STRING type\n    DATETIME at\n    INT actorId FK\n    JSON payload\n  }\n\n  ConsultationSlot {\n    INT id PK\n    INT librarianId FK\n    INT libraryId FK\n    DATETIME startAt\n    DATETIME endAt\n    STRING status\n    INT blockedByLibraryBlockId FK\n    DATETIME createdAt\n    DATETIME updatedAt\n  }\n\n  ConsultationProposal {\n    INT id PK\n    INT consultationId FK\n    STRING proposedBy\n    DATETIME fromStartAt\n    DATETIME fromEndAt\n    DATETIME toStartAt\n    DATETIME toEndAt\n    STRING message\n    STRING status\n    DATETIME createdAt\n    DATETIME decidedAt\n    INT decidedById FK\n  }\n\n  CulturalEvent {\n    INT id PK\n    INT feedId FK\n    STRING guid UK\n    STRING title\n    STRING description\n    DATETIME pubDate\n    DATETIME startDate\n    DATETIME endDate\n    STRING location\n    STRING category\n    INT capacity\n    STRING imageUrl\n    INT libraryId FK\n  }\n\n  EventReservation {\n    INT id PK\n    INT familyId FK\n    INT eventId FK\n    DATETIME bookedAt\n    STRING status\n  }\n\n  BookReservation {\n    INT id PK\n    INT childId FK\n    STRING bookIsbn FK\n    DATETIME reservedAt\n  }\n\n  Newsletter {\n    INT id PK\n    STRING title\n    STRING content\n    DATETIME publishedAt\n  }\n\n  NewsletterSubscription {\n    INT id PK\n    INT familyId FK\n    STRING frequency\n    DATETIME subscribedAt\n    STRING status\n  }\n\n  MicroContent {\n    INT id PK\n    STRING type\n    STRING text\n    STRING[] tags\n    BOOLEAN isPublished\n    DATETIME publishedAt\n    INT libraryId FK\n    INT authorId FK\n    DATETIME createdAt\n    DATETIME updatedAt\n  }\n\n  MicroInteraction {\n    INT id PK\n    INT userId FK\n    INT microContentId FK\n    DATETIME interactedAt\n  }\n\n  MicroContentBook {\n    INT microContentId PK,FK\n    STRING bookIsbn PK,FK\n  }\n\n  LibraryBook {\n    INT libraryId PK,FK\n    STRING bookIsbn PK,FK\n    INT quantity\n    STRING shelfCode\n    STRING accessionNo\n    DATETIME addedAt\n    DATETIME updatedAt\n  }\n\n  LibraryBlock {\n    INT id PK\n    INT libraryId FK\n    DATETIME startAt\n    DATETIME endAt\n    STRING reason\n    DATETIME createdAt\n    DATETIME updatedAt\n  }\n\n  %% =========================\n  %% RELACIONAMENTOS\n  %% =========================\n  Role ||--o{ UserRole : \"has many\"\n  User ||--o{ UserRole : \"has many\"\n\n  User ||--o{ UserLibrary : \"member of\"\n  Library ||--o{ UserLibrary : \"has members\"\n\n  Library ||--o{ FeedRss : \"feeds\"\n  FeedRss ||--o{ CulturalEvent : \"imports\"\n\n  Book ||--o{ BookOrigin : \"has origin\"\n  Origin ||--o{ BookOrigin : \"in\"\n\n  Child ||--o{ ChildFamily : \"belongs\"\n  User ||--o{ ChildFamily : \"family\"\n\n  Child ||--o{ Reading : \"reads\"\n  Book  ||--o{ Reading : \"is read in\"\n\n  Reading ||--o{ Rating : \"has\"\n  User    ||--o{ Rating : \"gives\"\n  Child   ||--o{ Rating : \"context\"\n  Book    ||--o{ Rating : \"rated\"\n\n  Badge ||--o{ BadgeAssignment : \"awarded\"\n  Child ||--o{ BadgeAssignment : \"earns\"\n\n  User ||--o{ PointsHistory : \"points\"\n\n  User ||--o{ Consultation : \"as family\"\n  User ||--o{ Consultation : \"as librarian\"\n  Child ||--o{ Consultation : \"topic\"\n  Library ||--o{ Consultation : \"host\"\n\n  Consultation ||--o{ ConsultationBook : \"recommends\"\n  Book ||--o{ ConsultationBook : \"in consultation\"\n\n  Consultation ||--o{ ConsultationMicroContent : \"uses\"\n  MicroContent ||--o{ ConsultationMicroContent : \"used in\"\n\n  Consultation ||--o{ ConsultationCulturalEvent : \"links\"\n  CulturalEvent ||--o{ ConsultationCulturalEvent : \"linked to\"\n\n  Consultation ||--o{ ConsultationEvent : \"timeline\"\n  User ||--o{ ConsultationEvent : \"actor\"\n\n  User ||--o{ ConsultationSlot : \"owns slots\"\n  Library ||--o{ ConsultationSlot : \"at\"\n  ConsultationSlot ||--o| Consultation : \"books 0..1\"\n\n  Consultation ||--o{ ConsultationProposal : \"proposals\"\n  User ||--o{ ConsultationProposal : \"decider\"\n\n  Library ||--o{ CulturalEvent : \"organizes\"\n  User ||--o{ EventReservation : \"reserves\"\n  CulturalEvent ||--o{ EventReservation : \"reservations\"\n\n  Child ||--o{ BookReservation : \"reserves\"\n  Book  ||--o{ BookReservation : \"reserved by\"\n  BookReservation ||--o{ Reading : \"yields readings\"\n\n  User ||--o{ NewsletterSubscription : \"subscribes\"\n\n  Library ||--o{ MicroContent : \"hosts\"\n  User ||--o{ MicroContent : \"author\"\n\n  User ||--o{ MicroInteraction : \"interacts\"\n  MicroContent ||--o{ MicroInteraction : \"has interactions\"\n\n  MicroContent ||--o{ MicroContentBook : \"about\"\n  Book ||--o{ MicroContentBook : \"mentioned\"\n\n  Library ||--o{ LibraryBook : \"stocks\"\n  Book ||--o{ LibraryBook : \"available at\"\n\n  Library ||--o{ LibraryBlock : \"blocks\"\n  LibraryBlock ||--o{ ConsultationSlot : \"affects\"\n\n  Child ||--|| ChildPreference : \"has 0..1\"\n",
+  "content_size": 7315,
+  "collected_at": "2026-02-06T14:03:15.485142",
+  "compilation_status": "success",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 principais 和 INT id PK\n    STRING name UK\n   这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'principais 和 INT id PK\n    STRING name UK\n  '。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ENTIDADES",
+        "Role"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 INT id PK\n    STRING fullName\n    STRING email UK\n    STRING phone\n    STRING citizenCard\n    STRING address\n    STRING postalCode\n    STRING passwordHash\n   和 INT userId PK,FK\n    INT roleId PK,FK\n   的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'INT id PK\n    STRING fullName\n    STRING email UK\n    STRING phone\n    STRING citizenCard\n    STRING address\n    STRING postalCode\n    STRING passwordHash\n   和 INT userId PK,FK\n    INT roleId PK,FK\n  '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "User",
+        "UserRole"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 INT id PK\n    STRING name\n    STRING address\n    STRING contact\n   和 INT userId PK,FK\n    INT libraryId PK,FK\n   的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 INT id PK\n    STRING name\n    STRING address\n    STRING contact\n  处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'INT id PK\n    STRING name\n    STRING address\n    STRING contact\n  处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Library",
+        "UserLibrary"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 INT id PK\n    INT libraryId FK\n    STRING url\n    DATETIME lastBuildDate\n    INT ttl\n   和 INT id PK\n    STRING name UK\n    STRING filePath\n    DATETIME importDate\n   这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'INT id PK\n    INT libraryId FK\n    STRING url\n    DATETIME lastBuildDate\n    INT ttl\n   和 INT id PK\n    STRING name UK\n    STRING filePath\n    DATETIME importDate\n  '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "FeedRss",
+        "CsvSource"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 STRING isbn PK\n    STRING title\n    STRING author\n    INT publicationYear\n    STRING collection\n    STRING category\n    STRING cdu\n    STRING ageRange\n    STRING coverUrl\n   和 INT id PK\n    STRING description UK\n   的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 STRING isbn PK\n    STRING title\n    STRING author\n    INT publicationYear\n    STRING collection\n    STRING category\n    STRING cdu\n    STRING ageRange\n    STRING coverUrl\n  处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'STRING isbn PK\n    STRING title\n    STRING author\n    INT publicationYear\n    STRING collection\n    STRING category\n    STRING cdu\n    STRING ageRange\n    STRING coverUrl\n  处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Book",
+        "Origin"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 STRING bookIsbn PK,FK\n    INT originId PK,FK\n   和 INT id PK\n    STRING name\n    DATETIME birthDate\n    STRING gender\n    STRING readerProfile\n   的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'STRING bookIsbn PK,FK\n    INT originId PK,FK\n   和 INT id PK\n    STRING name\n    DATETIME birthDate\n    STRING gender\n    STRING readerProfile\n  '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BookOrigin",
+        "Child"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 INT childId PK,FK\n    STRING profileText\n    BYTES embedding\n    DATETIME updatedAt\n   和 INT childId PK,FK\n    INT familyId PK,FK\n   的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'INT childId PK,FK\n    STRING profileText\n    BYTES embedding\n    DATETIME updatedAt\n   和 INT childId PK,FK\n    INT familyId PK,FK\n  '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ChildPreference",
+        "ChildFamily"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 INT id PK\n    INT childId FK\n    STRING bookIsbn FK\n    DATETIME startedAt\n    DATETIME finishedAt\n    INT reservationId FK\n   和 INT id PK\n    INT userId FK\n    INT childId FK\n    STRING bookIsbn FK\n    INT readingId FK\n    INT stars\n    STRING comment\n    DATETIME ratedAt\n  。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'INT id PK\n    INT childId FK\n    STRING bookIsbn FK\n    DATETIME startedAt\n    DATETIME finishedAt\n    INT reservationId FK\n   和 INT id PK\n    INT userId FK\n    INT childId FK\n    STRING bookIsbn FK\n    INT readingId FK\n    INT stars\n    STRING comment\n    DATETIME ratedAt\n  '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Reading",
+        "Rating"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 INT id PK\n    STRING name UK\n    STRING type\n    STRING criteria\n   和 INT childId PK,FK\n    INT badgeId PK,FK\n    DATETIME assignedAt\n   的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'INT id PK\n    STRING name UK\n    STRING type\n    STRING criteria\n   和 INT childId PK,FK\n    INT badgeId PK,FK\n    DATETIME assignedAt\n  '。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Badge",
+        "BadgeAssignment"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 INT id PK\n    INT userId FK\n    STRING action\n    FLOAT points\n    DATETIME actionDate\n   和 INT id PK\n    INT familyId FK\n    INT librarianId FK\n    INT childId FK\n    INT libraryId FK\n    STRING title\n    STRING purpose\n    STRING description\n    STRING meetingUrl\n    STRING meetingNotes\n    STRING mode\n    STRING location\n    DATETIME requestedAt\n    DATETIME startAt\n    DATETIME endAt\n    STRING status\n    INT slotId UK,FK\n    STRING notes\n    DATETIME createdAt\n    DATETIME updatedAt\n   这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 INT id PK\n    INT userId FK\n    STRING action\n    FLOAT points\n    DATETIME actionDate\n  处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'INT id PK\n    INT userId FK\n    STRING action\n    FLOAT points\n    DATETIME actionDate\n  处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PointsHistory",
+        "Consultation"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 INT consultationId PK,FK\n    STRING bookIsbn PK,FK\n    DATETIME addedAt\n   和 INT consultationId PK,FK\n    INT microContentId PK,FK\n    DATETIME addedAt\n  。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'INT consultationId PK,FK\n    STRING bookIsbn PK,FK\n    DATETIME addedAt\n   和 INT consultationId PK,FK\n    INT microContentId PK,FK\n    DATETIME addedAt\n  '。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ConsultationBook",
+        "ConsultationMicroContent"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 INT consultationId PK,FK\n    INT eventId PK,FK\n    DATETIME addedAt\n   和 INT id PK\n    INT consultationId FK\n    STRING type\n    DATETIME at\n    INT actorId FK\n    JSON payload\n   的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'INT consultationId PK,FK\n    INT eventId PK,FK\n    DATETIME addedAt\n   和 INT id PK\n    INT consultationId FK\n    STRING type\n    DATETIME at\n    INT actorId FK\n    JSON payload\n  '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ConsultationCulturalEvent",
+        "ConsultationEvent"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 INT id PK\n    INT librarianId FK\n    INT libraryId FK\n    DATETIME startAt\n    DATETIME endAt\n    STRING status\n    INT blockedByLibraryBlockId FK\n    DATETIME createdAt\n    DATETIME updatedAt\n   和 INT id PK\n    INT consultationId FK\n    STRING proposedBy\n    DATETIME fromStartAt\n    DATETIME fromEndAt\n    DATETIME toStartAt\n    DATETIME toEndAt\n    STRING message\n    STRING status\n    DATETIME createdAt\n    DATETIME decidedAt\n    INT decidedById FK\n   的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'INT id PK\n    INT librarianId FK\n    INT libraryId FK\n    DATETIME startAt\n    DATETIME endAt\n    STRING status\n    INT blockedByLibraryBlockId FK\n    DATETIME createdAt\n    DATETIME updatedAt\n   和 INT id PK\n    INT consultationId FK\n    STRING proposedBy\n    DATETIME fromStartAt\n    DATETIME fromEndAt\n    DATETIME toStartAt\n    DATETIME toEndAt\n    STRING message\n    STRING status\n    DATETIME createdAt\n    DATETIME decidedAt\n    INT decidedById FK\n  '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ConsultationSlot",
+        "ConsultationProposal"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 INT id PK\n    INT feedId FK\n    STRING guid UK\n    STRING title\n    STRING description\n    DATETIME pubDate\n    DATETIME startDate\n    DATETIME endDate\n    STRING location\n    STRING category\n    INT capacity\n    STRING imageUrl\n    INT libraryId FK\n   和 INT id PK\n    INT familyId FK\n    INT eventId FK\n    DATETIME bookedAt\n    STRING status\n   的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'INT id PK\n    INT feedId FK\n    STRING guid UK\n    STRING title\n    STRING description\n    DATETIME pubDate\n    DATETIME startDate\n    DATETIME endDate\n    STRING location\n    STRING category\n    INT capacity\n    STRING imageUrl\n    INT libraryId FK\n   和 INT id PK\n    INT familyId FK\n    INT eventId FK\n    DATETIME bookedAt\n    STRING status\n  '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CulturalEvent",
+        "EventReservation"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 INT id PK\n    INT childId FK\n    STRING bookIsbn FK\n    DATETIME reservedAt\n   和 INT id PK\n    STRING title\n    STRING content\n    DATETIME publishedAt\n   这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'INT id PK\n    INT childId FK\n    STRING bookIsbn FK\n    DATETIME reservedAt\n   和 INT id PK\n    STRING title\n    STRING content\n    DATETIME publishedAt\n  '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BookReservation",
+        "Newsletter"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 INT id PK\n    INT familyId FK\n    STRING frequency\n    DATETIME subscribedAt\n    STRING status\n   和 INT id PK\n    STRING type\n    STRING text\n    STRING[ 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'INT id PK\n    INT familyId FK\n    STRING frequency\n    DATETIME subscribedAt\n    STRING status\n   和 INT id PK\n    STRING type\n    STRING text\n    STRING['，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "NewsletterSubscription",
+        "MicroContent"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 INT id PK\n    INT userId FK\n    INT microContentId FK\n    DATETIME interactedAt\n   和 INT microContentId PK,FK\n    STRING bookIsbn PK,FK\n   的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'INT id PK\n    INT userId FK\n    INT microContentId FK\n    DATETIME interactedAt\n   和 INT microContentId PK,FK\n    STRING bookIsbn PK,FK\n  '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MicroInteraction",
+        "MicroContentBook"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 INT libraryId PK,FK\n    STRING bookIsbn PK,FK\n    INT quantity\n    STRING shelfCode\n    STRING accessionNo\n    DATETIME addedAt\n    DATETIME updatedAt\n   和 INT id PK\n    INT libraryId FK\n    DATETIME startAt\n    DATETIME endAt\n    STRING reason\n    DATETIME createdAt\n    DATETIME updatedAt\n   的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 73,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 INT libraryId PK,FK\n    STRING bookIsbn PK,FK\n    INT quantity\n    STRING shelfCode\n    STRING accessionNo\n    DATETIME addedAt\n    DATETIME updatedAt\n  处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 74,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'INT libraryId PK,FK\n    STRING bookIsbn PK,FK\n    INT quantity\n    STRING shelfCode\n    STRING accessionNo\n    DATETIME addedAt\n    DATETIME updatedAt\n  处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 75,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 76,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "LibraryBook",
+        "LibraryBlock"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 76,
+    "repair_count": 4,
+    "grounding_acts_count": 36,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:50Z"
+}

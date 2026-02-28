@@ -1,0 +1,256 @@
+{
+  "id": "gh_class_01054",
+  "source": "github",
+  "source_url": "https://github.com/daniel-vera-g/master-thesis/blob/d290fca4b3b99e612eec532fa897db547b91b5aa/diagramms/component.mmd",
+  "github_repo": "daniel-vera-g/master-thesis",
+  "github_file_path": "diagramms/component.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n    direction LR\n\n    class CICD_Pipeline {\n        +triggerWorkflow()\n        +enforcePolicy()\n    }\n\n    class DataIngestionLayer {\n        +ingestIaC(iac_config)\n        +parseConfiguration()\n    }\n\n    class DataProcessingLayer {\n        +analyzeArtifacts()\n    }\n\n    class StaticAnalysisEngine {\n        +scan(iac_config)\n    }\n\n    class GenAI_AnalysisEngine {\n        +deepContextualAnalysis()\n    }\n\n    class CodeGenerationLayer {\n        +generatePolicy()\n    }\n\n    class ValidationLayer {\n        +validatePolicy()\n        +syntacticValidation()\n        +securitySelfScan()\n        +gatherMetrics()\n    }\n\n    class HumanInTheLoop {\n        +reviewAndApprove()\n    }\n\n    class KnowledgeBase {\n        +query()\n    }\n\n    class AWS_Bedrock {\n        +generate()\n    }\n\n    class TerraformCode {\n      <<Artifact>>\n    }\n\n    class RegoPolicy {\n      <<Artifact>>\n    }\n\n    CICD_Pipeline --> DataIngestionLayer : triggers\n    DataIngestionLayer --> TerraformCode : receives\n    DataIngestionLayer --> DataProcessingLayer : passes artifacts\n\n    DataProcessingLayer o-- StaticAnalysisEngine\n    DataProcessingLayer o-- GenAI_AnalysisEngine\n\n    StaticAnalysisEngine --|> DataProcessingLayer\n    GenAI_AnalysisEngine --|> DataProcessingLayer\n    \n    DataProcessingLayer --> CodeGenerationLayer : passes analysis results\n    DataProcessingLayer --> ValidationLayer : sends results for baseline metrics\n\n    GenAI_AnalysisEngine --> KnowledgeBase : queries\n    GenAI_AnalysisEngine --> AWS_Bedrock : uses\n    \n    CodeGenerationLayer --> KnowledgeBase : queries\n    CodeGenerationLayer --> AWS_Bedrock : uses\n    CodeGenerationLayer --> RegoPolicy : generates\n    \n    CodeGenerationLayer --> ValidationLayer : sends for validation & post-metrics\n    ValidationLayer --> HumanInTheLoop : requests approval\n    \n    HumanInTheLoop --> CICD_Pipeline : approves/rejects",
+  "content_size": 1889,
+  "collected_at": "2026-02-06T01:52:20.187703",
+  "compilation_status": "success",
+  "compilation_error": "",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 +triggerWorkflow( 和 +ingestIaC(iac_config 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 +triggerWorkflow(处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '+triggerWorkflow(处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CICD_Pipeline",
+        "DataIngestionLayer"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 +analyzeArtifacts( 和 +scan(iac_config 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '+analyzeArtifacts( 和 +scan(iac_config'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DataProcessingLayer",
+        "StaticAnalysisEngine"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 +deepContextualAnalysis( 和 +generatePolicy( 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '+deepContextualAnalysis( 和 +generatePolicy('，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "GenAI_AnalysisEngine",
+        "CodeGenerationLayer"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 +validatePolicy( 和 +reviewAndApprove( 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '+validatePolicy( 和 +reviewAndApprove('。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ValidationLayer",
+        "HumanInTheLoop"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 +query( 和 +generate( 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 +query(处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '+query(处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "KnowledgeBase",
+        "AWS_Bedrock"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 <<Artifact>>\n     和 <<Artifact>>\n     的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '<<Artifact>>\n     和 <<Artifact>>\n    '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TerraformCode",
+        "RegoPolicy"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 26,
+    "repair_count": 2,
+    "grounding_acts_count": 12,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:23Z"
+}

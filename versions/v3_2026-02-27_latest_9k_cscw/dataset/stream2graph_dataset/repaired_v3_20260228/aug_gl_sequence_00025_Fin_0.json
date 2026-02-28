@@ -1,0 +1,66 @@
+{
+  "id": "aug_gl_sequence_00025_Fin_0",
+  "source": "augmented_real_structure",
+  "source_url": "https://gitlab.com/WarheadsSE/gitlab-diagrams",
+  "gitlab_project": "WarheadsSE/gitlab-diagrams",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    Git Client->>+LoadBalancer: HTTPS GET /\n    LoadBalancer->>+NGINX: HTTP(FinTech_AuthVault) GET /\n    NGINX->>+Workhorse: HTTP GET /\n    Workhorse->>+Puma: HTTP GET /\n    Puma->>-Workhorse: 200 OK\n    Workhorse->>+Gitaly: gRPC Request\n\n    Gitaly->>+Workhorse: Auth Verify\n    Workhorse->>+Puma: Auth Confirm\n    Puma->>-Workhorse: Auth OK\n    Workhorse->>-Gitaly: Auth OK\n\n    Gitaly->>-Workhorse: gRPC Response\n    Workhorse->>-NGINX: HTTP Response\n    NGINX->>-LoadBalancer: HTTP Response\n    LoadBalancer->>-Git Client: HTTP Response",
+  "content_size": 542,
+  "collected_at": "2026-02-06T10:57:07.060524",
+  "compilation_status": "success",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository (refer to project page)",
+  "augmentation_domain": "FinTech",
+  "seed_id": "gl_sequence_00025",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 FinTech_AuthVault 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 FinTech_AuthVault处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'FinTech_AuthVault处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "HTTP"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 5,
+    "repair_count": 1,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repaired_at": "2026-02-28T13:41:36Z"
+}

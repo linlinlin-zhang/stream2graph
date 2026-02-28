@@ -1,0 +1,310 @@
+{
+  "id": "gh_sequence_00472",
+  "source": "github",
+  "source_url": "https://github.com/luth9r/FitTracker/blob/c81958bfbd32229654cff70c18fdc0d6e0541f71/docs/register-flow.mmd",
+  "github_repo": "luth9r/FitTracker",
+  "github_file_path": "docs/register-flow.mmd",
+  "diagram_type": "sequence",
+  "code": "%%{init: {'look':'neo', 'theme':'redux-color'}}%%\nsequenceDiagram\n    autonumber\n    \n    box \"Client & Application\"\n        participant C as Client\n        participant AC as Auth Controller\n        participant H as Register Handler\n        participant PH as Password Hasher\n        participant U as User (Domain)\n    end\n\n    box \"Persistence\"\n        participant WR as Repository / DbContext\n        participant DB as PostgreSQL\n    end\n\n    box \"Background Infrastructure\"\n        participant OS as Signal (Channel)\n        participant OP as Outbox Processor\n        participant RMQ as RabbitMQ\n    end\n\n    box \"Email Delivery\"\n        participant EC as Email Consumer\n        participant JTG as Jwt Generator\n        participant SMTP as SMTP Server\n    end\n\n    Note over C, SMTP: == STAGE 1: Registration (Synchronous) ==\n\n    C->>AC: POST /register {email, password...}\n    AC->>H: Handle Command\n    \n    H->>WR: Check if Email Unique\n    WR->>DB: SELECT Count(*) WHERE Email = ?\n    DB-->>H: 0 (Unique)\n    \n    H->>PH: HashPassword(password)\n    PH-->>H: \"hashed_secret\"\n    \n    H->>U: User.Create(email, hashed...)\n    Note over U: 1. Creates User Entity<br/>(IsEmailVerified = false)<br/>2. Adds UserRegisteredEvent\n    \n    Note over H, DB: ATOMIC TRANSACTION\n    H->>WR: SaveChangesAsync()\n    \n    rect rgb(255, 245, 245)\n        Note right of WR: Inside DbContext\n        WR->>DB: BEGIN TRANSACTION\n        WR->>DB: INSERT INTO Users\n        WR->>DB: INSERT INTO OutboxMessages\n        WR->>DB: COMMIT\n    end\n    \n    WR-)OS: TryWrite(true) (Wake up signal)\n    \n    H-->>C: 200 OK { \"Success\" }\n    \n    Note over C, SMTP: == STAGE 2: Outbox Processing ==\n\n    OS-)OP: Signal Received\n    OP->>DB: SELECT * FROM OutboxMessages\n    DB-->>OP: [UserRegisteredEvent]\n    \n    OP->>RMQ: Publish(UserRegisteredEvent)\n    RMQ-->>OP: ACK\n    \n    OP->>DB: UPDATE OutboxMessages (Mark Processed)\n    \n    Note over C, SMTP: == STAGE 3: Verification Email ==\n    \n    RMQ->>EC: Consume(UserRegisteredEvent)\n    \n    Note right of EC: Token generated exclusively<br/>for the email\n    EC->>JTG: GenerateVerificationToken(userId)\n    JTG-->>EC: \"eyJ...\" (1 hour)\n    \n    EC->>SMTP: Send Email (link + token)\n    SMTP->>C: Email in Inbox\n    EC->>RMQ: ACK Message",
+  "content_size": 2270,
+  "collected_at": "2026-02-06T01:32:48.141822",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 2,
+  "repo_forks": 0,
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Domain 和 Channel 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Domain 和 Channel'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "User",
+        "Signal"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Synchronous 和 email, password... 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Synchronous 和 email, password...'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Registration",
+        "register"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 * 和 Unique。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '* 和 Unique'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Count",
+        "0"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 password 和 email, hashed... 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'password 和 email, hashed...'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "HashPassword",
+        "Create"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 255, 245, 245 和 true。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '255, 245, 245 和 true'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "rgb",
+        "TryWrite"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Success\"  和 UserRegisteredEvent 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Success\"  和 UserRegisteredEvent'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OK",
+        "Publish"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Mark Processed 和 UserRegisteredEvent。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Mark Processed 和 UserRegisteredEvent'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OutboxMessages",
+        "Consume"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 userId 和 link + token 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'userId 和 link + token'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "GenerateVerificationToken",
+        "Email"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 32,
+    "repair_count": 0,
+    "grounding_acts_count": 16,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:36Z"
+}

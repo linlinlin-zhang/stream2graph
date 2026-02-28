@@ -1,0 +1,207 @@
+{
+  "id": "ot_journey_01020",
+  "source": "other",
+  "source_url": "https://github.com/functario/Caravel/blob/9304846541fc821a7683952c615b8da4e1274a82/docs/sequence-diagrams/journey.goto.mmd",
+  "source_type": "github_search",
+  "github_repo": "functario/Caravel",
+  "diagram_type": "journey",
+  "code": "sequenceDiagram\n    participant Journey            as Journey\n    participant Ext                as JourneyExtensions\n    participant EmptyExcl          as EmptyExcludedWaypoints\n    participant Graph              as Graph\n    participant CurrentNode        as CurrentNode\n    participant Edge               as Edge\n    participant NeighborNavigator  as NeighborNavigator\n    participant JourneyLegFactory  as JourneyLegFactory\n    participant JourneyLegPublisher as JourneyLegPublisher\n\n    %% ---- 1. Extension entry ------------------------------------\n    Journey->>Ext: GotoAsync<Node3>()  \n    Ext->>Journey: GotoAsync<Node3>(EmptyWaypoints.Create() and EmptyExcludedWaypoints.Create() and token)\n\n    %% ---- 3. Visit starting node --------------------------------\n    Journey->>CurrentNode: OnNodeVisitedAsync(journey, token)\n\n    %% ---- 4. Resolve route ---------------------------------------\n    Journey->>Graph: GetRoute(originType, destinationType, waypoints, excludedWaypoints)\n    Graph-->>Journey: route\n\n    %% ---- 5. Create journey leg ----------------------------------\n    Journey->>JourneyLegFactory: CreateJourneyLeg(Id, legEdges, route)\n    JourneyLegFactory-->>Journey: journeyLeg\n\n    %% ---- 6. Publish leg started --------------------------------\n    Journey->>JourneyLegPublisher: PublishOnJourneyLegStartedAsync(event and token)\n\n    %% ---- 7. Navigate through the edges --------------------------\n    loop each edge in route.Edges\n        Journey->>Edge: edge\n        Edge->>NeighborNavigator: MoveNext(journey, token)\n        NeighborNavigator-->>Journey: newNode\n        Journey->>CurrentNode: OnNodeVisitedAsync(journey, token)\n        Journey->>journeyLeg: Edges.Enqueue(edge)\n        Journey->>JourneyLegPublisher: PublishOnJourneyLegUpdatedAsync(event and token)\n    end\n\n    %% ---- 8. Finish the leg --------------------------------------\n    Journey->>JourneyLegPublisher: PublishOnJourneyLegCompletedAsync(event and token)\n\n    %% ---- 9. Final node visit ------------------------------------\n    Journey->>CurrentNode: OnNodeVisitedAsync(journey, token)",
+  "content_size": 2098,
+  "collected_at": "2026-02-06T11:02:07.455987",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 journey, token 和 originType, destinationType, waypoints, excludedWaypoints。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'journey, token 和 originType, destinationType, waypoints, excludedWaypoints'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OnNodeVisitedAsync",
+        "GetRoute"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Id, legEdges, route 和 event and token 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Id, legEdges, route 和 event and token'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CreateJourneyLeg",
+        "PublishOnJourneyLegStartedAsync"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 journey, token 和 journey, token。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'journey, token 和 journey, token'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MoveNext",
+        "OnNodeVisitedAsync"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 edge 和 event and token 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'edge 和 event and token'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Enqueue",
+        "PublishOnJourneyLegUpdatedAsync"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 event and token 和 journey, token 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 event and token处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'event and token处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PublishOnJourneyLegCompletedAsync",
+        "OnNodeVisitedAsync"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 21,
+    "repair_count": 1,
+    "grounding_acts_count": 10,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repaired_at": "2026-02-28T13:41:24Z"
+}

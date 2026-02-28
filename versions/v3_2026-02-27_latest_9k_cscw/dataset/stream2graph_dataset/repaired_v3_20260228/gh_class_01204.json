@@ -1,0 +1,1075 @@
+{
+  "id": "gh_class_01204",
+  "source": "github",
+  "source_url": "https://github.com/4-sem-CatchUp/CatchUp-Social-core/blob/66c949ac060d0f1a89125517cd95d4e209b20454/Social.Core/Social-Class.mmd",
+  "github_repo": "4-sem-CatchUp/CatchUp-Social-core",
+  "github_file_path": "Social.Core/Social-Class.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram \n\t\n\tclass SubscriptionService  {\n\t\t-List~Subscription~ _subscriptions \n\t\t-ISubscriptionRepository _subscriptionRepository \n\t\t-INotificationSender _notificationSender \n\t\t+Notify(Profile Subscriber, string message) Task\n\t\t+Subscribe(Profile subscriber, Profile publisher) void\n\t\t+Unsubscribe(Profile subscriber, Profile publisher) void\n\t}\n\tclass ICommentRepository  {\n\t\t-GetByIdAsync(Guid commentId) Task~Comment?~\n\t\t-GetByPostIdAsync(Guid postId) Task~IReadOnlyList~Comment~~\n\t\t-AddAsync(Comment comment) Task\n\t\t-UpdateAsync(Comment comment) Task\n\t\t-DeleteAsync(Guid commentId) Task\n\t}\n\tclass IProfileUseCases  {\n\t\t-CreateProfileAsync(string userName) Task~Guid~\n\t\t-UpdateProfileAsync(Guid profileId, string? name, byte[]? profilePic, string? bio) Task\n\t\t-AddFriendAsync(Guid profileId, Guid friendId) Task\n\t}\n\tclass PostDbAdapter  {\n\t\t-SocialDbContext _context \n\t\t+AddAsync(Post post) Task\n\t\t+DeleteAsync(Guid postId) Task\n\t\t+GetAllAsync() Task~IEnumerable~Post~~\n\t\t+GetByIdAsync(Guid postId) Task~Post?~\n\t\t+UpdateAsync(Post post) Task\n\t}\n\tclass Profile  {\n\t\t+ Id : Guid\n\t\t+ Name : string\n\t\t+ ProfilePic : byte[]\n\t\t+ Bio : string\n\t\t+ DateOfSub : DateOnly\n\t\t+ Friends : List~Guid~\n\t\t+CreateNewProfile(string name) Profile\n\t\t+UpdateProfile(string? name, byte[]? profilePic, string? bio) void\n\t\t+AddFriend(Guid friendId) void\n\t}\n\tclass ICommentUseCases  {\n\t\t-AddComment(Guid postId, Guid authorId, string text) Task\n\t\t+VoteComment(Guid commentId, bool upVote, Guid userId) Task\n\t\t+GetUserCommentVote(Guid postId, Guid commentId, Guid userId) Task~bool?~\n\t\t+UpdateCommentAsync(Guid commentId, Guid userId, string newContent) Task~bool?~\n\t\t+DeleteComment(Guid postId, Guid commentId, Guid userId) Task~bool?~\n\t}\n\tclass IVoteRepository  {\n\t\t-GetByIdAsync(Guid voteId) Task~Vote?~\n\t\t-AddAsync(Vote vote) Task\n\t\t-UpdateAsync(Vote vote) Task\n\t\t-DeleteAsync(Guid voteId) Task\n\t\t-GetUserVoteAsync(Guid targetId, VoteTargetType targetType, Guid userId) Task~Vote?~\n\t\t-GetVotesForTargetAsync(Guid targetId, VoteTargetType targetType) Task~IReadOnlyList~Vote~~\n\t}\n\tclass Subscription  {\n\t\t+ Subscriber : Profile\n\t\t+ Publisher : Profile\n\t\t+ SubscribedOn : DateTime\n\t}\n\tclass ISubscribeUseCase  {\n\t\t-Subscribe(Profile subscriber, Profile publisher) void\n\t\t-Unsubscribe(Profile subscriber, Profile publisher) void\n\t\t-Notify(Profile Subscriber, string message) Task\n\t}\n\tclass CommentServices  {\n\t\t-IPostRepository _postRepository \n\t\t-ICommentRepository _commentRepository \n\t\t-IVoteRepository _voteRepository \n\t\t-ISubscribeUseCase _subscriptionService \n\t\t-IProfileRepository _profileRepository \n\t\t+AddComment(Guid postId, Guid authorId, string text) Task\n\t\t+VoteComment(Guid commentId, bool upVote, Guid userId) Task\n\t\t+GetUserCommentVote(Guid postId, Guid commentId, Guid userId) Task~bool?~\n\t\t+DeleteComment(Guid postId, Guid commentId, Guid userId) Task~bool?~\n\t\t+UpdateCommentAsync(Guid commentId, Guid userId, string newContent) Task~bool?~\n\t}\n\tclass ProfileDbAdapter  {\n\t\t+AddFriendAsync(Guid profileId, Guid friendId) Task\n\t\t+AddProfileAsync(Profile profile) Task\n\t\t+DeleteProfileAsync(Guid profileId) Task\n\t\t+GetAllProfilesAsync() Task~IEnumerable~Profile~~\n\t\t+GetProfileByIdAsync(Guid profileId) Task~Profile?~\n\t\t+UpdateProfileAsync(Profile profile) Task\n\t}\n\tclass ISubscriptionRepository  {\n\t\t-Add(Subscription subscription) void\n\t\t-Remove(Subscription subscription) void\n\t}\n\tclass ProfileService  {\n\t\t-IProfileRepository _profileRepository \n\t\t+CreateProfileAsync(string userName) Task~Guid~\n\t\t+UpdateProfileAsync(Guid profileId, string? name, byte[]? profilePic, string? bio) Task\n\t\t+AddFriendAsync(Guid profileId, Guid friendId) Task\n\t}\n\tclass INotificationSender  {\n\t\t-SendNotification(Profile recipient, string message) void\n\t}\n\tclass Comment  {\n\t\t-List~Vote~ _votes \n\t\t-int _karma \n\t\t+ Id : Guid\n\t\t+ AuthorId : Guid\n\t\t+ Content : string?\n\t\t+ Timestamp : DateTime\n\t\t+ Votes : IReadOnlyList~Vote~\n\t\t+ Karma : int\n\t\t+CreateNewComment(Guid authorId, string text) Comment\n\t\t+AddVote(Guid userId, bool upvote) Vote\n\t\t+UpdateComment(string newText) void\n\t\t+GetUserVote(Guid userId) bool?\n\t}\n\tclass Post  {\n\t\t-List~Comment~ _comments \n\t\t-List~Vote~ _votes \n\t\t-int _karma \n\t\t+ Id : Guid\n\t\t+ AuthorId : Guid\n\t\t+ Title : string\n\t\t+ Content : string\n\t\t+ CreatedAt : DateTime\n\t\t+ Comments : IReadOnlyList~Comment~\n\t\t+ Votes : IReadOnlyList~Vote~\n\t\t+ Karma : int\n\t\t+CreateNewPost(Guid authorId, string title, string content) Post\n\t\t+AddComment(Guid authorId, string text) Comment\n\t\t+AddVote(Guid userId, bool upvote) Vote\n\t\t+GetUserVote(Guid userId) bool?\n\t\t+UpdatePost(string? newTitle, string? newContent) void\n\t\t+RemoveComment(Guid commentId) void\n\t}\n\tclass IPostUseCases  {\n\t\t-CreatePostAsync(Guid authorId, string title, string content) Task~Guid~\n\t\t+VotePost(Guid postId, bool upVote, Guid userId) Task\n\t\t+GetUserPostVote(Guid postId, Guid userId) Task~bool?~\n\t\t+UpdatePostAsync(Guid postId, string? newTitle, string? newContent) Task\n\t\t+DeletePost(Guid postId) Task\n\t}\n\tclass SocialDbContext  {\n\t}\n\tclass PostService  {\n\t\t-IPostRepository _postRepository \n\t\t-ICommentRepository _commentRepository \n\t\t-IVoteRepository _voteRepository \n\t\t-ISubscribeUseCase _subscriptionService \n\t\t-IProfileRepository _profileRepository \n\t\t+CreatePostAsync(Guid authorId, string title, string content) Task~Guid~\n\t\t+VotePost(Guid postId, bool upVote, Guid userId) Task\n\t\t+GetUserPostVote(Guid postId, Guid userId) Task~bool?~\n\t\t+DeletePost(Guid postId) Task\n\t\t+UpdatePostAsync(Guid postId, string? newTitle, string? newContent) Task\n\t}\n\tclass NotificationHub  {\n\t\t+SendNotification(Profile recipient, string message) void\n\t}\n\tclass IProfileRepository  {\n\t\t-AddProfileAsync(Profile profile) Task\n\t\t-GetProfileByIdAsync(Guid profileId) Task~Profile?~\n\t\t-UpdateProfileAsync(Profile profile) Task\n\t\t-DeleteProfileAsync(Guid profileId) Task\n\t\t-AddFriendAsync(Guid profileId, Guid friendId) Task\n\t\t-GetAllProfilesAsync() Task~IEnumerable~Profile~~\n\t}\n\tclass IPostRepository  {\n\t\t-GetByIdAsync(Guid postId) Task~Post?~\n\t\t-GetAllAsync() Task~IEnumerable~Post~~\n\t\t-AddAsync(Post post) Task\n\t\t-UpdateAsync(Post post) Task\n\t\t-DeleteAsync(Guid postId) Task\n\t}\n\tclass Vote  {\n\t\t+ Id : Guid\n\t\t+ TargetId : Guid\n\t\t+ VoteTargetType : VoteTargetType\n\t\t+ UserId : Guid\n\t\t+ Upvote : bool\n\t\t+ Action : VoteAction\n\t}\n\tclass SocialServices  {\n\t}\n\tclass Program  {\n\t\t+Main(string[] args) void\n\t}\n\t\n\tSubscriptionService --|> ISubscribeUseCase\n\tPostDbAdapter --|> IPostRepository\n\tCommentServices --|> ICommentUseCases\n\tProfileDbAdapter --|> IProfileRepository\n\tProfileService --|> IProfileUseCases\n\tPostService --|> IPostUseCases\n\tNotificationHub --|> INotificationSender\n\tSocialServices --|> ControllerBase\n\t",
+  "content_size": 6668,
+  "collected_at": "2026-02-06T01:54:32.202987",
+  "compilation_status": "success",
+  "compilation_error": "",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 -List~Subscription~ _subscriptions \n\t\t-ISubscriptionRepository _subscriptionRepository \n\t\t-INotificationSender _notificationSender \n\t\t+Notify(Profile Subscriber, string message 和 Profile subscriber, Profile publisher 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '-List~Subscription~ _subscriptions \n\t\t-ISubscriptionRepository _subscriptionRepository \n\t\t-INotificationSender _notificationSender \n\t\t+Notify(Profile Subscriber, string message 和 Profile subscriber, Profile publisher'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SubscriptionService",
+        "Subscribe"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Profile subscriber, Profile publisher 和 -GetByIdAsync(Guid commentId 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Profile subscriber, Profile publisher 和 -GetByIdAsync(Guid commentId'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Unsubscribe",
+        "ICommentRepository"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Guid postId 和 Comment comment 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 Guid postId处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Guid postId处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "GetByPostIdAsync",
+        "AddAsync"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Comment comment 和 Guid commentId。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Comment comment 和 Guid commentId'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "UpdateAsync",
+        "DeleteAsync"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 -CreateProfileAsync(string userName 和 Guid profileId, string? name, byte[。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '-CreateProfileAsync(string userName 和 Guid profileId, string? name, byte['，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "IProfileUseCases",
+        "UpdateProfileAsync"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Guid profileId, Guid friendId 和 -SocialDbContext _context \n\t\t+AddAsync(Post post 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Guid profileId, Guid friendId 和 -SocialDbContext _context \n\t\t+AddAsync(Post post'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AddFriendAsync",
+        "PostDbAdapter"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Guid postId 和 Guid postId 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Guid postId 和 Guid postId'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DeleteAsync",
+        "GetByIdAsync"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Post post 和 + Id : Guid\n\t\t+ Name : string\n\t\t+ ProfilePic : byte[。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Post post 和 + Id : Guid\n\t\t+ Name : string\n\t\t+ ProfilePic : byte['，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "UpdateAsync",
+        "Profile"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 string name 和 string? name, byte[ 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 string name处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'string name处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CreateNewProfile",
+        "UpdateProfile"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Guid friendId 和 -AddComment(Guid postId, Guid authorId, string text 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Guid friendId 和 -AddComment(Guid postId, Guid authorId, string text'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AddFriend",
+        "ICommentUseCases"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Guid commentId, bool upVote, Guid userId 和 Guid postId, Guid commentId, Guid userId。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Guid commentId, bool upVote, Guid userId 和 Guid postId, Guid commentId, Guid userId'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "VoteComment",
+        "GetUserCommentVote"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Guid commentId, Guid userId, string newContent 和 Guid postId, Guid commentId, Guid userId。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Guid commentId, Guid userId, string newContent 和 Guid postId, Guid commentId, Guid userId'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "UpdateCommentAsync",
+        "DeleteComment"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 -GetByIdAsync(Guid voteId 和 Vote vote 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 -GetByIdAsync(Guid voteId处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 53,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '-GetByIdAsync(Guid voteId处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "IVoteRepository",
+        "AddAsync"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Vote vote 和 Guid voteId 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Vote vote 和 Guid voteId'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "UpdateAsync",
+        "DeleteAsync"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Guid targetId, VoteTargetType targetType, Guid userId 和 Guid targetId, VoteTargetType targetType 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Guid targetId, VoteTargetType targetType, Guid userId 和 Guid targetId, VoteTargetType targetType'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "GetUserVoteAsync",
+        "GetVotesForTargetAsync"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 + Subscriber : Profile\n\t\t+ Publisher : Profile\n\t\t+ SubscribedOn : DateTime\n\t 和 -Subscribe(Profile subscriber, Profile publisher。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '+ Subscriber : Profile\n\t\t+ Publisher : Profile\n\t\t+ SubscribedOn : DateTime\n\t 和 -Subscribe(Profile subscriber, Profile publisher'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Subscription",
+        "ISubscribeUseCase"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Profile subscriber, Profile publisher 和 Profile Subscriber, string message 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Profile subscriber, Profile publisher 和 Profile Subscriber, string message'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Unsubscribe",
+        "Notify"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 -IPostRepository _postRepository \n\t\t-ICommentRepository _commentRepository \n\t\t-IVoteRepository _voteRepository \n\t\t-ISubscribeUseCase _subscriptionService \n\t\t-IProfileRepository _profileRepository \n\t\t+AddComment(Guid postId, Guid authorId, string text 和 Guid commentId, bool upVote, Guid userId 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 73,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '-IPostRepository _postRepository \n\t\t-ICommentRepository _commentRepository \n\t\t-IVoteRepository _voteRepository \n\t\t-ISubscribeUseCase _subscriptionService \n\t\t-IProfileRepository _profileRepository \n\t\t+AddComment(Guid postId, Guid authorId, string text 和 Guid commentId, bool upVote, Guid userId'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 74,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 75,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CommentServices",
+        "VoteComment"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 76,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Guid postId, Guid commentId, Guid userId 和 Guid postId, Guid commentId, Guid userId 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 77,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 Guid postId, Guid commentId, Guid userId处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 78,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Guid postId, Guid commentId, Guid userId处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 79,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 80,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "GetUserCommentVote",
+        "DeleteComment"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 81,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Guid commentId, Guid userId, string newContent 和 +AddFriendAsync(Guid profileId, Guid friendId。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 82,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 Guid commentId, Guid userId, string newContent处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 83,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Guid commentId, Guid userId, string newContent处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 84,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 85,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "UpdateCommentAsync",
+        "ProfileDbAdapter"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 86,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Profile profile 和 Guid profileId 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 87,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Profile profile 和 Guid profileId'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 88,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 89,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AddProfileAsync",
+        "DeleteProfileAsync"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 90,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Guid profileId 和 Profile profile 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 91,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Guid profileId 和 Profile profile'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 92,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 93,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "GetProfileByIdAsync",
+        "UpdateProfileAsync"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 94,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 -Add(Subscription subscription 和 Subscription subscription 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 95,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '-Add(Subscription subscription 和 Subscription subscription'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 96,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 97,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ISubscriptionRepository",
+        "Remove"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 98,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 -IProfileRepository _profileRepository \n\t\t+CreateProfileAsync(string userName 和 Guid profileId, string? name, byte[ 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 99,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '-IProfileRepository _profileRepository \n\t\t+CreateProfileAsync(string userName 和 Guid profileId, string? name, byte['，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 100,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 101,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ProfileService",
+        "UpdateProfileAsync"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 102,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Guid profileId, Guid friendId 和 -SendNotification(Profile recipient, string message。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 103,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Guid profileId, Guid friendId 和 -SendNotification(Profile recipient, string message'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 104,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 105,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AddFriendAsync",
+        "INotificationSender"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 106,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 -List~Vote~ _votes \n\t\t-int _karma \n\t\t+ Id : Guid\n\t\t+ AuthorId : Guid\n\t\t+ Content : string?\n\t\t+ Timestamp : DateTime\n\t\t+ Votes : IReadOnlyList~Vote~\n\t\t+ Karma : int\n\t\t+CreateNewComment(Guid authorId, string text 和 Guid userId, bool upvote 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 107,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 -List~Vote~ _votes \n\t\t-int _karma \n\t\t+ Id : Guid\n\t\t+ AuthorId : Guid\n\t\t+ Content : string?\n\t\t+ Timestamp : DateTime\n\t\t+ Votes : IReadOnlyList~Vote~\n\t\t+ Karma : int\n\t\t+CreateNewComment(Guid authorId, string text处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 108,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '-List~Vote~ _votes \n\t\t-int _karma \n\t\t+ Id : Guid\n\t\t+ AuthorId : Guid\n\t\t+ Content : string?\n\t\t+ Timestamp : DateTime\n\t\t+ Votes : IReadOnlyList~Vote~\n\t\t+ Karma : int\n\t\t+CreateNewComment(Guid authorId, string text处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 109,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 110,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Comment",
+        "AddVote"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 111,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 string newText 和 Guid userId 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 112,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'string newText 和 Guid userId'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 113,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 114,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "UpdateComment",
+        "GetUserVote"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 115,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 -List~Comment~ _comments \n\t\t-List~Vote~ _votes \n\t\t-int _karma \n\t\t+ Id : Guid\n\t\t+ AuthorId : Guid\n\t\t+ Title : string\n\t\t+ Content : string\n\t\t+ CreatedAt : DateTime\n\t\t+ Comments : IReadOnlyList~Comment~\n\t\t+ Votes : IReadOnlyList~Vote~\n\t\t+ Karma : int\n\t\t+CreateNewPost(Guid authorId, string title, string content 和 Guid authorId, string text。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 116,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '-List~Comment~ _comments \n\t\t-List~Vote~ _votes \n\t\t-int _karma \n\t\t+ Id : Guid\n\t\t+ AuthorId : Guid\n\t\t+ Title : string\n\t\t+ Content : string\n\t\t+ CreatedAt : DateTime\n\t\t+ Comments : IReadOnlyList~Comment~\n\t\t+ Votes : IReadOnlyList~Vote~\n\t\t+ Karma : int\n\t\t+CreateNewPost(Guid authorId, string title, string content 和 Guid authorId, string text'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 117,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 118,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Post",
+        "AddComment"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 119,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Guid userId, bool upvote 和 Guid userId 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 120,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Guid userId, bool upvote 和 Guid userId'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 120,
+    "repair_count": 6,
+    "grounding_acts_count": 84,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "dialogue_trimmed",
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:22Z"
+}

@@ -1,0 +1,420 @@
+{
+  "id": "gh_class_01393",
+  "source": "github",
+  "source_url": "https://github.com/jennxsierra/event-workshop-manager-system/blob/b9b0226c1afa776677cb7254b376a4476101d9bb/docs/uml.mmd",
+  "github_repo": "jennxsierra/event-workshop-manager-system",
+  "github_file_path": "docs/uml.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n    %% Enumeration Classes\n    class Role {\n        <<enumeration>>\n        PARTICIPANT\n        STAFF\n        ADMIN\n    }\n    class EventCategory {\n        <<enumeration>>\n        WORKSHOP\n        TRAINING\n        PUBLIC_OUTREACH\n        PRESS\n        LAUNCH\n    }\n\n    %% User Hierarchy\n    class User {\n        <<abstract>>\n        - username: string\n        - password: string\n        - firstName: string\n        - lastName: string\n        - email: string\n        - phone: string\n        - organization: string\n        - role: Role\n        + getters/setters()\n        + User(username, password, firstName, lastName, email, phone, organization, role)\n        + login(): bool\n        + logout(): void\n    }\n    class Participant {\n        + Participant(username, password, firstName, lastName, email, phone, organization)\n        + registerForEvent(e: Event): bool\n        + cancelRegistration(e: Event): bool\n        + viewRegisteredEvents(em: EventManager): Event[]\n    }\n    class Staff {\n        + Staff(username, password, firstName, lastName, email, phone, organization)\n        + updateEvent(e: Event): void\n    }\n    class Administrator {\n        + Administrator(username, password, firstName, lastName, email, phone, organization)\n        + updateUser(): void\n        + generateReports(): void\n    }\n\n    %% Core Domain Classes\n    class Event {\n        - name: string\n        - date: Date\n        - time: Time\n        - location: string\n        - category: EventCategory\n        - capacity: int\n        - registrations: Registration[]\n        + getters/setters()\n        + Event(name, date, time, location, category, capacity)\n        + addRegistration(r: Registration): void\n        + removeRegistration(r: Registration): void\n    }\n    class Registration {\n        - timestamp: DateTime\n        - cancelled: bool\n        + Registration(timestamp: DateTime)\n        + cancel(): void\n        + isCancelled(): bool\n    }\n\n    %% Manager Classes\n    class EventManager {\n        - events: Event[]\n        + EventManager()\n        + createEvent(e: Event, currentUser: User): bool\n        + updateEvent(e: Event, currentUser: User): bool\n        + deleteEvent(e: Event, currentUser: User): bool\n        + getEvents(): Event[]\n    }\n    class ReportManager {\n        - eventManager: EventManager\n        + ReportManager(eventManager: EventManager)\n        + generateSummaryReport(): Report\n        + generateDetailedReport(): Report\n        + generateHistoricalReport(): Report\n    }\n\n    %% Relationships\n    User <|-- Participant\n    Participant <|-- Staff\n    Staff <|-- Administrator\n\n    Event *-- Registration : composes\n    EventManager o-- Event : aggregates\n    ReportManager o-- EventManager : uses\n\n    Participant --> Registration : makes\n",
+  "content_size": 2770,
+  "collected_at": "2026-02-06T01:57:13.361870",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "repo_owner": "jennxsierra",
+  "repo_name": "event-workshop-manager-system",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 <<enumeration>>\n        PARTICIPANT\n        STAFF\n        ADMIN\n     和 <<enumeration>>\n        WORKSHOP\n        TRAINING\n        PUBLIC_OUTREACH\n        PRESS\n        LAUNCH\n     的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '<<enumeration>>\n        PARTICIPANT\n        STAFF\n        ADMIN\n     和 <<enumeration>>\n        WORKSHOP\n        TRAINING\n        PUBLIC_OUTREACH\n        PRESS\n        LAUNCH\n    '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Role",
+        "EventCategory"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 <<abstract>>\n        - username: string\n        - password: string\n        - firstName: string\n        - lastName: string\n        - email: string\n        - phone: string\n        - organization: string\n        - role: Role\n        + getters/setters( 和 username, password, firstName, lastName, email, phone, organization, role 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '<<abstract>>\n        - username: string\n        - password: string\n        - firstName: string\n        - lastName: string\n        - email: string\n        - phone: string\n        - organization: string\n        - role: Role\n        + getters/setters( 和 username, password, firstName, lastName, email, phone, organization, role'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "User",
+        "User"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 + Participant(username, password, firstName, lastName, email, phone, organization 和 e: Event 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '+ Participant(username, password, firstName, lastName, email, phone, organization 和 e: Event'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Participant",
+        "registerForEvent"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 e: Event 和 em: EventManager 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 e: Event处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'e: Event处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "cancelRegistration",
+        "viewRegisteredEvents"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 + Staff(username, password, firstName, lastName, email, phone, organization 和 e: Event。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '+ Staff(username, password, firstName, lastName, email, phone, organization 和 e: Event'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Staff",
+        "updateEvent"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 + Administrator(username, password, firstName, lastName, email, phone, organization 和 - name: string\n        - date: Date\n        - time: Time\n        - location: string\n        - category: EventCategory\n        - capacity: int\n        - registrations: Registration[ 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '+ Administrator(username, password, firstName, lastName, email, phone, organization 和 - name: string\n        - date: Date\n        - time: Time\n        - location: string\n        - category: EventCategory\n        - capacity: int\n        - registrations: Registration['？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Administrator",
+        "Event"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 name, date, time, location, category, capacity 和 r: Registration 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'name, date, time, location, category, capacity 和 r: Registration'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Event",
+        "addRegistration"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 r: Registration 和 - timestamp: DateTime\n        - cancelled: bool\n        + Registration(timestamp: DateTime。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'r: Registration 和 - timestamp: DateTime\n        - cancelled: bool\n        + Registration(timestamp: DateTime'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "removeRegistration",
+        "Registration"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 - events: Event[ 和 e: Event, currentUser: User 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '- events: Event[ 和 e: Event, currentUser: User'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EventManager",
+        "createEvent"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 e: Event, currentUser: User 和 e: Event, currentUser: User 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'e: Event, currentUser: User 和 e: Event, currentUser: User'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "updateEvent",
+        "deleteEvent"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 - eventManager: EventManager\n        + ReportManager(eventManager: EventManager 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '- eventManager: EventManager\n        + ReportManager(eventManager: EventManager'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ReportManager"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 45,
+    "repair_count": 1,
+    "grounding_acts_count": 22,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repaired_at": "2026-02-28T13:41:23Z"
+}

@@ -1,0 +1,138 @@
+{
+  "id": "aug_ot_stateDiagram_00278_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/proyectoitsv/2025_SolarWAY/blob/bdf813a6fa7b267b9acd0eb2ab212f3fe8a93f10/Diagramas/Diagrama_de_estado.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "proyectoitsv/2025_SolarWAY",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram\n  direction TB\n  \n  state Eleccion_de_Accion <<choice>>\n  \n  [Infra_LoadBalancer] --> Desconectado: Inicio/Fallo de Energía\n  \n  Desconectado --> Conectado: Enlace Inalámbrico Establecido\n  \n  Conectado --> Eleccion_de_Accion: Inicio de Operación\n  \n  Eleccion_de_Accion --> Multiplexando: Comando Recibido (Infra_WorkerNode)\n  Eleccion_de_Accion --> Esperando_Comando: Comando Recibido (Infra_LoadBalancer)\n  \n  Esperando_Comando --> Multiplexando: Nuevo Comando ON\n  Multiplexando --> Esperando_Comando: Comando OFF Recibido\n  \n  Conectado --> Desconectado: Enlace Inalámbrico Perdido\n  Esperando_Comando --> Desconectado: Enlace Inalámbrico Perdido\n  Multiplexando --> Desconectado: Enlace Inalámbrico Perdido\n  \n  state Desconectado {Infra_EtcdCluster] --> Publicidad_Inalámbrica\n      Publicidad_Inalámbrica --> Publicidad_Inalámbrica : Ciclo de Anuncio\n      state Note: A la espera de un cliente para enlazarse.\n  }\n  \n  state Esperando_Comando {Infra_IngressController] --> Monitoreando_Bateria\n      Monitoreando_Bateria --> Monitoreando_Bateria : Ejecuta Tarea de Medición de Voltaje\n      state Note: Matriz apagada, esperando instrucción.\n  }\n  \n  state Multiplexando {Infra_EtcdCluster] --> Ciclo_Activo\n      Ciclo_Activo --> Ciclo_Activo : Recorre Fila por Fila para mantener la iluminación\n      state Note: Alta Actividad de I/O para alimentar las luces.\n  }",
+  "content_size": 1324,
+  "collected_at": "2026-02-06T10:40:06.012259",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "ot_stateDiagram_00278",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Infra_WorkerNode 和 Infra_LoadBalancer。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 Infra_WorkerNode处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Infra_WorkerNode处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Recibido",
+        "Recibido"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Infra_EtcdCluster 和 Infra_IngressController。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Infra_EtcdCluster 和 Infra_IngressController'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Desconectado",
+        "Esperando_Comando"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Infra_EtcdCluster 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Infra_EtcdCluster'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Multiplexando"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 13,
+    "repair_count": 1,
+    "grounding_acts_count": 6,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repaired_at": "2026-02-28T13:41:39Z"
+}

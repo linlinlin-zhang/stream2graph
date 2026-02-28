@@ -1,0 +1,500 @@
+{
+  "id": "gh_architecture_01426",
+  "source": "github",
+  "source_url": "https://github.com/aazad612/gcp-healthcare-data-landing-zone/blob/d0a894047af6203a677e8f15f81405eae0985cf6/infra/03-networking/network-detailed.mmd",
+  "github_repo": "aazad612/gcp-healthcare-data-landing-zone",
+  "github_file_path": "infra/03-networking/network-detailed.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TD\n    %% =========================================\n    %% 0. THE INTERNET\n    %% =========================================\n    Internet((☁️ Internet))\n\n    %% =========================================\n    %% 1. ON-PREMISE CONNECTIVITY\n    %% =========================================\n    subgraph OnPrem_Zone [🏢 On-Premise & Interconnect]\n        OnPrem[Legacy Data Center<br/>VPN - Direct Connect]\n        Interconnect((⚡ Dedicated<br/>Interconnect))\n    end\n\n    %% =========================================\n    %% 2. THE HUB (Networking Core)\n    %% =========================================\n    subgraph Hub_Project [PROJECT: prj-net-common-pd-host]\n        subgraph Hub_VPC [vpc-hub-main]\n            direction TB\n            Hub_Subnet[\"subnet: sb-hub-main-usc1<br/>10.0.0.0/24\"]\n            Hub_NAT[Cloud NAT - Router]\n        end\n    end\n\n    %% =========================================\n    %% 3. THE SPOKES (Domain Host Projects)\n    %% =========================================\n\n    %% --- CLINICAL SPOKE (High Security) ---\n    subgraph Clin_Project [PROJECT: prj-net-clin-pd-host]\n        subgraph Clin_VPC [vpc-clin-prod]\n            direction TB\n            %% Firewall Node representing the separation\n            FW_Ingress{🔥 FW: Ingress<br/>Allow 443}\n            FW_Internal{🔥 FW: Internal<br/>Allow 10.x Only}\n            \n            Clin_Subnet_Ext[\"subnet: sb-clin-prod-ext-usc1<br/>10.10.2.0/24<br/>🌐 External-Ingress\"]\n            Clin_Subnet_Int[\"subnet: sb-clin-prod-int-usc1<br/>10.10.1.0/24<br/>🔒 Private-Internal\"]\n        end\n    end\n\n    %% --- ENTERPRISE SPOKE (Standard) ---\n    subgraph Ent_Project [PROJECT: prj-net-ent-pd-host]\n        subgraph Ent_VPC [vpc-ent-prod]\n            Ent_Subnet[\"subnet: sb-ent-prod-int-usc1<br/>10.20.1.0/24\"]\n        end\n    end\n\n    %% --- RESEARCH SPOKE (Standard) ---\n    subgraph Res_Project [PROJECT: prj-net-res-pd-host]\n        subgraph Res_VPC [vpc-res-prod]\n            Res_Subnet[\"subnet: sb-res-prod-int-usc1<br/>10.30.1.0/24\"]\n        end\n    end\n\n    %% =========================================\n    %% CONNECTIONS & PEERING\n    %% =========================================\n\n    %% 1. Hybrid Link\n    OnPrem === Interconnect\n    Interconnect ===|BGP Routing| Hub_NAT\n\n    %% 2. Internet Connectivity\n    Hub_NAT ==>|NAT Egress| Internet\n    Internet -.->|HTTPS Ingress| FW_Ingress\n    FW_Ingress ==> Clin_Subnet_Ext\n    \n    %% 3. Internal Security Flow\n    Clin_Subnet_Ext -.-> FW_Internal\n    FW_Internal ==> Clin_Subnet_",
+  "content_size": 2511,
+  "collected_at": "2026-02-06T01:46:04.647728",
+  "license": "none",
+  "license_name": "No License",
+  "compilation_status": "success",
+  "compilation_error": "",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 (☁️ Internet 和 🏢 On-Premise & Interconnect。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '(☁️ Internet 和 🏢 On-Premise & Interconnect'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Internet",
+        "OnPrem_Zone"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Legacy Data Center<br/>VPN - Direct Connect 和 (⚡ Dedicated<br/>Interconnect。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Legacy Data Center<br/>VPN - Direct Connect 和 (⚡ Dedicated<br/>Interconnect'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OnPrem",
+        "Interconnect"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Networking Core 和 PROJECT: prj-net-common-pd-host 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Networking Core 和 PROJECT: prj-net-common-pd-host'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "HUB",
+        "Hub_Project"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 vpc-hub-main 和 \"subnet: sb-hub-main-usc1<br/>10.0.0.0/24\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'vpc-hub-main 和 \"subnet: sb-hub-main-usc1<br/>10.0.0.0/24\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Hub_VPC",
+        "Hub_Subnet"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Cloud NAT - Router 和 Domain Host Projects 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Cloud NAT - Router 和 Domain Host Projects'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Hub_NAT",
+        "SPOKES"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 High Security 和 PROJECT: prj-net-clin-pd-host 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'High Security 和 PROJECT: prj-net-clin-pd-host'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SPOKE",
+        "Clin_Project"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 vpc-clin-prod 和 🔥 FW: Ingress<br/>Allow 443 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 vpc-clin-prod处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'vpc-clin-prod处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Clin_VPC",
+        "FW_Ingress"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 🔥 FW: Internal<br/>Allow 10.x Only 和 \"subnet: sb-clin-prod-ext-usc1<br/>10.10.2.0/24<br/>🌐 External-Ingress\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '🔥 FW: Internal<br/>Allow 10.x Only 和 \"subnet: sb-clin-prod-ext-usc1<br/>10.10.2.0/24<br/>🌐 External-Ingress\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "FW_Internal",
+        "Clin_Subnet_Ext"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"subnet: sb-clin-prod-int-usc1<br/>10.10.1.0/24<br/>🔒 Private-Internal\" 和 Standard 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"subnet: sb-clin-prod-int-usc1<br/>10.10.1.0/24<br/>🔒 Private-Internal\" 和 Standard'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Clin_Subnet_Int",
+        "SPOKE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 PROJECT: prj-net-ent-pd-host 和 vpc-ent-prod 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 PROJECT: prj-net-ent-pd-host处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'PROJECT: prj-net-ent-pd-host处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Ent_Project",
+        "Ent_VPC"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"subnet: sb-ent-prod-int-usc1<br/>10.20.1.0/24\" 和 Standard 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"subnet: sb-ent-prod-int-usc1<br/>10.20.1.0/24\" 和 Standard'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Ent_Subnet",
+        "SPOKE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 PROJECT: prj-net-res-pd-host 和 vpc-res-prod。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'PROJECT: prj-net-res-pd-host 和 vpc-res-prod'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Res_Project",
+        "Res_VPC"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"subnet: sb-res-prod-int-usc1<br/>10.30.1.0/24\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"subnet: sb-res-prod-int-usc1<br/>10.30.1.0/24\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Res_Subnet"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 54,
+    "repair_count": 2,
+    "grounding_acts_count": 26,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:21Z"
+}

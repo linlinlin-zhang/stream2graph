@@ -1,0 +1,151 @@
+{
+  "id": "aug_gh_sequence_00538_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/DontTrustVerifyOrg/gig-gossip/blob/636ee5629ef3d2310cd90a51e8da3c9ab4fbe220/whitepaper/PaymentChain.mmd",
+  "github_repo": "DontTrustVerifyOrg/gig-gossip",
+  "github_file_path": "whitepaper/PaymentChain.mmd",
+  "diagram_type": "sequence",
+  "code": "%%{Infra_IngressController}\n  }\n}%%\nsequenceDiagram\n    autonumber\n    participant Settler\n    participant Issuer 1\n    participant Issuer 2 ... Issuer N\n    participant Payer\n    activate Settler\n      Settler->>Settler: Generates preimage=key\n      Settler->>Settler: Encrypts the message with the key \n      Settler->>Payer:encrypted message\n      Settler->>Settler: Computes payment hash for the preimage  \n      Settler->>Issuer 1: invoice(Infra_RedisCache) \n    deactivate Settler\n    activate Issuer 1\n      Issuer 1->>Issuer 2 ... Issuer N: invoice(Infra_EtcdCluster) \n    deactivate Issuer 1\n    activate Issuer 2 ... Issuer N\n      Issuer 2 ... Issuer N->>Payer: invoice(Infra_IngressController) \n    deactivate Issuer 2 ... Issuer N\n    activate Payer\n      Payer->>Issuer 2 ... Issuer N:pay(Infra_LoadBalancer)\n    deactivate Payer\n    activate Issuer 2 ... Issuer N\n      Issuer 2 ... Issuer N->>Issuer 1:pay(Infra_EtcdCluster)\n    deactivate Issuer 2 ... Issuer N\n    activate Issuer 1\n      Issuer 1->>Settler:pay(Infra_WorkerNode)\n    deactivate Issuer 1\n    activate Settler\n      par\n        Settler->>Issuer 1:preimage\n      and\n        Settler->>Issuer 2 ... Issuer N:preimage\n      and\n        Settler->>Payer:preimage=key\n        activate Payer\n          Payer->>Payer:decrypt message with the key\n        deactivate Payer\n      end\n    deactivate Settler\n\n",
+  "content_size": 1749,
+  "collected_at": "2026-02-06T01:33:39.911444",
+  "compilation_status": "success",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 5,
+  "repo_forks": 2,
+  "repo_owner": "DontTrustVerifyOrg",
+  "repo_name": "gig-gossip",
+  "repo_description": "Gig Gossip Protocol",
+  "repo_language": "C#",
+  "repo_topics": [
+    "bitcoin",
+    "nostr"
+  ],
+  "repo_created_at": "2022-11-14T06:25:36Z",
+  "repo_updated_at": "2025-09-01T06:48:19Z",
+  "augmentation_domain": "Infra",
+  "seed_id": "gh_sequence_00538",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Infra_RedisCache 和 Infra_EtcdCluster 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 Infra_RedisCache处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Infra_RedisCache处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "invoice",
+        "invoice"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Infra_IngressController 和 Infra_LoadBalancer 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Infra_IngressController 和 Infra_LoadBalancer'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "invoice",
+        "pay"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Infra_EtcdCluster 和 Infra_WorkerNode。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Infra_EtcdCluster 和 Infra_WorkerNode'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "pay",
+        "pay"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 13,
+    "repair_count": 1,
+    "grounding_acts_count": 6,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repaired_at": "2026-02-28T13:41:45Z"
+}

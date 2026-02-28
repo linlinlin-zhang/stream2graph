@@ -1,0 +1,65 @@
+{
+  "id": "gh_sequence_00332",
+  "source": "github",
+  "source_url": "https://github.com/wilberdelarosa/my-mail-hub/blob/a00a732b16ed74bc4ee9c855e933be0db6ddfb0c/archivos_no_proyecto/tesis/arquitectura/export/vista_d_idempotencia.mmd",
+  "github_repo": "wilberdelarosa/my-mail-hub",
+  "github_file_path": "archivos_no_proyecto/tesis/arquitectura/export/vista_d_idempotencia.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    autonumber\n    participant App as App Cliente (Offline)\n    participant OS as Offline Sync Service\n    participant DB as DB OfflineSync\n    participant EB as Event Bus\n    participant Core as Servicios Core\n\n    App->>App: Generar UUID unico\n    App->>App: Guardar en cache local\n\n    App->>OS: SubmitBatch(transacciones[])\n\n    loop Para cada transaccion\n        OS->>DB: Verificar IdempotencyKey\n        alt UUID nuevo\n            DB-->>OS: UUID valido\n            OS->>DB: Guardar UUID + timestamp\n            OS->>EB: Publicar eventos\n            EB-->>Core: Procesar eventos\n            Core-->>OS: Procesado\n        else UUID duplicado\n            DB-->>OS: UUID duplicado\n            OS->>OS: Log conflicto\n            OS-->>App: ConflictDetected\n        end\n    end\n\n    OS-->>App: Resultado final: aplicadas vs conflictos\n",
+  "content_size": 851,
+  "collected_at": "2026-02-06T01:30:48.908647",
+  "compilation_status": "success",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Offline 和 transacciones[ 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Offline 和 transacciones['。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Cliente",
+        "SubmitBatch"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:22Z"
+}

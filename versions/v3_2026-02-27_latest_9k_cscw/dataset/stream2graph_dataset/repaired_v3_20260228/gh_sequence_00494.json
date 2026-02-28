@@ -1,0 +1,64 @@
+{
+  "id": "gh_sequence_00494",
+  "source": "github",
+  "source_url": "https://github.com/pagopa/p4pa-doc/blob/7e7885cceb7021d36015482fc7455c44951d6b3f/design/io-notification/sequence_createService.mmd",
+  "github_repo": "pagopa/p4pa-doc",
+  "github_file_path": "design/io-notification/sequence_createService.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Payhub_Be\n    participant IONotification\n    participant IONotification_DB\n    participant Backend_IO\n\n    Payhub_Be ->> IONotification: richiesta creazione servizio <br/>POST /create/service/{enteId}/{tipoDovutoId}\n    activate IONotification\n    note left of IONotification: Payhub invia payload per la <br/>creazione del servizio nella request\n    IONotification ->> IONotification_DB: salva richiesta createService (se non esiste)\n\n    alt esiste db\n        IONotification ->> Backend_IO: getAll services da IO <br/>GET /manage/services\n\n        activate Backend_IO\n            Backend_IO -->> IONotification: lista di servizi\n        deactivate Backend_IO\n\n        alt servizio esiste su IO\n            IONotification ->> IONotification_DB: aggiorna servizio <br/>(serviceId, stato)\n            IONotification -->> Payhub_Be: 201 CREATED\n        else servizio NON esiste su IO\n            IONotification ->> Backend_IO: creare sevizio <br/>POST /api/v1/manage/services\n\n            activate Backend_IO\n                Backend_IO -->> IONotification: servizio\n            deactivate Backend_IO\n\n            IONotification ->> IONotification_DB: aggiorna servizio <br/>(serviceId, stato)\n            IONotification -->> Payhub_Be: 201 CREATED\n        end\n\n    else NON esiste db\n        IONotification ->> Backend_IO: creare sevizio <br/>POST /api/v1/manage/services\n\n        activate Backend_IO\n            Backend_IO -->> IONotification: servizio\n        deactivate Backend_IO\n\n        IONotification ->> IONotification_DB: aggiorna servizio <br/>(serviceId, stato)\n        IONotification -->> Payhub_Be: 201 CREATED\n\n    else error\n        IONotification_DB -->> IONotification: 429\n        IONotification -->> Payhub_Be: retry\n    else chiamata IO fallita\n        Backend_IO -->> IONotification: error\n        IONotification -->> Payhub_Be: retry\n    end\n\n    deactivate IONotification\n",
+  "content_size": 1925,
+  "collected_at": "2026-02-06T01:33:04.578282",
+  "compilation_status": "success",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 se non esiste 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'se non esiste'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "createService"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:20Z"
+}

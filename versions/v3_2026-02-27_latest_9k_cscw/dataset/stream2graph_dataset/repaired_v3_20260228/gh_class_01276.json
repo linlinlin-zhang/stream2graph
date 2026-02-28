@@ -1,0 +1,735 @@
+{
+  "id": "gh_class_01276",
+  "source": "github",
+  "source_url": "https://github.com/ayushdh96/Food-Delivery-App-on-Mern-Stack/blob/6d7a600823542ebb67b2da5b1df492e521555393/class-diagram.mmd",
+  "github_repo": "ayushdh96/Food-Delivery-App-on-Mern-Stack",
+  "github_file_path": "class-diagram.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n    %% ========== BACKEND MODELS ==========\n    \n    class userModel {\n        +String name\n        +String email\n        +String password\n        +Object cartData\n    }\n\n    class foodModel {\n        +String name\n        +String description\n        +Number price\n        +String image\n        +String category\n    }\n\n    class orderModel {\n        +String userId\n        +Array items\n        +Number amount\n        +Object address\n        +String status\n        +Date date\n        +Boolean payment\n    }\n\n    %% ========== BACKEND CONTROLLERS ==========\n\n    class userController {\n        +createToken(id)\n        +loginUser(req, res)\n        +registerUser(req, res)\n    }\n\n    class foodController {\n        +listFood(req, res)\n        +addFood(req, res)\n        +removeFood(req, res)\n    }\n\n    class cartController {\n        +addToCart(req, res)\n        +removeFromCart(req, res)\n        +getCart(req, res)\n    }\n\n    class orderController {\n        +placeOrder(req, res)\n        +placeOrderCod(req, res)\n        +listOrders(req, res)\n        +userOrders(req, res)\n        +updateStatus(req, res)\n        +verifyOrder(req, res)\n    }\n\n    %% ========== MIDDLEWARE ==========\n\n    class authMiddleware {\n        +authMiddleware(req, res, next)\n    }\n\n    %% ========== FRONTEND CONTEXT ==========\n\n    class StoreContext {\n        -String url\n        -Array~foodModel~ food_list\n        -Array menu_list\n        -Object cartItems\n        -String token\n        -String currency\n        -Number deliveryCharge\n        +addToCart(itemId)\n        +removeFromCart(itemId)\n        +getTotalCartAmount()\n        +fetchFoodList()\n        +loadCartData(token)\n        +setFoodList(list)\n        +setCartItems(items)\n        +setToken(token)\n    }\n\n    %% ========== FRONTEND COMPONENTS ==========\n\n    class Navbar {\n        -String menu\n        -Function setShowLogin\n        +logout()\n    }\n\n    class LoginPopup {\n        -String currState\n        -Object data\n        -Function setShowLogin\n        +onChangeHandler(event)\n        +onLogin(e)\n    }\n\n    class FoodItem {\n        -String image\n        -String name\n        -Number price\n        -String desc\n        -String id\n        -Number itemCount\n    }\n\n    class Cart {\n        +navigate()\n    }\n\n    class PlaceOrder {\n        -String payment\n        -Object data\n        +onChangeHandler(event)\n        +placeOrder(e)\n    }\n\n    %% ========== ADMIN COMPONENTS ==========\n\n    class Add {\n        -File image\n        -Object data\n        +onChangeHandler(event)\n        +onSubmitHandler(event)\n    }\n\n    class List {\n        -Array~foodModel~ list\n        +fetchList()\n        +removeFood(foodId)\n    }\n\n    class Orders {\n        -Array~orderModel~ orders\n        +fetchAllOrders()\n        +statusHandler(event, orderId)\n    }\n\n    %% ========== RELATIONSHIPS: Models ==========\n    \n    userModel \"1\" -- \"0..*\" orderModel : places\n    userModel \"1\" -- \"0..*\" foodModel : has in cartData\n    orderModel \"1\" *-- \"1..*\" foodModel : contains items\n\n    %% ========== RELATIONSHIPS: Controllers to Models ==========\n    \n    userController ..> userModel : uses\n    foodController ..> foodModel : uses\n    cartController ..> userModel : uses\n    orderController ..> orderModel : uses\n    orderController ..> userModel : uses\n\n    %% ========== RELATIONSHIPS: Middleware ==========\n    \n    authMiddleware ..> userController : validates token\n    cartController ..> authMiddleware : protected by\n    orderController ..> authMiddleware : protected by\n\n    %% ========== RELATIONSHIPS: Frontend Context ==========\n    \n    StoreContext ..> foodModel : fetches\n    StoreContext ..> userModel : manages cart\n    StoreContext ..> orderModel : creates\n\n    %% ========== RELATIONSHIPS: Frontend Components ==========\n    \n    Navbar ..> StoreContext : uses\n    LoginPopup ..> StoreContext : uses\n    FoodItem ..> StoreContext : uses\n    Cart ..> StoreContext : uses\n    PlaceOrder ..> StoreContext : uses\n\n    %% ========== RELATIONSHIPS: Admin Components ==========\n    \n    Add ..> foodModel : creates\n    List ..> foodModel : lists/deletes\n    Orders ..> orderModel : manages\n\n    %% ========== NOTES ==========\n    \n    note for userModel \"Schema Fields:\\n- minimize: false\\n- unique email\\n- cartData default: {}\"\n    note for orderModel \"Default status: 'Food Processing'\\nDefault payment: false\\nDefault date: Date.now()\"\n    note for authMiddleware \"Extracts userId from JWT\\nAttaches to req.body.userId\"\n    note for StoreContext \"React Context API\\nGlobal state for entire app\"\n",
+  "content_size": 4547,
+  "collected_at": "2026-02-06T01:55:32.460247",
+  "compilation_status": "success",
+  "compilation_error": "",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 +String name\n        +String email\n        +String password\n        +Object cartData\n     和 +String name\n        +String description\n        +Number price\n        +String image\n        +String category\n     的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '+String name\n        +String email\n        +String password\n        +Object cartData\n     和 +String name\n        +String description\n        +Number price\n        +String image\n        +String category\n    '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "userModel",
+        "foodModel"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 +String userId\n        +Array items\n        +Number amount\n        +Object address\n        +String status\n        +Date date\n        +Boolean payment\n     和 +createToken(id 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '+String userId\n        +Array items\n        +Number amount\n        +Object address\n        +String status\n        +Date date\n        +Boolean payment\n     和 +createToken(id'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "orderModel",
+        "userController"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 req, res 和 req, res。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'req, res 和 req, res'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "loginUser",
+        "registerUser"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 +listFood(req, res 和 req, res 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 +listFood(req, res处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '+listFood(req, res处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "foodController",
+        "addFood"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 req, res 和 +addToCart(req, res 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'req, res 和 +addToCart(req, res'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "removeFood",
+        "cartController"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 req, res 和 req, res 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'req, res 和 req, res'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "removeFromCart",
+        "getCart"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 +placeOrder(req, res 和 req, res。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '+placeOrder(req, res 和 req, res'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "orderController",
+        "placeOrderCod"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 req, res 和 req, res 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'req, res 和 req, res'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "listOrders",
+        "userOrders"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 req, res 和 req, res 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'req, res 和 req, res'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "updateStatus",
+        "verifyOrder"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 +authMiddleware(req, res, next 和 -String url\n        -Array~foodModel~ food_list\n        -Array menu_list\n        -Object cartItems\n        -String token\n        -String currency\n        -Number deliveryCharge\n        +addToCart(itemId 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '+authMiddleware(req, res, next 和 -String url\n        -Array~foodModel~ food_list\n        -Array menu_list\n        -Object cartItems\n        -String token\n        -String currency\n        -Number deliveryCharge\n        +addToCart(itemId'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "authMiddleware",
+        "StoreContext"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 itemId 和 token。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'itemId 和 token'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "removeFromCart",
+        "loadCartData"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 list 和 items 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'list 和 items'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "setFoodList",
+        "setCartItems"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 token 和 -String menu\n        -Function setShowLogin\n        +logout( 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 token处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'token处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "setToken",
+        "Navbar"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 -String currState\n        -Object data\n        -Function setShowLogin\n        +onChangeHandler(event 和 e。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '-String currState\n        -Object data\n        -Function setShowLogin\n        +onChangeHandler(event 和 e'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "LoginPopup",
+        "onLogin"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 -String image\n        -String name\n        -Number price\n        -String desc\n        -String id\n        -Number itemCount\n     和 +navigate( 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 -String image\n        -String name\n        -Number price\n        -String desc\n        -String id\n        -Number itemCount\n    处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 61,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '-String image\n        -String name\n        -Number price\n        -String desc\n        -String id\n        -Number itemCount\n    处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "FoodItem",
+        "Cart"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 -String payment\n        -Object data\n        +onChangeHandler(event 和 e 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '-String payment\n        -Object data\n        +onChangeHandler(event 和 e'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PlaceOrder",
+        "placeOrder"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 -File image\n        -Object data\n        +onChangeHandler(event 和 event 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '-File image\n        -Object data\n        +onChangeHandler(event 和 event'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Add",
+        "onSubmitHandler"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 -Array~foodModel~ list\n        +fetchList( 和 foodId。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 73,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 -Array~foodModel~ list\n        +fetchList(处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 74,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '-Array~foodModel~ list\n        +fetchList(处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 75,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 76,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "List",
+        "removeFood"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 77,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 -Array~orderModel~ orders\n        +fetchAllOrders( 和 event, orderId。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 78,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 -Array~orderModel~ orders\n        +fetchAllOrders(处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 79,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '-Array~orderModel~ orders\n        +fetchAllOrders(处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 80,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 81,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Orders",
+        "statusHandler"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 81,
+    "repair_count": 5,
+    "grounding_acts_count": 38,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:22Z"
+}

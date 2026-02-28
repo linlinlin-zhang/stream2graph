@@ -1,0 +1,61 @@
+{
+  "id": "ot_stateDiagram_00161",
+  "source": "other",
+  "source_url": "https://github.com/arenadata/consul-test/blob/f2eb392d4b89c8fcb36b1034226625a0b49f6564/docs/service-mesh/ca/state-machine.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "arenadata/consul-test",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n\n    [*] --> Uninitialized\n    Uninitialized --> Initializing : InitializeCA\n    Uninitialized --> Reconfig : UpdateConfiguration\n    Reconfig --> Uninitialized : return\n\n    # Initialized can transition to any state\n    Initialized --> Renew : RenewIntermediate\n    Initialized --> Uninitialized : Stop\n    Initialized --> Reconfig  : UpdateConfiguration\n    Initialized --> Initializing : INVALID\n\n    # Initialized is set using validate=false\n    Uninitialized --> Initialized : INVALID\n    Reconfig --> Initialized : return\n    Initializing --> Initialized : InitializeCA complete\n    Renew --> Initialized : return\n\n    # Uninitialized is set using validate=false\n    Renew --> Uninitialized : Stop\n    Reconfig --> Uninitialized : Stop\n    Initializing --> Uninitialized : Stop\n",
+  "content_size": 800,
+  "collected_at": "2026-02-06T10:38:36.334411",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 *。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '*'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:41Z"
+}

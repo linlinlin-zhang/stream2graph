@@ -1,0 +1,424 @@
+{
+  "id": "gh_ind_074c64276c",
+  "source": "github_industrial",
+  "repo": "entrepeneur4lyf/pmdaemon",
+  "license": "mit",
+  "code": "graph TD\n\n    User[\"User<br>External Actor\"]\n    subgraph PMDaemon[\"PMDaemon Application<br>Rust\"]\n        CLI[\"CLI Entry Point<br>Rust\"]\n\n        subgraph WebLayer[\"Web Layer\"]\n            WebAPI[\"Web API Server<br>Axum / HTTP\"]\n            Auth[\"API Key Authentication<br>Middleware\"]\n            WebSocket[\"WebSocket Handler<br>Real-time Updates\"]\n        end\n\n        subgraph CoreLayer[\"Core Management Layer\"]\n            ProcessManager[\"Process Manager<br>Core Orchestrator\"]\n            PortManager[\"Port Manager<br>Allocation & Conflicts\"]\n            ConfigService[\"Configuration Service<br>JSON/YAML/TOML\"]\n        end\n\n        subgraph MonitoringLayer[\"Monitoring & Health Layer\"]\n            HealthMonitor[\"Health Monitor<br>HTTP & Script Checks\"]\n            SystemMonitor[\"System Monitor<br>CPU/Memory/Load\"]\n            ProcessMonitor[\"Process Monitor<br>Individual Process Metrics\"]\n        end\n\n        subgraph ProcessLayer[\"Process Execution Layer\"]\n            ProcessExecution[\"Process Execution<br>Spawn & Control\"]\n            SignalHandler[\"Signal Handler<br>OS Signal Management\"]\n            LogManager[\"Log Manager<br>stdout/stderr Capture\"]\n        end\n\n        %% Web Layer Connections\n        WebAPI -->|Authenticates via| Auth\n        Auth -->|Authorized requests to| ProcessManager\n        WebAPI -->|Real-time updates via| WebSocket\n        WebSocket -->|Broadcasts from| SystemMonitor\n\n        %% CLI Connections\n        CLI -->|Direct commands to| ProcessManager\n\n        %% Core Layer Connections\n        ProcessManager -->|Manages ports via| PortManager\n        ProcessManager -->|Loads/saves config via| ConfigService\n        ProcessManager -->|Controls processes via| ProcessExecution\n        ProcessManager -->|Coordinates monitoring via| HealthMonitor\n        ProcessManager -->|Gets metrics from| SystemMonitor\n\n        %% Monitoring Connections\n        HealthMonitor -->|Checks health of| ProcessExecution\n        ProcessMonitor -->|Monitors individual| ProcessExecution\n        SystemMonitor -->|Aggregates data from| ProcessMonitor\n\n        %% Process Layer Connections\n        ProcessExecution -->|Handles signals via| SignalHandler\n        ProcessExecution -->|Captures logs via| LogManager\n        ProcessExecution -->|Uses config from| ConfigService\n        ProcessExecution -->|Reports to| ProcessMonitor\n    end\n\n    %% External Connections\n    User -->|CLI Commands| CLI\n    User -->|HTTP/WebSocket| WebAPI\n\n    %% External Systems\n    ProcessExecution -->|Spawns & Controls| SystemProcesses[\"System Processes<br>Managed Applications\"]\n    ConfigService -->|Persists to| ConfigFiles[\"Config Files<br>JSON/YAML/TOML\"]\n    LogManager -->|Writes to| LogFiles[\"Log Files<br>stdout/stderr\"]\n",
+  "diagram_type": "actor size:>1500",
+  "collected_at": "2026-02-27T03:39:34.487712",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"User<br>External Actor\" 和 \"PMDaemon Application<br>Rust\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"User<br>External Actor\" 和 \"PMDaemon Application<br>Rust\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "User",
+        "PMDaemon"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"CLI Entry Point<br>Rust\" 和 \"Web Layer\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"CLI Entry Point<br>Rust\" 和 \"Web Layer\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CLI",
+        "WebLayer"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Web API Server<br>Axum / HTTP\" 和 \"API Key Authentication<br>Middleware\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 \"Web API Server<br>Axum / HTTP\"处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Web API Server<br>Axum / HTTP\"处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "WebAPI",
+        "Auth"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"WebSocket Handler<br>Real-time Updates\" 和 \"Core Management Layer\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"WebSocket Handler<br>Real-time Updates\" 和 \"Core Management Layer\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "WebSocket",
+        "CoreLayer"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Process Manager<br>Core Orchestrator\" 和 \"Port Manager<br>Allocation & Conflicts\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Process Manager<br>Core Orchestrator\" 和 \"Port Manager<br>Allocation & Conflicts\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ProcessManager",
+        "PortManager"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Configuration Service<br>JSON/YAML/TOML\" 和 \"Monitoring & Health Layer\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Configuration Service<br>JSON/YAML/TOML\" 和 \"Monitoring & Health Layer\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ConfigService",
+        "MonitoringLayer"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Health Monitor<br>HTTP & Script Checks\" 和 \"System Monitor<br>CPU/Memory/Load\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Health Monitor<br>HTTP & Script Checks\" 和 \"System Monitor<br>CPU/Memory/Load\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "HealthMonitor",
+        "SystemMonitor"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Process Monitor<br>Individual Process Metrics\" 和 \"Process Execution Layer\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Process Monitor<br>Individual Process Metrics\" 和 \"Process Execution Layer\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ProcessMonitor",
+        "ProcessLayer"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Process Execution<br>Spawn & Control\" 和 \"Signal Handler<br>OS Signal Management\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 \"Process Execution<br>Spawn & Control\"处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Process Execution<br>Spawn & Control\"处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ProcessExecution",
+        "SignalHandler"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Log Manager<br>stdout/stderr Capture\" 和 \"System Processes<br>Managed Applications\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Log Manager<br>stdout/stderr Capture\" 和 \"System Processes<br>Managed Applications\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "LogManager",
+        "SystemProcesses"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Config Files<br>JSON/YAML/TOML\" 和 \"Log Files<br>stdout/stderr\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Config Files<br>JSON/YAML/TOML\" 和 \"Log Files<br>stdout/stderr\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ConfigFiles",
+        "LogFiles"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 46,
+    "repair_count": 2,
+    "grounding_acts_count": 22,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "compilation_status": "success",
+  "compilation_error": "",
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:35Z"
+}

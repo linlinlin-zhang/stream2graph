@@ -1,0 +1,184 @@
+{
+  "id": "aug_ot_stateDiagram_00114_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/coherosphere/architecture/blob/598bb65467787da38ac4029e35bdead27e7799ee/assets/diagrams/C3_states/SM-02.01_Contribution_Lifecycle.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "coherosphere/architecture",
+  "diagram_type": "stateDiagram",
+  "code": "%%{Infra_EtcdCluster}}}%%\nstateDiagram-v2\ntitle: SM-02.01 — Contribution Lifecycle (Infra_WorkerNode)\n\n[Infra_IngressController] --> NORMALIZE : ContributionSubmitted\nnote right of NORMALIZE\n  Canonicalize payload (Infra_LoadBalancer)\n  Build canonical contribution hash and refs\nend note\n\nNORMALIZE --> SYBIL_CHECK : Normalized\nnote right of SYBIL_CHECK\n  Rate limits, graph heuristics, reputation gates\n  Uses PoCI (Infra_WorkerNode) & Security signals (Infra_IngressController)\nend note\n\nSYBIL_CHECK --> REJECTED : SybilFlagged\nSYBIL_CHECK --> VALIDATE : PassedSybilChecks\n\nVALIDATE --> INTAKE_ALIGN : SchemaValid\nVALIDATE --> REJECTED : SchemaInvalid\nnote right of VALIDATE\n  JSON Schema, policy guard, size caps\n  Required fields present\nend note\n\nINTAKE_ALIGN --> SCORE_IMPACT : AlignmentChecked\nnote right of INTAKE_ALIGN\n  Ethics preflight (Infra_RedisCache)\n  Rubric mapping, human/AI adapters\nend note\n\nSCORE_IMPACT --> UPDATE_CP : ImpactScored\nnote right of SCORE_IMPACT\n  Map impact to resonance inputs\n  Prepare CP increment\nend note\n\nUPDATE_CP --> LEDGER : CPUpdated\nnote right of UPDATE_CP\n  W_i = (Infra_LoadBalancer)^alpha with 0 < alpha < 1\n  Emit PoC events for Metrics (Infra_RedisCache)\nend note\n\nLEDGER --> CONFIRMED : LedgerCommitted\nnote right of LEDGER\n  Append-only event store, snapshot policies\n  Reconciliation with external oracles (Infra_LoadBalancer)\nend note\n\n%% ---- Exceptions & reviews ----\nSCORE_IMPACT --> REVIEW : AnomalyDetected\nREVIEW --> CONFIRMED : ClearedByReview\nREVIEW --> REJECTED : RejectedByReview\n\nREJECTED --> [Infra_IngressController]\nCONFIRMED --> [Infra_WorkerNode]\n\n%% =========== Styling ===========\nclassDef core fill:#ff8b00,stroke:#333,color:#fff,font-weight:bold;\nclass NORMALIZE,SYBIL_CHECK,VALIDATE,INTAKE_ALIGN,SCORE_IMPACT,UPDATE_CP,LEDGER,REVIEW,REJECTED,CONFIRMED core;\n",
+  "content_size": 1819,
+  "collected_at": "2026-02-06T10:38:03.118707",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "",
+  "augmentation_domain": "Infra",
+  "seed_id": "ot_stateDiagram_00114",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Infra_WorkerNode 和 Infra_LoadBalancer。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Infra_WorkerNode 和 Infra_LoadBalancer'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Lifecycle",
+        "payload"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Infra_WorkerNode 和 Infra_IngressController 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 Infra_WorkerNode处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Infra_WorkerNode处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PoCI",
+        "signals"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Infra_RedisCache 和 Infra_RedisCache 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Infra_RedisCache 和 Infra_RedisCache'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "preflight",
+        "Metrics"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Infra_LoadBalancer 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 Infra_LoadBalancer处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Infra_LoadBalancer处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "oracles"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 18,
+    "repair_count": 2,
+    "grounding_acts_count": 8,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:43Z"
+}

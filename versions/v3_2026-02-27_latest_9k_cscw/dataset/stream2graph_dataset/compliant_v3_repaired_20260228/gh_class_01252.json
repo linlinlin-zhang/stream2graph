@@ -1,0 +1,170 @@
+{
+  "id": "gh_class_01252",
+  "source": "github",
+  "source_url": "https://github.com/gustavo-munhoz/rivu/blob/dee9bf0cd98e87660b7008fc4c4be22900b5686b/diagrams/evaluation.mmd",
+  "github_repo": "gustavo-munhoz/rivu",
+  "github_file_path": "diagrams/evaluation.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\ndirection LR\n\n  class PerformanceEvaluator {\n    <<interface>>\n    + reset()\n    + add_result(example: &dyn Instance, class_votes: Vec~f64~)\n    + performance() Vec~Measurement~\n  }\n\n  class PerformanceEvaluatorExt {\n      - metrics(names: I) Vec~(String, Option~f64~)~\n      - metric(name: &str) Option~f64~\n  }\n  note for InstanceHeader \"I: IntoIterator<Item = &'a str>\"\n\n  PerformanceEvaluator ..|> PerformanceEvaluatorExt\n\n  class Measurement {\n    - name: String\n    - value: f64\n  }\n  Measurement ..|> Serializable\n\n  class Estimator {\n    <<interface>>\n    + add(v: f64)\n    + estimation() f64\n  }\n\n  class BasicEstimator {\n    - len: f64\n    - sum: f64\n    + add(v: f64)\n    + estimation() f64\n  }\n  BasicEstimator ..|> Estimator\n  BasicEstimator ..|> Serializable\n\n  class BasicClassificationEvaluator {\n    - weight_correct: Box~dyn Estimator~\n    - row_kappa: Vec~Box~dyn Estimator~~\n    - col_kappa: Vec~Box~dyn Estimator~~\n    - precision: Vec~Box~dyn Estimator~~\n    - recall: Vec~Box~dyn Estimator~~\n    - num_classes: usize\n    - weight_correct_no_change: Box~dyn Estimator~\n    - weight_majority: Box~dyn Estimator~\n    - last_true_class: usize\n    - total_weight: f64\n\n    + new(num_classes: usize) BasicClassificationEvaluator\n  }\n\n  BasicClassificationEvaluator ..|> PerformanceEvaluator\n  PerformanceEvaluator ..> Measurement : produces\n",
+  "content_size": 1371,
+  "collected_at": "2026-02-06T01:55:07.455487",
+  "compilation_status": "success",
+  "compilation_error": "",
+  "license": "gpl-3.0",
+  "license_name": "GNU General Public License v3.0",
+  "license_url": "https://api.github.com/licenses/gpl-3.0",
+  "repo_stars": 3,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 <<interface>>\n    + reset( 和 example: &dyn Instance, class_votes: Vec~f64~ 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '<<interface>>\n    + reset( 和 example: &dyn Instance, class_votes: Vec~f64~'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PerformanceEvaluator",
+        "add_result"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 - metrics(names: I 和 name: &str 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '- metrics(names: I 和 name: &str'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PerformanceEvaluatorExt",
+        "metric"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 - name: String\n    - value: f64\n   和 <<interface>>\n    + add(v: f64 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '- name: String\n    - value: f64\n   和 <<interface>>\n    + add(v: f64'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Measurement",
+        "Estimator"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 - len: f64\n    - sum: f64\n    + add(v: f64 和 - weight_correct: Box~dyn Estimator~\n    - row_kappa: Vec~Box~dyn Estimator~~\n    - col_kappa: Vec~Box~dyn Estimator~~\n    - precision: Vec~Box~dyn Estimator~~\n    - recall: Vec~Box~dyn Estimator~~\n    - num_classes: usize\n    - weight_correct_no_change: Box~dyn Estimator~\n    - weight_majority: Box~dyn Estimator~\n    - last_true_class: usize\n    - total_weight: f64\n\n    + new(num_classes: usize 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '- len: f64\n    - sum: f64\n    + add(v: f64 和 - weight_correct: Box~dyn Estimator~\n    - row_kappa: Vec~Box~dyn Estimator~~\n    - col_kappa: Vec~Box~dyn Estimator~~\n    - precision: Vec~Box~dyn Estimator~~\n    - recall: Vec~Box~dyn Estimator~~\n    - num_classes: usize\n    - weight_correct_no_change: Box~dyn Estimator~\n    - weight_majority: Box~dyn Estimator~\n    - last_true_class: usize\n    - total_weight: f64\n\n    + new(num_classes: usize'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BasicEstimator",
+        "BasicClassificationEvaluator"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 16,
+    "repair_count": 0,
+    "grounding_acts_count": 8,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:38Z"
+}

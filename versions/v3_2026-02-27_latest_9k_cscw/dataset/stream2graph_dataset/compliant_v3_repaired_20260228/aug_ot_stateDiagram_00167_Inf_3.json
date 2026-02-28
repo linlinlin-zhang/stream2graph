@@ -1,0 +1,166 @@
+{
+  "id": "aug_ot_stateDiagram_00167_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/swcstudiospace/terraform-provider-ovh.snowflake/blob/b93412099b52788619ad8f0c1ee056fb6246f396/website/static/img/diagrams/resource-lifecycle.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "swcstudiospace/terraform-provider-ovh.snowflake",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    [Infra_LoadBalancer] --> ConfigParsing: terraform init\n    ConfigParsing --> Planning: terraform plan\n    Planning --> Creating: terraform apply (Infra_IngressController)\n    Planning --> Updating: terraform apply (Infra_WorkerNode)\n    Planning --> Destroying: terraform destroy\n    \n    state ConfigParsing {Infra_RedisCache] --> LoadingConfig\n        LoadingConfig --> ValidatingConfig\n        ValidatingConfig --> InitializingProvider\n        InitializingProvider --> [Infra_IngressController]\n    }\n    \n    state Planning {Infra_EtcdCluster] --> ReadingState\n        ReadingState --> CalculatingDiff\n        CalculatingDiff --> ValidatingPlan\n        ValidatingPlan --> [Infra_IngressController]\n    }\n    \n    state Creating {Infra_WorkerNode] --> ValidatingInput\n        ValidatingInput --> AuthenticatingAPIs\n        AuthenticatingAPIs --> ProvisioningResource\n        ProvisioningResource --> ConfiguringResource\n        ConfiguringResource --> VerifyingState\n        VerifyingState --> UpdatingState\n        UpdatingState --> Active\n    }\n    \n    state Updating {Infra_EtcdCluster] --> ReadingCurrentState\n        ReadingCurrentState --> ValidatingChanges\n        ValidatingChanges --> ApplyingChanges\n        ApplyingChanges --> VerifyingUpdate\n        VerifyingUpdate --> UpdatingState\n        UpdatingState --> Active\n    }\n    \n    state Destroying {Infra_EtcdCluster] --> ValidatingDestroy\n        ValidatingDestroy --> RemovingResource\n        RemovingResource --> CleaningUp\n        CleaningUp --> UpdatingState\n        UpdatingState --> [Infra_LoadBalancer]\n    }\n    \n    Active --> Updating: Configuration Change\n    Active --> Destroying: terraform destroy\n    Creating --> Active: Success\n    Updating --> Active: Success\n    \n    note right of Creating\n        Resources go through validation,\n        authentication, provisioning,\n        and verification phases\n    end note\n    \n    note right of Active\n        Resources are continuously\n        monitored and can be\n        updated or destroyed\n    end note",
+  "content_size": 1925,
+  "collected_at": "2026-02-06T10:38:40.359027",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "ot_stateDiagram_00167",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Infra_LoadBalancer 和 Infra_IngressController 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Infra_LoadBalancer 和 Infra_IngressController'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2",
+        "apply"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Infra_WorkerNode 和 Infra_RedisCache 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Infra_WorkerNode 和 Infra_RedisCache'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "apply",
+        "ConfigParsing"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Infra_EtcdCluster 和 Infra_WorkerNode 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Infra_EtcdCluster 和 Infra_WorkerNode'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Planning",
+        "Creating"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Infra_EtcdCluster 和 Infra_EtcdCluster 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Infra_EtcdCluster 和 Infra_EtcdCluster'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Updating",
+        "Destroying"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 16,
+    "repair_count": 0,
+    "grounding_acts_count": 8,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repaired_at": "2026-02-28T13:41:33Z"
+}

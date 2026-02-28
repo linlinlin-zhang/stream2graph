@@ -1,0 +1,252 @@
+{
+  "id": "aug_gh_sequence_00281_Edu_4",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/milanfusco/mcFramework/blob/688c1e422c0afb54ea9a0e4b840cc37c49deceb9/docs/source/diagrams/sequence_simulation.mmd",
+  "github_repo": "milanfusco/mcFramework",
+  "github_file_path": "docs/source/diagrams/sequence_simulation.mmd",
+  "diagram_type": "sequence",
+  "code": "---\nname: sequence_simulation\nconfig:\n    layout: elk\n    look: neo\n---\nsequenceDiagram\n    participant User\n    participant Sim as MonteCarloSimulation\n    participant Pool as ThreadPool/ProcessPool\n    participant Engine as StatsEngine\n    participant Result as SimulationResult\n\n    User->>Sim: run(Education_ClassroomService)\n    activate Sim\n\n    Sim->>Sim: _validate_run_params(Education_GradeSync)\n    Sim->>Sim: spawn SeedSequences\n\n    Note over Sim,Pool: Parallel Execution\n    Sim->>Pool: submit chunks to workers\n    activate Pool\n\n    par Worker 1\n        Pool->>Pool: single_simulation(Education_StudentDB) × chunk_size\n    and Worker 2\n        Pool->>Pool: single_simulation(Education_LMS_Portal) × chunk_size\n    and Worker 3\n        Pool->>Pool: single_simulation(Education_GradeSync) × chunk_size\n    end\n\n    Pool-->>Sim: collected results[Education_ContentCDN]\n    deactivate Pool\n\n    Sim->>Engine: compute(Education_GradeSync)\n    activate Engine\n    Engine->>Engine: mean(Education_ContentCDN), std(Education_StudentDB), ci_mean(Education_ContentCDN), ...\n    Engine-->>Sim: ComputeResult\n    deactivate Engine\n\n    Sim->>Result: _create_result(Education_ContentCDN)\n    Result-->>Sim: SimulationResult\n    Sim-->>User: SimulationResult\n    deactivate Sim\n\n",
+  "content_size": 1102,
+  "collected_at": "2026-02-06T01:30:10.443059",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "repo_owner": "milanfusco",
+  "repo_name": "mcFramework",
+  "repo_description": "Python framework to run Monte Carlo simulations and samplers",
+  "repo_language": "Python",
+  "repo_topics": [],
+  "repo_created_at": "2025-11-09T18:42:17Z",
+  "repo_updated_at": "2026-01-19T21:24:06Z",
+  "augmentation_domain": "Education",
+  "seed_id": "gh_sequence_00281",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Education_ClassroomService 和 Education_GradeSync 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Education_ClassroomService 和 Education_GradeSync'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "run",
+        "_validate_run_params"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Education_StudentDB 和 Education_LMS_Portal 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Education_StudentDB 和 Education_LMS_Portal'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "single_simulation",
+        "single_simulation"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Education_GradeSync 和 Education_ContentCDN 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Education_GradeSync 和 Education_ContentCDN'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "single_simulation",
+        "results"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Education_GradeSync 和 Education_ContentCDN 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Education_GradeSync 和 Education_ContentCDN'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "compute",
+        "mean"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Education_StudentDB 和 Education_ContentCDN 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 Education_StudentDB处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Education_StudentDB处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "std",
+        "ci_mean"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Education_ContentCDN 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Education_ContentCDN'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "_create_result"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 25,
+    "repair_count": 1,
+    "grounding_acts_count": 12,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repaired_at": "2026-02-28T13:41:41Z"
+}

@@ -1,0 +1,57 @@
+{
+  "id": "aug_gh_sequence_00001_IoT_2",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/rabbitmq/ra/blob/e13575d817fc75ad4ac2d8ffbf80adfd1918aa77/docs/internals/log.mmd",
+  "github_repo": "rabbitmq/ra",
+  "github_file_path": "docs/internals/log.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant WR as Writer\n    participant N as Ra Node\n    participant W as WAL\n    participant S as Segment Writer\n    WR->>+N: {IoT_Industrial_EdgeNode}\n    N-X+W: {IoT_Industrial_MQTT_Broker}\n    W->W: fsync\n    W-XN: {IoT_Industrial_EdgeNode}\n    N->>WR: command_appended\n    deactivate N\n    deactivate W\n    loop until full\n        W->W: write(IoT_Industrial_ActuatorController)\n    end\n    W-X+S: {IoT_Industrial_TelemetryStream]}\n    Note right of S: mem_tables -> segments\n    S -X N: {IoT_Industrial_TelemetryStream]}\n    deactivate S\n",
+  "content_size": 517,
+  "collected_at": "2026-02-06T01:23:52.934881",
+  "compilation_status": "success",
+  "augmentation_domain": "IoT_Industrial",
+  "seed_id": "gh_sequence_00001",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 IoT_Industrial_ActuatorController。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'IoT_Industrial_ActuatorController'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "write"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repaired_at": "2026-02-28T13:41:48Z"
+}

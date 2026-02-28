@@ -1,0 +1,57 @@
+{
+  "id": "gh_ind_84e2ca68b4",
+  "source": "github_industrial",
+  "repo": "MystenLabs/minting-server",
+  "license": "apache-2.0",
+  "code": "sequenceDiagram\n\tactor Client\n\tparticipant Request Handler\n\tparticipant Request Processor\n\tparticipant Notifier\n\tparticipant Database Queue\n\tClient -->> Request Handler: Send Request (e.g. mint)\n\tRequest Handler  ->> Request Handler: Check Eligibility\n  alt not eligible\n\t\tRequest Handler -->> Client: 405 Not allowed\n\telse eligible\n    Request Handler -->> Client: 202 Accepted & subscribe to web socket\n\t  Request Handler ->> Database Queue: Store transaction\n\t  Database Queue ->> Request Processor: Pull transaction to process it\n\t  Request Processor ->> Notifier: Send transaction result\n\t  Notifier -->> Client: Notify that the transaction was complete through web socket\n  end\n",
+  "diagram_type": "sequence size:600..900",
+  "collected_at": "2026-02-27T04:26:34.890136",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 e.g. mint。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'e.g. mint'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Request"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "compilation_status": "success",
+  "compilation_error": "",
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:40Z"
+}

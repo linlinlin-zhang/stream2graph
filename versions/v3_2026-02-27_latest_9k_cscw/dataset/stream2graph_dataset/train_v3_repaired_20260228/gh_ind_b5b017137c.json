@@ -1,0 +1,373 @@
+{
+  "id": "gh_ind_b5b017137c",
+  "source": "github_industrial",
+  "repo": "gpuweb/gpuweb",
+  "license": "other",
+  "code": "flowchart BT\n  RequiredToBeUniform ==> workgroupBarriercall;\n  CFreturn -.-> CFstart;\n  loopstart ==> ifCFend;\n  loopstart -.-> CFstart;\n  ivalueforloopin -.-> CFstart;\n  ivalueforloopin -.-> ilvalue;\n  iidentexpr -.-> loopstart;\n  iidentexpr -.-> ivalueforloopin;\n  binaryexprresult -.-> iidentexpr;\n  binaryexprresult ==> loopstart;\n  forconditionCFend ==> binaryexprresult;\n  ivalueforloopexit -.-> ivalueforloopin;\n  workgroupBarriercall ==> forconditionCFend;\n  CFafterworkgroupBarrier -.-> workgroupBarriercall;\n  lididentexpr ==> MayBeNonUniform;\n  iidentexpr1 -.-> CFafterworkgroupBarrier;\n  iidentexpr1 -.-> ivalueforloopin;\n  binaryexprresult1 ==> lididentexpr;\n  binaryexprresult1 -.-> iidentexpr1;\n  binaryexprresult2 ==> binaryexprresult1;\n  binaryexprresult2 -.-> CFafterworkgroupBarrier;\n  ifstmt ==> binaryexprresult2;\n  ifCFend ==> ifstmt;\n  iidentexpr2 -.-> ifCFend;\n  iidentexpr2 -.-> ivalueforloopin;\n  incdecresult -.-> iidentexpr2;\n  incdecresult -.-> ifCFend;\n  ilvalue -.-> incdecresult;\n\n  style MayBeNonUniform fill:#941b1b\n  style RequiredToBeUniform fill:#1818ab\n  linkStyle 0,2,9,10,12,14,17,19,21,22 stroke:#941b1b\n\n  CFstart([CF_start]);\n  CFreturn([CF_return]);\n  loopstart([CF_loop_body]);\n  ivalueforloopin[var_value: i at loop body];\n  iidentexpr[var_ident_expr: i];\n  binaryexprresult[binary_expr: i < 10];\n  forconditionCFend([CF_end_for_condition]);\n  ivalueforloopexit[var_value: i at loop end];\n  iidentexpr2([var_ident_expr: i]);\n  incdecresult[increment_stmt];\n  ilvalue[lvalue: i];\n  workgroupBarriercall([call: workgroupBarrier]);\n  CFafterworkgroupBarrier([CF_after_workgroupBarrier]);\n  subgraph if [if lid + i > 7]\n    iidentexpr1[var_ident_expr: i];\n    lididentexpr[formal_param_expr: lid];\n    binaryexprresult1[binary_expr: lid + i];\n    binaryexprresult2[binary_expr: lid + i > 7];\n    ifstmt([if_stmt: lid + i > 7]);\n    ifCFend([CF_after_if]);\n   end\n",
+  "diagram_type": "loop size:>1500",
+  "collected_at": "2026-02-27T04:02:48.910922",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 [CF_start 和 [CF_return 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '[CF_start 和 [CF_return'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CFstart",
+        "CFreturn"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 [CF_loop_body 和 var_value: i at loop body。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '[CF_loop_body 和 var_value: i at loop body'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "loopstart",
+        "ivalueforloopin"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 var_ident_expr: i 和 binary_expr: i < 10 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'var_ident_expr: i 和 binary_expr: i < 10'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "iidentexpr",
+        "binaryexprresult"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 [CF_end_for_condition 和 var_value: i at loop end。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '[CF_end_for_condition 和 var_value: i at loop end'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "forconditionCFend",
+        "ivalueforloopexit"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 [var_ident_expr: i 和 increment_stmt 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '[var_ident_expr: i 和 increment_stmt'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "iidentexpr2",
+        "incdecresult"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 lvalue: i 和 [call: workgroupBarrier。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'lvalue: i 和 [call: workgroupBarrier'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ilvalue",
+        "workgroupBarriercall"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 [CF_after_workgroupBarrier 和 if lid + i > 7 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '[CF_after_workgroupBarrier 和 if lid + i > 7'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CFafterworkgroupBarrier",
+        "if"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 var_ident_expr: i 和 formal_param_expr: lid 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'var_ident_expr: i 和 formal_param_expr: lid'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "iidentexpr1",
+        "lididentexpr"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 binary_expr: lid + i 和 binary_expr: lid + i > 7 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'binary_expr: lid + i 和 binary_expr: lid + i > 7'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "binaryexprresult1",
+        "binaryexprresult2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 [if_stmt: lid + i > 7 和 [CF_after_if 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '[if_stmt: lid + i > 7 和 [CF_after_if'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ifstmt",
+        "ifCFend"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 40,
+    "repair_count": 0,
+    "grounding_acts_count": 20,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "compilation_status": "success",
+  "compilation_error": "",
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:40Z"
+}

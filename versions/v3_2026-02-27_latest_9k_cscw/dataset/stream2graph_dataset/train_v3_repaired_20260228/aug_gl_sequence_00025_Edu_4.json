@@ -1,0 +1,58 @@
+{
+  "id": "aug_gl_sequence_00025_Edu_4",
+  "source": "augmented_real_structure",
+  "source_url": "https://gitlab.com/WarheadsSE/gitlab-diagrams",
+  "gitlab_project": "WarheadsSE/gitlab-diagrams",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    Git Client->>+LoadBalancer: HTTPS GET /\n    LoadBalancer->>+NGINX: HTTP(Education_GradeSync) GET /\n    NGINX->>+Workhorse: HTTP GET /\n    Workhorse->>+Puma: HTTP GET /\n    Puma->>-Workhorse: 200 OK\n    Workhorse->>+Gitaly: gRPC Request\n\n    Gitaly->>+Workhorse: Auth Verify\n    Workhorse->>+Puma: Auth Confirm\n    Puma->>-Workhorse: Auth OK\n    Workhorse->>-Gitaly: Auth OK\n\n    Gitaly->>-Workhorse: gRPC Response\n    Workhorse->>-NGINX: HTTP Response\n    NGINX->>-LoadBalancer: HTTP Response\n    LoadBalancer->>-Git Client: HTTP Response",
+  "content_size": 542,
+  "collected_at": "2026-02-06T10:57:07.060524",
+  "compilation_status": "success",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository (refer to project page)",
+  "augmentation_domain": "Education",
+  "seed_id": "gl_sequence_00025",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Education_GradeSync 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Education_GradeSync'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "HTTP"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repaired_at": "2026-02-28T13:41:50Z"
+}

@@ -1,0 +1,212 @@
+{
+  "id": "gh_class_01036",
+  "source": "github",
+  "source_url": "https://github.com/bcgov/nr-rfc-climate-obs/blob/0690e42b2169b6916a1c78e0a4606be94fab624c/docs/data_description.mmd",
+  "github_repo": "bcgov/nr-rfc-climate-obs",
+  "github_file_path": "docs/data_description.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n  direction LR\n\n\n  ASP_Daily_Bat \"1\" --o \"1\" ASP_Daily_R : calls\n  bc_fwx \"1\" --o \"1\" bc_fwx_format_wrapper : data_pipe\n  bc_fwx_format_wrapper \"1\" --o \"1\" bc_fwx_format_R : calls\n  bc_fwx_format_R \"1\" --o \"1\" bc_fwx_cleanup_bat : data_pipe\n  bc_fwx_cleanup_bat \"1\" --o \"1\" bc_fwx_cleanup_R : calls\n\n\n  class MPOML_Download_Bat {\n    -script : E:\\Shared\\MPOML\\SRC\\xml_daily.bat\n    -schedule : Daily 8:15am\n    -description: wget wrapper to pull data from env can datamart\n    -inputs_1: https://hpfx.collab.science.gc.ca/<YYYYMMDD>/observations/xml/BC/today/today_bc_<YYYYMMDD>_e.xml\n    -inputs_2: https://hpfx.collab.science.gc.ca/<YYYYMMDD>/observations/xml/BC/yesterday/yesterday_bc_<YYYYMMDD>_e.xml\n    -outputs_1: E:\\Shared\\MPOML\\Today\\<%YYYY%-%MT%-%DD%>\\today_bc_<YYYYMMDD>_e.xml\n    -outputs_2: E:\\Shared\\MPOML\\Yesterday\\<%YYYY%-%MT%-%DD%>\\yesterday_bc_<YYYYMMDD>_e.xml\n  }\n\n  class ASP_Daily_R {\n    -script: E:\\Shared\\Real-time_Data\\ASP_daily_R\\SRC\\ASP_daily_climate.R\n    -description:\n    -inputs_1: E:/Shared/ASP_Data/TA.csv\n    -inputs_2: E:/Shared/ASP_Data/SW.csv\n    -inputs_3: E:/Shared/ASP_Data/PC.csv\n    -outputs_1: E:/Shared/Real-time_Data/ASP_daily_R/ASP_daily-<YYYY-MM-DD>.csv\n    -outputs_2: E:/Shared/Real-time_Data/ASP_daily_R/ASP_daily-<YYYY-MM-DD>_yesterday.csv\n    -outputs_3: E:/Shared/Real-time_Data/ASP_daily/ASP_daily-<YYYY-MM-DD>.csv\n    -r_version: 4.0.3\n  }\n\n  class ASP_Daily_Bat {\n    -script: E:\\Shared\\Real-time_Data\\ASP_daily_R\\SRC\\ASP_daily_climate.bat\n    -schedule: Daily 8.40am\n    -schedule_name: ASP_daily_R\n    -description: wrapper to the R script\n  }\n\n  class bc_fwx {\n    -script: E:\\Shared\\Real-time_Data\\F_WX\\SRC\\xml_bc_FWX_hourly_download.bat\n    -schedule: Hourly 7.52am\n    -schedule_name: bc_fwx\n    -description: wget based Download of all the wildfire data from the BC FWX datamart\n    -inputs_1: http://hpfx.collab.science.gc.ca/%YYYY%%MT%%DD%/WXO-DD/observations/swob-ml/partners/bc-forestry/%YYYY%%MT%%DD%/\n    -outputs_1: E:\\Shared\\Real-time_Data\\F_WX\\HOURLY\\hpfx.collab.science.gc.ca\\<YYYYMMDD>\\\n  }\n\n  class bc_fwx_format_wrapper {\n    -script: E:\\Shared\\Real-time_Data\\F_WX\\SRC\\xml_bc_FWX_hourly.bat\n    -schedule: Daily 9am / Daily F/S/S 9:30am\n    -schedule_name: bc_fwx_format\n    -description: wrapper to R script that formats the data\n  }\n\n  class bc_fwx_format_R {\n    -script: e:\\Shared\\Real-time_Data\\F_WX\\SRC\\hourly_format.R\n    -description: R script reads / extracts all data from the various xml files\n    -inputs_1: E:\\Shared\\Real-time_Data\\F_WX\\HOURLY\\hpfx.collab.science.gc.ca\\<YYYYMMDD>\\\n    -outputs_1: E:/Shared/Real-time_Data/F_WX/HOURLY/<YYYY-MM-DD>/<YYYY-MM-DD>.csv\n    -outputs_2: E:/Shared/Real-time_Data/F_WX/output/HourlyWeatherAllFields_WA.txt\n  }\n\n  class bc_fwx_cleanup_bat {\n    -script: \\\\drain\\Shared\\Real-time_Data\\F_WX\\SRC\\rm_bc_FWX_directories.bat\n    -description: wrapper to an R script\n    -schedule: Daily 9am / Daily F/S/S 9:30am\n    -schedule_name: bc_fwx_rm\n  }\n\n  class bc_fwx_cleanup_R {\n    -script: \\\\drain\\Shared\\Real-time_Data\\F_WX\\SRC\\rm_directories.R\n    -description: Deletes data from the input_1 directory that is older than 2 days\n    -inputs_1: E:\\Shared\\Real-time_Data\\F_WX\\HOURLY\\hpfx.collab.science.gc.ca\\<YYYYMMDD>\\\n    -inputs_2: E:\\\\Shared\\\\Real-time_Data\\\\F_WX\\\\HOURLY\\\\<YYYY-MM-DD>\\\n  }\n\n  class zxs_bat {\n    -script: E:\\Shared\\ZXS\\SRC\\ZXS_wget.bat\n    -description: pulls the zxs temperature data\n    -schedule: Daily 8am\n    -schedule_name: ZXS\n    -inputs_1: http://hpfx.collab.science.gc.ca/<YYYYMTDD>/WXO-DD/vertical_profile/observation/csv/\n    -outputs_1: E:\\Shared\\ZXS\\ObsTephi_12_CZXS-<YYYY-MM-DD>.csv\n  }\n",
+  "content_size": 3658,
+  "collected_at": "2026-02-06T01:52:07.700118",
+  "compilation_status": "success",
+  "compilation_error": "",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 -script : E:\\Shared\\MPOML\\SRC\\xml_daily.bat\n    -schedule : Daily 8:15am\n    -description: wget wrapper to pull data from env can datamart\n    -inputs_1: https://hpfx.collab.science.gc.ca/<YYYYMMDD>/observations/xml/BC/today/today_bc_<YYYYMMDD>_e.xml\n    -inputs_2: https://hpfx.collab.science.gc.ca/<YYYYMMDD>/observations/xml/BC/yesterday/yesterday_bc_<YYYYMMDD>_e.xml\n    -outputs_1: E:\\Shared\\MPOML\\Today\\<%YYYY%-%MT%-%DD%>\\today_bc_<YYYYMMDD>_e.xml\n    -outputs_2: E:\\Shared\\MPOML\\Yesterday\\<%YYYY%-%MT%-%DD%>\\yesterday_bc_<YYYYMMDD>_e.xml\n   和 -script: E:\\Shared\\Real-time_Data\\ASP_daily_R\\SRC\\ASP_daily_climate.R\n    -description:\n    -inputs_1: E:/Shared/ASP_Data/TA.csv\n    -inputs_2: E:/Shared/ASP_Data/SW.csv\n    -inputs_3: E:/Shared/ASP_Data/PC.csv\n    -outputs_1: E:/Shared/Real-time_Data/ASP_daily_R/ASP_daily-<YYYY-MM-DD>.csv\n    -outputs_2: E:/Shared/Real-time_Data/ASP_daily_R/ASP_daily-<YYYY-MM-DD>_yesterday.csv\n    -outputs_3: E:/Shared/Real-time_Data/ASP_daily/ASP_daily-<YYYY-MM-DD>.csv\n    -r_version: 4.0.3\n   这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 -script : E:\\Shared\\MPOML\\SRC\\xml_daily.bat\n    -schedule : Daily 8:15am\n    -description: wget wrapper to pull data from env can datamart\n    -inputs_1: https://hpfx.collab.science.gc.ca/<YYYYMMDD>/observations/xml/BC/today/today_bc_<YYYYMMDD>_e.xml\n    -inputs_2: https://hpfx.collab.science.gc.ca/<YYYYMMDD>/observations/xml/BC/yesterday/yesterday_bc_<YYYYMMDD>_e.xml\n    -outputs_1: E:\\Shared\\MPOML\\Today\\<%YYYY%-%MT%-%DD%>\\today_bc_<YYYYMMDD>_e.xml\n    -outputs_2: E:\\Shared\\MPOML\\Yesterday\\<%YYYY%-%MT%-%DD%>\\yesterday_bc_<YYYYMMDD>_e.xml\n  处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '-script : E:\\Shared\\MPOML\\SRC\\xml_daily.bat\n    -schedule : Daily 8:15am\n    -description: wget wrapper to pull data from env can datamart\n    -inputs_1: https://hpfx.collab.science.gc.ca/<YYYYMMDD>/observations/xml/BC/today/today_bc_<YYYYMMDD>_e.xml\n    -inputs_2: https://hpfx.collab.science.gc.ca/<YYYYMMDD>/observations/xml/BC/yesterday/yesterday_bc_<YYYYMMDD>_e.xml\n    -outputs_1: E:\\Shared\\MPOML\\Today\\<%YYYY%-%MT%-%DD%>\\today_bc_<YYYYMMDD>_e.xml\n    -outputs_2: E:\\Shared\\MPOML\\Yesterday\\<%YYYY%-%MT%-%DD%>\\yesterday_bc_<YYYYMMDD>_e.xml\n  处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MPOML_Download_Bat",
+        "ASP_Daily_R"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 -script: E:\\Shared\\Real-time_Data\\ASP_daily_R\\SRC\\ASP_daily_climate.bat\n    -schedule: Daily 8.40am\n    -schedule_name: ASP_daily_R\n    -description: wrapper to the R script\n   和 -script: E:\\Shared\\Real-time_Data\\F_WX\\SRC\\xml_bc_FWX_hourly_download.bat\n    -schedule: Hourly 7.52am\n    -schedule_name: bc_fwx\n    -description: wget based Download of all the wildfire data from the BC FWX datamart\n    -inputs_1: http://hpfx.collab.science.gc.ca/%YYYY%%MT%%DD%/WXO-DD/observations/swob-ml/partners/bc-forestry/%YYYY%%MT%%DD%/\n    -outputs_1: E:\\Shared\\Real-time_Data\\F_WX\\HOURLY\\hpfx.collab.science.gc.ca\\<YYYYMMDD>\\\n   这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '-script: E:\\Shared\\Real-time_Data\\ASP_daily_R\\SRC\\ASP_daily_climate.bat\n    -schedule: Daily 8.40am\n    -schedule_name: ASP_daily_R\n    -description: wrapper to the R script\n   和 -script: E:\\Shared\\Real-time_Data\\F_WX\\SRC\\xml_bc_FWX_hourly_download.bat\n    -schedule: Hourly 7.52am\n    -schedule_name: bc_fwx\n    -description: wget based Download of all the wildfire data from the BC FWX datamart\n    -inputs_1: http://hpfx.collab.science.gc.ca/%YYYY%%MT%%DD%/WXO-DD/observations/swob-ml/partners/bc-forestry/%YYYY%%MT%%DD%/\n    -outputs_1: E:\\Shared\\Real-time_Data\\F_WX\\HOURLY\\hpfx.collab.science.gc.ca\\<YYYYMMDD>\\\n  '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ASP_Daily_Bat",
+        "bc_fwx"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 -script: E:\\Shared\\Real-time_Data\\F_WX\\SRC\\xml_bc_FWX_hourly.bat\n    -schedule: Daily 9am / Daily F/S/S 9:30am\n    -schedule_name: bc_fwx_format\n    -description: wrapper to R script that formats the data\n   和 -script: e:\\Shared\\Real-time_Data\\F_WX\\SRC\\hourly_format.R\n    -description: R script reads / extracts all data from the various xml files\n    -inputs_1: E:\\Shared\\Real-time_Data\\F_WX\\HOURLY\\hpfx.collab.science.gc.ca\\<YYYYMMDD>\\\n    -outputs_1: E:/Shared/Real-time_Data/F_WX/HOURLY/<YYYY-MM-DD>/<YYYY-MM-DD>.csv\n    -outputs_2: E:/Shared/Real-time_Data/F_WX/output/HourlyWeatherAllFields_WA.txt\n   的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '-script: E:\\Shared\\Real-time_Data\\F_WX\\SRC\\xml_bc_FWX_hourly.bat\n    -schedule: Daily 9am / Daily F/S/S 9:30am\n    -schedule_name: bc_fwx_format\n    -description: wrapper to R script that formats the data\n   和 -script: e:\\Shared\\Real-time_Data\\F_WX\\SRC\\hourly_format.R\n    -description: R script reads / extracts all data from the various xml files\n    -inputs_1: E:\\Shared\\Real-time_Data\\F_WX\\HOURLY\\hpfx.collab.science.gc.ca\\<YYYYMMDD>\\\n    -outputs_1: E:/Shared/Real-time_Data/F_WX/HOURLY/<YYYY-MM-DD>/<YYYY-MM-DD>.csv\n    -outputs_2: E:/Shared/Real-time_Data/F_WX/output/HourlyWeatherAllFields_WA.txt\n  '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "bc_fwx_format_wrapper",
+        "bc_fwx_format_R"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 -script: \\\\drain\\Shared\\Real-time_Data\\F_WX\\SRC\\rm_bc_FWX_directories.bat\n    -description: wrapper to an R script\n    -schedule: Daily 9am / Daily F/S/S 9:30am\n    -schedule_name: bc_fwx_rm\n   和 -script: \\\\drain\\Shared\\Real-time_Data\\F_WX\\SRC\\rm_directories.R\n    -description: Deletes data from the input_1 directory that is older than 2 days\n    -inputs_1: E:\\Shared\\Real-time_Data\\F_WX\\HOURLY\\hpfx.collab.science.gc.ca\\<YYYYMMDD>\\\n    -inputs_2: E:\\\\Shared\\\\Real-time_Data\\\\F_WX\\\\HOURLY\\\\<YYYY-MM-DD>\\\n   这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '-script: \\\\drain\\Shared\\Real-time_Data\\F_WX\\SRC\\rm_bc_FWX_directories.bat\n    -description: wrapper to an R script\n    -schedule: Daily 9am / Daily F/S/S 9:30am\n    -schedule_name: bc_fwx_rm\n   和 -script: \\\\drain\\Shared\\Real-time_Data\\F_WX\\SRC\\rm_directories.R\n    -description: Deletes data from the input_1 directory that is older than 2 days\n    -inputs_1: E:\\Shared\\Real-time_Data\\F_WX\\HOURLY\\hpfx.collab.science.gc.ca\\<YYYYMMDD>\\\n    -inputs_2: E:\\\\Shared\\\\Real-time_Data\\\\F_WX\\\\HOURLY\\\\<YYYY-MM-DD>\\\n  '。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "bc_fwx_cleanup_bat",
+        "bc_fwx_cleanup_R"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 -script: E:\\Shared\\ZXS\\SRC\\ZXS_wget.bat\n    -description: pulls the zxs temperature data\n    -schedule: Daily 8am\n    -schedule_name: ZXS\n    -inputs_1: http://hpfx.collab.science.gc.ca/<YYYYMTDD>/WXO-DD/vertical_profile/observation/csv/\n    -outputs_1: E:\\Shared\\ZXS\\ObsTephi_12_CZXS-<YYYY-MM-DD>.csv\n   的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '-script: E:\\Shared\\ZXS\\SRC\\ZXS_wget.bat\n    -description: pulls the zxs temperature data\n    -schedule: Daily 8am\n    -schedule_name: ZXS\n    -inputs_1: http://hpfx.collab.science.gc.ca/<YYYYMTDD>/WXO-DD/vertical_profile/observation/csv/\n    -outputs_1: E:\\Shared\\ZXS\\ObsTephi_12_CZXS-<YYYY-MM-DD>.csv\n  '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "zxs_bat"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 21,
+    "repair_count": 1,
+    "grounding_acts_count": 10,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:24Z"
+}

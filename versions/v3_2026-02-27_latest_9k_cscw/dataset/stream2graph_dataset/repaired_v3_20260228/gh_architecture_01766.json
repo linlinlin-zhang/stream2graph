@@ -1,0 +1,274 @@
+{
+  "id": "gh_architecture_01766",
+  "source": "github",
+  "source_url": "https://github.com/leanguardia/provider-switcher/blob/dd3f37a5c130c1af2d5d7887db94f5f21d0f276c/diagrams/architecture2-containers.mmd",
+  "github_repo": "leanguardia/provider-switcher",
+  "github_file_path": "diagrams/architecture2-containers.mmd",
+  "diagram_type": "architecture",
+  "code": "---\ntitle: \"C4 - Level 2: Containers\"\n---\ngraph TB    \n    subgraph PaymentSystem[\"Payment Service<br/>[NestJS Application]\"]\n        API[\"PaymentsController<br/>[REST API /payments]<br/>\"]\n        \n        Orchestrator[\"PaymentsService<br/>[Service]<br/>Payment processing\"]\n        \n        Switcher[\"ProviderSwitcherService<br/>[Service]<br/>Manages the chain\"]\n        \n        ChainHandler[\"PaymentHandler<br/>[abstract]<br/><br/>Chain of Responsibility<br/>base class\"]\n        \n        Exception[\"PaymentProvidersUnavailableException<br/>[Custom Exception]<br/>503 Service Unavailable\"]\n        \n        subgraph Handlers[\"Handler Chain\"]\n            HA[\"ProviderHandler<br/>[Concrete Handler]<br/>Wraps ProviderAService\"]\n            HB[\"ProviderHandler<br/>[Concrete Handler]<br/>Wraps ProviderBService\"]\n            HC[\"ProviderHandler<br/>[Concrete Handler]<br/>Wraps ProviderCService\"]\n        end\n    end\n    \n    ExtA[\"Provider A API<br/>[External REST API]\"]\n    ExtB[\"Provider B API<br/>[External REST API]\"]\n    ExtC[\"Provider C API<br/>[External REST API]\"]\n    \n    API --> Orchestrator\n    Orchestrator --> Switcher\n    Switcher --> ChainHandler\n    ChainHandler -.-> HA\n    HA -->|\"on failure\"| HB\n    HB -->|\"on failure\"| HC\n    HC -.->|\"all failed\"| Exception\n    Exception -.->|\"503 response\"| API\n    \n    HA -->|\"HTTP Request\"| ExtA\n    HB -->|\"HTTP Request\"| ExtB\n    HC -->|\"HTTP Request\"| ExtC\n\n",
+  "content_size": 1424,
+  "collected_at": "2026-02-06T02:03:04.015119",
+  "compilation_status": "success",
+  "compilation_error": "",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Payment Service<br/>[NestJS Application 和 \"PaymentsController<br/>[REST API /payments 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Payment Service<br/>[NestJS Application 和 \"PaymentsController<br/>[REST API /payments'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PaymentSystem",
+        "API"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"PaymentsService<br/>[Service 和 \"ProviderSwitcherService<br/>[Service 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"PaymentsService<br/>[Service 和 \"ProviderSwitcherService<br/>[Service'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Orchestrator",
+        "Switcher"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"PaymentHandler<br/>[abstract 和 \"PaymentProvidersUnavailableException<br/>[Custom Exception 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"PaymentHandler<br/>[abstract 和 \"PaymentProvidersUnavailableException<br/>[Custom Exception'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ChainHandler",
+        "Exception"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Handler Chain\" 和 \"ProviderHandler<br/>[Concrete Handler 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Handler Chain\" 和 \"ProviderHandler<br/>[Concrete Handler'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Handlers",
+        "HA"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"ProviderHandler<br/>[Concrete Handler 和 \"ProviderHandler<br/>[Concrete Handler 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"ProviderHandler<br/>[Concrete Handler 和 \"ProviderHandler<br/>[Concrete Handler'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "HB",
+        "HC"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Provider A API<br/>[External REST API 和 \"Provider B API<br/>[External REST API 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Provider A API<br/>[External REST API 和 \"Provider B API<br/>[External REST API'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ExtA",
+        "ExtB"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Provider C API<br/>[External REST API 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Provider C API<br/>[External REST API'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ExtC"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 28,
+    "repair_count": 0,
+    "grounding_acts_count": 14,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:20Z"
+}

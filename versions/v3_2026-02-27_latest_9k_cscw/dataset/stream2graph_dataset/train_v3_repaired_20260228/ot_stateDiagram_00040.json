@@ -1,0 +1,680 @@
+{
+  "id": "ot_stateDiagram_00040",
+  "source": "other",
+  "source_url": "https://github.com/FurkanAkkamis25/BSG-Sarj-Guvenligi/blob/8702599defedc052267406b284ba40b7bafd026d/Diagrams/defence_state_diagram.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "FurkanAkkamis25/BSG-Sarj-Guvenligi",
+  "diagram_type": "stateDiagram",
+  "code": "\nstateDiagram-v2\n    [*] --> NormalOperation: Sistem Başlatıldı\n    \n    state NormalOperation {\n        [*] --> BaselineEstablishment\n        \n        state BaselineEstablishment {\n            [*] --> HistoricalDataCollection\n            HistoricalDataCollection --> PatternLearning: Geçmiş Veri Toplandı\n            PatternLearning --> NormalProfileCreation: Patern Öğrenildi\n            NormalProfileCreation --> ThresholdCalculation: Normal Profil Oluşturuldu\n            ThresholdCalculation --> BaselineReady: Eşikler Hesaplandı\n        }\n        \n        BaselineEstablishment --> ContinuousMonitoring: Baseline Hazır\n        \n        state ContinuousMonitoring {\n            [*] --> RealtimeDataCollection\n            RealtimeDataCollection --> StatisticalAnalysis: Anlık Veri Toplanıyor\n            \n            state StatisticalAnalysis {\n                [*] --> MeanCalculation\n                MeanCalculation --> VarianceAnalysis: Ortalama Hesaplandı\n                VarianceAnalysis --> StandardDeviationCheck: Varyans Analizi\n                StandardDeviationCheck --> TrendAnalysis: Standart Sapma Kontrolü\n                TrendAnalysis --> AnalysisComplete: Trend Analizi\n            }\n            \n            StatisticalAnalysis --> FrequencyDomainAnalysis: İstatistik Tamamlandı\n            \n            state FrequencyDomainAnalysis {\n                [*] --> FFTTransform\n                FFTTransform --> HarmonicDetection: FFT Dönüşümü\n                HarmonicDetection --> SpectralAnalysis: Harmonik Tespiti\n                SpectralAnalysis --> FrequencyAnomalyCheck: Spektral Analiz\n            }\n            \n            FrequencyDomainAnalysis --> RealtimeDataCollection: Devam Et\n        }\n    }\n    \n    NormalOperation --> AnomalyDetectionTriggered: Anormallik Şüphesi\n    \n    state AnomalyDetectionTriggered {\n        [*] --> InitialAlert\n        InitialAlert --> ConfidenceScoring: İlk Alarm\n        \n        state ConfidenceScoring {\n            [*] --> MultiMetricEvaluation\n            MultiMetricEvaluation --> CorrelationAnalysis: Çoklu Metrik Değerlendirme\n            CorrelationAnalysis --> BayesianInference: Korelasyon Analizi\n            BayesianInference --> ConfidenceCalculated: Bayesian Çıkarım\n        }\n        \n        ConfidenceScoring --> SeverityClassification: Güven Skoru Hesaplandı\n        \n        state SeverityClassification {\n            [*] --> LowSeverity\n            [*] --> MediumSeverity\n            [*] --> HighSeverity\n            [*] --> CriticalSeverity\n            \n            LowSeverity --> ClassificationComplete: Düşük Önem\n            MediumSeverity --> ClassificationComplete: Orta Önem\n            HighSeverity --> ClassificationComplete: Yüksek Önem\n            CriticalSeverity --> ClassificationComplete: Kritik Önem\n        }\n    }\n    \n    AnomalyDetectionTriggered --> ThreatIntelligence: Sınıflandırma Tamamlandı\n    AnomalyDetectionTriggered --> NormalOperation: Yanlış Alarm\n    \n    state ThreatIntelligence {\n        [*] --> SignatureMatching\n        SignatureMatching --> BehavioralAnalysis: İmza Eşleştirme\n        \n        state BehavioralAnalysis {\n            [*] --> PatternRecognition\n            PatternRecognition --> AttackVectorIdentification: Patern Tanıma\n            AttackVectorIdentification --> TTPAnalysis: Saldırı Vektörü Belirlendi\n            TTPAnalysis --> AttributionAttempt: TTP Analizi\n        }\n        \n        BehavioralAnalysis --> ThreatConfirmed: Davranış Analizi Tamamlandı\n    }\n    \n    ThreatIntelligence --> ResponseStrategy: Tehdit Onaylandı\n    \n    state ResponseStrategy {\n        [*] --> StrategySelection\n        \n        state StrategySelection {\n            [*] --> PassiveMonitoring\n            [*] --> ActiveMitigation\n            [*] --> AggressiveContainment\n            \n            PassiveMonitoring --> StrategyChosen: Düşük Önem İçin\n            ActiveMitigation --> StrategyChosen: Orta Önem İçin\n            AggressiveContainment --> StrategyChosen: Yüksek Önem İçin\n        }\n        \n        StrategySelection --> ActionPlanGeneration: Strateji Seçildi\n        \n        state ActionPlanGeneration {\n            [*] --> ResourceAllocation\n            ResourceAllocation --> PriorityAssignment: Kaynak Tahsisi\n            PriorityAssignment --> TimelineEstablishment: Öncelik Atandı\n            TimelineEstablishment --> PlanReady: Zaman Çizelgesi Oluşturuldu\n        }\n    }\n    \n    ResponseStrategy --> MitigationExecution: Plan Hazır\n    \n    state MitigationExecution {\n        [*] --> ImmediateActions\n        \n        state ImmediateActions {\n            [*] --> RateLimiting\n            RateLimiting --> LoadThrottling: Hız Sınırlama\n            LoadThrottling --> ConnectionFiltering: Yük Azaltma\n            ConnectionFiltering --> ImmediateComplete: Bağlantı Filtreleme\n        }\n        \n        ImmediateActions --> ShortTermDefense: Acil Önlemler Alındı\n        \n        state ShortTermDefense {\n            [*] --> TrafficShaping\n            TrafficShaping --> AdaptiveFiltering: Trafik Şekillendirme\n            AdaptiveFiltering --> DynamicThresholdAdjustment: Adaptif Filtreleme\n            DynamicThresholdAdjustment --> ShortTermComplete: Dinamik Eşik Ayarı\n        }\n        \n        ShortTermDefense --> LongTermMitigation: Kısa Vade Tamamlandı\n        \n        state LongTermMitigation {\n            [*] --> SourceIsolation\n            SourceIsolation --> NetworkSegmentation: Kaynak İzolasyonu\n            NetworkSegmentation --> PolicyEnforcement: Ağ Segmentasyonu\n            PolicyEnforcement --> LongTermComplete: Politika Uygulandı\n        }\n    }\n    \n    MitigationExecution --> ForensicAnalysis: Önlemler Alındı\n    \n    state ForensicAnalysis {\n        [*] --> EvidenceCollection\n        \n        state EvidenceCollection {\n            [*] --> LogAggregation\n            LogAggregation --> NetworkTrafficCapture: Log Toplama\n            NetworkTrafficCapture --> MemoryDump: Ağ Trafiği Yakalandı\n            MemoryDump --> ArtifactPreservation: Bellek Dökümü\n            ArtifactPreservation --> EvidenceSecured: Kanıt Korundu\n        }\n        \n        EvidenceCollection --> RootCauseAnalysis: Kanıt Toplandı\n        \n        state RootCauseAnalysis {\n            [*] --> TimelineReconstruction\n            TimelineReconstruction --> VectorAnalysis: Zaman Çizelgesi Yeniden Yapılandı\n            VectorAnalysis --> VulnerabilityIdentification: Vektör Analizi\n            VulnerabilityIdentification --> ImpactAssessment: Zafiyet Belirlendi\n            ImpactAssessment --> RootCauseFound: Etki Değerlendirmesi\n        }\n        \n        RootCauseAnalysis --> ReportGeneration: Kök Neden Bulundu\n        \n        state ReportGeneration {\n            [*] --> ExecutiveSummary\n            ExecutiveSummary --> TechnicalDetails: Yönetici Özeti\n            TechnicalDetails --> RecommendationsCreation: Teknik Detaylar\n            RecommendationsCreation --> ReportComplete: Öneriler Oluşturuldu\n        }\n    }\n    \n    ForensicAnalysis --> RecoveryPhase: Analiz Tamamlandı\n    \n    state RecoveryPhase {\n        [*] --> SystemRestoration\n        \n        state SystemRestoration {\n            [*] --> ServiceValidation\n            ServiceValidation --> IntegrityCheck: Servis Doğrulama\n            IntegrityCheck --> ConfigurationReview: Bütünlük Kontrolü\n            ConfigurationReview --> RestorationComplete: Yapılandırma İncelemesi\n        }\n        \n        SystemRestoration --> SecurityHardening: Sistem Geri Yüklendi\n        \n        state SecurityHardening {\n            [*] --> PatchManagement\n            PatchManagement --> ConfigurationUpdate: Yama Yönetimi\n            ConfigurationUpdate --> PolicyRefinement: Yapılandırma Güncellendi\n            PolicyRefinement --> HardeningComplete: Politika İyileştirme\n        }\n        \n        SecurityHardening --> MonitoringEnhancement: Güvenlik Sertleştirildi\n        \n        state MonitoringEnhancement {\n            [*] --> NewSignatureDeployment\n            NewSignatureDeployment --> ThresholdTuning: Yeni İmza Dağıtıldı\n            ThresholdTuning --> AlertOptimization: Eşik Ayarı\n            AlertOptimization --> EnhancementComplete: Alarm Optimizasyonu\n        }\n    }\n    \n    RecoveryPhase --> LessonsLearned: İyileştirme Tamamlandı\n    \n    state LessonsLearned {\n        [*] --> PostIncidentReview\n        PostIncidentReview --> TeamDebriefing: Olay Sonrası İnceleme\n        TeamDebriefing --> ProcessImprovement: Ekip Bilgilendirme\n        ProcessImprovement --> KnowledgeBaseUpdate: Süreç İyileştirme\n        KnowledgeBaseUpdate --> TrainingUpdate: Bilgi Tabanı Güncellendi\n        TrainingUpdate --> LessonsDocumented: Eğitim Güncellendi\n    }\n    \n    LessonsLearned --> NormalOperation: Dersler Belgelendi\n    \n    MitigationExecution --> EscalationRequired: Önlemler Yetersiz\n    \n    state EscalationRequired {\n        [*] --> IncidentEscalation\n        IncidentEscalation --> ManagementNotification: Olay Yükseltildi\n        ManagementNotification --> ExternalSupport: Yönetime Bildirildi\n        ExternalSupport --> CrisisManagement: Dış Destek Çağrıldı\n        CrisisManagement --> EmergencyProtocol: Kriz Yönetimi\n        EmergencyProtocol --> SystemShutdown: Acil Durum Protokolü\n    }\n    \n    EscalationRequired --> EmergencyRecovery: Sistem Kapatıldı\n    \n    state EmergencyRecovery {\n        [*] --> DisasterRecoveryPlan\n        DisasterRecoveryPlan --> BackupActivation: Felaket Kurtarma Planı\n        BackupActivation --> FailoverExecution: Yedek Aktivasyonu\n        FailoverExecution --> BusinessContinuity: Failover Yürütüldü\n        BusinessContinuity --> EmergencyComplete: İş Sürekliliği\n    }\n    \n    EmergencyRecovery --> RecoveryPhase: Acil Durum Atlatıldı\n    \n    [*]\n",
+  "content_size": 9747,
+  "collected_at": "2026-02-06T10:37:05.974568",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 * 和 [* 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '* 和 [*'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2",
+        "NormalOperation"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 [* 和 [* 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '[* 和 [*'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BaselineEstablishment",
+        "ContinuousMonitoring"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 [* 和 [*。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '[* 和 [*'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "StatisticalAnalysis",
+        "FrequencyDomainAnalysis"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 [* 和 [* 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '[* 和 [*'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AnomalyDetectionTriggered",
+        "ConfidenceScoring"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 [* 和 *。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '[* 和 *'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SeverityClassification",
+        "LowSeverity"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 * 和 * 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '* 和 *'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MediumSeverity",
+        "HighSeverity"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 [* 和 [* 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 [*处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '[*处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ThreatIntelligence",
+        "BehavioralAnalysis"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 [* 和 [*。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 [*处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '[*处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ResponseStrategy",
+        "StrategySelection"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 * 和 * 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '* 和 *'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PassiveMonitoring",
+        "ActiveMitigation"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 [* 和 [* 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '[* 和 [*'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ActionPlanGeneration",
+        "MitigationExecution"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 [* 和 [* 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '[* 和 [*'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ImmediateActions",
+        "ShortTermDefense"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 [* 和 [* 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '[* 和 [*'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "LongTermMitigation",
+        "ForensicAnalysis"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 [* 和 [* 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 [*处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 53,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '[*处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EvidenceCollection",
+        "RootCauseAnalysis"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 [* 和 [* 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '[* 和 [*'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ReportGeneration",
+        "RecoveryPhase"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 [* 和 [* 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '[* 和 [*'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SystemRestoration",
+        "SecurityHardening"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 [* 和 [* 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '[* 和 [*'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MonitoringEnhancement",
+        "LessonsLearned"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 [* 和 [* 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '[* 和 [*'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EscalationRequired",
+        "EmergencyRecovery"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 *。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 73,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '*'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 74,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 75,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Atlatıldı"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 75,
+    "repair_count": 3,
+    "grounding_acts_count": 36,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:41Z"
+}

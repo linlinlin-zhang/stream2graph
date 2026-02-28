@@ -1,0 +1,187 @@
+{
+  "id": "aug_gh_sequence_00336_IoT_2",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/DamienReichhart/DockerWebInterface/blob/d5f29f636f5667b7f66c8963826694cea2309dab/documentation/technique/diagrammes/sequence/php_request_lifecycle.mmd",
+  "github_repo": "DamienReichhart/DockerWebInterface",
+  "github_file_path": "documentation/technique/diagrammes/sequence/php_request_lifecycle.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    title PHP Application Request Lifecycle\n    \n    participant Client as Client Browser\n    participant Apache as Apache Server\n    participant PHP as PHP-FPM\n    participant index as index.php\n    participant Request as HttpRequest\n    participant Response as HttpResponse\n    participant Session as Session\n    participant Router as Router\n    participant Route as Route\n    participant Middleware as Middlewares\n    participant Controller as Controller\n    participant Model as Model\n    participant DB as Database\n    \n    Client->>Apache: HTTP Request\n    Apache->>PHP: Forward to PHP-FPM via socket\n    PHP->>index: Execute index.php\n    \n    index->>index: Load autoloader\n    index->>index: Load environment variables\n    index->>Session: Create Session\n    Session->>Session: Start session\n    index->>Request: Create HttpRequest\n    Request->>Request: Parse request data\n    index->>Response: Create HttpResponse\n    index->>Router: Create Router(IoT_Industrial_TelemetryStream)\n    \n    Router->>Router: Load routes from routes.json\n    index->>Router: route(IoT_Industrial_PLC_Logic)\n    \n    Router->>Router: Get request method & URI\n    Router->>Router: searchRoute(IoT_Industrial_MQTT_Broker)\n    Router->>Route: Create Route object\n    Route->>Route: Parse route parameters\n    Route->>Route: Load middlewares\n    \n    alt Route Found\n        Router->>Middleware: Call entry middlewares\n        Middleware->>Middleware: Execute pre-controller logic\n        \n        Router->>Controller: Instantiate controller\n        Controller->>Controller: Initialize Twig\n        Router->>Controller: Call action method\n        \n        Controller->>Model: Interact with model(IoT_Industrial_ActuatorController)\n        Model->>DB: Execute SQL queries\n        DB->>Model: Return data\n        Model->>Controller: Return processed data\n        \n        Controller->>Controller: Render template\n        Controller->>Response: Append rendered content\n        \n        Router->>Middleware: Call exit middlewares\n        Middleware->>Middleware: Execute post-controller logic\n        \n        Router->>Response: send(IoT_Industrial_ActuatorController)\n        Response->>PHP: Output HTTP response\n    else Route Not Found\n        Router->>Controller: Create ErrorController\n        Controller->>Controller: error404(IoT_Industrial_EdgeNode)\n        Controller->>Response: Append error page\n        Router->>Response: send(IoT_Industrial_PLC_Logic)\n        Response->>PHP: Output HTTP response\n    end\n    \n    PHP->>Apache: Return response\n    Apache->>Client: HTTP Response ",
+  "content_size": 2435,
+  "collected_at": "2026-02-06T01:30:51.616066",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "",
+  "augmentation_domain": "IoT_Industrial",
+  "seed_id": "gh_sequence_00336",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 IoT_Industrial_TelemetryStream 和 IoT_Industrial_PLC_Logic 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'IoT_Industrial_TelemetryStream 和 IoT_Industrial_PLC_Logic'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Router",
+        "route"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 IoT_Industrial_MQTT_Broker 和 IoT_Industrial_ActuatorController 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 IoT_Industrial_MQTT_Broker处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'IoT_Industrial_MQTT_Broker处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "searchRoute",
+        "model"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 IoT_Industrial_ActuatorController 和 IoT_Industrial_EdgeNode 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'IoT_Industrial_ActuatorController 和 IoT_Industrial_EdgeNode'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "send",
+        "error404"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 IoT_Industrial_PLC_Logic 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 IoT_Industrial_PLC_Logic处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'IoT_Industrial_PLC_Logic处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "send"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 18,
+    "repair_count": 2,
+    "grounding_acts_count": 8,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:20Z"
+}

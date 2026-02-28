@@ -1,0 +1,184 @@
+{
+  "id": "gh_sequence_00453",
+  "source": "github",
+  "source_url": "https://github.com/MNRainDrop/CECS-491A-Spec/blob/1b550d3e51d8eb2f48b176e022a02ab51d3e46b3/Project%20Documents/Low%20Level%20Designs/VehicleProfileLLD/VP1-VehicleProfileCreation/VehicleProfileLibrary_ProfileCreation_APIFail.mmd",
+  "github_repo": "MNRainDrop/CECS-491A-Spec",
+  "github_file_path": "Project Documents/Low Level Designs/VehicleProfileLLD/VP1-VehicleProfileCreation/VehicleProfileLibrary_ProfileCreation_APIFail.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\nparticipant u as Browser\nparticipant az as AuthN/AuthZ<br>(Entry Point)\nparticipant e as VehicleProfileEntryPoint<br>(Entry Point)\nparticipant vpm as VehicleProfileManager<br>(Manager Layer)\nparticipant vps as VehicleProfileCreationService<br>(Services Layer)\nparticipant ll as LogService<br>(Services Layer)\nparticipant dg as SqlDbVehicleTarget<br>(Data Gateway)\nparticipant da as SqlServerDAO<br>(Data Access Object)\nparticipant ds as Data Store<br>(Sql Server)\n\nNote Left of u: User attempts to to create new vehicle profile\nu->>+az: CheckToken() \n    Note over u,az: *Temporary method signature*<br>Browser checks for<br>authorized access to the page.<br>See authorization success case\naz-->>-u: Return valid check\n\nu->>+e: CreateVehicleProfile(vin: string, licensePlate: string, make: string, model: string, year: int, color: string, description: string, userAccount: IUserAccount) : IActionResult\n    Note over u,e: Invoked when user accepts inputs for all fields to<br>Create VehicleProfile\n\n    e->>+vpm: CreateVehicleProfile(vin: string, licensePlate: string, make: string, model: string, year: int, color: string, description: string, userAccont: IUserAccount) : IResponse\n        Note over e,vpm: Entry point calls upon manager<br>to create vehicle profiles\n        \n        vpm->>vpm: Validate Parameters\n\n        vpm->>+vps: CreateVehicleProfile(vin: string, licensePlate: string, make: string, model: string, year: int, color: string, description: string, userAccount: IUserAccount) : IResponse\n            Note over vpm,vps: VehicleProfileManager calls upon<br>VehicleProfileCreationService to create the vehicle\n\n            vps->>vps: Validate Parameters\n\n            # Use api to search for other details on the vehicle\n            vps->>vps: HttpCleint.SendAsync(request: HttpRequestMessage) : Task<HttpResponseMessage>\n                Note over vps,vps: Requests information from API using the vin of the vehicle\n\n            vps->>vps: API Fails to retrieve necessary details\n\n            vps->>vps: Generate IResponse object\n                Note over vps,vps: HasError = true<br>ErrorMessage = \"Failed to retrieve data from API\"\n\n            # Log unsuccessful vehicle creation\n            vps-->>ll: CreateLogAsync(logLevel: string, logCategory: string, logContext: string, userHash: string) : IResponse\n                Note over vps,ll: VehicleProfileCreationService calls upon LogService to log<br>unsuccessful creation of vehicle profile.<br>See logging success case\n\n        vps-->>-vpm: IResponse object returned\n\n        vpm->>vpm: Check for violation of business rules\n\n        # Log unsuccessful vehicle creation\n        vpm-->>ll: CreateLogAsync(logLevel: string, logCategory: string, logContext: string, userHash: string) : IResponse\n            Note over vpm,ll: VehicleProfileManager calls upon LogService to log<br>unsuccessful creation of vehicle profile.<br>See logging success case\n        \n    vpm-->>-e: IResponse object returned\n\n    e->>e: Check for errors in returned IResponse object\n\ne-->>-u: Return StatusCode(500, IResponseObject.ErrorMessage)",
+  "content_size": 3107,
+  "collected_at": "2026-02-06T01:32:28.396514",
+  "compilation_status": "success",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 2,
+  "repo_forks": 0,
+  "repo_owner": "MNRainDrop",
+  "repo_name": "CECS-491A-Spec",
+  "repo_description": "CECS 491A repository for Team Spec",
+  "repo_language": "C#",
+  "repo_topics": [],
+  "repo_created_at": "2023-09-07T01:55:44Z",
+  "repo_updated_at": "2024-12-17T23:27:38Z",
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 vin: string, licensePlate: string, make: string, model: string, year: int, color: string, description: string, userAccount: IUserAccount 和 vin: string, licensePlate: string, make: string, model: string, year: int, color: string, description: string, userAccont: IUserAccount 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 vin: string, licensePlate: string, make: string, model: string, year: int, color: string, description: string, userAccount: IUserAccount处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'vin: string, licensePlate: string, make: string, model: string, year: int, color: string, description: string, userAccount: IUserAccount处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CreateVehicleProfile",
+        "CreateVehicleProfile"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 vin: string, licensePlate: string, make: string, model: string, year: int, color: string, description: string, userAccount: IUserAccount 和 request: HttpRequestMessage 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'vin: string, licensePlate: string, make: string, model: string, year: int, color: string, description: string, userAccount: IUserAccount 和 request: HttpRequestMessage'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CreateVehicleProfile",
+        "SendAsync"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 logLevel: string, logCategory: string, logContext: string, userHash: string 和 logLevel: string, logCategory: string, logContext: string, userHash: string 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'logLevel: string, logCategory: string, logContext: string, userHash: string 和 logLevel: string, logCategory: string, logContext: string, userHash: string'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CreateLogAsync",
+        "CreateLogAsync"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 500, IResponseObject.ErrorMessage。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '500, IResponseObject.ErrorMessage'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "StatusCode"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 17,
+    "repair_count": 1,
+    "grounding_acts_count": 8,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:21Z"
+}

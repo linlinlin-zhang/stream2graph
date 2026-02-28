@@ -1,0 +1,232 @@
+{
+  "id": "gh_ind_903d9d005f",
+  "source": "github_industrial",
+  "repo": "pulumi/pulumi-self-hosted-installers",
+  "license": "apache-2.0",
+  "code": "---\nconfig:\n  look: neo\n  theme: base\n---\ngraph TD\n    classDef awsInfra fill:#FF9900,stroke:#f7bf2a,stroke-width:4px,color:#FFFFFF\n    classDef awsSecure fill:#7B1FA2,stroke:#FFFFFF,stroke-width:4px,color:#FFFFFF\n    classDef awsNetwork fill:#D32F2F,stroke:#FFFFFF,stroke-width:4px,color:#FFFFFF\n    \n    subgraph FOUNDATION[\"Foundation Layer: IAM & Networking\"]\n        subgraph IAM_LAYER[\"01-iam: IAM Resources\"]\n            EKS_ROLE[Amazon EKS<br/>Cluster Service Role<br/>Required Policies]:::awsSecure\n            NODE_ROLE[Amazon EKS<br/>Node Group Role<br/>Worker Permissions]:::awsSecure\n            ALB_POLICY[AWS Load Balancer<br/>Controller Policy<br/>Ingress Management]:::awsSecure\n        end\n        \n        subgraph NET_LAYER[\"02-networking: VPC Infrastructure\"]\n            VPC[Amazon VPC<br/>CIDR: 10.0.0.0/16<br/>Multi-AZ Design]:::awsNetwork\n            PUB_SUBNETS[Public Subnets<br/>Internet Gateway<br/>NAT Gateway Hosts]:::awsNetwork\n            PRIV_SUBNETS[Private Subnets<br/>NAT Gateway Route<br/>EKS Node Groups]:::awsNetwork\n            IGW[Internet Gateway<br/>Public Access<br/>Outbound Traffic]:::awsNetwork\n            NAT[NAT Gateway<br/>Private Outbound<br/>High Availability]:::awsNetwork\n        end\n    end\n    \n    EKS_ROLE --> VPC\n    NODE_ROLE --> PRIV_SUBNETS\n    ALB_POLICY --> PUB_SUBNETS\n    \n    VPC --> PUB_SUBNETS\n    VPC --> PRIV_SUBNETS\n    PUB_SUBNETS --> IGW\n    PUB_SUBNETS --> NAT\n    PRIV_SUBNETS --> NAT",
+  "diagram_type": "node size:900..1500",
+  "collected_at": "2026-02-27T05:30:55.605855",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Foundation Layer: IAM & Networking\" 和 \"01-iam: IAM Resources\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Foundation Layer: IAM & Networking\" 和 \"01-iam: IAM Resources\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "FOUNDATION",
+        "IAM_LAYER"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Amazon EKS<br/>Cluster Service Role<br/>Required Policies 和 Amazon EKS<br/>Node Group Role<br/>Worker Permissions 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Amazon EKS<br/>Cluster Service Role<br/>Required Policies 和 Amazon EKS<br/>Node Group Role<br/>Worker Permissions'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EKS_ROLE",
+        "NODE_ROLE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 AWS Load Balancer<br/>Controller Policy<br/>Ingress Management 和 \"02-networking: VPC Infrastructure\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'AWS Load Balancer<br/>Controller Policy<br/>Ingress Management 和 \"02-networking: VPC Infrastructure\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ALB_POLICY",
+        "NET_LAYER"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Amazon VPC<br/>CIDR: 10.0.0.0/16<br/>Multi-AZ Design 和 Public Subnets<br/>Internet Gateway<br/>NAT Gateway Hosts 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Amazon VPC<br/>CIDR: 10.0.0.0/16<br/>Multi-AZ Design 和 Public Subnets<br/>Internet Gateway<br/>NAT Gateway Hosts'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "VPC",
+        "PUB_SUBNETS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Private Subnets<br/>NAT Gateway Route<br/>EKS Node Groups 和 Internet Gateway<br/>Public Access<br/>Outbound Traffic 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Private Subnets<br/>NAT Gateway Route<br/>EKS Node Groups 和 Internet Gateway<br/>Public Access<br/>Outbound Traffic'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PRIV_SUBNETS",
+        "IGW"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 NAT Gateway<br/>Private Outbound<br/>High Availability 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'NAT Gateway<br/>Private Outbound<br/>High Availability'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "NAT"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 24,
+    "repair_count": 0,
+    "grounding_acts_count": 12,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "compilation_status": "success",
+  "compilation_error": "",
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:25Z"
+}

@@ -1,0 +1,423 @@
+{
+  "id": "gh_architecture_01882",
+  "source": "github",
+  "source_url": "https://github.com/arrozet/basmati/blob/843c576d10ba768f1e3a58b3f63cf555e7396873/docs/diagrams/final/nosql.mmd",
+  "github_repo": "arrozet/basmati",
+  "github_file_path": "docs/diagrams/final/nosql.mmd",
+  "diagram_type": "architecture",
+  "code": "---\nconfig:\n  layout: elk\n---\nflowchart LR\n subgraph Users[\"<b>COLLECTION: users</b>\"]\n        direction TB\n        UsersColl[\"👤 users\"]\n        U1[\"<b>Document Structure</b><br>────────────────<br>• _id: ObjectId<br>• external_id: string<br>• provider: string<br>• email: string<br>• display_name: string<br>• avatar_url: string<br>• notification_preferences ⊕<br>• followed_calendar_ids: [ObjectId]<br>• created_at: datetime<br>• last_login: datetime\"]\n        U2[\"<b>notification_preferences</b><br>────────────────<br>• in_app: boolean<br>• email: boolean<br>• email_address: string<br>• frequency: string<br>  (instant | daily)\"]\n        U1 -. embeds .- U2\n  end\n  \n subgraph Calendars[\"<b>COLLECTION: calendars</b>\"]\n        direction TB\n        CalendarsColl[\"📅 calendars\"]\n        C1[\"<b>Document Structure</b><br>────────────────<br>• _id: ObjectId<br>• title: string<br>• creator_external_id: string →<br>• creator_display_name: string<br>• keywords: [string]<br>• color: string<br>• icon: string<br>• parent_calendar_id: ObjectId →<br>• path: [ObjectId]<br>• description: string<br>• visibility: string<br>• created_at: datetime<br>• updated_at: datetime<br>• subscriber_count: number<br>• comments ⊕⊕\"]\n        C2[\"<b>comments[]</b><br>────────────────<br>• _id: ObjectId<br>• author_external_id: string →<br>• author_display_name: string<br>• text: string<br>• created_at: datetime\"]\n        C1 -. embeds array .- C2\n  end\n  \n subgraph Events[\"<b>COLLECTION: events</b>\"]\n        direction TB\n        EventsColl[\"📌 events\"]\n        E1[\"<b>Document Structure</b><br>────────────────<br>• _id: ObjectId<br>• calendar_id: ObjectId →<br>• calendar_title: string<br>• creator_external_id: string →<br>• title: string<br>• description: string<br>• start_time: datetime<br>• end_time: datetime<br>• location ⊕<br>• attachments ⊕⊕<br>• comments ⊕⊕<br>• visibility: string<br>• recurrence ⊕<br>• created_at: datetime<br>• updated_at: datetime\"]\n        E2[\"<b>location</b><br>────────────────<br>• address: string<br>• latitude: number<br>• longitude: number<br>• place_name: string<br>• map_provider: string\"]\n        E3[\"<b>attachments[]</b><br>────────────────<br>• _id: ObjectId<br>• filename: string<br>• url: string (GCS)<br>• size: number<br>• mime_type: string<br>• uploaded_at: datetime<br>• uploaded_by: string<br>• is_image: boolean<br>• thumbnail_url: string\"]\n        E4[\"<b>comments[]</b><br>────────────────<br>• _id: ObjectId<br>• author_external_id: string →<br>• author_display_name: string<br>• text: string<br>• created_at: datetime\"]\n        E5[\"<b>recurrence</b><br>────────────────<br>• pattern: string<br>• interval: number<br>• days_of_week: [number]<br>• end_date: datetime<br>• exceptions: [datetime]\"]\n        E1 -. embeds .- E2\n        E1 -. embeds .- E5\n        E1 -. embeds array .- E3 & E4\n  end\n  \n subgraph Notifications[\"<b>COLLECTION: notifications</b>\"]\n        direction TB\n        NotificationsColl[\"🔔 notifications\"]\n        N1[\"<b>Document Structure</b><br>────────────────<br>• _id: ObjectId<br>• recipient_external_id: string →<br>• type: string<br>• title: string<br>• message: string<br>• is_read: boolean<br>• related_event_id: ObjectId →<br>• related_calendar_id: ObjectId →<br>• created_at: datetime<br>• expires_at: datetime\"]\n  end\n  \n subgraph GeocodeCache[\"<b>COLLECTION: geocode_cache</b>\"]\n        direction TB\n        GeocodeCacheColl[\"🗺️ geocode_cache\"]\n        GC1[\"<b>Document Structure</b><br>────────────────<br>• _id: ObjectId<br>• cache_key: string (unique)<br>• query_type: string<br>  (geocode | reverse | search)<br>• query_params: object<br>• response_data: object<br>• created_at: datetime<br>• expires_at: datetime<br>• hit_count: number<br>• last_accessed: datetime<br>• schema_version: number\"]\n  end\n  \n    UsersColl == creates ==> CalendarsColl\n    UsersColl == creates ==> EventsColl\n    UsersColl == receives ==> NotificationsColl\n    CalendarsColl == contains ==> EventsColl\n    CalendarsColl == parent_of ==> CalendarsColl\n    EventsColl == generates ==> NotificationsColl\n    EventsColl == relates_to ==> EventsColl\n    EventsColl == consumes ==> GeocodeCacheColl\n    \n    style Users fill:#e1f5ff,stroke:#0066cc,stroke-width:3px\n    style Calendars fill:#fff4e1,stroke:#cc8800,stroke-width:3px\n    style Events fill:#e8f5e8,stroke:#00aa00,stroke-width:3px\n    style Notifications fill:#ffe8f0,stroke:#cc0066,stroke-width:3px\n    style GeocodeCache fill:#f0e6ff,stroke:#8800cc,stroke-width:3px\n    \n    style UsersColl fill:#b3d9ff,stroke:#0066cc,stroke-width:2px\n    style CalendarsColl fill:#ffe4b3,stroke:#cc8800,stroke-width:2px\n    style EventsColl fill:#c2e0c2,stroke:#00aa00,stroke-width:2px\n    style NotificationsColl fill:#ffcce0,stroke:#cc0066,stroke-width:2px\n    style GeocodeCacheColl fill:#e6ccff,stroke:#8800cc,stroke-width:2px",
+  "content_size": 4824,
+  "collected_at": "2026-02-06T02:04:30.971815",
+  "compilation_status": "success",
+  "compilation_error": "",
+  "license": "gpl-3.0",
+  "license_name": "GNU General Public License v3.0",
+  "license_url": "https://api.github.com/licenses/gpl-3.0",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"<b>COLLECTION: users</b>\" 和 \"👤 users\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"<b>COLLECTION: users</b>\" 和 \"👤 users\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Users",
+        "UsersColl"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"<b>Document Structure</b><br>────────────────<br>• _id: ObjectId<br>• external_id: string<br>• provider: string<br>• email: string<br>• display_name: string<br>• avatar_url: string<br>• notification_preferences ⊕<br>• followed_calendar_ids: [ObjectId 和 \"<b>notification_preferences</b><br>────────────────<br>• in_app: boolean<br>• email: boolean<br>• email_address: string<br>• frequency: string<br>  (instant | daily 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"<b>Document Structure</b><br>────────────────<br>• _id: ObjectId<br>• external_id: string<br>• provider: string<br>• email: string<br>• display_name: string<br>• avatar_url: string<br>• notification_preferences ⊕<br>• followed_calendar_ids: [ObjectId 和 \"<b>notification_preferences</b><br>────────────────<br>• in_app: boolean<br>• email: boolean<br>• email_address: string<br>• frequency: string<br>  (instant | daily'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "U1",
+        "U2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"<b>COLLECTION: calendars</b>\" 和 \"📅 calendars\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"<b>COLLECTION: calendars</b>\" 和 \"📅 calendars\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Calendars",
+        "CalendarsColl"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"<b>Document Structure</b><br>────────────────<br>• _id: ObjectId<br>• title: string<br>• creator_external_id: string →<br>• creator_display_name: string<br>• keywords: [string 和 \"<b>comments[。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"<b>Document Structure</b><br>────────────────<br>• _id: ObjectId<br>• title: string<br>• creator_external_id: string →<br>• creator_display_name: string<br>• keywords: [string 和 \"<b>comments['，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "C1",
+        "C2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"<b>COLLECTION: events</b>\" 和 \"📌 events\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"<b>COLLECTION: events</b>\" 和 \"📌 events\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Events",
+        "EventsColl"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"<b>Document Structure</b><br>────────────────<br>• _id: ObjectId<br>• calendar_id: ObjectId →<br>• calendar_title: string<br>• creator_external_id: string →<br>• title: string<br>• description: string<br>• start_time: datetime<br>• end_time: datetime<br>• location ⊕<br>• attachments ⊕⊕<br>• comments ⊕⊕<br>• visibility: string<br>• recurrence ⊕<br>• created_at: datetime<br>• updated_at: datetime\" 和 \"<b>location</b><br>────────────────<br>• address: string<br>• latitude: number<br>• longitude: number<br>• place_name: string<br>• map_provider: string\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"<b>Document Structure</b><br>────────────────<br>• _id: ObjectId<br>• calendar_id: ObjectId →<br>• calendar_title: string<br>• creator_external_id: string →<br>• title: string<br>• description: string<br>• start_time: datetime<br>• end_time: datetime<br>• location ⊕<br>• attachments ⊕⊕<br>• comments ⊕⊕<br>• visibility: string<br>• recurrence ⊕<br>• created_at: datetime<br>• updated_at: datetime\" 和 \"<b>location</b><br>────────────────<br>• address: string<br>• latitude: number<br>• longitude: number<br>• place_name: string<br>• map_provider: string\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "E1",
+        "E2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"<b>attachments[ 和 GCS 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 \"<b>attachments[处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"<b>attachments[处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "E3",
+        "string"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"<b>comments[ 和 \"<b>recurrence</b><br>────────────────<br>• pattern: string<br>• interval: number<br>• days_of_week: [number 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"<b>comments[ 和 \"<b>recurrence</b><br>────────────────<br>• pattern: string<br>• interval: number<br>• days_of_week: [number'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "E4",
+        "E5"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"<b>COLLECTION: notifications</b>\" 和 \"🔔 notifications\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"<b>COLLECTION: notifications</b>\" 和 \"🔔 notifications\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Notifications",
+        "NotificationsColl"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"<b>Document Structure</b><br>────────────────<br>• _id: ObjectId<br>• recipient_external_id: string →<br>• type: string<br>• title: string<br>• message: string<br>• is_read: boolean<br>• related_event_id: ObjectId →<br>• related_calendar_id: ObjectId →<br>• created_at: datetime<br>• expires_at: datetime\" 和 \"<b>COLLECTION: geocode_cache</b>\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"<b>Document Structure</b><br>────────────────<br>• _id: ObjectId<br>• recipient_external_id: string →<br>• type: string<br>• title: string<br>• message: string<br>• is_read: boolean<br>• related_event_id: ObjectId →<br>• related_calendar_id: ObjectId →<br>• created_at: datetime<br>• expires_at: datetime\" 和 \"<b>COLLECTION: geocode_cache</b>\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "N1",
+        "GeocodeCache"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"🗺️ geocode_cache\" 和 \"<b>Document Structure</b><br>────────────────<br>• _id: ObjectId<br>• cache_key: string (unique 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"🗺️ geocode_cache\" 和 \"<b>Document Structure</b><br>────────────────<br>• _id: ObjectId<br>• cache_key: string (unique'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "GeocodeCacheColl",
+        "GC1"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 45,
+    "repair_count": 1,
+    "grounding_acts_count": 22,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:25Z"
+}

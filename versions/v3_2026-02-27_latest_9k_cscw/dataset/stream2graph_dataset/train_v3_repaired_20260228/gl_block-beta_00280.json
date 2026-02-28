@@ -1,0 +1,1080 @@
+{
+  "id": "gl_block-beta_00280",
+  "source": "gitlab",
+  "source_url": "https://github.com/YaduEnc/PlasticWorld/blob/0b9863fbe608d4756537b8e0bd846bb707645b90/SystemDesign/Backend%20Architecture-2026-01-09-023316.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "YaduEnc/PlasticWorld",
+  "diagram_type": "block-beta",
+  "code": "---\nconfig:\n  layout: dagre\n---\nflowchart TB\n subgraph subGraph0[\"Client Layer\"]\n        WEB[\"Web App<br>React.js/Next.js\"]\n        MOBILE[\"Mobile Apps<br>React Native<br>iOS &amp; Android\"]\n        WEB_SOCKET_CLIENT[\"WebSocket Client<br>Socket.io-client\"]\n        ENCRYPTION_CLIENT[\"E2E Encryption<br>Signal Protocol<br>Client-side Keys\"]\n  end\n subgraph subGraph1[\"CDN & Security Layer\"]\n        CF[\"Cloudflare<br>DNS + DDoS Protection\"]\n        CF_TUNNEL[\"Cloudflare Tunnel<br>cloudflared daemon\"]\n        SSL[\"SSL/TLS 1.3<br>Certificate Management\"]\n  end\n subgraph subGraph2[\"Reverse Proxy Layer\"]\n        NGINX[\"Nginx<br>Reverse Proxy<br>Load Balancer<br>Rate Limiting\"]\n  end\n subgraph subGraph3[\"API Gateway\"]\n        API_GATEWAY[\"API Gateway<br>Request Routing<br>JWT Validation<br>Version Control /api/v1/\"]\n  end\n subgraph subGraph4[\"Authentication Service\"]\n        AUTH_API[\"Auth API<br>REST Endpoints\"]\n        FIREBASE_ADMIN[\"Firebase Admin SDK<br>Token Verification\"]\n        JWT_SERVICE[\"JWT Service<br>Access &amp; Refresh Tokens\"]\n        SESSION_MGR[\"Session Manager<br>Redis-based Sessions\"]\n  end\n subgraph subGraph5[\"User Service\"]\n        USER_API[\"User API<br>Profile CRUD\"]\n        USER_SEARCH[\"Search Engine<br>Indexed Queries<br>Username/Email/Phone\"]\n        USER_VALIDATOR[\"Validation Service<br>Uniqueness Checks\"]\n  end\n subgraph subGraph6[\"Friendship Service\"]\n        FRIEND_API[\"Friendship API<br>Request Management\"]\n        FRIEND_STATE[\"State Machine<br>Pending→Accepted/Denied\"]\n        BLOCK_SERVICE[\"Block/Unblock Service\"]\n  end\n subgraph subGraph7[\"Messaging Service\"]\n        MSG_API[\"Message API<br>REST Endpoints\"]\n        WS_SERVER[\"WebSocket Server<br>Socket.io<br>Real-time Events\"]\n        MSG_QUEUE[\"Message Queue<br>Offline User Handling\"]\n        TYPING_SERVICE[\"Typing Indicators<br>Ephemeral Events\"]\n        RECEIPT_SERVICE[\"Read Receipts<br>Delivery Status\"]\n  end\n subgraph subGraph8[\"Encryption Service\"]\n        KEY_EXCHANGE[\"Key Exchange<br>X3DH Protocol\"]\n        DOUBLE_RATCHET[\"Double Ratchet<br>Forward Secrecy\"]\n        KEY_STORAGE[\"Server Key Store<br>Public Keys Only\"]\n  end\n subgraph subGraph9[\"Application Services Layer\"]\n        subGraph4\n        subGraph5\n        subGraph6\n        subGraph7\n        subGraph8\n  end\n subgraph subGraph10[\"PostgreSQL Database\"]\n        DB_USERS[(\"Users Table<br>id, firebase_uid<br>username, email<br>phone, name, age\")]\n        DB_FRIENDS[(\"Friendships Table<br>requester_id<br>addressee_id<br>status, timestamps\")]\n        DB_MESSAGES[(\"Messages Table<br>sender_id, recipient_id<br>encrypted_content<br>status, timestamps\")]\n        DB_KEYS[(\"Encryption Keys<br>user_id, device_id<br>identity_key<br>prekeys\")]\n  end\n subgraph subGraph11[\"Redis Cache\"]\n        REDIS_SESSION[\"Session Store<br>session:user_id\"]\n        REDIS_ONLINE[\"Online Status<br>online:user_id<br>TTL: 30s\"]\n        REDIS_TYPING[\"Typing Indicators<br>typing:conv_id:user_id<br>TTL: 3s\"]\n        REDIS_QUEUE[\"Message Queue<br>msg_queue:user_id\"]\n        REDIS_RATE[\"Rate Limiting<br>rate_limit:user_id\"]\n  end\n subgraph subGraph12[\"Data Layer\"]\n        subGraph10\n        subGraph11\n  end\n subgraph subGraph13[\"External Services\"]\n        FIREBASE[\"Firebase Auth<br>Google Sign-In<br>OAuth Provider\"]\n  end\n subgraph subGraph14[\"Monitoring & Logging\"]\n        PROMETHEUS[\"Prometheus<br>Metrics Collection<br>API/WebSocket/DB metrics\"]\n        GRAFANA[\"Grafana<br>Dashboards<br>Alerts\"]\n        LOGS[\"Application Logs<br>Winston/Python Logging<br>Structured JSON\"]\n  end\n subgraph Infrastructure[\"Infrastructure\"]\n        DOCKER[\"Docker Containers<br>Isolated Services\"]\n        LINUX[\"Linux Server<br>Ubuntu/Debian<br>Self-hosted\"]\n  end\n    WEB --> CF\n    MOBILE --> CF\n    CF --> CF_TUNNEL\n    CF_TUNNEL --> SSL\n    SSL --> NGINX\n    NGINX --> API_GATEWAY & REDIS_RATE\n    API_GATEWAY --> AUTH_API & USER_API & FRIEND_API & MSG_API\n    NGINX -. ws:// .-> WS_SERVER\n    AUTH_API --> FIREBASE_ADMIN & JWT_SERVICE\n    FIREBASE_ADMIN --> FIREBASE\n    JWT_SERVICE --> SESSION_MGR\n    SESSION_MGR --> REDIS_SESSION\n    USER_API --> USER_SEARCH & USER_VALIDATOR & DB_USERS\n    FRIEND_API --> FRIEND_STATE & BLOCK_SERVICE & DB_FRIENDS\n    MSG_API --> MSG_QUEUE & DB_MESSAGES & KEY_EXCHANGE\n    WS_SERVER --> TYPING_SERVICE & RECEIPT_SERVICE & REDIS_ONLINE\n    MSG_QUEUE --> REDIS_QUEUE\n    TYPING_SERVICE --> REDIS_TYPING\n    RECEIPT_SERVICE --> DB_MESSAGES\n    KEY_EXCHANGE --> DOUBLE_RATCHET\n    DOUBLE_RATCHET --> KEY_STORAGE\n    KEY_STORAGE --> DB_KEYS\n    WEB_SOCKET_CLIENT --> ENCRYPTION_CLIENT\n    ENCRYPTION_CLIENT -. Encrypted Payload .-> WS_SERVER\n    AUTH_API -. Metrics .-> PROMETHEUS\n    USER_API -. Metrics .-> PROMETHEUS\n    FRIEND_API -. Metrics .-> PROMETHEUS\n    MSG_API -. Metrics .-> PROMETHEUS\n    WS_SERVER -. Metrics .-> PROMETHEUS\n    DB_USERS -. Metrics .-> PROMETHEUS\n    PROMETHEUS --> GRAFANA\n    AUTH_API -. Logs .-> LOGS\n    USER_API -. Logs .-> LOGS\n    FRIEND_API -. Logs .-> LOGS\n    MSG_API -. Logs .-> LOGS\n    WS_SERVER -. Logs .-> LOGS\n    DOCKER --> AUTH_API & USER_API & FRIEND_API & MSG_API & WS_SERVER & DB_USERS & REDIS_SESSION & NGINX\n    LINUX --> DOCKER\n\n    style WEB fill:#61dafb\n    style MOBILE fill:#61dafb\n    style CF fill:#f38020\n    style NGINX fill:#009639\n    style DB_USERS fill:#336791\n    style DB_FRIENDS fill:#336791\n    style DB_MESSAGES fill:#336791\n    style DB_KEYS fill:#336791\n    style REDIS_SESSION fill:#dc382d\n    style REDIS_ONLINE fill:#dc382d\n    style REDIS_TYPING fill:#dc382d\n    style REDIS_QUEUE fill:#dc382d\n    style FIREBASE fill:#ffca28\n    style PROMETHEUS fill:#e6522c\n    style GRAFANA fill:#f46800\n    style DOCKER fill:#2496ed\n    style LINUX fill:#fcc624",
+  "content_size": 5715,
+  "collected_at": "2026-02-06T14:06:10.273792",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 2,
+  "repo_forks": 0,
+  "repo_owner": "YaduEnc",
+  "repo_name": "PlasticWorld",
+  "repo_description": "Production-grade messaging platform backend with E2E encryption",
+  "repo_language": "TypeScript",
+  "repo_topics": [],
+  "repo_created_at": "2026-01-09T03:28:09Z",
+  "repo_updated_at": "2026-01-25T13:07:52Z",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Client Layer\" 和 \"Web App<br>React.js/Next.js\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Client Layer\" 和 \"Web App<br>React.js/Next.js\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "subGraph0",
+        "WEB"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Mobile Apps<br>React Native<br>iOS &amp; Android\" 和 \"WebSocket Client<br>Socket.io-client\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 \"Mobile Apps<br>React Native<br>iOS &amp; Android\"处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Mobile Apps<br>React Native<br>iOS &amp; Android\"处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MOBILE",
+        "WEB_SOCKET_CLIENT"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"E2E Encryption<br>Signal Protocol<br>Client-side Keys\" 和 \"CDN & Security Layer\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"E2E Encryption<br>Signal Protocol<br>Client-side Keys\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"E2E Encryption<br>Signal Protocol<br>Client-side Keys\"处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ENCRYPTION_CLIENT",
+        "subGraph1"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Cloudflare<br>DNS + DDoS Protection\" 和 \"Cloudflare Tunnel<br>cloudflared daemon\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 \"Cloudflare<br>DNS + DDoS Protection\"处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Cloudflare<br>DNS + DDoS Protection\"处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CF",
+        "CF_TUNNEL"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"SSL/TLS 1.3<br>Certificate Management\" 和 \"Reverse Proxy Layer\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"SSL/TLS 1.3<br>Certificate Management\" 和 \"Reverse Proxy Layer\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SSL",
+        "subGraph2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Nginx<br>Reverse Proxy<br>Load Balancer<br>Rate Limiting\" 和 \"API Gateway\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Nginx<br>Reverse Proxy<br>Load Balancer<br>Rate Limiting\" 和 \"API Gateway\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "NGINX",
+        "subGraph3"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"API Gateway<br>Request Routing<br>JWT Validation<br>Version Control /api/v1/\" 和 \"Authentication Service\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"API Gateway<br>Request Routing<br>JWT Validation<br>Version Control /api/v1/\" 和 \"Authentication Service\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "API_GATEWAY",
+        "subGraph4"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Auth API<br>REST Endpoints\" 和 \"Firebase Admin SDK<br>Token Verification\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 \"Auth API<br>REST Endpoints\"处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Auth API<br>REST Endpoints\"处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AUTH_API",
+        "FIREBASE_ADMIN"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"JWT Service<br>Access &amp; Refresh Tokens\" 和 \"Session Manager<br>Redis-based Sessions\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"JWT Service<br>Access &amp; Refresh Tokens\" 和 \"Session Manager<br>Redis-based Sessions\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "JWT_SERVICE",
+        "SESSION_MGR"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"User Service\" 和 \"User API<br>Profile CRUD\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"User Service\" 和 \"User API<br>Profile CRUD\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "subGraph5",
+        "USER_API"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Search Engine<br>Indexed Queries<br>Username/Email/Phone\" 和 \"Validation Service<br>Uniqueness Checks\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Search Engine<br>Indexed Queries<br>Username/Email/Phone\" 和 \"Validation Service<br>Uniqueness Checks\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "USER_SEARCH",
+        "USER_VALIDATOR"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Friendship Service\" 和 \"Friendship API<br>Request Management\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Friendship Service\" 和 \"Friendship API<br>Request Management\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "subGraph6",
+        "FRIEND_API"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"State Machine<br>Pending→Accepted/Denied\" 和 \"Block/Unblock Service\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"State Machine<br>Pending→Accepted/Denied\" 和 \"Block/Unblock Service\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "FRIEND_STATE",
+        "BLOCK_SERVICE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Messaging Service\" 和 \"Message API<br>REST Endpoints\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Messaging Service\" 和 \"Message API<br>REST Endpoints\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "subGraph7",
+        "MSG_API"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"WebSocket Server<br>Socket.io<br>Real-time Events\" 和 \"Message Queue<br>Offline User Handling\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"WebSocket Server<br>Socket.io<br>Real-time Events\" 和 \"Message Queue<br>Offline User Handling\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "WS_SERVER",
+        "MSG_QUEUE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Typing Indicators<br>Ephemeral Events\" 和 \"Read Receipts<br>Delivery Status\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Typing Indicators<br>Ephemeral Events\" 和 \"Read Receipts<br>Delivery Status\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TYPING_SERVICE",
+        "RECEIPT_SERVICE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Encryption Service\" 和 \"Key Exchange<br>X3DH Protocol\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Encryption Service\" 和 \"Key Exchange<br>X3DH Protocol\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "subGraph8",
+        "KEY_EXCHANGE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 73,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Double Ratchet<br>Forward Secrecy\" 和 \"Server Key Store<br>Public Keys Only\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 74,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Double Ratchet<br>Forward Secrecy\" 和 \"Server Key Store<br>Public Keys Only\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 75,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 76,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DOUBLE_RATCHET",
+        "KEY_STORAGE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 77,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Application Services Layer\" 和 \"PostgreSQL Database\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 78,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"Application Services Layer\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 79,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Application Services Layer\"处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 80,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 81,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "subGraph9",
+        "subGraph10"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 82,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 (\"Users Table<br>id, firebase_uid<br>username, email<br>phone, name, age\" 和 (\"Friendships Table<br>requester_id<br>addressee_id<br>status, timestamps\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 83,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '(\"Users Table<br>id, firebase_uid<br>username, email<br>phone, name, age\" 和 (\"Friendships Table<br>requester_id<br>addressee_id<br>status, timestamps\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 84,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 85,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DB_USERS",
+        "DB_FRIENDS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 86,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 (\"Messages Table<br>sender_id, recipient_id<br>encrypted_content<br>status, timestamps\" 和 (\"Encryption Keys<br>user_id, device_id<br>identity_key<br>prekeys\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 87,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '(\"Messages Table<br>sender_id, recipient_id<br>encrypted_content<br>status, timestamps\" 和 (\"Encryption Keys<br>user_id, device_id<br>identity_key<br>prekeys\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 88,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 89,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DB_MESSAGES",
+        "DB_KEYS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 90,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Redis Cache\" 和 \"Session Store<br>session:user_id\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 91,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Redis Cache\" 和 \"Session Store<br>session:user_id\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 92,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 93,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "subGraph11",
+        "REDIS_SESSION"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 94,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Online Status<br>online:user_id<br>TTL: 30s\" 和 \"Typing Indicators<br>typing:conv_id:user_id<br>TTL: 3s\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 95,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Online Status<br>online:user_id<br>TTL: 30s\" 和 \"Typing Indicators<br>typing:conv_id:user_id<br>TTL: 3s\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 96,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 97,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "REDIS_ONLINE",
+        "REDIS_TYPING"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 98,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Message Queue<br>msg_queue:user_id\" 和 \"Rate Limiting<br>rate_limit:user_id\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 99,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Message Queue<br>msg_queue:user_id\" 和 \"Rate Limiting<br>rate_limit:user_id\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 100,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 101,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "REDIS_QUEUE",
+        "REDIS_RATE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 102,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Data Layer\" 和 \"External Services\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 103,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"Data Layer\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 104,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Data Layer\"处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 105,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 106,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "subGraph12",
+        "subGraph13"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 107,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Firebase Auth<br>Google Sign-In<br>OAuth Provider\" 和 \"Monitoring & Logging\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 108,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Firebase Auth<br>Google Sign-In<br>OAuth Provider\" 和 \"Monitoring & Logging\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 109,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 110,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "FIREBASE",
+        "subGraph14"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 111,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Prometheus<br>Metrics Collection<br>API/WebSocket/DB metrics\" 和 \"Grafana<br>Dashboards<br>Alerts\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 112,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Prometheus<br>Metrics Collection<br>API/WebSocket/DB metrics\" 和 \"Grafana<br>Dashboards<br>Alerts\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 113,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 114,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PROMETHEUS",
+        "GRAFANA"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 115,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Application Logs<br>Winston/Python Logging<br>Structured JSON\" 和 \"Infrastructure\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 116,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Application Logs<br>Winston/Python Logging<br>Structured JSON\" 和 \"Infrastructure\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 117,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 118,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "LOGS",
+        "Infrastructure"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 119,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Docker Containers<br>Isolated Services\" 和 \"Linux Server<br>Ubuntu/Debian<br>Self-hosted\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 120,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Docker Containers<br>Isolated Services\" 和 \"Linux Server<br>Ubuntu/Debian<br>Self-hosted\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 120,
+    "repair_count": 6,
+    "grounding_acts_count": 58,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "dialogue_trimmed"
+  ],
+  "repaired_at": "2026-02-28T13:41:44Z"
+}

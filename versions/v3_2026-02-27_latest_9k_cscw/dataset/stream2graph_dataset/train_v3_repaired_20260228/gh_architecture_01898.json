@@ -1,0 +1,570 @@
+{
+  "id": "gh_architecture_01898",
+  "source": "github",
+  "source_url": "https://github.com/raktim-mondol/hist2RNA/blob/33fbe0205f35701cdc69e225af2e5275f4ab35f4/hist2scRNA/docs/diagrams/12_input_preprocessing_workflow.mmd",
+  "github_repo": "raktim-mondol/hist2RNA",
+  "github_file_path": "hist2scRNA/docs/diagrams/12_input_preprocessing_workflow.mmd",
+  "diagram_type": "architecture",
+  "code": "flowchart TD\n    subgraph \"Input Data\"\n        A1[Whole Slide Image<br/>WSI file .svs, .tiff]\n        A2[Spatial Transcriptomics<br/>10X Visium / Slide-seq]\n        A3[Gene Expression<br/>Count Matrix]\n    end\n\n    subgraph \"Step 1: Load Data\"\n        B1[Load WSI<br/>OpenSlide]\n        B2[Load Spot Coordinates<br/>tissue_positions_list.csv]\n        B3[Load Gene Expression<br/>filtered_feature_bc_matrix]\n\n        A1 --> B1\n        A2 --> B2\n        A3 --> B3\n    end\n\n    subgraph \"Step 2: Coordinate Alignment\"\n        C1[Read Scale Factors<br/>scalefactors_json.json]\n        C2{Coordinates<br/>Aligned?}\n        C3[Transform Coordinates<br/>Visium space → WSI space]\n        C4[Manual Alignment<br/>QuPath or fiducial markers]\n\n        B2 --> C1\n        C1 --> C2\n        C2 -->|Yes| D1\n        C2 -->|No| C3\n        C3 --> C4\n        C4 --> D1\n    end\n\n    subgraph \"Step 3: Quality Control\"\n        D1[Filter In-Tissue Spots<br/>in_tissue == 1]\n        D2[Check Spot Coverage<br/>% tissue in patch]\n        D3[Remove Low Quality<br/>Blank or folded tissue]\n\n        D1 --> D2\n        D2 --> D3\n    end\n\n    subgraph \"Step 4: Patch Extraction\"\n        E1[For Each Spot<br/>Get x, y coordinates]\n        E2[Calculate Patch Bounds<br/>center ± 112 pixels]\n        E3[Extract 224×224 Patch<br/>slide.read_region]\n        E4[Convert to RGB<br/>Remove alpha channel]\n        E5[Color Normalization<br/>Macenko method]\n\n        D3 --> E1\n        E1 --> E2\n        E2 --> E3\n        E3 --> E4\n        E4 --> E5\n    end\n\n    subgraph \"Step 5: Spatial Graph\"\n        F1[Build KDTree<br/>from coordinates]\n        F2[For Each Spot<br/>Find k=6 neighbors]\n        F3[Create Edge List<br/>source, target]\n        F4[Save Edges<br/>spatial_edges.csv]\n\n        E5 --> F1\n        F1 --> F2\n        F2 --> F3\n        F3 --> F4\n    end\n\n    subgraph \"Step 6: Save Dataset\"\n        G1[Save Patches<br/>patches/spot_*.png]\n        G2[Save Coordinates<br/>spatial_coordinates.csv]\n        G3[Save Expression<br/>gene_expression.csv]\n        G4[Save Metadata<br/>dataset_info.json]\n\n        E5 --> G1\n        F4 --> G2\n        B3 --> G3\n        G1 --> G4\n        G2 --> G4\n        G3 --> G4\n    end\n\n    subgraph \"Output: Ready for Training\"\n        H1[Complete Dataset<br/>patches/ + CSV files]\n        H2[Load in DataLoader<br/>SpatialTranscriptomicsDataset]\n        H3[Train hist2scRNA<br/>Model]\n\n        G4 --> H1\n        H1 --> H2\n        H2 --> H3\n    end\n\n    style A1 fill:#ffe1e1\n    style A2 fill:#ffe1e1\n    style B1 fill:#e1f5ff\n    style E5 fill:#fff4e1\n    style F4 fill:#ffe1f5\n    style H3 fill:#e1ffe1\n",
+  "content_size": 2606,
+  "collected_at": "2026-02-06T02:04:43.404658",
+  "compilation_status": "success",
+  "compilation_error": "",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 7,
+  "repo_forks": 2,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Whole Slide Image<br/>WSI file .svs, .tiff 和 Spatial Transcriptomics<br/>10X Visium / Slide-seq。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Whole Slide Image<br/>WSI file .svs, .tiff 和 Spatial Transcriptomics<br/>10X Visium / Slide-seq'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "A1",
+        "A2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Gene Expression<br/>Count Matrix 和 Load WSI<br/>OpenSlide 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Gene Expression<br/>Count Matrix 和 Load WSI<br/>OpenSlide'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "A3",
+        "B1"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Load Spot Coordinates<br/>tissue_positions_list.csv 和 Load Gene Expression<br/>filtered_feature_bc_matrix 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Load Spot Coordinates<br/>tissue_positions_list.csv 和 Load Gene Expression<br/>filtered_feature_bc_matrix'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "B2",
+        "B3"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Read Scale Factors<br/>scalefactors_json.json 和 Coordinates<br/>Aligned? 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Read Scale Factors<br/>scalefactors_json.json 和 Coordinates<br/>Aligned?'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "C1",
+        "C2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Transform Coordinates<br/>Visium space → WSI space 和 Manual Alignment<br/>QuPath or fiducial markers 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Transform Coordinates<br/>Visium space → WSI space 和 Manual Alignment<br/>QuPath or fiducial markers'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "C3",
+        "C4"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Filter In-Tissue Spots<br/>in_tissue == 1 和 Check Spot Coverage<br/>% tissue in patch 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Filter In-Tissue Spots<br/>in_tissue == 1 和 Check Spot Coverage<br/>% tissue in patch'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "D1",
+        "D2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Remove Low Quality<br/>Blank or folded tissue 和 For Each Spot<br/>Get x, y coordinates 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 Remove Low Quality<br/>Blank or folded tissue处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Remove Low Quality<br/>Blank or folded tissue处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "D3",
+        "E1"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Calculate Patch Bounds<br/>center ± 112 pixels 和 Extract 224×224 Patch<br/>slide.read_region 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Calculate Patch Bounds<br/>center ± 112 pixels 和 Extract 224×224 Patch<br/>slide.read_region'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "E2",
+        "E3"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Convert to RGB<br/>Remove alpha channel 和 Color Normalization<br/>Macenko method。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Convert to RGB<br/>Remove alpha channel 和 Color Normalization<br/>Macenko method'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "E4",
+        "E5"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Build KDTree<br/>from coordinates 和 For Each Spot<br/>Find k=6 neighbors 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Build KDTree<br/>from coordinates 和 For Each Spot<br/>Find k=6 neighbors'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "F1",
+        "F2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Create Edge List<br/>source, target 和 Save Edges<br/>spatial_edges.csv 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Create Edge List<br/>source, target 和 Save Edges<br/>spatial_edges.csv'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "F3",
+        "F4"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Save Patches<br/>patches/spot_*.png 和 Save Coordinates<br/>spatial_coordinates.csv 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 Save Patches<br/>patches/spot_*.png处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Save Patches<br/>patches/spot_*.png处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "G1",
+        "G2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Save Expression<br/>gene_expression.csv 和 Save Metadata<br/>dataset_info.json。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Save Expression<br/>gene_expression.csv 和 Save Metadata<br/>dataset_info.json'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "G3",
+        "G4"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Complete Dataset<br/>patches/ + CSV files 和 Load in DataLoader<br/>SpatialTranscriptomicsDataset 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Complete Dataset<br/>patches/ + CSV files 和 Load in DataLoader<br/>SpatialTranscriptomicsDataset'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "H1",
+        "H2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Train hist2scRNA<br/>Model 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Train hist2scRNA<br/>Model'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "H3"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 62,
+    "repair_count": 2,
+    "grounding_acts_count": 30,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:22Z"
+}

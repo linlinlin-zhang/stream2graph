@@ -1,0 +1,229 @@
+{
+  "id": "gh_class_01515",
+  "source": "github",
+  "source_url": "https://github.com/nexus-gpu/GPUFabric/blob/fbcd3bcb9c1cdc29847980b5b2cd3dfd1fd0cb4b/docs/svg/gpuf_c_code_map.mmd",
+  "github_repo": "nexus-gpu/GPUFabric",
+  "github_file_path": "docs/svg/gpuf_c_code_map.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n    class Args {\n        +server_addr: String\n        +control_port: u16\n        +local_addr: String\n        +local_port: u16\n        +engine_type: EngineType\n        +load_config() Result<Self>\n    }\n\n    class WorkerHandle {\n        <<trait>>\n        +login() Result<()>\n        +handler() Result<()>\n        +model_task() Result<()>\n        +heartbeat_task() Result<()>\n    }\n\n    class TCPWorker {\n        -reader: Arc<Mutex<ReadHalf<TcpStream>>>\n        -writer: Arc<Mutex<WriteHalf<TcpStream>>>\n        -system_info: Arc<SystemInfo>\n        -devices_info: Arc<Vec<DevicesInfo>>\n        -engine: Arc<Mutex<Option<AnyEngine>>>\n        +login() Result<()>\n        +handler() Result<()>\n    }\n\n    class WSWorker {\n        -reader: Arc<Mutex<SplitStream<...>>>\n        -writer: Arc<Mutex<SplitSink<...>>>\n        -args: Args\n    }\n\n    class AutoWorker {\n        +login() Result<()>\n        +handler() Result<()>\n        +model_task() Result<()>\n        +heartbeat_task() Result<()>\n    }\n\n    class Engine {\n        <<trait>>\n        +init() Result<()>\n        +infer() Result<()>\n    }\n\n    class VLLMEngine {\n        +init() Result<()>\n        +infer() Result<()>\n    }\n\n    class OllamaEngine {\n        +init() Result<()>\n        +infer() Result<()>\n    }\n\n    class SystemInfo {\n        // System information fields\n    }\n\n    class DevicesInfo {\n        // Device information fields\n    }\n\n    AutoWorker --> TCPWorker : contains\n    AutoWorker --> WSWorker : contains\n    TCPWorker ..|> WorkerHandle : implements\n    WSWorker ..|> WorkerHandle : implements\n    VLLMEngine ..|> Engine : implements\n    OllamaEngine ..|> Engine : implements\n    TCPWorker --> Args : uses\n    TCPWorker --> Engine : uses\n    TCPWorker --> SystemInfo : contains\n    TCPWorker --> DevicesInfo : contains",
+  "content_size": 1803,
+  "collected_at": "2026-02-06T01:58:47.902371",
+  "compilation_status": "success",
+  "license": "bsd-3-clause",
+  "license_name": "BSD 3-Clause \"New\" or \"Revised\" License",
+  "license_url": "https://api.github.com/licenses/bsd-3-clause",
+  "repo_stars": 7,
+  "repo_forks": 5,
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 +server_addr: String\n        +control_port: u16\n        +local_addr: String\n        +local_port: u16\n        +engine_type: EngineType\n        +load_config( 和 <<trait>>\n        +login( 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 +server_addr: String\n        +control_port: u16\n        +local_addr: String\n        +local_port: u16\n        +engine_type: EngineType\n        +load_config(处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '+server_addr: String\n        +control_port: u16\n        +local_addr: String\n        +local_port: u16\n        +engine_type: EngineType\n        +load_config(处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Args",
+        "WorkerHandle"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 -reader: Arc<Mutex<ReadHalf<TcpStream>>>\n        -writer: Arc<Mutex<WriteHalf<TcpStream>>>\n        -system_info: Arc<SystemInfo>\n        -devices_info: Arc<Vec<DevicesInfo>>\n        -engine: Arc<Mutex<Option<AnyEngine>>>\n        +login( 和 -reader: Arc<Mutex<SplitStream<...>>>\n        -writer: Arc<Mutex<SplitSink<...>>>\n        -args: Args\n     的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '-reader: Arc<Mutex<ReadHalf<TcpStream>>>\n        -writer: Arc<Mutex<WriteHalf<TcpStream>>>\n        -system_info: Arc<SystemInfo>\n        -devices_info: Arc<Vec<DevicesInfo>>\n        -engine: Arc<Mutex<Option<AnyEngine>>>\n        +login( 和 -reader: Arc<Mutex<SplitStream<...>>>\n        -writer: Arc<Mutex<SplitSink<...>>>\n        -args: Args\n    '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TCPWorker",
+        "WSWorker"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 +login( 和 <<trait>>\n        +init( 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '+login( 和 <<trait>>\n        +init('？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AutoWorker",
+        "Engine"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 +init( 和 +init( 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 +init(处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '+init(处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "VLLMEngine",
+        "OllamaEngine"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 // System information fields\n     和 // Device information fields\n     的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 // System information fields\n    处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '// System information fields\n    处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SystemInfo",
+        "DevicesInfo"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 23,
+    "repair_count": 3,
+    "grounding_acts_count": 10,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:34Z"
+}

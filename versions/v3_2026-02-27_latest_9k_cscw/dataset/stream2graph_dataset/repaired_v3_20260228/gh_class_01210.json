@@ -1,0 +1,485 @@
+{
+  "id": "gh_class_01210",
+  "source": "github",
+  "source_url": "https://github.com/mlaurel/openai-cookbook/blob/86145b3f530889860dba904d61fb95b8c9cd466c/examples/object_oriented_agentic_approach/resources/diagrams/src/uml.mmd",
+  "github_repo": "mlaurel/openai-cookbook",
+  "github_file_path": "examples/object_oriented_agentic_approach/resources/diagrams/src/uml.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n\n    %% ==========================\n    %% Abstract Classes\n    %% ==========================\n    class BaseAgent {\n        - model_name: str\n        - messages: ChatMessages\n        - tool_manager: ToolManager\n        - logger: Logger\n        - language_model_interface: LanguageModelInterface\n\n        + __init__(developer_prompt: str, model_name: str)\n        + setup_tools(): void  %% abstract\n        + add_context(content: str): void\n        + add_message(content: str): void\n        + task(user_task: str, tool_call_enabled: bool, return_tool_response_as_is: bool): str\n    }\n\n    class ToolInterface {\n        + get_definition(): Dict[str, Any]\n        + run(arguments: Dict[str, Any]): str\n    }\n\n    class LanguageModelInterface {\n        + generate_completion(\n            model: str, \n            messages: List<Dict[str, str]], \n            tools: List[Dict[str, Any]]\n        ): Dict[str, Any]\n    }\n\n\n    %% ==========================\n    %% Concrete Classes\n    %% ==========================\n    class ChatMessages {\n        - messages: List<Dict[str, str]>\n\n        + __init__(developer_prompt: str)\n        + add_developer_message(content: str): void\n        + add_user_message(content: str): void\n        + add_assistant_message(content: str): void\n        + get_messages(): List<Dict[str, str]>\n    }\n\n    class ToolManager {\n        - tools: Dict[str, ToolInterface]\n        - logger: Logger\n        - language_model_interface: LanguageModelInterface\n\n        + __init__()\n        + register_tool(tool: ToolInterface): void\n        + get_tool_definitions(): List<Dict[str, Any]>\n        + handle_tool_call_sequence(\n            response: str, \n            return_tool_response_as_is: bool, \n            messages: ChatMessages\n        ): str\n    }\n\n    class OpenAILanguageModel {\n        - openai_client: OpenAI\n        - logger: Logger\n\n        + __init__()\n        + generate_completion(\n            model: str, \n            messages: List<Dict[str, str]], \n            tools: List<Dict[str, Any]]\n        ): Dict[str, Any]\n    }\n\n    class OpenAIClientFactory {\n        + create_client(api_key: str): OpenAI\n        - _resolve_api_key(api_key: str): str\n    }\n\n\n    %% ==========================\n    %% Relationships\n    %% ==========================\n    BaseAgent --> ChatMessages : uses\n    BaseAgent --> LanguageModelInterface : uses\n    BaseAgent --> ToolManager : optionally uses\n\n    ToolManager \"0..*\" --> \"1\" ToolInterface : manages\n    ToolManager --> ChatMessages : uses\n    ToolManager --> LanguageModelInterface : uses\n\n    LanguageModelInterface <|-- OpenAILanguageModel\n    OpenAILanguageModel --> OpenAIClientFactory : uses",
+  "content_size": 2674,
+  "collected_at": "2026-02-06T01:54:36.454348",
+  "compilation_status": "success",
+  "compilation_error": "",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 - model_name: str\n        - messages: ChatMessages\n        - tool_manager: ToolManager\n        - logger: Logger\n        - language_model_interface: LanguageModelInterface\n\n        + __init__(developer_prompt: str, model_name: str 和 content: str。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '- model_name: str\n        - messages: ChatMessages\n        - tool_manager: ToolManager\n        - logger: Logger\n        - language_model_interface: LanguageModelInterface\n\n        + __init__(developer_prompt: str, model_name: str 和 content: str'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BaseAgent",
+        "add_context"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 content: str 和 user_task: str, tool_call_enabled: bool, return_tool_response_as_is: bool 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'content: str 和 user_task: str, tool_call_enabled: bool, return_tool_response_as_is: bool'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "add_message",
+        "task"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 + get_definition( 和 str, Any 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '+ get_definition( 和 str, Any'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ToolInterface",
+        "Dict"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 arguments: Dict[str, Any 和 + generate_completion(\n            model: str, \n            messages: List<Dict[str, str 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'arguments: Dict[str, Any 和 + generate_completion(\n            model: str, \n            messages: List<Dict[str, str'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "run",
+        "LanguageModelInterface"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Dict[str, Any 和 str, Any 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Dict[str, Any 和 str, Any'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "List",
+        "Dict"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 - messages: List<Dict[str, str 和 developer_prompt: str。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '- messages: List<Dict[str, str 和 developer_prompt: str'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ChatMessages",
+        "__init__"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 content: str 和 content: str 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'content: str 和 content: str'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "add_developer_message",
+        "add_user_message"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 content: str 和 str, str 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'content: str 和 str, str'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "add_assistant_message",
+        "Dict"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 - tools: Dict[str, ToolInterface 和 tool: ToolInterface 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '- tools: Dict[str, ToolInterface 和 tool: ToolInterface'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ToolManager",
+        "register_tool"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 str, Any 和 response: str, \n            return_tool_response_as_is: bool, \n            messages: ChatMessages\n         的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'str, Any 和 response: str, \n            return_tool_response_as_is: bool, \n            messages: ChatMessages\n        '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Dict",
+        "handle_tool_call_sequence"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 - openai_client: OpenAI\n        - logger: Logger\n\n        + __init__( 和 model: str, \n            messages: List<Dict[str, str 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '- openai_client: OpenAI\n        - logger: Logger\n\n        + __init__( 和 model: str, \n            messages: List<Dict[str, str'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OpenAILanguageModel",
+        "generate_completion"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 str, Any 和 str, Any 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'str, Any 和 str, Any'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Dict",
+        "Dict"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 + create_client(api_key: str 和 api_key: str 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '+ create_client(api_key: str 和 api_key: str'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OpenAIClientFactory",
+        "_resolve_api_key"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 52,
+    "repair_count": 0,
+    "grounding_acts_count": 26,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:22Z"
+}

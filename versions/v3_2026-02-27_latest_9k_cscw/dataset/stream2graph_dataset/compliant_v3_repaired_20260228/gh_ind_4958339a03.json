@@ -1,0 +1,859 @@
+{
+  "id": "gh_ind_4958339a03",
+  "source": "github_industrial",
+  "repo": "timothywarner/az305",
+  "license": "mit",
+  "code": "%% AZ-305 Domain 1: Centralized Logging Architecture\n%% Reference: Azure Monitor architecture, Log Analytics workspace design\n%% Exam Focus: Data collection, routing, retention, destinations\n\nflowchart TB\n    subgraph SOURCES[\"Data Sources\"]\n        direction TB\n\n        subgraph AZURE_RES[\"Azure Resources\"]\n            VM[\"Virtual Machines<br/>Azure Monitor Agent\"]\n            WEBAPP[\"App Service<br/>Diagnostic Settings\"]\n            AKS[\"AKS Clusters<br/>Container Insights\"]\n            SQL[\"Azure SQL<br/>Audit Logs\"]\n            STORAGE[\"Storage Accounts<br/>Metrics & Logs\"]\n            KEYVAULT[\"Key Vault<br/>Audit Events\"]\n        end\n\n        subgraph APPS[\"Applications\"]\n            APPINSIGHTS[\"Application Insights<br/>SDK / Auto-instrumentation\"]\n            CUSTOM_LOGS[\"Custom Logs<br/>Data Collection API\"]\n        end\n\n        subgraph HYBRID[\"Hybrid / On-Premises\"]\n            ONPREM_VM[\"On-Premises VMs<br/>Azure Arc + AMA\"]\n            SYSLOG[\"Syslog Sources<br/>Linux / Network Devices\"]\n            CEF[\"CEF/Syslog<br/>Security Devices\"]\n        end\n\n        subgraph SECURITY[\"Security Sources\"]\n            DEFENDER[\"Microsoft Defender<br/>for Cloud\"]\n            SENTINEL[\"Microsoft Sentinel<br/>Data Connectors\"]\n            AAD_LOGS[\"Entra ID Logs<br/>Sign-in / Audit\"]\n        end\n    end\n\n    subgraph COLLECTION[\"Data Collection & Routing\"]\n        direction TB\n\n        DCR[\"Data Collection Rules<br/>Transform & Filter\"]\n        DCE[\"Data Collection<br/>Endpoints\"]\n        DIAG[\"Diagnostic Settings<br/>Resource Logs\"]\n\n        subgraph EVENTHUB[\"Event Hub Namespace\"]\n            EH_STREAM[\"Event Hub<br/>Real-time Streaming\"]\n        end\n    end\n\n    subgraph DESTINATIONS[\"Destinations\"]\n        direction TB\n\n        subgraph LAW[\"Log Analytics Workspace\"]\n            TABLES[\"Tables<br/>- AzureActivity<br/>- Heartbeat<br/>- Perf<br/>- SecurityEvent<br/>- Custom_CL\"]\n            RETENTION[\"Retention Settings<br/>Interactive: 30-730 days<br/>Archive: Up to 12 years\"]\n            BASIC_LOGS[\"Basic Logs Tier<br/>Cost-optimized<br/>8-day retention\"]\n        end\n\n        subgraph STORAGE_DEST[\"Storage Account\"]\n            BLOB[\"Blob Storage<br/>Long-term Archive\"]\n            LIFECYCLE[\"Lifecycle Management<br/>Hot -> Cool -> Archive\"]\n        end\n\n        subgraph EXTERNAL[\"External Systems\"]\n            SIEM[\"Third-party SIEM<br/>via Event Hub\"]\n            SPLUNK[\"Splunk / Datadog<br/>Partner Solutions\"]\n        end\n    end\n\n    subgraph ANALYSIS[\"Analysis & Action\"]\n        direction TB\n\n        QUERIES[\"KQL Queries<br/>Log Analytics\"]\n        WORKBOOKS[\"Azure Workbooks<br/>Visualization\"]\n        ALERTS[\"Alert Rules<br/>Log / Metric\"]\n        AUTOMATION[\"Automation<br/>Logic Apps / Functions\"]\n        SENTINEL_ANALYTICS[\"Sentinel Analytics<br/>SIEM / SOAR\"]\n    end\n\n    %% Data flow connections\n    VM --> DCR\n    WEBAPP --> DIAG\n    AKS --> DCR\n    SQL --> DIAG\n    STORAGE --> DIAG\n    KEYVAULT --> DIAG\n\n    APPINSIGHTS --> LAW\n    CUSTOM_LOGS --> DCE\n\n    ONPREM_VM --> DCR\n    SYSLOG --> DCE\n    CEF --> DCE\n\n    DEFENDER --> LAW\n    SENTINEL --> LAW\n    AAD_LOGS --> DIAG\n\n    DCR --> LAW\n    DCE --> LAW\n    DIAG --> LAW\n    DIAG --> EH_STREAM\n    DIAG --> BLOB\n\n    EH_STREAM --> SIEM\n    EH_STREAM --> SPLUNK\n\n    LAW --> QUERIES\n    QUERIES --> WORKBOOKS\n    QUERIES --> ALERTS\n    ALERTS --> AUTOMATION\n    LAW --> SENTINEL_ANALYTICS\n\n    %% Exam notes\n    NOTE1[\"**EXAM TIP**: DCRs enable<br/>transformation at ingestion<br/>reducing costs\"]\n    NOTE2[\"**EXAM TIP**: Basic Logs tier<br/>costs 60% less but has<br/>limited query capabilities\"]\n    NOTE3[\"**EXAM TIP**: Event Hub enables<br/>real-time streaming to<br/>external systems\"]\n\n    %% Styling\n    classDef sourceStyle fill:#42a5f5,stroke:#1976d2,color:#fff\n    classDef appStyle fill:#66bb6a,stroke:#388e3c,color:#fff\n    classDef hybridStyle fill:#ab47bc,stroke:#7b1fa2,color:#fff\n    classDef securityStyle fill:#ef5350,stroke:#c62828,color:#fff\n    classDef collectionStyle fill:#ffca28,stroke:#ff8f00,color:#000\n    classDef destStyle fill:#26c6da,stroke:#00838f,color:#000\n    classDef analysisStyle fill:#7e57c2,stroke:#512da8,color:#fff\n    classDef noteStyle fill:#fff9c4,stroke:#fbc02d,color:#000,stroke-dasharray: 5 5\n\n    class VM,WEBAPP,AKS,SQL,STORAGE,KEYVAULT sourceStyle\n    class APPINSIGHTS,CUSTOM_LOGS appStyle\n    class ONPREM_VM,SYSLOG,CEF hybridStyle\n    class DEFENDER,SENTINEL,AAD_LOGS securityStyle\n    class DCR,DCE,DIAG,EH_STREAM collectionStyle\n    class TABLES,RETENTION,BASIC_LOGS,BLOB,LIFECYCLE,SIEM,SPLUNK destStyle\n    class QUERIES,WORKBOOKS,ALERTS,AUTOMATION,SENTINEL_ANALYTICS analysisStyle\n    class NOTE1,NOTE2,NOTE3 noteStyle\n",
+  "diagram_type": "architecture",
+  "collected_at": "2026-02-27T03:18:04.904722",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Data Sources\" 和 \"Azure Resources\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Data Sources\" 和 \"Azure Resources\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SOURCES",
+        "AZURE_RES"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Virtual Machines<br/>Azure Monitor Agent\" 和 \"App Service<br/>Diagnostic Settings\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Virtual Machines<br/>Azure Monitor Agent\" 和 \"App Service<br/>Diagnostic Settings\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "VM",
+        "WEBAPP"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"AKS Clusters<br/>Container Insights\" 和 \"Azure SQL<br/>Audit Logs\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"AKS Clusters<br/>Container Insights\" 和 \"Azure SQL<br/>Audit Logs\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AKS",
+        "SQL"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Storage Accounts<br/>Metrics & Logs\" 和 \"Key Vault<br/>Audit Events\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Storage Accounts<br/>Metrics & Logs\" 和 \"Key Vault<br/>Audit Events\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "STORAGE",
+        "KEYVAULT"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Applications\" 和 \"Application Insights<br/>SDK / Auto-instrumentation\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Applications\" 和 \"Application Insights<br/>SDK / Auto-instrumentation\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "APPS",
+        "APPINSIGHTS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Custom Logs<br/>Data Collection API\" 和 \"Hybrid / On-Premises\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Custom Logs<br/>Data Collection API\" 和 \"Hybrid / On-Premises\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CUSTOM_LOGS",
+        "HYBRID"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"On-Premises VMs<br/>Azure Arc + AMA\" 和 \"Syslog Sources<br/>Linux / Network Devices\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"On-Premises VMs<br/>Azure Arc + AMA\" 和 \"Syslog Sources<br/>Linux / Network Devices\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ONPREM_VM",
+        "SYSLOG"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"CEF/Syslog<br/>Security Devices\" 和 \"Security Sources\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"CEF/Syslog<br/>Security Devices\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"CEF/Syslog<br/>Security Devices\"处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CEF",
+        "SECURITY"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Microsoft Defender<br/>for Cloud\" 和 \"Microsoft Sentinel<br/>Data Connectors\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Microsoft Defender<br/>for Cloud\" 和 \"Microsoft Sentinel<br/>Data Connectors\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DEFENDER",
+        "SENTINEL"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Entra ID Logs<br/>Sign-in / Audit\" 和 \"Data Collection & Routing\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"Entra ID Logs<br/>Sign-in / Audit\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Entra ID Logs<br/>Sign-in / Audit\"处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AAD_LOGS",
+        "COLLECTION"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Data Collection Rules<br/>Transform & Filter\" 和 \"Data Collection<br/>Endpoints\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Data Collection Rules<br/>Transform & Filter\" 和 \"Data Collection<br/>Endpoints\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DCR",
+        "DCE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Diagnostic Settings<br/>Resource Logs\" 和 \"Event Hub Namespace\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Diagnostic Settings<br/>Resource Logs\" 和 \"Event Hub Namespace\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DIAG",
+        "EVENTHUB"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Event Hub<br/>Real-time Streaming\" 和 \"Destinations\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Event Hub<br/>Real-time Streaming\" 和 \"Destinations\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EH_STREAM",
+        "DESTINATIONS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Log Analytics Workspace\" 和 \"Tables<br/>- AzureActivity<br/>- Heartbeat<br/>- Perf<br/>- SecurityEvent<br/>- Custom_CL\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Log Analytics Workspace\" 和 \"Tables<br/>- AzureActivity<br/>- Heartbeat<br/>- Perf<br/>- SecurityEvent<br/>- Custom_CL\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "LAW",
+        "TABLES"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Retention Settings<br/>Interactive: 30-730 days<br/>Archive: Up to 12 years\" 和 \"Basic Logs Tier<br/>Cost-optimized<br/>8-day retention\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Retention Settings<br/>Interactive: 30-730 days<br/>Archive: Up to 12 years\" 和 \"Basic Logs Tier<br/>Cost-optimized<br/>8-day retention\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "RETENTION",
+        "BASIC_LOGS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Storage Account\" 和 \"Blob Storage<br/>Long-term Archive\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Storage Account\" 和 \"Blob Storage<br/>Long-term Archive\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "STORAGE_DEST",
+        "BLOB"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Lifecycle Management<br/>Hot -> Cool -> Archive\" 和 \"External Systems\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Lifecycle Management<br/>Hot -> Cool -> Archive\" 和 \"External Systems\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "LIFECYCLE",
+        "EXTERNAL"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Third-party SIEM<br/>via Event Hub\" 和 \"Splunk / Datadog<br/>Partner Solutions\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"Third-party SIEM<br/>via Event Hub\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 73,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Third-party SIEM<br/>via Event Hub\"处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 74,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 75,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SIEM",
+        "SPLUNK"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 76,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Analysis & Action\" 和 \"KQL Queries<br/>Log Analytics\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 77,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Analysis & Action\" 和 \"KQL Queries<br/>Log Analytics\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 78,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 79,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ANALYSIS",
+        "QUERIES"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 80,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Azure Workbooks<br/>Visualization\" 和 \"Alert Rules<br/>Log / Metric\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 81,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 \"Azure Workbooks<br/>Visualization\"处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 82,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Azure Workbooks<br/>Visualization\"处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 83,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 84,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "WORKBOOKS",
+        "ALERTS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 85,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Automation<br/>Logic Apps / Functions\" 和 \"Sentinel Analytics<br/>SIEM / SOAR\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 86,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Automation<br/>Logic Apps / Functions\" 和 \"Sentinel Analytics<br/>SIEM / SOAR\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 87,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 88,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AUTOMATION",
+        "SENTINEL_ANALYTICS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 89,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"**EXAM TIP**: DCRs enable<br/>transformation at ingestion<br/>reducing costs\" 和 \"**EXAM TIP**: Basic Logs tier<br/>costs 60% less but has<br/>limited query capabilities\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 90,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"**EXAM TIP**: DCRs enable<br/>transformation at ingestion<br/>reducing costs\" 和 \"**EXAM TIP**: Basic Logs tier<br/>costs 60% less but has<br/>limited query capabilities\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 91,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 92,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "NOTE1",
+        "NOTE2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 93,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"**EXAM TIP**: Event Hub enables<br/>real-time streaming to<br/>external systems\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 94,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"**EXAM TIP**: Event Hub enables<br/>real-time streaming to<br/>external systems\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 95,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 96,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "NOTE3"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 96,
+    "repair_count": 4,
+    "grounding_acts_count": 46,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "compilation_status": "success",
+  "compilation_error": "",
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:33Z"
+}

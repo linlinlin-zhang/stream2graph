@@ -1,0 +1,361 @@
+{
+  "id": "gh_flowchart_00357",
+  "source": "github",
+  "source_url": "https://github.com/better-together-org/community-engine-rails/blob/681b3c2767bcfb770f447e7eebd3ad2f217e2576/docs/diagrams/source/translatable_attachments_flow.mmd",
+  "github_repo": "better-together-org/community-engine-rails",
+  "github_file_path": "docs/diagrams/source/translatable_attachments_flow.mmd",
+  "diagram_type": "flowchart",
+  "code": "%% Translatable Attachments flow\nflowchart LR\n  subgraph DB[Database]\n    A[active_storage_attachments table]\n  end\n\n  M[Migration adds locale column and backfill] --> A\n\n  Init[Mobility initializer]\n  Init -->|require backend| B[Attachments backend from lib/mobility/backends]\n  Init -->|register backend| Mobility[Mobility.register_backend attachments]\n\n  B -->|provides| Apply[AttachmentsBackend apply_to and setup]\n\n  ModelCanonical[Model translates hero_image with backend attachments]\n  ModelDSL[Model extend Mobility DSL Attachments<br/>translates_attached hero_image]\n\n  ModelCanonical --> Apply\n  ModelDSL --> Apply\n\n  Apply -->|defines associations| Assoc[has_many hero_image_attachments_all<br/>has_one hero_image_attachment]\n  Apply -->|defines accessors| Accessors[hero_image_en, hero_image_en=, hero_image_en?, hero_image_en_url]\n\n  View[Form partial: translated file field tabs]\n  View -->|uploads per-locale| Controller\n\n  Controller[Controller] -->|permits locale params or maps| Model\n  Model -->|writer methods| ActiveStorage[Create/modify ActiveStorage::Attachment rows]\n  ActiveStorage --> A\n\n  Serve[URL helper / rails_blob_url] -->|serves blob| UserBrowser[User's browser]\n\n  Accessors -->|getter fallback| Fallback[Default-locale fallback if enabled]\n  Fallback --> ActiveStorage\n\n  classDef infra fill:#f8f9fa,stroke:#333,stroke-width:1px;\n  class DB,Init,B,Apply,Assoc,Accessors,View,Controller,ActiveStorage,Serve,Fallback infra;\n",
+  "content_size": 1457,
+  "collected_at": "2026-02-06T01:43:37.397396",
+  "compilation_status": "success",
+  "license": "lgpl-3.0",
+  "license_name": "GNU Lesser General Public License v3.0",
+  "license_url": "https://api.github.com/licenses/lgpl-3.0",
+  "repo_stars": 13,
+  "repo_forks": 5,
+  "repo_owner": "better-together-org",
+  "repo_name": "community-engine-rails",
+  "repo_description": "The Better Together Community Engine is an accessible open source community platform that's Democratic by Design. All are welcome!",
+  "repo_language": "Ruby",
+  "repo_topics": [
+    "community",
+    "community-engine",
+    "cooperation",
+    "docker",
+    "gem"
+  ],
+  "repo_created_at": "2019-02-13T22:45:26Z",
+  "repo_updated_at": "2026-02-04T12:40:58Z",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Database 和 active_storage_attachments table 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Database 和 active_storage_attachments table'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DB",
+        "A"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Migration adds locale column and backfill 和 Mobility initializer 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Migration adds locale column and backfill 和 Mobility initializer'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "M",
+        "Init"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Attachments backend from lib/mobility/backends 和 Mobility.register_backend attachments 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Attachments backend from lib/mobility/backends 和 Mobility.register_backend attachments'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "B",
+        "Mobility"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 AttachmentsBackend apply_to and setup 和 Model translates hero_image with backend attachments 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'AttachmentsBackend apply_to and setup 和 Model translates hero_image with backend attachments'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Apply",
+        "ModelCanonical"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Model extend Mobility DSL Attachments<br/>translates_attached hero_image 和 has_many hero_image_attachments_all<br/>has_one hero_image_attachment 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 Model extend Mobility DSL Attachments<br/>translates_attached hero_image处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Model extend Mobility DSL Attachments<br/>translates_attached hero_image处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ModelDSL",
+        "Assoc"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 hero_image_en, hero_image_en=, hero_image_en?, hero_image_en_url 和 Form partial: translated file field tabs 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'hero_image_en, hero_image_en=, hero_image_en?, hero_image_en_url 和 Form partial: translated file field tabs'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Accessors",
+        "View"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Controller 和 Create/modify ActiveStorage::Attachment rows 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Controller 和 Create/modify ActiveStorage::Attachment rows'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Controller",
+        "ActiveStorage"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 URL helper / rails_blob_url 和 User's browser 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'URL helper / rails_blob_url 和 User's browser'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Serve",
+        "UserBrowser"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Default-locale fallback if enabled。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Default-locale fallback if enabled'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Fallback"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 37,
+    "repair_count": 1,
+    "grounding_acts_count": 18,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repaired_at": "2026-02-28T13:41:49Z"
+}

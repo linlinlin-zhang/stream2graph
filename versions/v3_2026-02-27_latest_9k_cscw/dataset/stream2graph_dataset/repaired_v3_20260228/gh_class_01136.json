@@ -1,0 +1,290 @@
+{
+  "id": "gh_class_01136",
+  "source": "github",
+  "source_url": "https://github.com/UAX-2025-26/Benchmark_Pablo_Javi/blob/15af6c89a753e98a7da44362dc50adadefc739c0/docs/clases-pruebas-rendimiento.mmd",
+  "github_repo": "UAX-2025-26/Benchmark_Pablo_Javi",
+  "github_file_path": "docs/clases-pruebas-rendimiento.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n    %% Paquete model\n    class BenchmarkResult {\n        +int totalTasks\n        +int threads\n        +String executorType\n        +List~ModeResult~ results\n        +String conclusion\n    }\n\n    class ModeResult {\n        +String mode\n        +long executionTimeMs\n        +double speedup\n        +double efficiency\n    }\n\n    BenchmarkResult --> ModeResult : contiene\n\n    %% Paquete task\n    class IntensiveTask {\n        -int iterations\n        +execute() void\n        -performCpuIntensiveWork() void\n    }\n\n    %% Paquete service\n    class BenchmarkService {\n        -IntensiveTask intensiveTask\n        -AsyncTaskService asyncTaskService\n        -ThreadPoolTaskExecutor customTaskExecutor\n        -BenchmarkResult lastResult\n        -AtomicBoolean running\n        +runBenchmark(int, int, String) BenchmarkResult\n        +getLastResult() BenchmarkResult\n        -runSequentialNs(int) long\n        -runWithExecutorServiceNs(int, int, String) long\n        -runWithSpringAsyncNs(int, int) long\n    }\n\n    class AsyncTaskService {\n        +executeTaskAsync(IntensiveTask) CompletableFuture~Void~\n    }\n\n    BenchmarkService --> IntensiveTask : ejecuta\n    BenchmarkService --> AsyncTaskService : usa\n    BenchmarkService --> BenchmarkResult : genera\n    BenchmarkService --> ModeResult : construye\n    AsyncTaskService --> IntensiveTask : ejecuta async\n\n    %% Paquete config\n    class AppConfig {\n        +customTaskExecutor() ThreadPoolTaskExecutor\n    }\n\n    AppConfig --> BenchmarkService : configura executor para\n\n    %% Paquete controller\n    class BenchmarkController {\n        -BenchmarkService benchmarkService\n        +startBenchmark(int, int, String) ResponseEntity\n        +getResult() ResponseEntity\n    }\n\n    BenchmarkController --> BenchmarkService : delega a\n    BenchmarkController --> BenchmarkResult : devuelve\n\n    %% Relaciones de concurrencia\n    class ThreadPoolTaskExecutor {\n        <<Spring>>\n    }\n\n    class ExecutorService {\n        <<Java>>\n    }\n\n    class CompletableFuture {\n        <<Java>>\n    }\n\n    BenchmarkService ..> ExecutorService : crea y usa\n    BenchmarkService --> ThreadPoolTaskExecutor : usa\n    AsyncTaskService ..> CompletableFuture : retorna\n\n",
+  "content_size": 2209,
+  "collected_at": "2026-02-06T01:53:29.786547",
+  "compilation_status": "success",
+  "compilation_error": "",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 +int totalTasks\n        +int threads\n        +String executorType\n        +List~ModeResult~ results\n        +String conclusion\n     和 +String mode\n        +long executionTimeMs\n        +double speedup\n        +double efficiency\n    。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '+int totalTasks\n        +int threads\n        +String executorType\n        +List~ModeResult~ results\n        +String conclusion\n     和 +String mode\n        +long executionTimeMs\n        +double speedup\n        +double efficiency\n    '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BenchmarkResult",
+        "ModeResult"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 -int iterations\n        +execute( 和 -IntensiveTask intensiveTask\n        -AsyncTaskService asyncTaskService\n        -ThreadPoolTaskExecutor customTaskExecutor\n        -BenchmarkResult lastResult\n        -AtomicBoolean running\n        +runBenchmark(int, int, String。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 -int iterations\n        +execute(处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '-int iterations\n        +execute(处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "IntensiveTask",
+        "BenchmarkService"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 int 和 int, int, String 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'int 和 int, int, String'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "runSequentialNs",
+        "runWithExecutorServiceNs"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 int, int 和 +executeTaskAsync(IntensiveTask 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 int, int处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'int, int处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "runWithSpringAsyncNs",
+        "AsyncTaskService"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 +customTaskExecutor( 和 -BenchmarkService benchmarkService\n        +startBenchmark(int, int, String 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '+customTaskExecutor( 和 -BenchmarkService benchmarkService\n        +startBenchmark(int, int, String'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AppConfig",
+        "BenchmarkController"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 <<Spring>>\n     和 <<Java>>\n    。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '<<Spring>>\n     和 <<Java>>\n    '。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ThreadPoolTaskExecutor",
+        "ExecutorService"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 <<Java>>\n     这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '<<Java>>\n    '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CompletableFuture"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 30,
+    "repair_count": 2,
+    "grounding_acts_count": 14,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:39Z"
+}

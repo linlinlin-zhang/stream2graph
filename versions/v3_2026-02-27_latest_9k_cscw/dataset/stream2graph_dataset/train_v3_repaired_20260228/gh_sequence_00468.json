@@ -1,0 +1,135 @@
+{
+  "id": "gh_sequence_00468",
+  "source": "github",
+  "source_url": "https://github.com/fikriaf/UPJ-Parking-Detection/blob/9410b507b47815c84e0a9c403577a60a590fc170/docs/user-journey.mmd",
+  "github_repo": "fikriaf/UPJ-Parking-Detection",
+  "github_file_path": "docs/user-journey.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant U as 👤 User\n    participant F as 🖥️ Frontend\n    participant B as ⚙️ Backend\n    participant Y as 🔬 YOLO\n    participant S as 💾 Storage\n    \n    Note over U,S: 1. CALIBRATION SETUP (One-time)\n    U->>F: Navigate to Calibration\n    F->>B: GET /calibration/:camera_id\n    B->>S: Load calibration data\n    S-->>B: Calibration or null\n    B-->>F: Return calibration\n    \n    alt No Calibration\n        U->>F: Upload reference image\n        U->>F: Click to mark parking rows\n        U->>F: Enter row details\n        F->>B: POST /calibration\n        B->>S: Save calibration\n        S-->>B: Success\n        B-->>F: Calibration saved\n        F-->>U: Show success\n    end\n    \n    Note over U,S: 2. FRAME UPLOAD\n    U->>F: Navigate to Upload\n    \n    alt Camera Stream\n        U->>F: Enter camera URL\n        F->>F: Connect to camera\n        F-->>U: Show live preview (90° rotated)\n        U->>F: Click capture frame\n        F->>F: Rotate & prepare image\n    else Manual Upload\n        U->>F: Select image files\n        F-->>U: Show previews\n    end\n    \n    U->>F: Enter session ID\n    U->>F: Enter camera ID (optional)\n    U->>F: Click Upload\n    \n    loop For each frame\n        F->>B: POST /upload (multipart/form-data)\n        B->>S: Save frame image\n        B->>S: Update session metadata\n        S-->>B: Success\n        B-->>F: 200 OK\n        F-->>U: Update progress bar\n    end\n    \n    Note over U,S: 3. DETECTION PROCESSING\n    U->>F: Click Complete Session\n    F->>B: POST /complete/:session_id\n    B->>S: Load all session frames\n    \n    loop For each frame\n        B->>Y: Run detection\n        Y-->>B: Bounding boxes + confidence\n        \n        alt Calibration Active\n            B->>B: Assign detections to rows\n            B->>B: Calculate empty spaces\n            B->>B: Calculate occupancy rate\n        end\n        \n        B->>S: Store detection results\n    end\n    \n    B->>B: Select best frame (max detections)\n    B->>B: Draw annotations (boxes + spaces)\n    B->>S: Save annotated image\n    B->>S: Update session status\n    S-->>B: Success\n    B-->>F: Detection results\n    F-->>U: Redirect to Results\n    \n    Note over U,S: 4. VIEW RESULTS\n    U->>F: View Results Page\n    F->>B: GET /results/live\n    B->>S: Query active session\n    S-->>B: Session data\n    B-->>F: Detection results JSON\n    \n    F->>B: GET /results/:session_id/image\n    B->>S: Load annotated image\n    S-->>B: Image file\n    B-->>F: JPEG image\n    \n    F-->>U: Display results\n    F-->>U: Show statistics\n    F-->>U: Show annotated image\n    \n    Note over U,S: 5. VIEW HISTORY\n    U->>F: Click View History\n    F->>B: GET /results/latest?limit=10\n    B->>S: Query sessions\n    S-->>B: Sessions list\n    B-->>F: Sessions JSON\n    F-->>U: Display history\n    \n    U->>F: Select specific session\n    F->>B: GET /results/:session_id\n    B->>S: Load session\n    S-->>B: Session data\n    B-->>F: Results JSON\n    F-->>U: Display details\n",
+  "content_size": 2951,
+  "collected_at": "2026-02-06T01:32:38.847180",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 One-time 和 90° rotated 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'One-time 和 90° rotated'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SETUP",
+        "preview"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 optional 和 multipart/form-data 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'optional 和 multipart/form-data'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ID",
+        "upload"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 max detections 和 boxes + spaces 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'max detections 和 boxes + spaces'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "frame",
+        "annotations"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 12,
+    "repair_count": 0,
+    "grounding_acts_count": 6,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:41Z"
+}

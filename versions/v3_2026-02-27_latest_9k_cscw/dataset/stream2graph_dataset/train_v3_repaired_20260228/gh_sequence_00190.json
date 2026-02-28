@@ -1,0 +1,134 @@
+{
+  "id": "gh_sequence_00190",
+  "source": "github",
+  "source_url": "https://github.com/atoxfy/kikwiflow/blob/50f543c2bc2f5bbf3a389f97aba094843e707314/docs/mongo-uow-seq.mmd",
+  "github_repo": "atoxfy/kikwiflow",
+  "github_file_path": "docs/mongo-uow-seq.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Core as \"kikwi-core<br>(runWhileNotFindAStopPoint)\"\n    participant UoW as \"UnitOfWork (em memória)\"\n    participant Repository as \"ProcessExecutionRepository\"\n    participant MongoDB as \"MongoDB\"\n    participant Publisher as \"EventPublisher (em memória)\"\n\n    Core->>Core: Executa tarefas síncronas...\n    Core->>UoW: new UnitOfWork()\n    Core->>UoW: Acumula alterações (estado, tarefas, eventos)\n\n    Note over Core: Fim do bloco síncrono.\n\n    Core->>+Repository: commit(unitOfWork)\n\n    Repository->>+MongoDB: INICIAR TRANSAÇÃO\n    MongoDB->>MongoDB: 1. Atualiza ProcessInstance\n    MongoDB->>MongoDB: 2. Cria/Apaga ExecutableTasks\n    MongoDB->>MongoDB: 3. Insere 'criticalEvents' na 'event_outbox'\n    MongoDB-->>-Repository: COMMIT TRANSAÇÃO\n    Repository-->>-Core: Commit bem-sucedido\n\n    Core->>+Publisher: publishEvents(unitOfWork.lightweightEvents())\n    Publisher-->>-Core: Retorno Imediato",
+  "content_size": 936,
+  "collected_at": "2026-02-06T01:28:57.577923",
+  "compilation_status": "success",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 14,
+  "repo_forks": 0,
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 em memória 和 em memória。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'em memória 和 em memória'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "UnitOfWork",
+        "EventPublisher"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 estado, tarefas, eventos 和 unitOfWork。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'estado, tarefas, eventos 和 unitOfWork'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "alterações",
+        "commit"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 unitOfWork.lightweightEvents(。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'unitOfWork.lightweightEvents('。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "publishEvents"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 12,
+    "repair_count": 0,
+    "grounding_acts_count": 6,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:37Z"
+}

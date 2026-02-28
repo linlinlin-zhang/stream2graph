@@ -1,0 +1,625 @@
+{
+  "id": "gh_architecture_01888",
+  "source": "github",
+  "source_url": "https://github.com/emujicad/my-selfhosted-ai-kit/blob/2097a04f4e68d01f720a80a265e6f4eab67239c8/diagrams_mmd/architecture_complete.mmd",
+  "github_repo": "emujicad/my-selfhosted-ai-kit",
+  "github_file_path": "diagrams_mmd/architecture_complete.mmd",
+  "diagram_type": "architecture",
+  "code": "%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#1a1a2e', 'primaryTextColor':'#eaeaea', 'primaryBorderColor':'#4a4a6a', 'lineColor':'#6c63ff', 'fontSize':'13px', 'fontFamily':'Inter, Segoe UI, sans-serif'}}}%%\ngraph TB\n    subgraph FRONTEND [\"🌐 Frontend Layer\"]\n        USER([\"👤 User<br/>Browser\"])\n        HAPROXY[\"🔀 HAProxy<br/>Load Balancer<br/>:80 / :443\"]\n    end\n    \n    subgraph SECURITY [\"🔐 Security Layer\"]\n        KC[\"🔐 Keycloak<br/>SSO Provider<br/>:8080\"]\n        MODSEC[\"🛡️ ModSecurity<br/>WAF\"]\n        KCINIT[\"⚙️ keycloak-init<br/>Auto-config\"]\n    end\n    \n    subgraph AI [\"🤖 AI Services\"]\n        OLLAMA[\"🧠 Ollama<br/>LLM Engine<br/>:11434\"]\n        WEBUI[\"💬 Open WebUI<br/>Chat Interface<br/>:3000\"]\n    end\n    \n    subgraph AUTOMATION [\"⚙️ Automation\"]\n        N8N[\"⚙️ n8n<br/>Workflows<br/>:5678\"]\n        JENKINS[\"🔧 Jenkins<br/>CI/CD<br/>:8081→8082\"]\n        WATCH[\"🔄 Watchtower<br/>Auto-updates\"]\n        SYNC[\"📂 Sync<br/>Data sync\"]\n    end\n    \n    subgraph MONITORING [\"📊 Monitoring Stack\"]\n        PROM[\"📊 Prometheus<br/>Metrics<br/>:9090\"]\n        GRAF[\"📈 Grafana<br/>Dashboards<br/>:3001\"]\n        ALERT[\"🔔 AlertManager<br/>Alerts<br/>:9093\"]\n        BACKUP[\"💾 Backup Runner<br/>Daily backups\"]\n    end\n    \n    subgraph EXPORTERS [\"📡 Metrics Exporters\"]\n        direction LR\n        NVEXP[\"nvidia<br/>:9400\"]\n        OLLEXP[\"ollama<br/>:9888\"]\n        N8NEXP[\"n8n<br/>:9889\"]\n        OWEXP[\"webui<br/>:9890\"]\n        REDEXP[\"redis<br/>:9121\"]\n        PGEXP[\"postgres<br/>:9187\"]\n        NODEEXP[\"node<br/>:9100\"]\n        CADV[\"cAdvisor<br/>:8082\"]\n    end\n    \n    subgraph DATA [\"🗄️ Data Layer\"]\n        PG[\"🗄️ PostgreSQL<br/>Main DB<br/>:5432\"]\n        REDIS[\"💾 Redis<br/>Cache<br/>:6379\"]\n        QDRANT[\"🔮 Qdrant<br/>Vectors<br/>:6333\"]\n        PGVEC[\"📐 pgvector<br/>:5433\"]\n    end\n    \n    %% User Flow\n    USER -->|\"HTTP/S\"| HAPROXY\n    HAPROXY -->|\"/chat\"| WEBUI\n    HAPROXY -->|\"/grafana\"| GRAF\n    HAPROXY -->|\"/prometheus\"| PROM\n    HAPROXY -->|\"/alertmanager\"| ALERT\n    HAPROXY --> MODSEC\n    \n    %% AI Flow\n    WEBUI -->|\"Inference\"| OLLAMA\n    WEBUI -->|\"OIDC\"| KC\n    WEBUI -->|\"Cache\"| REDIS\n    WEBUI -->|\"Data\"| PG\n    WEBUI -->|\"Embeddings\"| QDRANT\n    \n    %% Automation Flow\n    N8N -->|\"AI Calls\"| OLLAMA\n    N8N -->|\"OIDC\"| KC\n    N8N -->|\"Data\"| PG\n    JENKINS -->|\"OIDC\"| KC\n    \n    %% Monitoring Flow\n    GRAF -->|\"Query\"| PROM\n    GRAF -->|\"OIDC\"| KC\n    PROM -->|\"Alerts\"| ALERT\n    \n    %% Exporters to Prometheus\n    NVEXP -.-> PROM\n    OLLEXP -.-> PROM\n    N8NEXP -.-> PROM\n    OWEXP -.-> PROM\n    REDEXP -.-> PROM\n    PGEXP -.-> PROM\n    NODEEXP -.-> PROM\n    CADV -.-> PROM\n    \n    %% Security init\n    KCINIT -->|\"Configure\"| KC\n    \n    %% Styling\n    classDef frontend fill:#0d47a1,stroke:#1976d2,stroke-width:2px,color:#fff\n    classDef security fill:#b71c1c,stroke:#d32f2f,stroke-width:2px,color:#fff\n    classDef ai fill:#1565c0,stroke:#1e88e5,stroke-width:2px,color:#fff\n    classDef automation fill:#4a148c,stroke:#7b1fa2,stroke-width:2px,color:#fff\n    classDef monitoring fill:#1b5e20,stroke:#388e3c,stroke-width:2px,color:#fff\n    classDef exporters fill:#e65100,stroke:#f57c00,stroke-width:2px,color:#fff\n    classDef data fill:#37474f,stroke:#607d8b,stroke-width:2px,color:#fff\n    \n    class USER,HAPROXY frontend\n    class KC,MODSEC,KCINIT security\n    class OLLAMA,WEBUI ai\n    class N8N,JENKINS,WATCH,SYNC automation\n    class PROM,GRAF,ALERT,BACKUP monitoring\n    class NVEXP,OLLEXP,N8NEXP,OWEXP,REDEXP,PGEXP,NODEEXP,CADV exporters\n    class PG,REDIS,QDRANT,PGVEC data\n",
+  "content_size": 3570,
+  "collected_at": "2026-02-06T02:04:35.616167",
+  "compilation_status": "success",
+  "compilation_error": "",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"🌐 Frontend Layer\" 和 [\"👤 User<br/>Browser\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"🌐 Frontend Layer\" 和 [\"👤 User<br/>Browser\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "FRONTEND",
+        "USER"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"🔀 HAProxy<br/>Load Balancer<br/>:80 / :443\" 和 \"🔐 Security Layer\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"🔀 HAProxy<br/>Load Balancer<br/>:80 / :443\" 和 \"🔐 Security Layer\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "HAPROXY",
+        "SECURITY"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"🔐 Keycloak<br/>SSO Provider<br/>:8080\" 和 \"🛡️ ModSecurity<br/>WAF\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"🔐 Keycloak<br/>SSO Provider<br/>:8080\" 和 \"🛡️ ModSecurity<br/>WAF\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "KC",
+        "MODSEC"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"⚙️ keycloak-init<br/>Auto-config\" 和 \"🤖 AI Services\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"⚙️ keycloak-init<br/>Auto-config\" 和 \"🤖 AI Services\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "KCINIT",
+        "AI"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"🧠 Ollama<br/>LLM Engine<br/>:11434\" 和 \"💬 Open WebUI<br/>Chat Interface<br/>:3000\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"🧠 Ollama<br/>LLM Engine<br/>:11434\" 和 \"💬 Open WebUI<br/>Chat Interface<br/>:3000\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OLLAMA",
+        "WEBUI"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"⚙️ Automation\" 和 \"⚙️ n8n<br/>Workflows<br/>:5678\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"⚙️ Automation\" 和 \"⚙️ n8n<br/>Workflows<br/>:5678\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AUTOMATION",
+        "N8N"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"🔧 Jenkins<br/>CI/CD<br/>:8081→8082\" 和 \"🔄 Watchtower<br/>Auto-updates\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"🔧 Jenkins<br/>CI/CD<br/>:8081→8082\" 和 \"🔄 Watchtower<br/>Auto-updates\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "JENKINS",
+        "WATCH"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"📂 Sync<br/>Data sync\" 和 \"📊 Monitoring Stack\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"📂 Sync<br/>Data sync\" 和 \"📊 Monitoring Stack\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SYNC",
+        "MONITORING"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"📊 Prometheus<br/>Metrics<br/>:9090\" 和 \"📈 Grafana<br/>Dashboards<br/>:3001\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"📊 Prometheus<br/>Metrics<br/>:9090\" 和 \"📈 Grafana<br/>Dashboards<br/>:3001\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PROM",
+        "GRAF"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"🔔 AlertManager<br/>Alerts<br/>:9093\" 和 \"💾 Backup Runner<br/>Daily backups\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"🔔 AlertManager<br/>Alerts<br/>:9093\" 和 \"💾 Backup Runner<br/>Daily backups\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ALERT",
+        "BACKUP"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"📡 Metrics Exporters\" 和 \"nvidia<br/>:9400\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"📡 Metrics Exporters\" 和 \"nvidia<br/>:9400\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EXPORTERS",
+        "NVEXP"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"ollama<br/>:9888\" 和 \"n8n<br/>:9889\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"ollama<br/>:9888\" 和 \"n8n<br/>:9889\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OLLEXP",
+        "N8NEXP"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"webui<br/>:9890\" 和 \"redis<br/>:9121\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"webui<br/>:9890\" 和 \"redis<br/>:9121\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OWEXP",
+        "REDEXP"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"postgres<br/>:9187\" 和 \"node<br/>:9100\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"postgres<br/>:9187\" 和 \"node<br/>:9100\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PGEXP",
+        "NODEEXP"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"cAdvisor<br/>:8082\" 和 \"🗄️ Data Layer\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"cAdvisor<br/>:8082\" 和 \"🗄️ Data Layer\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CADV",
+        "DATA"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"🗄️ PostgreSQL<br/>Main DB<br/>:5432\" 和 \"💾 Redis<br/>Cache<br/>:6379\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"🗄️ PostgreSQL<br/>Main DB<br/>:5432\" 和 \"💾 Redis<br/>Cache<br/>:6379\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PG",
+        "REDIS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"🔮 Qdrant<br/>Vectors<br/>:6333\" 和 \"📐 pgvector<br/>:5433\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"🔮 Qdrant<br/>Vectors<br/>:6333\" 和 \"📐 pgvector<br/>:5433\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "QDRANT",
+        "PGVEC"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 68,
+    "repair_count": 0,
+    "grounding_acts_count": 34,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:34Z"
+}

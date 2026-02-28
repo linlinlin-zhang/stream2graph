@@ -1,0 +1,541 @@
+{
+  "id": "ot_pie_00842",
+  "source": "other",
+  "source_url": "https://github.com/erikmenchaca/ConnectFour/blob/0dc7e536642a025db8e2b5ca19a8f3f01e94b290/ConnectFourUML.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "erikmenchaca/ConnectFour",
+  "diagram_type": "pie",
+  "code": "classDiagram\n    class ConnectFour {\n        -Board board\n        -GameState gameState\n        -Player currentPlayer\n        -ConnectFourObserver observer\n        +ConnectFour(int rows, int cols, Player player1, Player player2)\n        +getBoard() Board\n        +getGameState() GameState\n        +getCurrentPlayer() Player\n        +makeMove(Move move) boolean\n        +getPossibleMoves() List~Move~\n        +registerObserver(ConnectFourObserver observer) void\n        -notifyObserver() void\n        +toString() String\n        +main(String[] args) void\n    }\n\n    class Board {\n        -final int ROWS\n        -final int COLS\n        -Column[] columns\n        +Board()\n        +Board(int rows, int cols)\n        +dropPiece(int columnIndex, Piece piece) int\n        +isFull() boolean\n        +getRows() int\n        +getCols() int\n        +getColumn(int colIndex) Column\n        +getCell(int row, int col) Cell\n        +getPiece(int row, int col) Piece\n    }\n\n    class Column {\n        -Cell[] cells\n        +Column(int rows)\n        +addPiece(Piece piece) int\n        +isFull() boolean\n        +getCells() Cell[]\n        +getCell(int row) Cell\n    }\n\n    class Cell {\n        -Piece piece\n        +Cell()\n        +isEmpty() boolean\n        +setPiece(Piece piece) void\n        +getPiece() Piece\n        +toSymbol() BoardSymbol\n    }\n\n    class Player {\n        -String name\n        -Piece piece\n        +Player(String name, Piece piece)\n        +getName() String\n        +getPiece() Piece\n    }\n\n    class Move {\n        -final int column\n        -final Piece piece\n        +Move(int column, Piece piece)\n        +getColumn() int\n        +getPiece() Piece\n        +toString() String\n    }\n\n    class WinChecker {\n        -final Board board\n        +WinChecker(Board board)\n        +checkWin(Piece piece) boolean\n        -checkHorizontal(Piece piece) boolean\n        -checkVertical(Piece piece) boolean\n        -checkDiagonal(Piece piece) boolean\n    }\n\n    class ConnectFourException {\n        +ConnectFourException(String message)\n    }\n\n    class Piece {\n        <<enumeration>>\n        RED\n        YELLOW\n        +toSymbol() String\n    }\n\n    class GameState {\n        <<enumeration>>\n        IN_PROGRESS\n        RED_WINS\n        YELLOW_WINS\n        DRAW\n    }\n\n    class BoardSymbol {\n        <<enumeration>>\n        EMPTY\n        RED\n        YELLOW\n        -final String symbol\n        +BoardSymbol(String symbol)\n        +getSymbol() String\n    }\n\n    class ConnectFourObserver {\n        <<interface>>\n        +updateBoard() void\n    }\n\n    %% Relationships\n    ConnectFour --> Board : contains\n    ConnectFour --> GameState : uses\n    ConnectFour --> Player : has current\n    ConnectFour --> Move : uses\n    ConnectFour --> WinChecker : creates\n    ConnectFour --> ConnectFourObserver : observes\n    ConnectFour --> ConnectFourException : throws\n\n    Board --> Column : contains array of\n    Column --> Cell : contains array of\n    Cell --> Piece : contains\n    Cell --> BoardSymbol : returns\n\n    Player --> Piece : has\n    Move --> Piece : contains\n\n    WinChecker --> Board : analyzes\n    WinChecker --> Piece : checks for\n\n    ConnectFourException --|> Exception : extends",
+  "content_size": 3181,
+  "collected_at": "2026-02-06T10:47:46.530601",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 -Board board\n        -GameState gameState\n        -Player currentPlayer\n        -ConnectFourObserver observer\n        +ConnectFour(int rows, int cols, Player player1, Player player2 和 Move move。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '-Board board\n        -GameState gameState\n        -Player currentPlayer\n        -ConnectFourObserver observer\n        +ConnectFour(int rows, int cols, Player player1, Player player2 和 Move move'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ConnectFour",
+        "makeMove"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 ConnectFourObserver observer 和 String[ 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 ConnectFourObserver observer处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'ConnectFourObserver observer处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "registerObserver",
+        "main"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 -final int ROWS\n        -final int COLS\n        -Column[ 和 int rows, int cols。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '-final int ROWS\n        -final int COLS\n        -Column[ 和 int rows, int cols'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Board",
+        "Board"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 int columnIndex, Piece piece 和 int colIndex 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 int columnIndex, Piece piece处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'int columnIndex, Piece piece处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "dropPiece",
+        "getColumn"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 int row, int col 和 int row, int col。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'int row, int col 和 int row, int col'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "getCell",
+        "getPiece"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 -Cell[ 和 int rows 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '-Cell[ 和 int rows'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Column",
+        "Column"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Piece piece 和 int row。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Piece piece 和 int row'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "addPiece",
+        "getCell"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 -Piece piece\n        +Cell( 和 Piece piece。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '-Piece piece\n        +Cell( 和 Piece piece'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Cell",
+        "setPiece"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 -String name\n        -Piece piece\n        +Player(String name, Piece piece 和 -final int column\n        -final Piece piece\n        +Move(int column, Piece piece 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '-String name\n        -Piece piece\n        +Player(String name, Piece piece 和 -final int column\n        -final Piece piece\n        +Move(int column, Piece piece'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Player",
+        "Move"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 -final Board board\n        +WinChecker(Board board 和 Piece piece 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '-final Board board\n        +WinChecker(Board board 和 Piece piece'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "WinChecker",
+        "checkWin"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Piece piece 和 Piece piece。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Piece piece 和 Piece piece'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "checkHorizontal",
+        "checkVertical"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Piece piece 和 +ConnectFourException(String message 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Piece piece 和 +ConnectFourException(String message'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "checkDiagonal",
+        "ConnectFourException"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 <<enumeration>>\n        RED\n        YELLOW\n        +toSymbol( 和 <<enumeration>>\n        IN_PROGRESS\n        RED_WINS\n        YELLOW_WINS\n        DRAW\n     的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 <<enumeration>>\n        RED\n        YELLOW\n        +toSymbol(处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 53,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '<<enumeration>>\n        RED\n        YELLOW\n        +toSymbol(处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Piece",
+        "GameState"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 <<enumeration>>\n        EMPTY\n        RED\n        YELLOW\n        -final String symbol\n        +BoardSymbol(String symbol 和 <<interface>>\n        +updateBoard( 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '<<enumeration>>\n        EMPTY\n        RED\n        YELLOW\n        -final String symbol\n        +BoardSymbol(String symbol 和 <<interface>>\n        +updateBoard('，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BoardSymbol",
+        "ConnectFourObserver"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 59,
+    "repair_count": 3,
+    "grounding_acts_count": 28,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:45Z"
+}

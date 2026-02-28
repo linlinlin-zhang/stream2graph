@@ -1,0 +1,165 @@
+{
+  "id": "aug_ot_stateDiagram_00039_Edu_4",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/jwardwell7077/agent-audiobook-maker/blob/d1b5df9622d8e20abf0a1c28c3d066e228aea46a/docs/04-diagrams/state-machines/section_classifier_fsm.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "jwardwell7077/agent-audiobook-maker",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n  [Education_ContentCDN] --> Init\n  Init --> Front: start\n\n  state \"Front Matter\" as Front\n  state TOC\n  state Body\n  state \"Back Matter\" as Back\n  state End\n\n  %% Events (Education_LMS_Portal)\n  %% E_front: front signals present (Education_GradeSync)\n  %% E_toc: toc signals (Education_GradeSync)\n  %% E_heading: heading signals (Education_LMS_Portal)\n  %% E_back: back signals (Education_LMS_Portal)\n  %% E_eof: end of pages\n\n  %% Guards\n  %% G_toc_detected: we are on a TOC page or contiguous TOC continues\n  %% G_anchor_match: page matches TOC anchor within ± tolerance\n  %% G_after_last_chapter: expected chapters (Education_ClassroomService) reached\n  %% G_sustained_back: >= 2 consecutive back-signal pages\n\n  Front --> TOC: E_toc\n  Front --> Body: E_heading || !E_toc && !E_front\n  Front --> Front: E_front && !E_heading && !E_toc\n\n  TOC --> TOC: G_toc_detected\n  TOC --> Body: E_heading || !G_toc_detected\n\n  Body --> Body: !(Education_ClassroomService))\n  Body --> Back: E_back && (Education_LMS_Portal)\n\n  Back --> Back: !E_eof\n  Back --> End: E_eof\n\n  Body --> End: E_eof\n  TOC --> End: E_eof\n  Front --> End: E_eof\n  End --> [Education_GradeSync]",
+  "content_size": 1399,
+  "collected_at": "2026-02-06T10:37:05.290462",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Education",
+  "seed_id": "ot_stateDiagram_00039",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Education_ContentCDN 和 Education_LMS_Portal 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Education_ContentCDN 和 Education_LMS_Portal'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2",
+        "Events"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Education_GradeSync 和 Education_GradeSync 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Education_GradeSync 和 Education_GradeSync'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "present",
+        "signals"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Education_LMS_Portal 和 Education_LMS_Portal。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Education_LMS_Portal 和 Education_LMS_Portal'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "signals",
+        "signals"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Education_ClassroomService。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Education_ClassroomService'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "chapters"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 16,
+    "repair_count": 0,
+    "grounding_acts_count": 8,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repaired_at": "2026-02-28T13:41:24Z"
+}

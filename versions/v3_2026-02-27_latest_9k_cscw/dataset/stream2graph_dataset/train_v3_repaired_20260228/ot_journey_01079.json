@@ -1,0 +1,468 @@
+{
+  "id": "ot_journey_01079",
+  "source": "other",
+  "source_url": "https://github.com/Helix-Flow/Platform/blob/b4f40a0a8236a89b434322c0226a0a236db49d92/diagrams/helixflow-testing-pipeline.mmd",
+  "source_type": "github_search",
+  "github_repo": "Helix-Flow/Platform",
+  "diagram_type": "journey",
+  "code": "graph LR\n    %% Code Commit\n    DEV[Developer<br/>Code Commit] --> CI[CI Pipeline Trigger]\n\n    %% CI Pipeline\n    subgraph \"Continuous Integration Pipeline\"\n        LINT[Code Linting<br/>gofmt, golangci-lint]\n        TEST_UNIT[Unit Tests<br/>100% Coverage<br/>Go test -cover]\n        TEST_INT[Integration Tests<br/>API Endpoints<br/>Database Tests]\n        BUILD[Build Artifacts<br/>Go build<br/>Docker images]\n        SCAN_SEC[Security Scanning<br/>Snyk, SonarQube<br/>Dependency checks]\n    end\n\n    %% Quality Gates\n    LINT --> TEST_UNIT\n    TEST_UNIT --> TEST_INT\n    TEST_INT --> BUILD\n    BUILD --> SCAN_SEC\n    SCAN_SEC --> DEPLOY_STAGING[Deploy to Staging]\n\n    %% Staging Environment\n    subgraph \"Staging Environment\"\n        E2E_TESTS[E2E Tests<br/>Cypress, Playwright<br/>Full user workflows]\n        PERF_TESTS[Performance Tests<br/>k6, JMeter<br/>Load testing<br/>100 RPS target]\n        SEC_TESTS[Security Tests<br/>OWASP ZAP<br/>Penetration Testing<br/>DDoS Simulation]\n        COMP_TESTS[Compatibility Tests<br/>Multi-browser<br/>Mobile devices<br/>API versions]\n    end\n\n    %% Production Deployment\n    DEPLOY_STAGING --> E2E_TESTS\n    E2E_TESTS --> PERF_TESTS\n    PERF_TESTS --> SEC_TESTS\n    SEC_TESTS --> COMP_TESTS\n    COMP_TESTS --> APPROVAL[Manual Approval<br/>QA Sign-off]\n\n    APPROVAL --> DEPLOY_PROD[Deploy to Production]\n\n    %% Production Monitoring\n    subgraph \"Production Monitoring\"\n        HEALTH_CHECKS[Health Checks<br/>Kubernetes probes<br/>Service mesh checks]\n        MONITORING[Real-time Monitoring<br/>Prometheus metrics<br/>Grafana dashboards]\n        ALERTS[Automated Alerts<br/>Slack, PagerDuty<br/>Incident response]\n        LOG_ANALYSIS[Log Analysis<br/>ELK Stack<br/>Error tracking]\n    end\n\n    DEPLOY_PROD --> HEALTH_CHECKS\n    HEALTH_CHECKS --> MONITORING\n    MONITORING --> ALERTS\n    ALERTS --> LOG_ANALYSIS\n\n    %% Feedback Loop\n    LOG_ANALYSIS --> FEEDBACK[Feedback to Dev<br/>Bug reports<br/>Performance data]\n    FEEDBACK --> DEV\n\n    %% Test Coverage Requirements\n    subgraph \"Quality Metrics\"\n        COV_UNIT[Unit Test Coverage<br/>100% target<br/>SonarQube tracking]\n        COV_E2E[E2E Coverage<br/>Critical paths 100%<br/>User journeys]\n        PERF_TARGET[Performance Targets<br/>P95 < 200ms<br/>99.9% uptime]\n        SEC_SCORE[Security Score<br/>A+ rating<br/>Zero critical vulns]\n        SUCCESS_RATE[Test Success Rate<br/>100% pass rate<br/>Zero flakes]\n    end\n\n    TEST_UNIT -.-> COV_UNIT\n    E2E_TESTS -.-> COV_E2E\n    PERF_TESTS -.-> PERF_TARGET\n    SEC_TESTS -.-> SEC_SCORE\n    ALL_TESTS -.-> SUCCESS_RATE\n\n    %% Styling\n    classDef devClass fill:#e3f2fd,stroke:#1976d2,stroke-width:2px\n    classDef ciClass fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px\n    classDef stagingClass fill:#fff3e0,stroke:#f57c00,stroke-width:2px\n    classDef prodClass fill:#e8f5e8,stroke:#388e3c,stroke-width:2px\n    classDef monitoringClass fill:#fce4ec,stroke:#c2185b,stroke-width:2px\n    classDef qualityClass fill:#f1f8e9,stroke:#689f38,stroke-width:2px\n\n    class DEV,APPROVAL devClass\n    class LINT,TEST_UNIT,TEST_INT,BUILD,SCAN_SEC ciClass\n    class E2E_TESTS,PERF_TESTS,SEC_TESTS,COMP_TESTS stagingClass\n    class DEPLOY_PROD,HEALTH_CHECKS,MONITORING,ALERTS,LOG_ANALYSIS prodClass\n    class COV_UNIT,COV_E2E,PERF_TARGET,SEC_SCORE,SUCCESS_RATE qualityClass",
+  "content_size": 3322,
+  "collected_at": "2026-02-06T11:03:10.002034",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Developer<br/>Code Commit 和 CI Pipeline Trigger 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Developer<br/>Code Commit 和 CI Pipeline Trigger'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DEV",
+        "CI"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Code Linting<br/>gofmt, golangci-lint 和 Unit Tests<br/>100% Coverage<br/>Go test -cover 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Code Linting<br/>gofmt, golangci-lint 和 Unit Tests<br/>100% Coverage<br/>Go test -cover'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "LINT",
+        "TEST_UNIT"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Integration Tests<br/>API Endpoints<br/>Database Tests 和 Build Artifacts<br/>Go build<br/>Docker images。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 Integration Tests<br/>API Endpoints<br/>Database Tests处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Integration Tests<br/>API Endpoints<br/>Database Tests处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TEST_INT",
+        "BUILD"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Security Scanning<br/>Snyk, SonarQube<br/>Dependency checks 和 Deploy to Staging 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Security Scanning<br/>Snyk, SonarQube<br/>Dependency checks 和 Deploy to Staging'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SCAN_SEC",
+        "DEPLOY_STAGING"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 E2E Tests<br/>Cypress, Playwright<br/>Full user workflows 和 Performance Tests<br/>k6, JMeter<br/>Load testing<br/>100 RPS target 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 E2E Tests<br/>Cypress, Playwright<br/>Full user workflows处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'E2E Tests<br/>Cypress, Playwright<br/>Full user workflows处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "E2E_TESTS",
+        "PERF_TESTS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Security Tests<br/>OWASP ZAP<br/>Penetration Testing<br/>DDoS Simulation 和 Compatibility Tests<br/>Multi-browser<br/>Mobile devices<br/>API versions 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Security Tests<br/>OWASP ZAP<br/>Penetration Testing<br/>DDoS Simulation 和 Compatibility Tests<br/>Multi-browser<br/>Mobile devices<br/>API versions'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SEC_TESTS",
+        "COMP_TESTS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Manual Approval<br/>QA Sign-off 和 Deploy to Production 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Manual Approval<br/>QA Sign-off 和 Deploy to Production'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "APPROVAL",
+        "DEPLOY_PROD"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Health Checks<br/>Kubernetes probes<br/>Service mesh checks 和 Real-time Monitoring<br/>Prometheus metrics<br/>Grafana dashboards。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Health Checks<br/>Kubernetes probes<br/>Service mesh checks 和 Real-time Monitoring<br/>Prometheus metrics<br/>Grafana dashboards'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "HEALTH_CHECKS",
+        "MONITORING"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Automated Alerts<br/>Slack, PagerDuty<br/>Incident response 和 Log Analysis<br/>ELK Stack<br/>Error tracking 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Automated Alerts<br/>Slack, PagerDuty<br/>Incident response 和 Log Analysis<br/>ELK Stack<br/>Error tracking'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ALERTS",
+        "LOG_ANALYSIS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Feedback to Dev<br/>Bug reports<br/>Performance data 和 Unit Test Coverage<br/>100% target<br/>SonarQube tracking。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 Feedback to Dev<br/>Bug reports<br/>Performance data处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Feedback to Dev<br/>Bug reports<br/>Performance data处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "FEEDBACK",
+        "COV_UNIT"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 E2E Coverage<br/>Critical paths 100%<br/>User journeys 和 Performance Targets<br/>P95 < 200ms<br/>99.9% uptime 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'E2E Coverage<br/>Critical paths 100%<br/>User journeys 和 Performance Targets<br/>P95 < 200ms<br/>99.9% uptime'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "COV_E2E",
+        "PERF_TARGET"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Security Score<br/>A+ rating<br/>Zero critical vulns 和 Test Success Rate<br/>100% pass rate<br/>Zero flakes。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Security Score<br/>A+ rating<br/>Zero critical vulns 和 Test Success Rate<br/>100% pass rate<br/>Zero flakes'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SEC_SCORE",
+        "SUCCESS_RATE"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 51,
+    "repair_count": 3,
+    "grounding_acts_count": 24,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repaired_at": "2026-02-28T13:41:36Z"
+}

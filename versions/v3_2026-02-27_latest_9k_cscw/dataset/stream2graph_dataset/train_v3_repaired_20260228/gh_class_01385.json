@@ -1,0 +1,1075 @@
+{
+  "id": "gh_class_01385",
+  "source": "github",
+  "source_url": "https://github.com/miong/pycodeanalyzer/blob/6728d8f77385a1145db67952167710cf412b2343/docs/source/code/diagrams/pycodeanalyzer_core_languages_filedispatcher_FileDispatcher.mmd",
+  "github_repo": "miong/pycodeanalyzer",
+  "github_file_path": "docs/source/code/diagrams/pycodeanalyzer_core_languages_filedispatcher_FileDispatcher.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\nclass FileDispatcher {\n<<Class>>\n+ Any logger\n+ CppAnalyzer cppAnalyzer\n+ PythonAnalyzer pythonAnalyzer\n+ JavaAnalyzer javaAnalyzer\n+ KotlinAnalyzer kotlinAnalyzer\n+ UiFileDispatcherListener uiListener\n+Constructor(CppAnalyzer cppAnalyzer, PythonAnalyzer pythonAnalyzer, JavaAnalyzer javaAnalyzer, KotlinAnalyzer kotlinAnalyzer, UiFileDispatcherListener uiListener) None\n+dispatchRoots(List&lt;Tuple&lt;str,List&lt;str&gt;&gt;&gt; roots) List~AbstractObject~\n+dispatch(str rootDir, List~str~ files) List~AbstractObject~\n+sortObjects(List~AbstractObject~ abstractObjects) List~AbstractObject~\n}\nclass CppAnalyzer {\n<<Class>>\n+ List~str~ objectPaths\n+ Encoding encoding\n+ List~str~ forceIgnoredSymbols\n+ Configuration configuration\n+ bool configured\n+ List~str~ defines\n+Constructor(Configuration config) None\n+analyze(str rootDir, str path) List~AbstractObject~\n+isHeader(str path) bool\n+handleHeader(str path, str encoding, str code, List~AbstractObject~ abstractObjects) None\n+handleClass(str path, Any klass, List~AbstractObject~ abstractObjects) None\n+addMethods(AbstractClass abstraction, Any klass, str visibility) None\n+addMembers(AbstractClass abstraction, Any klass, str visibility) None\n+addParents(AbstractClass abstraction, Any klass) None\n+handleEnum(str path, Any enum, List~AbstractObject~ abstractObjects) None\n+handleFunction(str path, Any function, List~AbstractObject~ abstractObjects) None\n+clearNamespace(str namespace) str\n+extractUnexpectedFromParseError(CppHeaderParser::CppParseError err) str\n+defineConfig() None\n+handleConfigation() None\n}\nlink CppAnalyzer \"class££pycodeanalyzer::core::languages::analyzers::cppanalyzer::CppAnalyzer\"\nclass PythonAnalyzer {\n<<Class>>\n+ List~str~ globalImports\n+Constructor() None\n+analyze(str rootDir, str path) List~AbstractObject~\n+handleEnum(str path, str namespace, ClassDef item, List~AbstractObject~ abstractObjects) None\n+handleClass(str path, str namespace, ClassDef item, List~AbstractObject~ abstractObjects) None\n+isEnumType(str type) bool\n+handleFunction(str path, str namespace, FunctionDef item, List~AbstractObject~ abstractObjects) None\n+handleMembers(Any func, AbstractClass abstraction) None\n+deduceType(FunctionDef func, Assign item) str\n+deduceReturnType(Any returnItem) str\n+deduceTypeFromTypeName(Name item) str\n+deduceTypeFromName(FunctionDef func, Name item) str\n+deduceTypeFromTuple(Tuple item) str\n+deduceTypeFromList(typeList item) str\n+deduceTypeFromDict(Dict item) str\n+deduceTypeFromConst(Const item) str\n+handleTypeAnnotation(Any typeNope) str\n+deduceNamespaceFromAttribute(Attribute attrib, bool isRoot) str\n+deduceNamespace(str path, str rootDir) str\n+getImportsNameSpace(Any item) List~str~\n}\nlink PythonAnalyzer \"class££pycodeanalyzer::core::languages::analyzers::pythonanalyzer::PythonAnalyzer\"\nclass JavaAnalyzer {\n<<Class>>\n+ List~str~ globalImports\n+Constructor() None\n+analyze(str rootDir, str path) List~AbstractObject~\n+handleClass(List~AbstractObject~ abstractObjects, str path, str currentNS, Union~javalang::ClassDeclaration,javalang::InterfaceDeclaration~ klass) None\n+handleEnum(List~AbstractObject~ abstractObjects, str path, str currentNS, javalang::EnumDeclaration enum) None\n+handleParent(Any item, AbstractClass klass) None\n+deduceVisibility(Any item) str\n+deduceType(Any item) str\n}\nlink JavaAnalyzer \"class££pycodeanalyzer::core::languages::analyzers::javaanalyzer::JavaAnalyzer\"\nclass KotlinAnalyzer {\n<<Class>>\n+ List~str~ globalImports\n+Constructor() None\n+analyze(str rootDir, str path) List~AbstractObject~\n+handleClass(List~AbstractObject~ abstractObjects, str path, str currentNS, Union~kopyt::ClassDeclaration,kopyt::InterfaceDeclaration~ klass) None\n+handleParent(AbstractClass abstraction, kopyt::DelegationSpecifiers item) None\n+handleConstuctor(AbstractClass abstraction, Union~kopyt::PrimaryConstructor,kopyt::SecondaryConstructor~ item, bool isPrimary) None\n+handleProperty(AbstractClass abstraction, kopyt::PropertyDeclaration item, bool isStatic) None\n+handleMethod(AbstractClass abstraction, kopyt::FunctionDeclaration item, bool isStatic) None\n+handleEnum(List~AbstractObject~ abstractObjects, str path, str currentNS, kopyt::EnumDeclaration enum) None\n+handleFunction(List~AbstractObject~ abstractObjects, str path, str currentNS, kopyt::FunctionDeclaration function) None\n+deduceVisibility(Any item) str\n+deduceTypeFromExpression(str expression) str\n+deduceType(str type) str\n}\nlink KotlinAnalyzer \"class££pycodeanalyzer::core::languages::analyzers::kotlinanalyzer::KotlinAnalyzer\"\nclass UiFileDispatcherListener {\n<<Class>>\n+notifyAnalyzing(str file) None\n+notifyAnalysisEnd() None\n}\nlink UiFileDispatcherListener \"class££pycodeanalyzer::ui::app::UiFileDispatcherListener\"\nclass AbstractObject {\n<<Class>>\n+ str name\n+ str type\n+ str origin\n+ List~str~ usingNS\n+ AbstractObjectLanguage objectLanguage\n+ List~str~ linkedGenericTypes\n+Constructor(str name, str origin) None\n+addUsingNamespace(str namespace) None\n}\nlink AbstractObject \"class££pycodeanalyzer::core::abstraction::objects::AbstractObject\"\nFileDispatcher ..> CppAnalyzer\nFileDispatcher ..> PythonAnalyzer\nFileDispatcher ..> JavaAnalyzer\nFileDispatcher ..> KotlinAnalyzer\nFileDispatcher ..> UiFileDispatcherListener\nFileDispatcher ..> AbstractObject\n",
+  "content_size": 5258,
+  "collected_at": "2026-02-06T01:57:07.237755",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 7,
+  "repo_forks": 0,
+  "repo_owner": "miong",
+  "repo_name": "pycodeanalyzer",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 <<Class>>\n+ Any logger\n+ CppAnalyzer cppAnalyzer\n+ PythonAnalyzer pythonAnalyzer\n+ JavaAnalyzer javaAnalyzer\n+ KotlinAnalyzer kotlinAnalyzer\n+ UiFileDispatcherListener uiListener\n+Constructor(CppAnalyzer cppAnalyzer, PythonAnalyzer pythonAnalyzer, JavaAnalyzer javaAnalyzer, KotlinAnalyzer kotlinAnalyzer, UiFileDispatcherListener uiListener 和 List&lt;Tuple&lt;str,List&lt;str&gt;&gt;&gt; roots。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '<<Class>>\n+ Any logger\n+ CppAnalyzer cppAnalyzer\n+ PythonAnalyzer pythonAnalyzer\n+ JavaAnalyzer javaAnalyzer\n+ KotlinAnalyzer kotlinAnalyzer\n+ UiFileDispatcherListener uiListener\n+Constructor(CppAnalyzer cppAnalyzer, PythonAnalyzer pythonAnalyzer, JavaAnalyzer javaAnalyzer, KotlinAnalyzer kotlinAnalyzer, UiFileDispatcherListener uiListener 和 List&lt;Tuple&lt;str,List&lt;str&gt;&gt;&gt; roots'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "FileDispatcher",
+        "dispatchRoots"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 str rootDir, List~str~ files 和 List~AbstractObject~ abstractObjects 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 str rootDir, List~str~ files处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'str rootDir, List~str~ files处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "dispatch",
+        "sortObjects"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 <<Class>>\n+ List~str~ objectPaths\n+ Encoding encoding\n+ List~str~ forceIgnoredSymbols\n+ Configuration configuration\n+ bool configured\n+ List~str~ defines\n+Constructor(Configuration config 和 str rootDir, str path 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '<<Class>>\n+ List~str~ objectPaths\n+ Encoding encoding\n+ List~str~ forceIgnoredSymbols\n+ Configuration configuration\n+ bool configured\n+ List~str~ defines\n+Constructor(Configuration config 和 str rootDir, str path'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CppAnalyzer",
+        "analyze"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 str path 和 str path, str encoding, str code, List~AbstractObject~ abstractObjects 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'str path 和 str path, str encoding, str code, List~AbstractObject~ abstractObjects'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "isHeader",
+        "handleHeader"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 str path, Any klass, List~AbstractObject~ abstractObjects 和 AbstractClass abstraction, Any klass, str visibility 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'str path, Any klass, List~AbstractObject~ abstractObjects 和 AbstractClass abstraction, Any klass, str visibility'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "handleClass",
+        "addMethods"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 AbstractClass abstraction, Any klass, str visibility 和 AbstractClass abstraction, Any klass 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 AbstractClass abstraction, Any klass, str visibility处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'AbstractClass abstraction, Any klass, str visibility处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "addMembers",
+        "addParents"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 str path, Any enum, List~AbstractObject~ abstractObjects 和 str path, Any function, List~AbstractObject~ abstractObjects 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'str path, Any enum, List~AbstractObject~ abstractObjects 和 str path, Any function, List~AbstractObject~ abstractObjects'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "handleEnum",
+        "handleFunction"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 str namespace 和 CppHeaderParser::CppParseError err 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 str namespace处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'str namespace处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "clearNamespace",
+        "extractUnexpectedFromParseError"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 <<Class>>\n+ List~str~ globalImports\n+Constructor( 和 str rootDir, str path 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '<<Class>>\n+ List~str~ globalImports\n+Constructor( 和 str rootDir, str path'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PythonAnalyzer",
+        "analyze"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 str path, str namespace, ClassDef item, List~AbstractObject~ abstractObjects 和 str path, str namespace, ClassDef item, List~AbstractObject~ abstractObjects 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'str path, str namespace, ClassDef item, List~AbstractObject~ abstractObjects 和 str path, str namespace, ClassDef item, List~AbstractObject~ abstractObjects'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "handleEnum",
+        "handleClass"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 str type 和 str path, str namespace, FunctionDef item, List~AbstractObject~ abstractObjects 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'str type 和 str path, str namespace, FunctionDef item, List~AbstractObject~ abstractObjects'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "isEnumType",
+        "handleFunction"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Any func, AbstractClass abstraction 和 FunctionDef func, Assign item 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Any func, AbstractClass abstraction 和 FunctionDef func, Assign item'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "handleMembers",
+        "deduceType"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Any returnItem 和 Name item 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 Any returnItem处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Any returnItem处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "deduceReturnType",
+        "deduceTypeFromTypeName"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 FunctionDef func, Name item 和 Tuple item 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'FunctionDef func, Name item 和 Tuple item'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "deduceTypeFromName",
+        "deduceTypeFromTuple"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 typeList item 和 Dict item 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'typeList item 和 Dict item'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "deduceTypeFromList",
+        "deduceTypeFromDict"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Const item 和 Any typeNope。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Const item 和 Any typeNope'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "deduceTypeFromConst",
+        "handleTypeAnnotation"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Attribute attrib, bool isRoot 和 str path, str rootDir 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Attribute attrib, bool isRoot 和 str path, str rootDir'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "deduceNamespaceFromAttribute",
+        "deduceNamespace"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 73,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Any item 和 <<Class>>\n+ List~str~ globalImports\n+Constructor( 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 74,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Any item 和 <<Class>>\n+ List~str~ globalImports\n+Constructor('。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 75,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 76,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "getImportsNameSpace",
+        "JavaAnalyzer"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 77,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 str rootDir, str path 和 List~AbstractObject~ abstractObjects, str path, str currentNS, Union~javalang::ClassDeclaration,javalang::InterfaceDeclaration~ klass 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 78,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'str rootDir, str path 和 List~AbstractObject~ abstractObjects, str path, str currentNS, Union~javalang::ClassDeclaration,javalang::InterfaceDeclaration~ klass'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 79,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 80,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "analyze",
+        "handleClass"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 81,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 List~AbstractObject~ abstractObjects, str path, str currentNS, javalang::EnumDeclaration enum 和 Any item, AbstractClass klass 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 82,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'List~AbstractObject~ abstractObjects, str path, str currentNS, javalang::EnumDeclaration enum 和 Any item, AbstractClass klass'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 83,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 84,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "handleEnum",
+        "handleParent"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 85,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Any item 和 Any item 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 86,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Any item 和 Any item'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 87,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 88,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "deduceVisibility",
+        "deduceType"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 89,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 <<Class>>\n+ List~str~ globalImports\n+Constructor( 和 str rootDir, str path 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 90,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '<<Class>>\n+ List~str~ globalImports\n+Constructor( 和 str rootDir, str path'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 91,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 92,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "KotlinAnalyzer",
+        "analyze"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 93,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 List~AbstractObject~ abstractObjects, str path, str currentNS, Union~kopyt::ClassDeclaration,kopyt::InterfaceDeclaration~ klass 和 AbstractClass abstraction, kopyt::DelegationSpecifiers item。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 94,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 List~AbstractObject~ abstractObjects, str path, str currentNS, Union~kopyt::ClassDeclaration,kopyt::InterfaceDeclaration~ klass处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 95,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'List~AbstractObject~ abstractObjects, str path, str currentNS, Union~kopyt::ClassDeclaration,kopyt::InterfaceDeclaration~ klass处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 96,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 97,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "handleClass",
+        "handleParent"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 98,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 AbstractClass abstraction, Union~kopyt::PrimaryConstructor,kopyt::SecondaryConstructor~ item, bool isPrimary 和 AbstractClass abstraction, kopyt::PropertyDeclaration item, bool isStatic 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 99,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 AbstractClass abstraction, Union~kopyt::PrimaryConstructor,kopyt::SecondaryConstructor~ item, bool isPrimary处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 100,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'AbstractClass abstraction, Union~kopyt::PrimaryConstructor,kopyt::SecondaryConstructor~ item, bool isPrimary处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 101,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 102,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "handleConstuctor",
+        "handleProperty"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 103,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 AbstractClass abstraction, kopyt::FunctionDeclaration item, bool isStatic 和 List~AbstractObject~ abstractObjects, str path, str currentNS, kopyt::EnumDeclaration enum。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 104,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'AbstractClass abstraction, kopyt::FunctionDeclaration item, bool isStatic 和 List~AbstractObject~ abstractObjects, str path, str currentNS, kopyt::EnumDeclaration enum'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 105,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 106,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "handleMethod",
+        "handleEnum"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 107,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 List~AbstractObject~ abstractObjects, str path, str currentNS, kopyt::FunctionDeclaration function 和 Any item 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 108,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'List~AbstractObject~ abstractObjects, str path, str currentNS, kopyt::FunctionDeclaration function 和 Any item'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 109,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 110,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "handleFunction",
+        "deduceVisibility"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 111,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 str expression 和 str type 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 112,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'str expression 和 str type'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 113,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 114,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "deduceTypeFromExpression",
+        "deduceType"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 115,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 <<Class>>\n+notifyAnalyzing(str file 和 <<Class>>\n+ str name\n+ str type\n+ str origin\n+ List~str~ usingNS\n+ AbstractObjectLanguage objectLanguage\n+ List~str~ linkedGenericTypes\n+Constructor(str name, str origin。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 116,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 <<Class>>\n+notifyAnalyzing(str file处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 117,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '<<Class>>\n+notifyAnalyzing(str file处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 118,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 119,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "UiFileDispatcherListener",
+        "AbstractObject"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 120,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 str namespace 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 120,
+    "repair_count": 7,
+    "grounding_acts_count": 58,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "dialogue_trimmed"
+  ],
+  "repaired_at": "2026-02-28T13:41:22Z"
+}

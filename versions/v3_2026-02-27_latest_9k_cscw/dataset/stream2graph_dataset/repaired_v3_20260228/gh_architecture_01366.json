@@ -1,0 +1,822 @@
+{
+  "id": "gh_architecture_01366",
+  "source": "github",
+  "source_url": "https://github.com/SamoraHunter/pat2vec/blob/498aba4e5cea9d85c1dae9379d573af7b2177b77/assets/main.mmd",
+  "github_repo": "SamoraHunter/pat2vec",
+  "github_file_path": "assets/main.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TD\n    subgraph Title [pat2vec: Batch Data Fetching Logic]\n        style Title fill:#fff,stroke:#333,stroke-width:2px,font-size:20px,text-align:center\n        direction TB\n        T[\"File: pat2vec/patvec_get_batch_methods/main.py\"]\n    end\n\n    subgraph CoreLogic [\"Shared Logic for all get_pat_batch_* functions\"]\n        A[\"Start: Call get_pat_batch_... function\"] --> B[\"Get parameters from config_obj<br/>- Global date range<br/>- Paths<br/>- Caching flags (e.g., store_pat_batch_observations)\"];\n        B --> C[\"Construct target CSV path for patient's batch<br/>e.g., .../pre_bloods_batch_path/{patient_id}.csv\"];\n        C --> D{\"Batch CSV exists and not overwriting?\"};\n        D -- No --> F[\"Fetch data from Elasticsearch\"];\n        D -- Yes --> E[\"Read DataFrame from CSV\"];\n\n        F --> G{\"Store batch enabled?\"};\n        G -- Yes --> H[\"Save DataFrame to CSV\"];\n        G -- No --> I[\"Return DataFrame\"];\n        H --> I;\n        E --> I;\n    end\n\n    subgraph ElasticsearchQuery [\"Elasticsearch Query (Inside 'Fetch data' step)\"]\n        F --> F1[\"Call cohort_searcher_with_terms_and_search\"];\n        F1 --> F2[\"Provide:<br/>- index_name<br/>- fields_list<br/>- term_name (e.g., client_idcode.keyword)<br/>- patient_id<br/>- search_string\"];\n        F2 --> F3[\"search_string is built using specific filters and the global date range\"];\n    end\n\n    subgraph FunctionSpecifics [\"Function-Specific Elasticsearch Queries & Post-Processing\"]\n        direction LR\n\n        subgraph ObsGroup [\"Observations (obs, news, bmi)\"]\n            Obs_Index[\"<b>index:</b> observations\"]\n            Obs_Search[\"<b>search_string examples:</b><br/>- get_pat_batch_obs: 'obscatalogmasteritem_displayname:(&quot;{search_term}&quot;)'<br/>- get_pat_batch_news: '...:(&quot;NEWS&quot; OR &quot;NEWS2&quot;)'<br/>- get_pat_batch_bmi: '...:(&quot;OBS BMI&quot; OR &quot;OBS Weight&quot; OR &quot;OBS height&quot;)'\"]\n        end\n\n        subgraph BloodsGroup [\"get_pat_batch_bloods\"]\n            Bloods_Index[\"<b>index:</b> basic_observations\"]\n            Bloods_Search[\"<b>search_string:</b><br/>'basicobs_value_numeric:*'\"]\n            Bloods_Search --> Bloods_Filter[\"Apply fuzzy term &amp; data type filters\"]\n        end\n\n        subgraph OrdersGroup [\"Orders (drugs, diagnostics)\"]\n            Orders_Index[\"<b>index:</b> order\"]\n            Orders_Search[\"<b>search_string examples:</b><br/>- get_pat_batch_drugs: 'order_typecode:&quot;medication&quot;'<br/>- get_pat_batch_diagnostics: 'order_typecode:&quot;diagnostic&quot;'\"]\n        end\n\n        subgraph DocsGroup [\"Documents (epr, mct, textual_obs, reports)\"]\n            EPR_Index[\"<b>get_pat_batch_epr_docs</b><br/><b>index:</b> epr_documents<br/><b>post-processing:</b><br/>- Fuzzy/regex filters<br/>- Optional note splitting\"]\n            MCT_Index[\"<b>get_pat_batch_mct_docs</b><br/><b>index:</b> observations<br/><b>search:</b> 'AoMRC_ClinicalSummary_FT'<br/><b>post-processing:</b><br/>- Data type filters<br/>- Optional note splitting\"]\n            TextualObs_Index[\"<b>get_pat_batch_textual_obs_docs</b><br/><b>index:</b> basic_observations<br/><b>post-processing:</b><br/>- Drop empty textualObs<br/>- Create 'body_analysed'\"]\n            Reports_Index[\"<b>get_pat_batch_reports</b><br/><b>index:</b> basic_observations<br/><b>search:</b> 'basicobs_itemname_analysed:report'<br/><b>post-processing:</b><br/>- Create 'body_analysed'\"]\n        end\n\n        subgraph AnnotationsGroup [\"Annotation Logic (e.g., get_pat_batch_epr_docs_annotations)\"]\n            Annot_Start[\"Start\"] --> Annot_Check{\"Annotation batch exists?\"}\n            Annot_Check -- Yes --> Annot_Read[\"Read annotation CSV\"]\n            Annot_Check -- No --> Annot_Read_Doc[\"Read corresponding document batch CSV\"]\n            Annot_Read_Doc --> Annot_Process[\"Annotate with MedCAT<br/>(calls get_pat_document_annotation_batch_...)\"]\n            Annot_Process --> Annot_Save[\"Save annotation CSV\"]\n            Annot_Save --> Annot_Return[\"Return DataFrame\"]\n            Annot_Read --> Annot_Return\n        end\n\n        subgraph OtherGroup [\"Other Data Types\"]\n            Demo_Index[\"<b>get_pat_batch_demo</b><br/><b>index:</b> epr_documents\"]\n            Appt_Index[\"<b>get_pat_batch_appointments</b><br/><b>index:</b> pims_apps*\"]\n        end\n    end\n",
+  "content_size": 4292,
+  "collected_at": "2026-02-06T01:45:19.673729",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 2,
+  "repo_forks": 0,
+  "repo_owner": "SamoraHunter",
+  "repo_name": "pat2vec",
+  "compilation_status": "success",
+  "compilation_error": "",
+  "repo_description": "transform patient data to time interval feature vectors",
+  "repo_language": "Python",
+  "repo_topics": [],
+  "repo_created_at": "2023-08-17T13:51:01Z",
+  "repo_updated_at": "2026-02-03T14:53:14Z",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 pat2vec: Batch Data Fetching Logic 和 \"File: pat2vec/patvec_get_batch_methods/main.py\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'pat2vec: Batch Data Fetching Logic 和 \"File: pat2vec/patvec_get_batch_methods/main.py\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Title",
+        "T"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Shared Logic for all get_pat_batch_* functions\" 和 \"Start: Call get_pat_batch_... function\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 \"Shared Logic for all get_pat_batch_* functions\"处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Shared Logic for all get_pat_batch_* functions\"处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CoreLogic",
+        "A"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Get parameters from config_obj<br/>- Global date range<br/>- Paths<br/>- Caching flags (e.g., store_pat_batch_observations 和 \"Construct target CSV path for patient's batch<br/>e.g., .../pre_bloods_batch_path/{patient_id 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Get parameters from config_obj<br/>- Global date range<br/>- Paths<br/>- Caching flags (e.g., store_pat_batch_observations 和 \"Construct target CSV path for patient's batch<br/>e.g., .../pre_bloods_batch_path/{patient_id'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "B",
+        "C"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Batch CSV exists and not overwriting?\" 和 \"Fetch data from Elasticsearch\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Batch CSV exists and not overwriting?\" 和 \"Fetch data from Elasticsearch\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "D",
+        "F"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Read DataFrame from CSV\" 和 \"Store batch enabled?\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Read DataFrame from CSV\" 和 \"Store batch enabled?\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "E",
+        "G"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Save DataFrame to CSV\" 和 \"Return DataFrame\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Save DataFrame to CSV\" 和 \"Return DataFrame\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "H",
+        "I"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Elasticsearch Query (Inside 'Fetch data' step 和 \"Call cohort_searcher_with_terms_and_search\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Elasticsearch Query (Inside 'Fetch data' step 和 \"Call cohort_searcher_with_terms_and_search\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ElasticsearchQuery",
+        "F1"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Provide:<br/>- index_name<br/>- fields_list<br/>- term_name (e.g., client_idcode.keyword 和 \"search_string is built using specific filters and the global date range\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Provide:<br/>- index_name<br/>- fields_list<br/>- term_name (e.g., client_idcode.keyword 和 \"search_string is built using specific filters and the global date range\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "F2",
+        "F3"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Function-Specific Elasticsearch Queries & Post-Processing\" 和 \"Observations (obs, news, bmi 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Function-Specific Elasticsearch Queries & Post-Processing\" 和 \"Observations (obs, news, bmi'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "FunctionSpecifics",
+        "ObsGroup"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"<b>index:</b> observations\" 和 \"<b>search_string examples:</b><br/>- get_pat_batch_obs: 'obscatalogmasteritem_displayname:(&quot;{search_term 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"<b>index:</b> observations\" 和 \"<b>search_string examples:</b><br/>- get_pat_batch_obs: 'obscatalogmasteritem_displayname:(&quot;{search_term'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Obs_Index",
+        "Obs_Search"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"get_pat_batch_bloods\" 和 \"<b>index:</b> basic_observations\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"get_pat_batch_bloods\" 和 \"<b>index:</b> basic_observations\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BloodsGroup",
+        "Bloods_Index"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"<b>search_string:</b><br/>'basicobs_value_numeric:*'\" 和 \"Apply fuzzy term &amp; data type filters\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"<b>search_string:</b><br/>'basicobs_value_numeric:*'\" 和 \"Apply fuzzy term &amp; data type filters\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Bloods_Search",
+        "Bloods_Filter"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Orders (drugs, diagnostics 和 \"<b>index:</b> order\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Orders (drugs, diagnostics 和 \"<b>index:</b> order\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OrdersGroup",
+        "Orders_Index"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"<b>search_string examples:</b><br/>- get_pat_batch_drugs: 'order_typecode:&quot;medication&quot;'<br/>- get_pat_batch_diagnostics: 'order_typecode:&quot;diagnostic&quot;'\" 和 \"Documents (epr, mct, textual_obs, reports 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"<b>search_string examples:</b><br/>- get_pat_batch_drugs: 'order_typecode:&quot;medication&quot;'<br/>- get_pat_batch_diagnostics: 'order_typecode:&quot;diagnostic&quot;'\" 和 \"Documents (epr, mct, textual_obs, reports'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Orders_Search",
+        "DocsGroup"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"<b>get_pat_batch_epr_docs</b><br/><b>index:</b> epr_documents<br/><b>post-processing:</b><br/>- Fuzzy/regex filters<br/>- Optional note splitting\" 和 \"<b>get_pat_batch_mct_docs</b><br/><b>index:</b> observations<br/><b>search:</b> 'AoMRC_ClinicalSummary_FT'<br/><b>post-processing:</b><br/>- Data type filters<br/>- Optional note splitting\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"<b>get_pat_batch_epr_docs</b><br/><b>index:</b> epr_documents<br/><b>post-processing:</b><br/>- Fuzzy/regex filters<br/>- Optional note splitting\" 和 \"<b>get_pat_batch_mct_docs</b><br/><b>index:</b> observations<br/><b>search:</b> 'AoMRC_ClinicalSummary_FT'<br/><b>post-processing:</b><br/>- Data type filters<br/>- Optional note splitting\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EPR_Index",
+        "MCT_Index"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"<b>get_pat_batch_textual_obs_docs</b><br/><b>index:</b> basic_observations<br/><b>post-processing:</b><br/>- Drop empty textualObs<br/>- Create 'body_analysed'\" 和 \"<b>get_pat_batch_reports</b><br/><b>index:</b> basic_observations<br/><b>search:</b> 'basicobs_itemname_analysed:report'<br/><b>post-processing:</b><br/>- Create 'body_analysed'\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"<b>get_pat_batch_textual_obs_docs</b><br/><b>index:</b> basic_observations<br/><b>post-processing:</b><br/>- Drop empty textualObs<br/>- Create 'body_analysed'\" 和 \"<b>get_pat_batch_reports</b><br/><b>index:</b> basic_observations<br/><b>search:</b> 'basicobs_itemname_analysed:report'<br/><b>post-processing:</b><br/>- Create 'body_analysed'\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TextualObs_Index",
+        "Reports_Index"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Annotation Logic (e.g., get_pat_batch_epr_docs_annotations 和 \"Start\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Annotation Logic (e.g., get_pat_batch_epr_docs_annotations 和 \"Start\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AnnotationsGroup",
+        "Annot_Start"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Annotation batch exists?\" 和 \"Read annotation CSV\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Annotation batch exists?\" 和 \"Read annotation CSV\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 73,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Annot_Check",
+        "Annot_Read"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 74,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Read corresponding document batch CSV\" 和 \"Annotate with MedCAT<br/>(calls get_pat_document_annotation_batch_... 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 75,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Read corresponding document batch CSV\" 和 \"Annotate with MedCAT<br/>(calls get_pat_document_annotation_batch_...'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 76,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 77,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Annot_Read_Doc",
+        "Annot_Process"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 78,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Save annotation CSV\" 和 \"Return DataFrame\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 79,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"Save annotation CSV\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 80,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Save annotation CSV\"处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 81,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 82,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Annot_Save",
+        "Annot_Return"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 83,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Other Data Types\" 和 \"<b>get_pat_batch_demo</b><br/><b>index:</b> epr_documents\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 84,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Other Data Types\" 和 \"<b>get_pat_batch_demo</b><br/><b>index:</b> epr_documents\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 85,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 86,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OtherGroup",
+        "Demo_Index"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 87,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"<b>get_pat_batch_appointments</b><br/><b>index:</b> pims_apps*\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 88,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"<b>get_pat_batch_appointments</b><br/><b>index:</b> pims_apps*\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 89,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 90,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Appt_Index"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 90,
+    "repair_count": 2,
+    "grounding_acts_count": 44,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:20Z"
+}

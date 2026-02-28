@@ -1,0 +1,134 @@
+{
+  "id": "gh_sequence_00583",
+  "source": "github",
+  "source_url": "https://github.com/JuanCS-Dev/V-rtice/blob/2cc60d775e33463af9693cae0c3df4d0be8be10c/vertice-terminal/docs/flows/diagrams/ip_analysis_flow.mmd",
+  "github_repo": "JuanCS-Dev/V-rtice",
+  "github_file_path": "vertice-terminal/docs/flows/diagrams/ip_analysis_flow.mmd",
+  "diagram_type": "sequence",
+  "code": "\nsequenceDiagram\n    participant User\n    participant CLI_Typer as Vértice CLI (Typer)\n    participant Cmd_IP as ip.py Command\n    participant Auth as auth.py\n    participant Connector as IPIntelConnector\n    participant Service as IP Intel Service\n\n    User->>+CLI_Typer: vcli ip analyze 8.8.8.8\n    CLI_Typer->>+Cmd_IP: analyze(\"8.8.8.8\")\n\n    Cmd_IP->>+Auth: require_auth()\n    Auth-->>-Cmd_IP: OK (Authenticated)\n\n    Cmd_IP->>+Connector: __init__()\n    Cmd_IP->>+Connector: health_check()\n    Connector->>+Service: GET /health\n    Service-->>-Connector: {\"status\": \"operational\"}\n    Connector-->>-Cmd_IP: True\n\n    Cmd_IP->>+Connector: analyze_ip(\"8.8.8.8\")\n    Connector->>+Service: POST /api/ip/analyze\n    Note right of Service: Processa o IP, busca em BDs, etc.\n    Service-->>-Connector: {ip: \"...\", geo: \"...\", ...}\n    Connector-->>-Cmd_IP: {ip: \"...\", geo: \"...\", ...}\n\n    Cmd_IP->>CLI_Typer: Formata a saída (rich.Table)\n    CLI_Typer-->>-User: (Exibe a tabela com os resultados)\n",
+  "content_size": 996,
+  "collected_at": "2026-02-06T01:34:18.653468",
+  "compilation_status": "success",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 2,
+  "repo_forks": 0,
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Typer 和 \"8.8.8.8\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Typer 和 \"8.8.8.8\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CLI",
+        "analyze"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Authenticated 和 \"8.8.8.8\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Authenticated 和 \"8.8.8.8\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OK",
+        "analyze_ip"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 rich.Table。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'rich.Table'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "saída"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 12,
+    "repair_count": 0,
+    "grounding_acts_count": 6,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:20Z"
+}

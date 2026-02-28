@@ -1,0 +1,64 @@
+{
+  "id": "aug_ot_stateDiagram_00249_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/Oldranda1414/Privacy-P2P-Federated-Learning/blob/eaa92d5191de1a6751b6e1491709a3e2dd2a5c9e/doc/assets/src/state.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "Oldranda1414/Privacy-P2P-Federated-Learning",
+  "diagram_type": "stateDiagram",
+  "code": "---\nconfig:\n  theme: base\n  look: classic\n---\nstateDiagram-v2\n    [Infra_WorkerNode] --> Connecting\n    Connecting --> Setup : Connected to peers\n    Connecting --> Shutdown : Unable to connect to peers\n    Setup --> Executing : sent/received starting model\n    state Executing {Infra_IngressController] --> Training\n        Training --> WaitingForPeers : training step complete\n        WaitingForPeers --> SecureAverageComputation : all peers ready for SAC\n        SecureAverageComputation --> Training : model not complete\n        SecureAverageComputation --> [Infra_LoadBalancer] : model complete\n    }\n    Executing --> SavingPartialModel : peer failure detected\n    Executing --> TerminationCheck : execution completed\n    TerminationCheck --> SavingModel : all peers reached desired accuracy\n    SavingModel --> Shutdown : model saved\n    SavingPartialModel --> Shutdown : partial model saved\n    Shutdown --> [Infra_LoadBalancer]\n\n",
+  "content_size": 877,
+  "collected_at": "2026-02-06T10:39:40.443355",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "",
+  "augmentation_domain": "Infra",
+  "seed_id": "ot_stateDiagram_00249",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Infra_WorkerNode 和 Infra_IngressController 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Infra_WorkerNode 和 Infra_IngressController'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2",
+        "Executing"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:46Z"
+}

@@ -1,0 +1,180 @@
+{
+  "id": "aug_gh_sequence_00583_Sec_7",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/JuanCS-Dev/V-rtice/blob/2cc60d775e33463af9693cae0c3df4d0be8be10c/vertice-terminal/docs/flows/diagrams/ip_analysis_flow.mmd",
+  "github_repo": "JuanCS-Dev/V-rtice",
+  "github_file_path": "vertice-terminal/docs/flows/diagrams/ip_analysis_flow.mmd",
+  "diagram_type": "sequence",
+  "code": "\nsequenceDiagram\n    participant User\n    participant CLI_Typer as Vértice CLI (Security_ZeroTrust)\n    participant Cmd_IP as ip.py Command\n    participant Auth as auth.py\n    participant Connector as IPIntelConnector\n    participant Service as IP Intel Service\n\n    User->>+CLI_Typer: vcli ip analyze 8.8.8.8\n    CLI_Typer->>+Cmd_IP: analyze(Security_OAuth2)\n\n    Cmd_IP->>+Auth: require_auth(Security_OAuth2)\n    Auth-->>-Cmd_IP: OK (Security_IntrusionDetection)\n\n    Cmd_IP->>+Connector: __init__(Security_OAuth2)\n    Cmd_IP->>+Connector: health_check(Security_ZeroTrust)\n    Connector->>+Service: GET /health\n    Service-->>-Connector: {Security_IntrusionDetection}\n    Connector-->>-Cmd_IP: True\n\n    Cmd_IP->>+Connector: analyze_ip(Security_OAuth2)\n    Connector->>+Service: POST /api/ip/analyze\n    Note right of Service: Processa o IP, busca em BDs, etc.\n    Service-->>-Connector: {Security_ZeroTrust}\n    Connector-->>-Cmd_IP: {Security_ZeroTrust}\n\n    Cmd_IP->>CLI_Typer: Formata a saída (Security_ZeroTrust)\n    CLI_Typer-->>-User: (Security_ZeroTrust)\n",
+  "content_size": 996,
+  "collected_at": "2026-02-06T01:34:18.653468",
+  "compilation_status": "success",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 2,
+  "repo_forks": 0,
+  "compilation_error": "",
+  "augmentation_domain": "Security",
+  "seed_id": "gh_sequence_00583",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Security_ZeroTrust 和 Security_OAuth2 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Security_ZeroTrust 和 Security_OAuth2'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CLI",
+        "analyze"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Security_OAuth2 和 Security_IntrusionDetection 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Security_OAuth2 和 Security_IntrusionDetection'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "require_auth",
+        "OK"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Security_OAuth2 和 Security_ZeroTrust 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 Security_OAuth2处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Security_OAuth2处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "__init__",
+        "health_check"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Security_OAuth2 和 Security_ZeroTrust 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Security_OAuth2 和 Security_ZeroTrust'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "analyze_ip",
+        "saída"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 17,
+    "repair_count": 1,
+    "grounding_acts_count": 8,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:49Z"
+}

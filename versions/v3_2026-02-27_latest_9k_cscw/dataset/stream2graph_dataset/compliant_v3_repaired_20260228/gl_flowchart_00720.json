@@ -1,0 +1,429 @@
+{
+  "id": "gl_flowchart_00720",
+  "source": "gitlab",
+  "source_url": "https://github.com/davenel621/argon_test/blob/5b98b2dc87b5e4fd02c6c19be9700175d33132ec/docs/mermaid/build-process-flowchart.mmd",
+  "source_note": "collected_from_github_final",
+  "github_repo": "davenel621/argon_test",
+  "diagram_type": "flowchart",
+  "code": "---\nconfig:\n  flowchart:\n    htmlLabels: true\n    curve: basis\n  themeVariables:\n    primaryColor: \"#f9f9f9\"\n    primaryTextColor: \"#333333\"\n    primaryBorderColor: \"#cccccc\"\n    lineColor: \"#666666\"\n    secondaryColor: \"#e8f4f8\"\n    tertiaryColor: \"#fff2cc\"\n---\nflowchart TD\n    %% Build Process Entry Point\n    ReusableWF[Reusable Workflow] --> |Execute Build| BuildComp[Build Composite]\n    \n    %% Initial Build Steps\n    BuildComp --> BuildTools[🔧 1. Install Build Tools]\n    BuildTools --> SecurityScans[🛡️ Security Scanning Steps:<br/>2-3*. Prepare & Run SCA Scan<br/>📋 4*. Generate SBOM<br/>📊 5-6*. Publish SCA Results & Enforce Policy<br/>🔍 7-8*. Prepare & Run SAST Scan<br/>📄 9-11*. Generate SARIF & Publish Results]\n    \n    %% Security Scanning Pass/Fail Check\n    SecurityScans --> SecurityCheck{Security Scans<br/>Pass or Fail?}\n    SecurityCheck --> |Pass| BuildApp[📦 12. Restore Dependencies<br/>🏗️ 13. Build Application]\n    SecurityCheck --> |Fail| BuildProcessError\n    \n    %% Application Build Pass/Fail Check\n    BuildApp --> BuildCheck{Build Success?}\n    BuildCheck --> |Pass| RunTests[🧪 14-15. Run Unit Tests & Publish Results]\n    BuildCheck --> |Fail| BuildProcessError\n    \n    RunTests --> TestCheck{Tests Pass?}\n    TestCheck --> |Pass| PostBuild[✅ Post-Build: Validation & Manifest Generation]\n    TestCheck --> |Fail| TestError[❌ Tests Failed]\n    \n    %% Completion and Handoff\n    PostBuild --> ValidateArtifacts{Artifacts Valid?}\n    ValidateArtifacts --> |Yes| PassArtifacts[📤 Pass Build Artifacts & Security Reports]\n    ValidateArtifacts --> |No| ArtifactError[❌ Artifact Validation Failed]\n    \n    PassArtifacts --> BuildComplete[✅ Build Process Complete]\n    BuildComplete --> NotifySuccess[📧 Notify Build Success]\n    NotifySuccess --> ProceedToDeploy[🚀 Proceed to Deployment Phase]\n    \n    %% Error Handling Flows\n    BuildProcessError --> NotifyError[📧 Notify Build Failure]\n    TestError --> NotifyError\n    ArtifactError --> NotifyError\n    \n    NotifyError --> BuildFailed[❌ Build Process Failed]\n    \n    %% Legacy Application Note\n    SecurityScans -.-> LegacyNote[Note: Steps 2-11 marked with asterisk<br/>represent legacy security application flow]\n    \n    %% Styling - Blue/Purple/Teal/Orange palette (colorblind-friendly, no red/green)\n    classDef processBox fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#000\n    classDef decisionBox fill:#fff8e1,stroke:#f57c00,stroke-width:2px,color:#000\n    classDef securityBox fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000\n    classDef errorBox fill:#fff3e0,stroke:#ff8f00,stroke-width:2px,color:#000\n    classDef successBox fill:#e0f7fa,stroke:#00838f,stroke-width:3px,color:#000\n    classDef noteBox fill:#f5f5f5,stroke:#757575,stroke-width:1px,color:#000\n    \n    class ReusableWF,BuildComp processBox\n    class BuildTools,BuildApp,RunTests,PostBuild,PassArtifacts,NotifySuccess,ProceedToDeploy processBox\n    class SecurityScans securityBox\n    class SecurityCheck,BuildCheck,TestCheck,ValidateArtifacts decisionBox\n    class BuildProcessError,TestError,ArtifactError,NotifyError,BuildFailed errorBox\n    class BuildComplete successBox\n    class LegacyNote noteBox",
+  "content_size": 3178,
+  "collected_at": "2026-02-06T14:19:25.677759",
+  "compilation_status": "success",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "repo_owner": "davenel621",
+  "repo_name": "argon_test",
+  "repo_description": "testing with old argon repo in local",
+  "repo_language": "PowerShell",
+  "repo_topics": [],
+  "repo_created_at": "2026-01-26T18:24:33Z",
+  "repo_updated_at": "2026-01-26T21:00:16Z",
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Reusable Workflow 和 Build Composite 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Reusable Workflow 和 Build Composite'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ReusableWF",
+        "BuildComp"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 🔧 1. Install Build Tools 和 🛡️ Security Scanning Steps:<br/>2-3*. Prepare & Run SCA Scan<br/>📋 4*. Generate SBOM<br/>📊 5-6*. Publish SCA Results & Enforce Policy<br/>🔍 7-8*. Prepare & Run SAST Scan<br/>📄 9-11*. Generate SARIF & Publish Results。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 🔧 1. Install Build Tools处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '🔧 1. Install Build Tools处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BuildTools",
+        "SecurityScans"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Security Scans<br/>Pass or Fail? 和 📦 12. Restore Dependencies<br/>🏗️ 13. Build Application。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Security Scans<br/>Pass or Fail? 和 📦 12. Restore Dependencies<br/>🏗️ 13. Build Application'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SecurityCheck",
+        "BuildApp"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Build Success? 和 🧪 14-15. Run Unit Tests & Publish Results 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Build Success? 和 🧪 14-15. Run Unit Tests & Publish Results'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BuildCheck",
+        "RunTests"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Tests Pass? 和 ✅ Post-Build: Validation & Manifest Generation。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Tests Pass? 和 ✅ Post-Build: Validation & Manifest Generation'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TestCheck",
+        "PostBuild"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 ❌ Tests Failed 和 Artifacts Valid? 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '❌ Tests Failed 和 Artifacts Valid?'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TestError",
+        "ValidateArtifacts"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 📤 Pass Build Artifacts & Security Reports 和 ❌ Artifact Validation Failed 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '📤 Pass Build Artifacts & Security Reports 和 ❌ Artifact Validation Failed'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PassArtifacts",
+        "ArtifactError"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 ✅ Build Process Complete 和 📧 Notify Build Success 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '✅ Build Process Complete 和 📧 Notify Build Success'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BuildComplete",
+        "NotifySuccess"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 🚀 Proceed to Deployment Phase 和 📧 Notify Build Failure 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '🚀 Proceed to Deployment Phase 和 📧 Notify Build Failure'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ProceedToDeploy",
+        "NotifyError"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 ❌ Build Process Failed 和 Note: Steps 2-11 marked with asterisk<br/>represent legacy security application flow 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '❌ Build Process Failed 和 Note: Steps 2-11 marked with asterisk<br/>represent legacy security application flow'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BuildFailed",
+        "LegacyNote"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 colorblind-friendly, no red/green 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'colorblind-friendly, no red/green'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "palette"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 45,
+    "repair_count": 1,
+    "grounding_acts_count": 22,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:24Z"
+}

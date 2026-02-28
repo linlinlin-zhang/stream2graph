@@ -1,0 +1,288 @@
+{
+  "id": "gh_architecture_01526",
+  "source": "github",
+  "source_url": "https://github.com/qusuyan/Reth/blob/283898bd1a8f43911292b725c0f4522fbdb8c29b/crates/engine/tree/docs/mermaid/state-root-task.mmd",
+  "github_repo": "qusuyan/Reth",
+  "github_file_path": "crates/engine/tree/docs/mermaid/state-root-task.mmd",
+  "diagram_type": "architecture",
+  "code": "flowchart TD\n    subgraph StateRootTaskMessages[State Root Task messages]\n        StateRootMessage::StateUpdate\n        StateRootMessage::PrefetchProofs\n        StateRootMessage::EmptyProof\n        StateRootMessage::ProofCalculated\n        StataRootMessage::FinishedStateUpdates\n    end\n\n    subgraph StateRootTask[State Root Task thread]\n        DeduplicateProofTargets[Deduplicate proof targets according to the list of already fetched proofs]\n        GenerateProofTargets[Generate proof targets from state update]\n            --> DeduplicateProofTargets\n\n        NewProof[New proof calculated]\n            -->|Add new proof| ProofSequencer\n            --> EndCondition1\n        ProofSequencer --> ProofSequencerCondition{{Has sequential proofs?}}\n\n        EndCondition1{{All updates processed?}}\n            --> EndCondition2{{All pending proofs requested?}}\n            --> EndCondition3{{All proofs finished processing?}}\n    end\n\n    subgraph SparseTrieTask[Sparse Trie thread]\n        SparseTrieUpdate([SparseTrieUpdate channel])\n    end\n\n    subgraph MultiProofManager[MultiProofManager]\n        MultiProofCompletion[on_calculation_complete]\n        MultiProofSpawn[spawn_or_queue]\n    end\n\n    StateRootMessage::PrefetchProofs --> DeduplicateProofTargets\n    StateRootMessage::StateUpdate --> GenerateProofTargets\n\n    DeduplicateProofTargets -----> MultiProofSpawn\n\n    StateRootMessage::EmptyProof --> NewProof\n    StateRootMessage::ProofCalculated --> NewProof\n    NewProof ---> MultiProofCompletion\n    ProofSequencerCondition -->|Yes, send multiproof and state update| SparseTrieUpdate\n    StataRootMessage::FinishedStateUpdates --> EndCondition1\n    EndCondition3 -->|Close SparseTrieUpdate channel| SparseTrieUpdate\n",
+  "content_size": 1732,
+  "collected_at": "2026-02-06T01:47:27.560834",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 State Root Task messages 和 State Root Task thread 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'State Root Task messages 和 State Root Task thread'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "StateRootTaskMessages",
+        "StateRootTask"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Deduplicate proof targets according to the list of already fetched proofs 和 Generate proof targets from state update 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Deduplicate proof targets according to the list of already fetched proofs 和 Generate proof targets from state update'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DeduplicateProofTargets",
+        "GenerateProofTargets"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 New proof calculated 和 {Has sequential proofs? 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 New proof calculated处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'New proof calculated处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "NewProof",
+        "ProofSequencerCondition"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 {All updates processed? 和 {All pending proofs requested?。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '{All updates processed? 和 {All pending proofs requested?'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EndCondition1",
+        "EndCondition2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 {All proofs finished processing? 和 Sparse Trie thread 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '{All proofs finished processing? 和 Sparse Trie thread'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EndCondition3",
+        "SparseTrieTask"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 [SparseTrieUpdate channel 和 MultiProofManager。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '[SparseTrieUpdate channel 和 MultiProofManager'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SparseTrieUpdate",
+        "MultiProofManager"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 on_calculation_complete 和 spawn_or_queue 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 on_calculation_complete处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'on_calculation_complete处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MultiProofCompletion",
+        "MultiProofSpawn"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 30,
+    "repair_count": 2,
+    "grounding_acts_count": 14,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repaired_at": "2026-02-28T13:41:38Z"
+}

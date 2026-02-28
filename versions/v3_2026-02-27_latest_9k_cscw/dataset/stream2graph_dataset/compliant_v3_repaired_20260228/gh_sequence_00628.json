@@ -1,0 +1,528 @@
+{
+  "id": "gh_sequence_00628",
+  "source": "github",
+  "source_url": "https://github.com/DiscoLucas/P8-Project/blob/b379ef87e0f2bd50d129288d5f398512846df89a/Dataprocessing%20Pipeline/pain.mmd",
+  "github_repo": "DiscoLucas/P8-Project",
+  "github_file_path": "Dataprocessing Pipeline/pain.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Notebook as Notebook Execution\n    participant MainBlock as Main Processing Block\n    participant proc_subj_data as process_subject_data()\n    participant extract_xdf as extract_bvp_and_markers_from_xdf()\n    participant pyxdf as pyxdf.load_xdf()\n    participant get_hrv as get_hrv_metrics()\n    participant filter_bvp as filter_bvp()\n    participant scipy as scipy.signal\n    participant heartpy as heartpy.process()\n    participant neurokit as neurokit2.hrv()\n    participant pd as pandas\n    participant statsmodels as statsmodels.mixedlm()\n\n    Notebook->>MainBlock: Start data processing\n    MainBlock->>MainBlock: Iterate session_folders (os.scandir)\n    loop For each session_folder\n        MainBlock->>MainBlock: Iterate subject_folders_map (os.scandir, re.search)\n        loop For each subject_id\n            MainBlock->>MainBlock: Find baseline_filepath & task_filepath (glob.glob)\n            alt baseline_filepath AND task_filepath exist\n                MainBlock->>proc_subj_data: Call(subject_id, baseline_filepath, task_filepath)\n                \n                proc_subj_data->>proc_subj_data: Determine condition\n                \n                %% Baseline Processing\n                proc_subj_data->>extract_xdf: Call(baseline_filepath)\n                extract_xdf->>pyxdf: load_xdf(baseline_filepath)\n                pyxdf-->>extract_xdf: streams, header\n                extract_xdf-->>proc_subj_data: bvp_baseline, ts_baseline, ...\n                \n                alt bvp_baseline data exists\n                    proc_subj_data->>get_hrv: Call(bvp_baseline, ts_baseline, fs)\n                    get_hrv->>filter_bvp: Call(bvp_baseline, fs)\n                    filter_bvp->>scipy: butter()\n                    scipy-->>filter_bvp: filter_coeffs (b,a)\n                    filter_bvp->>scipy: filtfilt(coeffs, bvp_baseline)\n                    scipy-->>filter_bvp: filtered_signal\n                    filter_bvp-->>get_hrv: filtered_bvp_baseline\n                    get_hrv->>heartpy: process(filtered_bvp_baseline, fs)\n                    heartpy-->>get_hrv: wd, m (peaks)\n                    get_hrv->>neurokit: hrv(ibi_ms, ...)\n                    neurokit-->>get_hrv: hrv_indices\n                    get_hrv-->>proc_subj_data: baseline_hrv_metrics\n                    proc_subj_data->>proc_subj_data: Store baseline_hrv_metrics\n                else No baseline BVP\n                    proc_subj_data->>proc_subj_data: Log warning\n                end\n\n                %% Task Processing\n                proc_subj_data->>extract_xdf: Call(task_filepath)\n                extract_xdf->>pyxdf: load_xdf(task_filepath)\n                pyxdf-->>extract_xdf: streams, header\n                extract_xdf-->>proc_subj_data: bvp_task, ts_task, ...\n\n                alt bvp_task data exists\n                    proc_subj_data->>get_hrv: Call(bvp_task, ts_task, fs)\n                    get_hrv->>filter_bvp: Call(bvp_task, fs)\n                    filter_bvp->>scipy: butter()\n                    scipy-->>filter_bvp: filter_coeffs (b,a)\n                    filter_bvp->>scipy: filtfilt(coeffs, bvp_task)\n                    scipy-->>filter_bvp: filtered_signal\n                    filter_bvp-->>get_hrv: filtered_bvp_task\n                    get_hrv->>heartpy: process(filtered_bvp_task, fs)\n                    heartpy-->>get_hrv: wd, m (peaks)\n                    get_hrv->>neurokit: hrv(ibi_ms, ...)\n                    neurokit-->>get_hrv: hrv_indices\n                    get_hrv-->>proc_subj_data: task_hrv_metrics\n                    proc_subj_data->>proc_subj_data: Store task_hrv_metrics\n                else No task BVP\n                    proc_subj_data->>proc_subj_data: Log warning\n                end\n                \n                proc_subj_data->>pd: pd.DataFrame(results_list)\n                pd-->>proc_subj_data: subject_hrv_df\n                proc_subj_data-->>MainBlock: subject_hrv_df\n                MainBlock->>MainBlock: Append subject_hrv_df to all_participant_dfs\n            else Missing files\n                MainBlock->>MainBlock: Log skipping subject\n            end\n        end\n    end\n    \n    alt all_participant_dfs is not empty\n        MainBlock->>pd: pd.concat(all_participant_dfs)\n        pd-->>MainBlock: final_df\n    else\n        MainBlock->>pd: pd.DataFrame() (empty)\n        pd-->>MainBlock: final_df (empty)\n    end\n    MainBlock-->>Notebook: final_df\n\n    %% Statistical Modeling Phase\n    Notebook->>Notebook: Check final_df for validity\n    alt final_df is valid and has HRV_RMSSD\n        Notebook->>Notebook: Prepare model_df (dropna, astype)\n        Notebook->>statsmodels: mixedlm(\"HRV_RMSSD ~ C(Phase)*C(Condition)\", model_df, groups=\"ParticipantID\")\n        statsmodels-->>Notebook: model_lmm\n        Notebook->>model_lmm: fit()\n        model_lmm-->>Notebook: result_lmm\n        Notebook->>result_lmm: summary()\n        result_lmm-->>Notebook: Print summary\n    else final_df is not valid\n        Notebook->>Notebook: Print \"Skipping statistical analysis\"\n    end",
+  "content_size": 5058,
+  "collected_at": "2026-02-06T01:34:57.597472",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 os.scandir 和 os.scandir, re.search 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'os.scandir 和 os.scandir, re.search'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "session_folders",
+        "subject_folders_map"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 glob.glob 和 subject_id, baseline_filepath, task_filepath。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'glob.glob 和 subject_id, baseline_filepath, task_filepath'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "task_filepath",
+        "Call"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 baseline_filepath 和 baseline_filepath 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'baseline_filepath 和 baseline_filepath'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Call",
+        "load_xdf"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 bvp_baseline, ts_baseline, fs 和 bvp_baseline, fs 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'bvp_baseline, ts_baseline, fs 和 bvp_baseline, fs'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Call",
+        "Call"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 b,a 和 coeffs, bvp_baseline 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 b,a处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'b,a处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "filter_coeffs",
+        "filtfilt"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 filtered_bvp_baseline, fs 和 peaks。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'filtered_bvp_baseline, fs 和 peaks'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "process",
+        "m"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 ibi_ms, ... 和 task_filepath 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'ibi_ms, ... 和 task_filepath'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "hrv",
+        "Call"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 task_filepath 和 bvp_task, ts_task, fs 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'task_filepath 和 bvp_task, ts_task, fs'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "load_xdf",
+        "Call"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 bvp_task, fs 和 b,a 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'bvp_task, fs 和 b,a'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Call",
+        "filter_coeffs"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 coeffs, bvp_task 和 filtered_bvp_task, fs 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'coeffs, bvp_task 和 filtered_bvp_task, fs'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "filtfilt",
+        "process"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 peaks 和 ibi_ms, ... 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'peaks 和 ibi_ms, ...'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "m",
+        "hrv"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 results_list 和 all_participant_dfs。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'results_list 和 all_participant_dfs'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DataFrame",
+        "concat"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 empty 和 dropna, astype 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'empty 和 dropna, astype'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "final_df",
+        "model_df"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"HRV_RMSSD ~ C(Phase 和 Condition 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"HRV_RMSSD ~ C(Phase 和 Condition'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "mixedlm",
+        "C"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 57,
+    "repair_count": 1,
+    "grounding_acts_count": 28,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:28Z"
+}

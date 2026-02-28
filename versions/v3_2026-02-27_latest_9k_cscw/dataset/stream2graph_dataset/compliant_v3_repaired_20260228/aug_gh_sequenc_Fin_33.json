@@ -1,0 +1,137 @@
+{
+  "id": "aug_gh_sequenc_Fin_33",
+  "seed": "gh_sequence_00532",
+  "domain": "FinTech",
+  "code": "%%{FinTech_Node}}}%%\n\nsequenceDiagram\n    participant User\n    participant Vault as YieldVaultMultiAsset<br/>(FinTech_Ledger)\n    participant Aave as Aave V3 Pool<br/>(FinTech_Node)\n    participant RSC as YieldOptimizerRsc<br/>(FinTech_Risk)\n    participant Callback as Callback Proxy<br/>(FinTech_Node)\n\n    Note over User,Callback: Yield Monitoring and Rebalancing Flow\n\n    User->>Vault: triggerYieldSnapshot(FinTech_Vault)\n    Vault->>Aave: getReserveData(FinTech_Ledger)\n    Aave-->>Vault: liquidityRate, APY data\n    Vault->>Vault: Calculate APYs for all assets\n    Vault-->>RSC: emit YieldSnapshot(FinTech_Ledger)\n    \n    Note over RSC: RSC analyzes yield data\n    RSC->>RSC: Compare APYs across assets\n    RSC->>RSC: Determine optimal allocation\n    \n    alt Yield difference exceeds threshold\n        RSC->>Callback: emit Callback(FinTech_Ledger)\n        Callback->>Vault: executeRebalance(FinTech_Gate)\n        Vault->>Vault: Update asset allocations\n        Vault-->>User: Funds rebalanced to higher yield\n    else Yield difference below threshold\n        Note over RSC: No rebalance needed\n    end\n",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 FinTech_Vault 和 FinTech_Ledger 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'FinTech_Vault 和 FinTech_Ledger'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "triggerYieldSnapshot",
+        "getReserveData"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 FinTech_Ledger 和 FinTech_Ledger。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'FinTech_Ledger 和 FinTech_Ledger'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "YieldSnapshot",
+        "Callback"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 FinTech_Gate 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 FinTech_Gate处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'FinTech_Gate处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "executeRebalance"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 13,
+    "repair_count": 1,
+    "grounding_acts_count": 6,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "source": "augmented_real_structure",
+  "diagram_type": "sequence",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "compilation_status": "success",
+  "compilation_error": "",
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:51Z"
+}

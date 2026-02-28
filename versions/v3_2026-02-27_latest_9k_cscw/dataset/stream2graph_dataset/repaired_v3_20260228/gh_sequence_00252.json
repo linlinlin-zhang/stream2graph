@@ -1,0 +1,150 @@
+{
+  "id": "gh_sequence_00252",
+  "source": "github",
+  "source_url": "https://github.com/5G-MAG/rt-data-collection-application-function/blob/c423612d6dc3cbe4b220b7bb909c7e2cbb9d9e59/docs/C-APIs-sequence-SP-actions.mmd",
+  "github_repo": "5G-MAG/rt-data-collection-application-function",
+  "github_file_path": "docs/C-APIs-sequence-SP-actions.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\nautonumber\ntitle Data Collection AF and service provider call flows (SP providing interfaces)\n\nbox rgb(255,255,220) User Equipment\nparticipant UE as Direct Data<br/>Reporting Client\nend\nbox rgb(220,255,220) Data Collection\nparticipant AF as Application Function\nparticipant SP as Data Collection library\nend\nbox rgb(220,220,255) 5G Core\nparticipant NRF as Network Registration Function\nend\nbox rgb(255,220,220) 3rd Party Systems\nparticipant AP as Application Provider\nend\n\n%% == Start-up ==\nnote over UE,AP: Start-up\nAF ->> SP: Initialise library:<br/>Register known data<br/>reports and event types\nSP -->> AF: Library initialised:<br/>True or False\nAF ->> SP: Register NF services:<br/>Add library handled services<br/>to NF instance description\nSP -->> AF: OK\nAF ->> NRF: Register NF Instance\nNRF -->> AF: Instance registered\n%% == Provisioning ==\nnote over UE,AP: Provisioning\nAP ->> AF: Create Data Reporting Provisioning Session:<br/>Register a session for a given external app id and event type\nAF -->> SP: Pass on provisioning session request\nSP ->> SP: Validate DataReportingProvisioningSession JSON<br/>and convert to C API data model\nbreak validation failed\nSP -->> AP: Error: ProblemDetail indicates the cause of the error\nend\nSP ->> SP: (C API)<br/>Create provisioning session\nSP -->> SP: (C API)<br/>Provisioning session creation result\nbreak session failed\nSP -->> AP: Error: ProblemDetail indicates the cause of the error\nend\nSP -->> AP: OK: Return the provisioning session id in the Location header\n\nAP ->> AF: Create Data Reporting Configuration for the provisioning session:<br/>Includes configuration for sampling, reporting and filtering/aggregation for event exposure\nAF ->> SP: Pass on configuration request\nSP ->> SP: Validate DataReportingConfiguration\nbreak validation failed\nSP -->> AP: Error: ProblemDetail indicates the cause of the error\nend\nSP ->> SP: (C API)<br/>Add configuration to provisioning session\nSP -->> SP: (C API)<br/>Configuration addition result\nbreak configuration failed\nSP -->> AP: Error: ProblemDetail indicates the cause of the error\nend\nSP -->> AP: Configuration added to the provisioning session\n\n%% == Event Subscription ==\nnote over UE,AP: Event Subscription\nAP ->> AF: Register for events<br/>POST /naf-eventexposure/v1/...\nAF ->> SP: Pass on event subscription request\nSP ->> SP: Validate AfEventExposureSubsc JSON\nbreak validation failed\nSP -->> AP: Error: Reason for error in ProblemDetail\nend\nSP ->> SP: (C API)<br/>Create event exposure subscription\nSP -->> SP: (C API)<br/>Event exposure subscription result\nbreak subscription failed\nSP -->> AP: Error: Reason for error in ProblemDetail\nend\nSP -->> AP: OK: event subscription id in Location header\n\n%% == Data Reporting ==\nnote over UE,AP: Data Reporting\nUE ->> AF: Create Data Reporting Session<br/>POST /3gpp-ndcaf_data-reporting/v1/sessions<br/>DataReportingSession\nAF ->> SP: Pass on reporting session request\nSP ->> SP: Validate DataReportingSession JSON\nbreak validation failed\nSP -->> UE: Error: Reason for error in ProblemDetail\nend\nSP ->> SP: (C API)<br/>Create data reporting session\nSP -->> SP: (C API)<br/>Data reporting session result\nbreak session failed\nSP -->> UE: Error: Reason for error in ProblemDetail\nend\nSP -->> UE: Reporting session created<br/>Location header contains the reporting session id\nloop Operations according to rules in DataReportingSession\n  alt Report Data\n    UE ->> AF: Report data<br/>POST /3gpp-ndcaf_data-reporting/v1/sessions/{sessionId}/report<br/>DataReport\n    AF ->> SP: Pass on data report submission\n    SP ->> SP: (C API) Add data report\n    SP ->> AF: (C API - callback) Parse data report\n    AF -->> SP: (C API - callback) Parse result\n    break on error\n        SP -->> SP: (C api) Return error\n        SP -->> UE: Error: Reason for error in ProblemDetail\n    end\n    SP -->> SP: report samples added to database\n    SP -->> SP: (C API) Return OK for add data report\n    SP -->> UE: OK\n    opt If there is a subscription to an event that uses this report type\n        SP ->> AF: (C API)<br/>Generate event notifications<br/>for event subscription\n        AF ->> SP: (C API)<br/>Get bucketed reports: passes some filtering information\n        SP -->> SP: collect samples from database\n        SP -->> SP: bucket samples for aggregation\n        opt if sample needs apportioning for the bucket\n            SP ->> AF: (C API - callback)<br/>Proportion record\n            AF -->> SP: (C API - callback)<br/>Proportioned record\n        end\n        SP ->> AF: (C API - callback) Aggregate samples for each bucket\n        AF ->> SP: (C API)<br/>Apply aggregation to sample values\n        SP -->> AF: (C API)<br/>Aggregated result\n        AF -->> AF: Create new data sample record with aggregated results\n        AF -->> SP: (C API - callback) Aggregated sample(s)\n        SP -->> AF: (C API) Return bucketed aggregated samples\n        AF -->> AF: Convert bucketed samples into event exposure notifications\n        AF -->> SP: (C API) Return generated event notifications\n        SP ->> AP: Send event notifications\n    end\n  else Refresh Data Reporting Session\n    UE ->> AF: Retrieve Data Reporting Session<br/>GET /3gpp-ndcaf_data-reporting/v1/sessions/{sessionId}\n    AF ->> SP: Pass on get request for DataReportingSession\n    SP -->> UE: 200 OK<br/>DataReportingSession\n  end\nend\n\n%% == End Data Reporting ==\nnote over UE,AP: End Data Reporting\nUE ->> AF: Destroy Data Reporting Session<br/>DELETE /3gpp-ndcaf_data-reporting/v1/sessions/{sessionId}\nAF -->> UE: 204 No Content\n%% == End Event Subscription ==\nnote over UE,AP: End Event Subscription\nAP ->> AF: Destroy Event Subscription<br/>DELETE /naf-eventexposure/v1/...\nAF -->> AP: 204 No Content\n%% == End Data Reporting Provisioning Session ==\nnote over UE,AP: End Data Reporting Provisioning Session\nAP ->> AF: Destroy Data Reporting Provisioning Session<br/>DELETE /3gpp-ndcaf_data-reporting-provisioning/v1/sessions/{sessionId}\nAF -->> AP: 204 No Content\n",
+  "content_size": 5991,
+  "collected_at": "2026-02-06T01:29:46.004594",
+  "compilation_status": "success",
+  "license": "none",
+  "license_name": "No License (Assumed)",
+  "license_url": null,
+  "repo_stars": 1,
+  "repo_forks": 3,
+  "repo_owner": "5G-MAG",
+  "repo_name": "rt-data-collection-application-function",
+  "repo_description": "A reusable library that implements the generic Data Collection AF defined in 3GPP TS 23.531 and specified in TS 26.532.",
+  "repo_language": "C",
+  "repo_topics": [],
+  "repo_created_at": "2023-12-20T14:33:08Z",
+  "repo_updated_at": "2025-05-13T12:23:18Z",
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 SP providing interfaces 和 255,255,220。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'SP providing interfaces 和 255,255,220'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "flows",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 220,255,220 和 220,220,255 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 220,255,220处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '220,255,220处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "rgb",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 255,220,220 和 s 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '255,220,220 和 s'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "rgb",
+        "sample"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 13,
+    "repair_count": 1,
+    "grounding_acts_count": 6,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:21Z"
+}

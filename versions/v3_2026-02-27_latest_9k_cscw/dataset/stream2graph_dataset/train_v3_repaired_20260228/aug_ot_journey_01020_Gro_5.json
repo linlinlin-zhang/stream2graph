@@ -1,0 +1,235 @@
+{
+  "id": "aug_ot_journey_01020_Gro_5",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/functario/Caravel/blob/9304846541fc821a7683952c615b8da4e1274a82/docs/sequence-diagrams/journey.goto.mmd",
+  "source_type": "github_search",
+  "github_repo": "functario/Caravel",
+  "diagram_type": "journey",
+  "code": "sequenceDiagram\n    participant Journey            as Journey\n    participant Ext                as JourneyExtensions\n    participant EmptyExcl          as EmptyExcludedWaypoints\n    participant Graph              as Graph\n    participant CurrentNode        as CurrentNode\n    participant Edge               as Edge\n    participant NeighborNavigator  as NeighborNavigator\n    participant JourneyLegFactory  as JourneyLegFactory\n    participant JourneyLegPublisher as JourneyLegPublisher\n\n    %% ---- 1. Extension entry ------------------------------------\n    Journey->>Ext: GotoAsync<Node3>(Groupware_IssueTracker)  \n    Ext->>Journey: GotoAsync<Node3>(Groupware_IssueTracker) and EmptyExcludedWaypoints.Create(Groupware_KanbanBoard) and token)\n\n    %% ---- 3. Visit starting node --------------------------------\n    Journey->>CurrentNode: OnNodeVisitedAsync(Groupware_WikiPage)\n\n    %% ---- 4. Resolve route ---------------------------------------\n    Journey->>Graph: GetRoute(Groupware_WikiPage)\n    Graph-->>Journey: route\n\n    %% ---- 5. Create journey leg ----------------------------------\n    Journey->>JourneyLegFactory: CreateJourneyLeg(Groupware_KanbanBoard)\n    JourneyLegFactory-->>Journey: journeyLeg\n\n    %% ---- 6. Publish leg started --------------------------------\n    Journey->>JourneyLegPublisher: PublishOnJourneyLegStartedAsync(Groupware_WikiPage)\n\n    %% ---- 7. Navigate through the edges --------------------------\n    loop each edge in route.Edges\n        Journey->>Edge: edge\n        Edge->>NeighborNavigator: MoveNext(Groupware_KanbanBoard)\n        NeighborNavigator-->>Journey: newNode\n        Journey->>CurrentNode: OnNodeVisitedAsync(Groupware_KanbanBoard)\n        Journey->>journeyLeg: Edges.Enqueue(Groupware_KanbanBoard)\n        Journey->>JourneyLegPublisher: PublishOnJourneyLegUpdatedAsync(Groupware_ChatRoom)\n    end\n\n    %% ---- 8. Finish the leg --------------------------------------\n    Journey->>JourneyLegPublisher: PublishOnJourneyLegCompletedAsync(Groupware_IssueTracker)\n\n    %% ---- 9. Final node visit ------------------------------------\n    Journey->>CurrentNode: OnNodeVisitedAsync(Groupware_ChatRoom)",
+  "content_size": 2098,
+  "collected_at": "2026-02-06T11:02:07.455987",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Groupware",
+  "seed_id": "ot_journey_01020",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Groupware_KanbanBoard 和 Groupware_WikiPage 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Groupware_KanbanBoard 和 Groupware_WikiPage'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Create",
+        "OnNodeVisitedAsync"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Groupware_WikiPage 和 Groupware_KanbanBoard 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Groupware_WikiPage 和 Groupware_KanbanBoard'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "GetRoute",
+        "CreateJourneyLeg"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Groupware_WikiPage 和 Groupware_KanbanBoard 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Groupware_WikiPage 和 Groupware_KanbanBoard'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PublishOnJourneyLegStartedAsync",
+        "MoveNext"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Groupware_KanbanBoard 和 Groupware_KanbanBoard 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Groupware_KanbanBoard 和 Groupware_KanbanBoard'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OnNodeVisitedAsync",
+        "Enqueue"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Groupware_ChatRoom 和 Groupware_IssueTracker 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Groupware_ChatRoom 和 Groupware_IssueTracker'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PublishOnJourneyLegUpdatedAsync",
+        "PublishOnJourneyLegCompletedAsync"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Groupware_ChatRoom 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Groupware_ChatRoom'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OnNodeVisitedAsync"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 24,
+    "repair_count": 0,
+    "grounding_acts_count": 12,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repaired_at": "2026-02-28T13:41:29Z"
+}

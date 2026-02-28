@@ -1,0 +1,210 @@
+{
+  "id": "gl_packet-beta_00374",
+  "source": "gitlab",
+  "source_url": "https://github.com/mariovillacortagarcia/sistemas-distribuidos-2025/blob/2ff34175a81d58aa7da7faea5d2230905c7d7b43/remote-filesystem-with-sockets-example/sockets-client/sequence.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "mariovillacortagarcia/sistemas-distribuidos-2025",
+  "diagram_type": "packet-beta",
+  "code": "---\nconfig:\n  theme: default\ntitle: Sockets Client - Execution Flow\n---\n\nsequenceDiagram\n    autonumber\n    actor User\n    participant Main as SocketsClient\n    \n    box rgb(220, 240, 255) Middleware Layer\n        participant ClientAdapter as TCPClientAdapter\n        participant Network\n    end\n    \n    box rgb(255, 245, 220) App Layer - Application\n        participant UseCase as SendFileUseCase\n    end\n    \n    box rgb(255, 235, 220) App Layer - Infrastructure\n        participant Repo as ConsoleFileRepository\n    end\n    \n    participant Console\n    \n    box rgb(220, 255, 220) Server Side\n        participant Server\n    end\n\n    User->>Main: Start client application\n    Main->>Repo: new ConsoleFileRepository()\n    Main->>UseCase: new SendFileUseCase(filePort, \"message\")\n    Main->>ClientAdapter: new TCPClientAdapter(HOST, PORT, useCase)\n    Main->>ClientAdapter: start()\n\n    ClientAdapter->>Console: Print \"Connecting to localhost:1234\"\n    ClientAdapter->>Network: new Socket(host, port)\n    Network-->>ClientAdapter: Return connected socket\n    ClientAdapter->>Console: Print \"Connected to server\"\n\n    ClientAdapter->>UseCase: execute()\n    UseCase->>Repo: getFileFromSrc(\"message\")\n    Repo->>Console: Print \"Enter content for 'message': \"\n    Console->>User: Display prompt\n    User->>Console: Type message and press Enter\n    Console-->>Repo: Return input string\n    Repo->>Repo: Create File entity\n    Repo-->>UseCase: Return File\n    UseCase->>UseCase: Extract content\n    UseCase-->>ClientAdapter: Return content string\n\n    ClientAdapter->>Network: write(data)\n    ClientAdapter->>Network: newLine()\n    ClientAdapter->>Network: flush()\n    Network->>Server: Send data packet\n    ClientAdapter->>Console: Print \"Sent: [data]\"\n\n    ClientAdapter->>Network: Close socket\n    ClientAdapter->>Console: Print \"Connection closed\"\n    ClientAdapter-->>Main: Return\n    Main-->>User: Exit application\n\n",
+  "content_size": 1917,
+  "collected_at": "2026-02-06T14:08:28.614509",
+  "compilation_status": "success",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 220, 240, 255 和 255, 245, 220。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '220, 240, 255 和 255, 245, 220'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "rgb",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 255, 235, 220 和 220, 255, 220 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '255, 235, 220 和 220, 255, 220'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "rgb",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 filePort, \"message\" 和 HOST, PORT, useCase 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'filePort, \"message\" 和 HOST, PORT, useCase'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SendFileUseCase",
+        "TCPClientAdapter"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 host, port 和 \"message\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 host, port处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'host, port处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Socket",
+        "getFileFromSrc"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 data 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'data'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "write"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 21,
+    "repair_count": 1,
+    "grounding_acts_count": 10,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-02-28T13:41:46Z"
+}
