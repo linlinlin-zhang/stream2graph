@@ -13,11 +13,15 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from dataclasses import asdict
+import threading
+import time
+import uuid
+from dataclasses import asdict, dataclass, field
 from http import HTTPStatus
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from typing import Dict, List, Optional
+from statistics import mean, median
+from typing import Dict, List, Optional, Sequence, Tuple
 from urllib.parse import urlparse
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -31,9 +35,161 @@ if str(REPO_ROOT / "tools") not in sys.path:
 
 from asr_stream_adapter import ASRChunk  # noqa: E402
 from evaluate_realtime_pipeline import evaluate_payload  # noqa: E402
+from incremental_renderer import IncrementalGraphRenderer  # noqa: E402
 from run_realtime_pipeline import run_realtime_pipeline  # noqa: E402
-from streaming_intent_engine import EngineConfig  # noqa: E402
+from streaming_intent_engine import EngineConfig, StreamingIntentEngine, StreamingUpdate, TranscriptChunk  # noqa: E402
 from unified_pretrain_eval import evaluate_dataset, merge_scores  # noqa: E402
+
+SESSION_LOCK = threading.Lock()
+SESSIONS: Dict[str, "SessionState"] = {}
+
+
+def _pctl(values: List[float], p: float) -> float:
+    if not values:
+        return 0.0
+    arr = sorted(values)
+    if p <= 0:
+        return float(arr[0])
+    if p >= 100:
+        return float(arr[-1])
+    idx = int(round((len(arr) - 1) * p / 100.0))
+    return float(arr[idx])
+
+
+def _stats(values: List[float]) -> Dict:
+    if not values:
+        return {"count": 0.0, "mean": 0.0, "p50": 0.0, "p95": 0.0, "max": 0.0}
+    return {
+        "count": float(len(values)),
+        "mean": round(float(mean(values)), 4),
+        "p50": round(float(median(values)), 4),
+        "p95": round(float(_pctl(values, 95.0)), 4),
+        "max": round(float(max(values)), 4),
+    }
+
+
+def _majority_label_in_range(
+    labeled_chunks: Sequence[Tuple[int, Optional[str]]],
+    start_ms: int,
+    end_ms: int,
+) -> Optional[str]:
+    counts: Dict[str, int] = {}
+    for ts, label in labeled_chunks:
+        if not label:
+            continue
+        if start_ms <= ts <= end_ms:
+            counts[label] = counts.get(label, 0) + 1
+    if not counts:
+        return None
+    return max(counts.items(), key=lambda x: x[1])[0]
+
+
+@dataclass
+class SessionState:
+    session_id: str
+    config: EngineConfig
+    engine: StreamingIntentEngine
+    renderer: IncrementalGraphRenderer
+    created_wall_ms: int = field(default_factory=lambda: int(time.time() * 1000))
+    lock: threading.Lock = field(default_factory=threading.Lock)
+    events: List[Dict] = field(default_factory=list)
+    labeled_chunks: List[Tuple[int, Optional[str]]] = field(default_factory=list)
+    chunk_count: int = 0
+    first_ts: Optional[int] = None
+    last_ts: Optional[int] = None
+    e2e_latencies: List[float] = field(default_factory=list)
+    update_latencies: List[float] = field(default_factory=list)
+    render_latencies: List[float] = field(default_factory=list)
+
+    def ingest_chunk(self, chunk: TranscriptChunk, expected_intent: Optional[str]) -> List[Dict]:
+        if self.first_ts is None:
+            self.first_ts = chunk.timestamp_ms
+        self.last_ts = chunk.timestamp_ms
+        self.chunk_count += 1
+        self.labeled_chunks.append((chunk.timestamp_ms, expected_intent))
+
+        updates = self.engine.ingest(chunk)
+        return self._consume_updates(updates)
+
+    def flush(self) -> List[Dict]:
+        updates = self.engine.flush()
+        return self._consume_updates(updates)
+
+    def _consume_updates(self, updates: Sequence[StreamingUpdate]) -> List[Dict]:
+        emitted: List[Dict] = []
+        for update in updates:
+            render_t0 = int(time.time() * 1000)
+            frame = self.renderer.apply_update(
+                update_id=update.update_id,
+                operations=update.operations,
+                intent_type=update.intent_type,
+            )
+            render_ms = int(time.time() * 1000) - render_t0
+            e2e_ms = float(update.processing_latency_ms + render_ms)
+            gold_intent = _majority_label_in_range(
+                labeled_chunks=self.labeled_chunks,
+                start_ms=update.start_ms,
+                end_ms=update.end_ms,
+            )
+            event = {
+                "update": asdict(update),
+                "render_frame": asdict(frame),
+                "gold_intent": gold_intent,
+                "intent_correct": (gold_intent == update.intent_type) if gold_intent else None,
+                "render_latency_ms": render_ms,
+                "e2e_latency_ms": round(e2e_ms, 4),
+            }
+            self.events.append(event)
+            emitted.append(event)
+            self.e2e_latencies.append(e2e_ms)
+            self.update_latencies.append(float(update.processing_latency_ms))
+            self.render_latencies.append(float(render_ms))
+        return emitted
+
+    def pipeline_payload(self, mode: str = "live_session") -> Dict:
+        runtime_ms = int(time.time() * 1000) - self.created_wall_ms
+        transcript_duration_ms = 0
+        if self.first_ts is not None and self.last_ts is not None:
+            transcript_duration_ms = max(0, self.last_ts - self.first_ts)
+        speed_vs_realtime = (
+            round(transcript_duration_ms / runtime_ms, 4)
+            if runtime_ms > 0 and transcript_duration_ms > 0
+            else 0.0
+        )
+
+        prediction_pairs = []
+        for ev in self.events:
+            gold = ev.get("gold_intent")
+            pred = ev.get("update", {}).get("intent_type")
+            prediction_pairs.append((gold, pred))
+        labeled_eval_count = len([1 for g, _ in prediction_pairs if g is not None])
+        labeled_correct = len([1 for g, p in prediction_pairs if g is not None and g == p])
+        labeled_accuracy = (labeled_correct / labeled_eval_count) if labeled_eval_count > 0 else None
+
+        return {
+            "meta": {
+                "mode": mode,
+                "time_scale": 1.0,
+                "input_chunk_count": self.chunk_count,
+                "runtime_ms": runtime_ms,
+                "transcript_duration_ms": transcript_duration_ms,
+                "speedup_vs_realtime": speed_vs_realtime,
+            },
+            "summary": {
+                "updates_emitted": len(self.events),
+                "latency_e2e_ms": _stats(self.e2e_latencies),
+                "latency_update_ms": _stats(self.update_latencies),
+                "latency_render_ms": _stats(self.render_latencies),
+                "intent_labeled_eval_count": labeled_eval_count,
+                "intent_labeled_accuracy": round(labeled_accuracy, 4) if labeled_accuracy is not None else None,
+                "intent_runtime_distribution": self.engine.get_runtime_report().get("intent_distribution", {}),
+                "boundary_distribution": self.engine.get_runtime_report().get("boundary_distribution", {}),
+                "renderer_stability": self.renderer.summary(),
+            },
+            "engine_report": self.engine.get_runtime_report(),
+            "renderer_state": self.renderer.export_state(),
+            "events": self.events,
+        }
 
 
 def _json_response(handler: SimpleHTTPRequestHandler, payload: Dict, status: int = 200) -> None:
@@ -156,6 +312,7 @@ class RealtimeUIHandler(SimpleHTTPRequestHandler):
                     "service": "stream2graph-realtime-ui-server",
                     "repo_root": str(REPO_ROOT),
                     "frontend_dir": str(FRONTEND_DIR),
+                    "active_sessions": len(SESSIONS),
                 },
             )
             return
@@ -178,8 +335,24 @@ class RealtimeUIHandler(SimpleHTTPRequestHandler):
                         "mental_map_min": 0.85,
                         "intent_accuracy_threshold": 0.8,
                     },
+                    "speech_recognition_hint": "browser_web_speech_api",
                 },
             )
+            return
+        if parsed.path == "/api/session/list":
+            with SESSION_LOCK:
+                items = sorted(
+                    [
+                        {
+                            "session_id": sid,
+                            "chunk_count": sess.chunk_count,
+                            "updates_emitted": len(sess.events),
+                        }
+                        for sid, sess in SESSIONS.items()
+                    ],
+                    key=lambda x: x["session_id"],
+                )
+            _json_response(self, {"ok": True, "sessions": items})
             return
         if parsed.path in {"/", "/index.html"}:
             self.path = "/index.html"
@@ -188,6 +361,126 @@ class RealtimeUIHandler(SimpleHTTPRequestHandler):
     def do_POST(self) -> None:
         parsed = urlparse(self.path)
         payload = _read_json_body(self)
+
+        if parsed.path == "/api/session/create":
+            config = EngineConfig(
+                min_wait_k=int(payload.get("min_wait_k", 1)),
+                base_wait_k=int(payload.get("base_wait_k", 2)),
+                max_wait_k=int(payload.get("max_wait_k", 4)),
+            )
+            session_id = uuid.uuid4().hex[:12]
+            sess = SessionState(
+                session_id=session_id,
+                config=config,
+                engine=StreamingIntentEngine(config=config),
+                renderer=IncrementalGraphRenderer(),
+            )
+            with SESSION_LOCK:
+                SESSIONS[session_id] = sess
+            _json_response(
+                self,
+                {
+                    "ok": True,
+                    "session_id": session_id,
+                    "config": asdict(config),
+                },
+            )
+            return
+
+        if parsed.path == "/api/session/chunk":
+            session_id = str(payload.get("session_id", "")).strip()
+            text = str(payload.get("text", "")).strip()
+            if not session_id:
+                _json_response(self, {"ok": False, "error": "session_id required"}, status=400)
+                return
+            if not text:
+                _json_response(self, {"ok": False, "error": "text required"}, status=400)
+                return
+            with SESSION_LOCK:
+                sess = SESSIONS.get(session_id)
+            if sess is None:
+                _json_response(self, {"ok": False, "error": "session not found"}, status=404)
+                return
+
+            timestamp_ms = payload.get("timestamp_ms")
+            if timestamp_ms is None:
+                if sess.last_ts is None:
+                    timestamp_ms = 0
+                else:
+                    timestamp_ms = sess.last_ts + 450
+
+            tchunk = TranscriptChunk(
+                timestamp_ms=int(timestamp_ms),
+                text=text,
+                speaker=str(payload.get("speaker", "user")),
+                is_final=bool(payload.get("is_final", True)),
+            )
+            expected_intent = payload.get("expected_intent")
+
+            with sess.lock:
+                emitted = sess.ingest_chunk(tchunk, expected_intent=expected_intent)
+                summary = sess.pipeline_payload(mode="live_session")
+
+            _json_response(
+                self,
+                {
+                    "ok": True,
+                    "session_id": session_id,
+                    "emitted_events": emitted,
+                    "session_summary": summary.get("summary", {}),
+                    "events_total": len(summary.get("events", [])),
+                },
+            )
+            return
+
+        if parsed.path == "/api/session/flush":
+            session_id = str(payload.get("session_id", "")).strip()
+            if not session_id:
+                _json_response(self, {"ok": False, "error": "session_id required"}, status=400)
+                return
+            with SESSION_LOCK:
+                sess = SESSIONS.get(session_id)
+            if sess is None:
+                _json_response(self, {"ok": False, "error": "session not found"}, status=404)
+                return
+
+            with sess.lock:
+                emitted = sess.flush()
+                pipeline = sess.pipeline_payload(mode="live_session")
+                evaluation = evaluate_payload(
+                    payload=pipeline,
+                    latency_p95_threshold_ms=float(payload.get("latency_p95_threshold_ms", 2000.0)),
+                    flicker_mean_threshold=float(payload.get("flicker_mean_threshold", 6.0)),
+                    mental_map_min=float(payload.get("mental_map_min", 0.85)),
+                    intent_acc_threshold=float(payload.get("intent_accuracy_threshold", 0.8)),
+                )
+
+            if bool(payload.get("close_after_flush", True)):
+                with SESSION_LOCK:
+                    SESSIONS.pop(session_id, None)
+
+            _json_response(
+                self,
+                {
+                    "ok": True,
+                    "session_id": session_id,
+                    "emitted_events": emitted,
+                    "pipeline": pipeline,
+                    "evaluation": evaluation,
+                    "closed": bool(payload.get("close_after_flush", True)),
+                },
+            )
+            return
+
+        if parsed.path == "/api/session/close":
+            session_id = str(payload.get("session_id", "")).strip()
+            if not session_id:
+                _json_response(self, {"ok": False, "error": "session_id required"}, status=400)
+                return
+            with SESSION_LOCK:
+                removed = SESSIONS.pop(session_id, None)
+            _json_response(self, {"ok": True, "closed": removed is not None, "session_id": session_id})
+            return
 
         if parsed.path == "/api/pipeline/run":
             chunks = _build_chunks(payload)

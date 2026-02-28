@@ -119,6 +119,7 @@ python3 tools/realtime_frontend_server.py --host 127.0.0.1 --port 8088
 
 1. 端到端闭环：
 - `ASR transcript -> intent engine -> incremental renderer`
+  - 新增会话流式模式：浏览器麦克风转写可逐条推送到后端
 
 2. 实时评测：
 - 在前端直接触发 `/api/pipeline/evaluate`
@@ -137,9 +138,28 @@ python3 tools/realtime_frontend_server.py --host 127.0.0.1 --port 8088
 
 - `GET /api/health`
 - `GET /api/config`
+- `GET /api/session/list`
+- `POST /api/session/create`
+- `POST /api/session/chunk`
+- `POST /api/session/flush`
+- `POST /api/session/close`
 - `POST /api/pipeline/run`
 - `POST /api/pipeline/evaluate`
 - `POST /api/pretrain/unified`
+
+### 实时语音模式（前端）
+
+前端支持浏览器 Web Speech API（Chrome/Edge）：
+
+1. 点击 `麦克风开始`
+2. 语音将被实时转写并按会话流式推送到后端
+3. 舞台区实时增量成图
+4. 点击 `结束并评测` 生成会话级评测结果
+
+说明：
+
+- 该模式依赖浏览器语音识别能力，不依赖额外 Python ASR 包。
+- 若浏览器不支持 Web Speech API，仍可使用 transcript 文本模式。
 
 ### Transcript 输入格式（前端文本框）
 
