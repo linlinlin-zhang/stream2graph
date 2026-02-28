@@ -1,0 +1,29 @@
+{
+  "id": "gl_flowchart_00683",
+  "source": "gitlab",
+  "source_url": "https://github.com/jtremblay/ShotgunMG/blob/98c3c583f0b85862b68784562bad2f1fbbbca1e2/shotgunmg.mmd",
+  "source_note": "collected_from_github_final",
+  "github_repo": "jtremblay/ShotgunMG",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\n    p0((Channel.fromFilePairs))\n    p1[TRIMMOMATIC]\n    p2(( ))\n    p3(( ))\n    p4[BBDUK]\n    p5(( ))\n    p6(( ))\n    p7((Channel.empty))\n    p8(( ))\n    p9[BBMAP_SUBTRACT]\n    p10(( ))\n    p11([collect])\n    p12([collect])\n    p13([collect])\n    p14((Channel.empty))\n    p15[MEGAHIT]\n    p16(( ))\n    p17(( ))\n    p18([collect])\n    p19([ifEmpty])\n    p20([mix])\n    p21([collect])\n    p22[PRODIGAL]\n    p23(( ))\n    p24([collect])\n    p25[BEDFILE_CONTIGS]\n    p26[BEDFILE_GENES]\n    p27([collect])\n    p28[MAKE_BWA_INDEX]\n    p29([collect])\n    p30[BWAMEM_PE]\n    p31(( ))\n    p32[BEDTOOLS_COV_CONTIGS]\n    p33[BEDTOOLS_COV_GENES]\n    p34([map])\n    p35([collect])\n    p36[MERGE_COV_CONTIGS]\n    p37([map])\n    p38([collect])\n    p39[MERGE_COV_GENES]\n    p40([collect])\n    p41[EXONERATE_CONTIGS]\n    p42(( ))\n    p43(( ))\n    p44(( ))\n    p45[EXONERATE_GENES]\n    p46(( ))\n    p47(( ))\n    p48(( ))\n    p49(( ))\n    p50([map])\n    p51([transpose])\n    p52[DIAMOND_BLASTP_NR]\n    p53([collect])\n    p54[MERGE_DIAMOND_BLASTP_NR]\n    p55[HMMSEARCH_PFAM]\n    p56([collect])\n    p57([collect])\n    p58[MERGE_PFAM]\n    p59(( ))\n    p60(( ))\n    p61[RPSBLAST_COG]\n    p62([collect])\n    p63[MERGE_COG]\n    p64[COG_OVERREP]\n    p65(( ))\n    p66[HMMSEARCH_KEGG]\n    p67([collect])\n    p68([collect])\n    p69[MERGE_KEGG]\n    p70(( ))\n    p71[PARSE_KEGG]\n    p72[KO_OVERREP]\n    p73(( ))\n    p74[CONVERT_IDS_FOR_CAT]\n    p75[CAT]\n    p76[GENERATE_FEATURE_TABLES]\n    p77(( ))\n    p78(( ))\n    p79[SUMMARIZE_TAXONOMY]\n    p80(( ))\n    p81(( ))\n    p82[BETA_DIVERSITY_BACTARCH]\n    p83(( ))\n    p84(( ))\n    p85(( ))\n    p86[BETA_DIVERSITY_ALL]\n    p87(( ))\n    p88(( ))\n    p89(( ))\n    p90[ALPHA_DIVERSITY_CONTIGS]\n    p91(( ))\n    p92[ALPHA_DIVERSITY_GENES]\n    p93(( ))\n    p94[COG_MATRIX_RPOB]\n    p95[COG_MATRIX_RECA]\n    p96[ALPHA_DIVERSITY_RPOB]\n    p97(( ))\n    p98[ALPHA_DIVERSITY_RECA]\n    p99(( ))\n    p100([map])\n    p101([collect])\n    p102[METABAT_ABUNDANCE]\n    p103([collect])\n    p104[METABAT2]\n    p105[CHECKM_METABAT2]\n    p106(( ))\n    p0 -->|raw_reads_channel| p1\n    p1 --> p4\n    p1 --> p3\n    p1 --> p2\n    p4 --> p9\n    p4 --> p6\n    p4 --> p5\n    p7 -->|ch_qced_reads| p8\n    p9 --> p11\n    p9 --> p10\n    p11 -->|sample_id| p15\n    p9 --> p12\n    p12 -->|R1| p15\n    p9 --> p13\n    p13 -->|R2| p15\n    p14 -->|ch_assembly| p20\n    p15 --> p18\n    p15 --> p17\n    p15 --> p16\n    p18 --> p19\n    p19 --> p20\n    p20 -->|ch_assembly| p21\n    p21 --> p22\n    p22 --> p23\n    p22 --> p45\n    p22 --> p26\n    p22 --> p75\n    p20 -->|ch_assembly| p24\n    p24 --> p25\n    p25 --> p32\n    p26 --> p33\n    p20 -->|ch_assembly| p27\n    p27 --> p28\n    p28 --> p30\n    p28 --> p30\n    p28 --> p30\n    p28 --> p30\n    p28 --> p30\n    p28 --> p30\n    p20 -->|ch_assembly| p29\n    p29 --> p30\n    p9 --> p30\n    p30 --> p32\n    p30 --> p31\n    p32 --> p34\n    p30 --> p33\n    p33 --> p37\n    p34 --> p35\n    p35 --> p36\n    p36 --> p76\n    p37 --> p38\n    p38 --> p39\n    p39 --> p64\n    p20 -->|ch_assembly| p40\n    p40 --> p41\n    p41 --> p44\n    p41 --> p43\n    p41 --> p42\n    p45 --> p49\n    p45 --> p48\n    p45 --> p47\n    p45 -->|NUMCHUNKS| p46\n    p45 --> p50\n    p50 --> p51\n    p51 -->|ch_gene_chunks| p52\n    p52 --> p53\n    p53 --> p54\n    p54 --> p74\n    p51 -->|ch_gene_chunks| p55\n    p55 --> p57\n    p55 --> p56\n    p56 --> p58\n    p57 --> p58\n    p58 --> p60\n    p58 --> p59\n    p51 -->|ch_gene_chunks| p61\n    p61 --> p62\n    p62 --> p63\n    p63 --> p64\n    p64 --> p65\n    p51 -->|ch_gene_chunks| p66\n    p66 --> p68\n    p66 --> p67\n    p67 --> p69\n    p68 --> p69\n    p69 --> p71\n    p69 --> p70\n    p71 --> p72\n    p39 -->|gene_abundance| p72\n    p72 --> p73\n    p22 -->|infile_gff| p74\n    p74 --> p75\n    p15 -->|contigs_fna| p75\n    p75 --> p76\n    p76 --> p78\n    p76 --> p79\n    p76 --> p82\n    p76 --> p77\n    p79 --> p81\n    p79 --> p80\n    p82 --> p85\n    p82 --> p84\n    p82 --> p83\n    p76 -->|feature_table| p86\n    p86 --> p89\n    p86 --> p88\n    p86 --> p87\n    p36 -->|contig_abundance| p90\n    p90 --> p91\n    p39 -->|gene_abundance| p92\n    p92 --> p93\n    p39 -->|gene_abundance| p94\n    p63 -->|rpsblast_cog| p94\n    p94 --> p96\n    p39 -->|gene_abundance| p95\n    p63 -->|rpsblast_cog| p95\n    p95 --> p98\n    p96 --> p97\n    p98 --> p99\n    p30 --> p100\n    p100 --> p101\n    p101 --> p102\n    p102 --> p104\n    p20 -->|ch_assembly| p103\n    p103 --> p104\n    p104 --> p105\n    p105 --> p106\n",
+  "content_size": 4450,
+  "collected_at": "2026-02-06T14:18:53.443374",
+  "compilation_status": "success",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 1,
+  "repo_owner": "jtremblay",
+  "repo_name": "ShotgunMG",
+  "repo_description": "This repository contains the code for ShotgunMG, a Nextflow bioinformatic pipeline for high-resolution metagenomics",
+  "repo_language": "Nextflow",
+  "repo_topics": [
+    "nextflow",
+    "nextflow-pipeline",
+    "pipeline",
+    "shotgun-metagenomics"
+  ],
+  "repo_created_at": "2023-03-03T22:05:15Z",
+  "repo_updated_at": "2024-02-15T13:51:54Z"
+}

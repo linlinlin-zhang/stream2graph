@@ -1,0 +1,9 @@
+{
+  "id": "gh_ind_bce5e3f0de",
+  "source": "github_industrial",
+  "repo": "OnceApp/Analytics",
+  "license": "mit",
+  "code": "sequenceDiagram\nparticipant M as Some module\nparticipant E as MyEvent(record)\nparticipant R as RecordsSupervisor\nparticipant PS as ProducerSupervisor\nparticipant P as Producer\nparticipant CD as ConsumerDynamicSupervisor\nparticipant CS as ConsumerSupervisor\nparticipant C as Consumer\nparticipant T as Task\nparticipant K as Kinesis\nM->>+E: record(event)\n\nopt MyEvent server not running\nE->>+R: start_child\nR->>+E: init\nE->>E: New ets table\nE->>E: create_or_get_queue\n\nE->>+PS: start_child(MyEvent)\nPS->>+P: init(MyEvent)\nP->>+CD: start_child(MyEvent, pid)\nCD->>+CS: init({MyEvent, pid})\nCS-->>-CD: {:ok, pid}\nCD-->>-P: {:ok, pid}\nP->>+E: create_or_get_queue\nE-->>-P: queue\nP-->>-PS: {:producer, {{queue, 0}, MyEvent}}\nPS-->>-E: {:ok, pid}\nE-->>-R: {:ok, nil}\nR-->>-E: {:ok pid}\nend\n\nE->>E: add(event)\n\nE-->>-M: :ok\n\nloop Every tick\nC->>+E: create_batches_and_flush\nE-->>-C: batch of events\nC->>C: Append batches to the current batches queue\n\nopt When there is enough batches to dispatch\nC->>C: dispatch batches\nend\nend\n\nopt When a new batch is dispatched\nCS->>+C: start_link(MyEvent, events)\nC->>+T: start_link\nT->>E: handle_event(events)\nE->>K: send_data(events)\nT->>-C: :ok\nC-->>-CS: {:ok, pid}\nend\n",
+  "diagram_type": "size:1000..1500",
+  "collected_at": "2026-02-27T03:26:12.409371"
+}

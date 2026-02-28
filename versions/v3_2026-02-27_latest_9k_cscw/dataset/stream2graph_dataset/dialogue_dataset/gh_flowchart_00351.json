@@ -1,0 +1,691 @@
+{
+  "id": "gh_flowchart_00351",
+  "source": "github",
+  "source_url": "https://github.com/seanchatmangpt/erlmcp/blob/1356e12d778f4f4908360bdb3af445db8caff50d/docs/diagrams/observability/chaos-testing.mmd",
+  "github_repo": "seanchatmangpt/erlmcp",
+  "github_file_path": "docs/diagrams/observability/chaos-testing.mmd",
+  "diagram_type": "flowchart",
+  "code": "---\ntitle: erlmcp Chaos Engineering Failure Injection\n---\nflowchart TB\n    subgraph Chaos[\"erlmcp_chaos Coordinator\"]\n        Scheduler[\"Chaos Scheduler<br/>Cron-based trigger\"]\n        Config[\"Chaos Config<br/>Scenarios & intensity\"]\n        WorkerSup[\"chaos_worker_sup<br/>Dynamic supervisor\"]\n    end\n\n    subgraph Network[\"Network Failure Injection\"]\n        Latency[\"chaos_network<br/>inject_latency\"]\n        PacketLoss[\"chaos_network<br/>inject_packet_loss\"]\n        Partition[\"chaos_network<br/>inject_partition\"]\n    end\n\n    subgraph Process[\"Process Failure Injection\"]\n        Kill[\"chaos_process<br/>kill_random_process\"]\n        SpawnStorm[\"chaos_process<br/>spawn_storm\"]\n        MsgQueue[\"chaos_process<br/>message_queue_overflow\"]\n    end\n\n    subgraph Resource[\"Resource Exhaustion\"]\n        MemExhaust[\"chaos_resource<br/>memory_exhaustion\"]\n        CPUSat[\"chaos_resource<br/>cpu_saturation\"]\n        DiskFull[\"chaos_resource<br/>disk_full_simulation\"]\n        ETSFill[\"chaos_resource<br/>ets_table_fill\"]\n    end\n\n    subgraph Monitoring[\"Chaos Monitoring\"]\n        Recovery[\"erlmcp_recovery_manager<br/>Recovery time tracking\"]\n        Health[\"Health Monitor<br/>System state during chaos\"]\n        Metrics[\"Metrics Collector<br/>Performance impact\"]\n    end\n\n    subgraph Validation[\"Validation Criteria\"]\n        V1[\"Recovery Time < 5s<br/>(bounded recovery)\"]\n        V2[\"No Cascade Failures<br/>(isolation verified)\"]\n        V3[\"Circuit Breaker Triggered<br/>(protection active)\"]\n        V4[\"Graceful Degradation<br/>(andon visible)\"]\n        V5[\"Bounded Refusals<br/>(errors < 10%)\"]\n    end\n\n    Scheduler -->|\"select scenario\"| Config\n    Config -->|\"spawn worker\"| WorkerSup\n\n    WorkerSup -->|\"network chaos\"| Network\n    WorkerSup -->|\"process chaos\"| Process\n    WorkerSup -->|\"resource chaos\"| Resource\n\n    Network -->|\"inject failure\"| System[\"erlmcp System<br/>(Under Test)\"]\n    Process -->|\"inject failure\"| System\n    Resource -->|\"inject failure\"| System\n\n    System -->|\"health events\"| Health\n    System -->|\"recovery events\"| Recovery\n    System -->|\"metrics stream\"| Metrics\n\n    Health -->|\"validate\"| Validation\n    Recovery -->|\"measure recovery_time_s\"| Validation\n    Metrics -->|\"performance impact\"| Validation\n\n    style Chaos fill:#e1f5fe\n    style Network fill:#fff3e0\n    style Process fill:#f3e5f5\n    style Resource fill:#e8f5e9\n    style Monitoring fill:#ffebee\n    style Validation fill:#fff9c4\n\n    classDef coordinator fill:#0277bd,stroke:#01579b,color:#fff\n    classDef network fill:#f57c00,stroke:#e65100,color:#fff\n    classDef process fill:#7b1fa2,stroke:#4a148c,color:#fff\n    classDef resource fill:#388e3c,stroke:#1b5e20,color:#fff\n    classDef monitoring fill:#c62828,stroke:#b71c1c,color:#fff\n    classDef validation fill:#f9a825,stroke:#f57f17,color:#fff\n\n    class Scheduler,Config,WorkerSup coordinator\n    class Latency,PacketLoss,Partition network\n    class Kill,SpawnStorm,MsgQueue process\n    class MemExhaust,CPUSat,DiskFull,ETSFill resource\n    class Recovery,Health,Metrics monitoring\n    class V1,V2,V3,V4,V5 validation\n\n    %% Failure intensity levels\n    subgraph Intensity[\"Chaos Intensity Levels\"]\n        I1[\"LOW: 10ms latency / 1% packet loss\"]\n        I2[\"MEDIUM: 100ms latency / 5% packet loss\"]\n        I3[\"HIGH: 1s latency / 20% packet loss\"]\n        I4[\"EXTREME: 5s latency / 50% packet loss\"]\n    end\n",
+  "content_size": 3397,
+  "collected_at": "2026-02-06T01:43:34.819355",
+  "compilation_status": "success",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "repo_owner": "seanchatmangpt",
+  "repo_name": "erlmcp",
+  "repo_description": "Model Context Protocol (MCP) SDK for Erlang",
+  "repo_language": "Erlang",
+  "repo_topics": [],
+  "repo_created_at": "2025-08-26T03:19:12Z",
+  "repo_updated_at": "2026-02-05T01:44:49Z",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是\"erlmcp_chaos Coordinator\"、\"Chaos Scheduler<br/>Cron-based trigger\"应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，\"erlmcp_chaos Coordinator\"、\"Chaos Scheduler<br/>Cron-based trigger\"有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "Chaos",
+        "Scheduler"
+      ],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下\"Chaos Config<br/>Scenarios & intensity\"吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，\"Chaos Config<br/>Scenarios & intensity\"就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "Config"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含\"chaos_worker_sup<br/>Dynamic supervisor\"、\"Network Failure Injection\"这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，\"chaos_worker_sup<br/>Dynamic supervisor\"、\"Network Failure Injection\"是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达\"chaos_worker_sup<br/>Dynamic supervisor\"、\"Network Failure Injection\"结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，\"chaos_worker_sup<br/>Dynamic supervisor\"、\"Network Failure Injection\"是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "WorkerSup",
+        "Network",
+        "Latency"
+      ],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下\"chaos_network<br/>inject_packet_loss\"、\"chaos_network<br/>inject_partition\"吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "\"chaos_network<br/>inject_packet_loss\"、\"chaos_network<br/>inject_partition\"和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "PacketLoss",
+        "Partition"
+      ],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有\"Process Failure Injection\"。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "Process"
+      ],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有\"chaos_process<br/>kill_random_process\"、\"chaos_process<br/>spawn_storm\"。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，\"chaos_process<br/>kill_random_process\"、\"chaos_process<br/>spawn_storm\"就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "Kill",
+        "SpawnStorm",
+        "MsgQueue"
+      ],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理\"Resource Exhaustion\"、\"chaos_resource<br/>memory_exhaustion\"？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，\"Resource Exhaustion\"、\"chaos_resource<br/>memory_exhaustion\"的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理\"Resource Exhaustion\"、\"chaos_resource<br/>memory_exhaustion\"？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "Resource",
+        "MemExhaust",
+        "CPUSat"
+      ],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "\"chaos_resource<br/>disk_full_simulation\"、\"chaos_resource<br/>ets_table_fill\"主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将\"chaos_resource<br/>disk_full_simulation\"、\"chaos_resource<br/>ets_table_fill\"分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，\"chaos_resource<br/>disk_full_simulation\"、\"chaos_resource<br/>ets_table_fill\"的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "DiskFull",
+        "ETSFill",
+        "Monitoring"
+      ],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "\"erlmcp_recovery_manager<br/>Recovery time tracking\"主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是\"erlmcp_recovery_manager<br/>Recovery time tracking\"应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将\"erlmcp_recovery_manager<br/>Recovery time tracking\"分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "Recovery"
+      ],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由\"Health Monitor<br/>System state during chaos\"组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，\"Health Monitor<br/>System state during chaos\"是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "Health"
+      ],
+      "timestamp_offset": 495
+    },
+    {
+      "turn_id": 34,
+      "speaker": "Speaker_A",
+      "utterance": "关于\"Metrics Collector<br/>Performance impact\"、\"Validation Criteria\"，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 510
+    },
+    {
+      "turn_id": 35,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 525
+    },
+    {
+      "turn_id": 36,
+      "speaker": "Speaker_A",
+      "utterance": "最后，流程到达\"Metrics Collector<br/>Performance impact\"、\"Validation Criteria\"结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 540
+    },
+    {
+      "turn_id": 37,
+      "speaker": "Speaker_B",
+      "utterance": "\"Metrics Collector<br/>Performance impact\"、\"Validation Criteria\"负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "Metrics",
+        "Validation"
+      ],
+      "timestamp_offset": 555
+    },
+    {
+      "turn_id": 38,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有\"Recovery Time < 5s<br/>(bounded recovery、\"No Cascade Failures<br/>(isolation verified。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 570
+    },
+    {
+      "turn_id": 39,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 585
+    },
+    {
+      "turn_id": 40,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，\"Recovery Time < 5s<br/>(bounded recovery、\"No Cascade Failures<br/>(isolation verified的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "V1",
+        "V2"
+      ],
+      "timestamp_offset": 600
+    },
+    {
+      "turn_id": 41,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理\"Circuit Breaker Triggered<br/>(protection active、\"Graceful Degradation<br/>(andon visible？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 615
+    },
+    {
+      "turn_id": 42,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，\"Circuit Breaker Triggered<br/>(protection active、\"Graceful Degradation<br/>(andon visible的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 630
+    },
+    {
+      "turn_id": 43,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "V3",
+        "V4",
+        "V5"
+      ],
+      "timestamp_offset": 645
+    },
+    {
+      "turn_id": 44,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有\"erlmcp System<br/>(Under Test、\"Chaos Intensity Levels\"。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 660
+    },
+    {
+      "turn_id": 45,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 675
+    },
+    {
+      "turn_id": 46,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在\"erlmcp System<br/>(Under Test、\"Chaos Intensity Levels\"完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 690
+    },
+    {
+      "turn_id": 47,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "System",
+        "Intensity"
+      ],
+      "timestamp_offset": 705
+    },
+    {
+      "turn_id": 48,
+      "speaker": "Speaker_A",
+      "utterance": "关于\"LOW: 10ms latency / 1% packet loss\"、\"MEDIUM: 100ms latency / 5% packet loss\"，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 720
+    },
+    {
+      "turn_id": 49,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是\"LOW: 10ms latency / 1% packet loss\"、\"MEDIUM: 100ms latency / 5% packet loss\"应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "I1",
+        "I2"
+      ],
+      "timestamp_offset": 735
+    },
+    {
+      "turn_id": 50,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下\"HIGH: 1s latency / 20% packet loss\"、\"EXTREME: 5s latency / 50% packet loss\"吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 750
+    },
+    {
+      "turn_id": 51,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，\"HIGH: 1s latency / 20% packet loss\"、\"EXTREME: 5s latency / 50% packet loss\"的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "I3",
+        "I4"
+      ],
+      "timestamp_offset": 765
+    },
+    {
+      "turn_id": 52,
+      "speaker": "Speaker_A",
+      "utterance": "关于\"select scenario\"、\"spawn worker\"，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 780
+    },
+    {
+      "turn_id": 53,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，\"select scenario\"、\"spawn worker\"的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 795
+    },
+    {
+      "turn_id": 54,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含\"select scenario\"、\"spawn worker\"这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "edge_0",
+        "edge_1"
+      ],
+      "timestamp_offset": 810
+    },
+    {
+      "turn_id": 55,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理\"network chaos\"、\"process chaos\"？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 825
+    },
+    {
+      "turn_id": 56,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_2",
+        "edge_3"
+      ],
+      "timestamp_offset": 840
+    },
+    {
+      "turn_id": 57,
+      "speaker": "Speaker_B",
+      "utterance": "关于\"resource chaos\"、\"inject failure\"，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 855
+    },
+    {
+      "turn_id": 58,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，\"resource chaos\"、\"inject failure\"的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 870
+    },
+    {
+      "turn_id": 59,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理\"resource chaos\"、\"inject failure\"？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 885
+    },
+    {
+      "turn_id": 60,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，\"resource chaos\"、\"inject failure\"就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_4",
+        "edge_5"
+      ],
+      "timestamp_offset": 900
+    },
+    {
+      "turn_id": 61,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有\"inject failure\"。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 915
+    },
+    {
+      "turn_id": 62,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是\"inject failure\"应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 930
+    },
+    {
+      "turn_id": 63,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，\"inject failure\"有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "edge_6"
+      ],
+      "timestamp_offset": 945
+    },
+    {
+      "turn_id": 64,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理\"inject failure\"、\"health events\"？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 960
+    },
+    {
+      "turn_id": 65,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，\"inject failure\"、\"health events\"的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 975
+    },
+    {
+      "turn_id": 66,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将\"inject failure\"、\"health events\"分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "edge_7",
+        "edge_8"
+      ],
+      "timestamp_offset": 990
+    },
+    {
+      "turn_id": 67,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下\"recovery events\"、\"metrics stream\"吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1005
+    },
+    {
+      "turn_id": 68,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1020
+    },
+    {
+      "turn_id": 69,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1035
+    },
+    {
+      "turn_id": 70,
+      "speaker": "Speaker_A",
+      "utterance": "\"recovery events\"、\"metrics stream\"负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "edge_9",
+        "edge_10"
+      ],
+      "timestamp_offset": 1050
+    },
+    {
+      "turn_id": 71,
+      "speaker": "Speaker_B",
+      "utterance": "\"validate\"、\"measure recovery_time_s\"主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1065
+    },
+    {
+      "turn_id": 72,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在\"validate\"、\"measure recovery_time_s\"完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "edge_11",
+        "edge_12",
+        "edge_13"
+      ],
+      "timestamp_offset": 1080
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 72,
+    "speaker_distribution": {
+      "Speaker_B": 36,
+      "Speaker_A": 36
+    },
+    "speech_act_distribution": {
+      "sequential": 7,
+      "clarify": 12,
+      "contrastive": 3,
+      "request": 14,
+      "confirm": 11,
+      "structural": 10,
+      "inform": 9,
+      "classification": 6
+    },
+    "avg_turn_length": 53.0,
+    "dialogue_duration": 1080
+  }
+}

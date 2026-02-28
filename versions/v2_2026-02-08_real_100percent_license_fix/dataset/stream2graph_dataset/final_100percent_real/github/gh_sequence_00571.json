@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00571",
+  "source": "github",
+  "source_url": "https://github.com/linhh011202/fyp-report/blob/02e94338c04bfbc3eb6bb6a19c19f907aa8358c3/diagrams/auth_verify_token_flow.mmd",
+  "github_repo": "linhh011202/fyp-report",
+  "github_file_path": "diagrams/auth_verify_token_flow.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Client\n    participant Controller as AuthController\n    participant Service as AuthService\n    participant JWT as JwtService\n    participant TB as TokenBlacklist\n    participant UT as UserTokens\n    participant UserSvc as UserService\n    participant DB as MongoDB\n\n    Client->>Controller: POST /auth/verify-token\n    Note over Client,Controller: Body: {token: \"jwt_string\"}\n    \n    Controller->>Service: verifyAccessToken(token)\n    \n    Service->>JWT: decode(token)\n    alt Invalid token format\n        JWT-->>Service: null\n        Service-->>Client: {valid: false, expired: false, message: \"Invalid token format\"}\n    end\n    JWT-->>Service: {sub, email, role, name, type, exp, aud}\n    \n    Service->>TB: findOne({token})\n    alt Token blacklisted\n        TB-->>Service: Found\n        Service-->>Client: {valid: false, expired: false, message: \"Token has been revoked\"}\n    end\n    TB-->>Service: Not found\n    \n    Service->>JWT: verifyAsync(token)\n    alt Token expired\n        JWT-->>Service: TokenExpiredError\n        Service-->>Client: {valid: false, expired: true, message: \"Token has expired\"}\n    else Invalid signature\n        JWT-->>Service: JsonWebTokenError\n        Service-->>Client: {valid: false, expired: false, message: \"Invalid token signature\"}\n    end\n    JWT-->>Service: Valid\n    \n    Service->>UserSvc: findById(decoded.sub)\n    alt User not found\n        UserSvc-->>Service: null\n        Service-->>Client: {valid: false, message: \"User not found\"}\n    end\n    UserSvc-->>Service: User document\n    \n    Service-->>Client: {valid: true, expired: false, user: {...}, expiresAt}\n",
+  "content_size": 1638,
+  "collected_at": "2026-02-06T01:34:06.442326",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

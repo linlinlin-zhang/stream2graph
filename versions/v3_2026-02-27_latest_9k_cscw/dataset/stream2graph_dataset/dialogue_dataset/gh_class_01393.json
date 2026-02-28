@@ -1,0 +1,229 @@
+{
+  "id": "gh_class_01393",
+  "source": "github",
+  "source_url": "https://github.com/jennxsierra/event-workshop-manager-system/blob/b9b0226c1afa776677cb7254b376a4476101d9bb/docs/uml.mmd",
+  "github_repo": "jennxsierra/event-workshop-manager-system",
+  "github_file_path": "docs/uml.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n    %% Enumeration Classes\n    class Role {\n        <<enumeration>>\n        PARTICIPANT\n        STAFF\n        ADMIN\n    }\n    class EventCategory {\n        <<enumeration>>\n        WORKSHOP\n        TRAINING\n        PUBLIC_OUTREACH\n        PRESS\n        LAUNCH\n    }\n\n    %% User Hierarchy\n    class User {\n        <<abstract>>\n        - username: string\n        - password: string\n        - firstName: string\n        - lastName: string\n        - email: string\n        - phone: string\n        - organization: string\n        - role: Role\n        + getters/setters()\n        + User(username, password, firstName, lastName, email, phone, organization, role)\n        + login(): bool\n        + logout(): void\n    }\n    class Participant {\n        + Participant(username, password, firstName, lastName, email, phone, organization)\n        + registerForEvent(e: Event): bool\n        + cancelRegistration(e: Event): bool\n        + viewRegisteredEvents(em: EventManager): Event[]\n    }\n    class Staff {\n        + Staff(username, password, firstName, lastName, email, phone, organization)\n        + updateEvent(e: Event): void\n    }\n    class Administrator {\n        + Administrator(username, password, firstName, lastName, email, phone, organization)\n        + updateUser(): void\n        + generateReports(): void\n    }\n\n    %% Core Domain Classes\n    class Event {\n        - name: string\n        - date: Date\n        - time: Time\n        - location: string\n        - category: EventCategory\n        - capacity: int\n        - registrations: Registration[]\n        + getters/setters()\n        + Event(name, date, time, location, category, capacity)\n        + addRegistration(r: Registration): void\n        + removeRegistration(r: Registration): void\n    }\n    class Registration {\n        - timestamp: DateTime\n        - cancelled: bool\n        + Registration(timestamp: DateTime)\n        + cancel(): void\n        + isCancelled(): bool\n    }\n\n    %% Manager Classes\n    class EventManager {\n        - events: Event[]\n        + EventManager()\n        + createEvent(e: Event, currentUser: User): bool\n        + updateEvent(e: Event, currentUser: User): bool\n        + deleteEvent(e: Event, currentUser: User): bool\n        + getEvents(): Event[]\n    }\n    class ReportManager {\n        - eventManager: EventManager\n        + ReportManager(eventManager: EventManager)\n        + generateSummaryReport(): Report\n        + generateDetailedReport(): Report\n        + generateHistoricalReport(): Report\n    }\n\n    %% Relationships\n    User <|-- Participant\n    Participant <|-- Staff\n    Staff <|-- Administrator\n\n    Event *-- Registration : composes\n    EventManager o-- Event : aggregates\n    ReportManager o-- EventManager : uses\n\n    Participant --> Registration : makes\n",
+  "content_size": 2770,
+  "collected_at": "2026-02-06T01:57:13.361870",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "repo_owner": "jennxsierra",
+  "repo_name": "event-workshop-manager-system",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "首先，我们需要定义流程的起点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Role分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "Role"
+      ],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下EventCategory、User吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "EventCategory",
+        "User"
+      ],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Participant、Staff分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，Participant、Staff是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "Participant",
+        "Staff"
+      ],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Administrator组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，Administrator是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "Administrator"
+      ],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Event、Registration分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Event、Registration就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Event、Registration的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Event、Registration的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "Event",
+        "Registration",
+        "EventManager"
+      ],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "关于ReportManager、<|--，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "ReportManager、<|--和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将ReportManager、<|--分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "ReportManager",
+        "rel_0",
+        "rel_1"
+      ],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由<|--、-->组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理<|--、-->？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在<|--、-->完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "rel_2",
+        "rel_3"
+      ],
+      "timestamp_offset": 315
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 21,
+    "speaker_distribution": {
+      "Speaker_B": 11,
+      "Speaker_A": 10
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "inform": 3,
+      "classification": 4,
+      "request": 3,
+      "confirm": 4,
+      "structural": 2,
+      "clarify": 2,
+      "contrastive": 1
+    },
+    "avg_turn_length": 22.476190476190474,
+    "dialogue_duration": 315
+  }
+}

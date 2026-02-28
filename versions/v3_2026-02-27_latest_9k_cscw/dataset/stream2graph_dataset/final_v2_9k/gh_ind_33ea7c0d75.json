@@ -1,0 +1,9 @@
+{
+  "id": "gh_ind_33ea7c0d75",
+  "source": "github_industrial",
+  "repo": "japan1988/multi-agent-mediation",
+  "license": "apache-2.0",
+  "code": "flowchart LR\n  %% Maestro Orchestrator (KAGE-ish) — architecture + decision flow\n  %% Invariants:\n  %% - Pipeline: Agent -> Mediator -> Orchestrator\n  %% - Fixed order: Meaning -> Consistency -> RFL -> Ethics -> ACC -> Dispatch\n  %% - RFL never seals (always HITL; sealed=false, overrideable=true)\n  %% - Only Ethics/ACC may seal (sealed=true)\n  %% - Audit/ARL emits minimal fields each event\n\n  U[\"User / Human input\"] --> OR[\"Orchestrator (entrypoint)\"]\n\n  OR -->|\"route task(s)\"| A1[\"Agent A\"]\n  OR -->|\"route task(s)\"| A2[\"Agent B\"]\n  OR -->|\"route task(s)\"| A3[\"Agent C\"]\n\n  A1 --> M[\"Mediator (advice / reconciliation)\"]\n  A2 --> M\n  A3 --> M\n\n  M --> G0\n\n  subgraph GATES[\"Orchestrator Gates (fixed order)\"]\n    direction LR\n    G0[\"Meaning\"] --> G1[\"Consistency\"]\n    G1 --> G2[\"RFL\"]\n    G2 --> G3[\"Ethics\"]\n    G3 --> G4[\"ACC\"]\n  end\n\n  G4 -->|\"RUN\"| D[\"DISPATCH / Execute\"]\n\n  %% Sealing (only Ethics/ACC)\n  G3 -->|\"SEALED\"| S_SYS1[\"STOPPED (SYSTEM)\"]\n  G4 -->|\"SEALED\"| S_SYS2[\"STOPPED (SYSTEM)\"]\n\n  %% RFL -> HITL (never sealed)\n  G2 -->|\"PAUSE_FOR_HITL\"| H[\"HITL request (ask user)\"]\n  H -->|\"USER: CONTINUE\"| G3\n  H -->|\"USER: STOP\"| S_USR[\"STOPPED (USER)\"]\n\n  %% Audit / ARL (conceptual)\n  subgraph LOG[\"Audit / ARL JSONL\"]\n    direction TB\n    L1[\"emit(event): run_id, layer, decision, sealed, overrideable, final_decider, reason_code\"]\n    L2[\"No raw PII persisted; store safe_text only\"]\n  end\n\n  OR -.-> L1\n  M  -.-> L1\n  G0 -.-> L1\n  G1 -.-> L1\n  G2 -.-> L1\n  G3 -.-> L1\n  G4 -.-> L1\n  D  -.-> L1\n",
+  "diagram_type": "architecture size:>1500",
+  "collected_at": "2026-02-27T04:45:00.828466"
+}

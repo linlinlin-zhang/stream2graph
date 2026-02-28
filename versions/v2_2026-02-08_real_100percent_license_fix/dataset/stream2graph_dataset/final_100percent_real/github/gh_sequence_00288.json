@@ -1,0 +1,31 @@
+{
+  "id": "gh_sequence_00288",
+  "source": "github",
+  "source_url": "https://github.com/Youknow2509/cio_verify_face/blob/64dd1b1eb75e62b25244067fb046f81672585bbe/doc/sequence_diagrams/analytics_reporting/daily_report.mmd",
+  "github_repo": "Youknow2509/cio_verify_face",
+  "github_file_path": "doc/sequence_diagrams/analytics_reporting/daily_report.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Admin as Company Admin\n    participant LB as Load Balancer\n    participant Gateway as API Gateway\n    parameter Auth as Auth Service\n    participant Analytics as Analytics Service\n    participant TimeSeries as ScyllaDB\n    participant Cache as Redis Cache\n    participant DB as PostgreSQL\n    participant Workforce as Workforce Service\n\n    Admin->>+LB: GET /api/v1/reports/daily?date=2024-01-15&location_id=123\n    Note over Admin,LB: Authorization: Bearer {admin_token}\n    \n    LB->>+Gateway: Forward request\n    Gateway->>+Auth: Validate token & extract company_id\n    Auth-->>-Gateway: Company authorized\n    \n    Gateway->>+Analytics: GET /api/v1/reports/daily\n    Note over Gateway,Analytics: {company_id, date, location_id, filters}\n    \n    Analytics->>+Cache: GET daily_report:{company_id}:{date}:{location_id}\n    Cache-->>-Analytics: Cached report or miss\n    \n    alt Cache hit - return cached report\n        Analytics-->>Gateway: Cached daily report\n    else Cache miss - generate report\n        par Fetch attendance records\n            Analytics->>+TimeSeries: Query attendance records for date\n            Note over Analytics,TimeSeries: SELECT * FROM attendance<br/>WHERE company_id AND date AND location_id\n            TimeSeries-->>-Analytics: Raw attendance data\n        and Fetch employee schedules\n            Analytics->>+Workforce: Get scheduled employees for date\n            Note over Analytics,Workforce: Expected vs actual attendance\n            Workforce-->>-Analytics: Schedule data\n        and Get employee details\n            Analytics->>+DB: Get employee information\n            Note over Analytics,DB: JOIN with departments, positions\n            DB-->>-Analytics: Employee details\n        end\n        \n        Analytics->>Analytics: Process and aggregate data\n        Note over Analytics: Calculate:\n        Note over Analytics: - Total check-ins/outs\n        Note over Analytics: - Late arrivals\n        Note over Analytics: - Early departures  \n        Note over Analytics: - Missing attendances\n        Note over Analytics: - Work hour summaries\n        \n        par Generate detailed report\n            Analytics->>Analytics: Build comprehensive report\n            Note over Analytics: Include charts, summaries, exceptions\n        and Cache the report\n            Analytics->>+Cache: Cache daily report\n            Note over Analytics,Cache: TTL: 6 hours (updates during day)\n            Cache-->>-Analytics: Report cached\n        and Update aggregated metrics\n            Analytics->>+DB: Update daily summary tables\n            Note over Analytics,DB: For monthly/yearly reporting\n            DB-->>-Analytics: Metrics updated\n        end\n        \n        Analytics-->>-Gateway: Generated daily report\n    end\n    \n    Gateway-->>-LB: Report response\n    LB-->>-Admin: Daily attendance report\n    \n    Note over Admin,DB: Reporting optimizations for scale:\n    Note over Admin,DB: 1. Pre-aggregated daily summaries\n    Note over Admin,DB: 2. Time-series data compression\n    Note over Admin,DB: 3. Report caching with smart invalidation\n    Note over Admin,DB: 4. Async report generation for large datasets\n    Note over Admin,DB: 5. Dashboard real-time metrics streaming",
+  "content_size": 3245,
+  "collected_at": "2026-02-06T01:30:15.382598",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 1,
+  "repo_forks": 2,
+  "repo_owner": "Youknow2509",
+  "repo_name": "cio_verify_face",
+  "repo_description": "Microservice system for real-time face-based check-in/check-out, providing scalable facial recognition, identity verification, attendance tracking, and event-driven data processing across independent,",
+  "repo_language": "Go",
+  "repo_topics": [
+    "embeddings",
+    "golang",
+    "helm",
+    "kafka",
+    "kubernetes"
+  ],
+  "repo_created_at": "2025-09-01T02:48:17Z",
+  "repo_updated_at": "2025-12-12T03:33:51Z"
+}

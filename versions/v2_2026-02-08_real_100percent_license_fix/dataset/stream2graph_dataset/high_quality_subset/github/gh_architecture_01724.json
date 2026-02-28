@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01724",
+  "source": "github",
+  "source_url": "https://github.com/younwony/TIL/blob/1362d09516776205cbcad554be57d68f92fd060e/cs/ai-agent/images/hook-execution-flow.mmd",
+  "github_repo": "younwony/TIL",
+  "github_file_path": "cs/ai-agent/images/hook-execution-flow.mmd",
+  "diagram_type": "architecture",
+  "code": "%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e1f5fe', 'primaryTextColor': '#333', 'primaryBorderColor': '#0288d1', 'lineColor': '#333', 'secondaryColor': '#f3e5f5', 'tertiaryColor': '#fff3e0'}}}%%\nflowchart TB\n    subgraph Step1[\"1. Claude가 Tool 호출 결정\"]\n        Decision[\"Edit 도구로 config.js 수정\"]\n    end\n\n    subgraph Step2[\"2. PreToolUse Hook 트리거\"]\n        Matcher[\"matcher: Edit 일치\"]\n        Command[\"command 실행\"]\n    end\n\n    subgraph Step3[\"3. Hook에 JSON 입력 전달 (stdin)\"]\n        JSON[\"{ tool_name: Edit,<br/>tool_input: { file_path: ... } }\"]\n    end\n\n    subgraph Step4[\"4. Hook 결과 평가\"]\n        Exit0[\"exit 0: Tool 실행 진행\"]\n        Exit2[\"exit 2: Tool 실행 차단<br/>stderr를 Claude에 전달\"]\n        ExitOther[\"exit 1,3+: 경고 후 진행\"]\n    end\n\n    subgraph Step5[\"5. Tool 실행\"]\n        Execute[\"차단되지 않은 경우 실행\"]\n    end\n\n    subgraph Step6[\"6. PostToolUse Hook 트리거\"]\n        Post[\"자동 포맷팅, 로깅 등\"]\n    end\n\n    Step1 --> Step2\n    Matcher --> Command\n    Step2 --> Step3\n    Step3 --> Step4\n\n    Exit0 --> Step5\n    Exit2 -.->|차단| Blocked[\"Tool 실행 안 됨\"]\n    ExitOther --> Step5\n\n    Step5 --> Step6\n\n    style Decision fill:#e3f2fd\n    style Exit0 fill:#c8e6c9\n    style Exit2 fill:#ffcdd2\n    style Blocked fill:#ffcdd2\n    style Post fill:#e1bee7\n",
+  "content_size": 1257,
+  "collected_at": "2026-02-06T02:02:33.809189",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

@@ -1,0 +1,179 @@
+{
+  "id": "aug_gh_sequence_00008_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/m9xxx/stepik_parser_test/blob/d536e191f149c760d2c453e9a73a2c2a9293d434/auth_sequence.mmd",
+  "github_repo": "m9xxx/stepik_parser_test",
+  "github_file_path": "auth_sequence.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Frontend\n    participant API as API (Infra_IngressController)\n    participant AC as AuthController\n    participant User as User Model\n    participant DB as Database\n    \n    %% Успешный вход\n    Frontend->>API: POST /api/v1/auth/login\n    Note over Frontend,API: {Infra_RedisCache}\n    activate API\n    API->>AC: login(Infra_RedisCache)\n    activate AC\n    \n    %% Валидация входных данных\n    AC->>AC: Validate input\n    \n    alt Missing fields\n        AC-->>API: Error: Не все поля заполнены\n        API-->>Frontend: 400 Bad Request\n    else Has all fields\n        AC->>User: findByUsername(Infra_IngressController)\n        activate User\n        User->>DB: SELECT query\n        activate DB\n        Note over DB: SELECT * FROM users WHERE username = email\n        DB-->>User: user data (Infra_LoadBalancer)\n        deactivate DB\n        Note over User: Create User object with DB data\n        User-->>AC: User object\n        deactivate User\n        \n        alt User not found\n            AC-->>API: Error: Пользователь не найден\n            API-->>Frontend: 400 Bad Request\n        else User exists\n            AC->>User: authenticate(Infra_RedisCache)\n            activate User\n            Note over User: Compare password hash\\nwith stored hash\\n(Infra_EtcdCluster)\n            \n            alt Invalid password\n                User-->>AC: false\n                AC-->>API: Error: Неверный пароль\n                API-->>Frontend: 400 Bad Request\n            else Valid password\n                User-->>AC: true\n                AC->>User: toArray(Infra_IngressController)\n                Note over User: Convert object data to array\\n(Infra_IngressController)\n                User-->>AC: user data\n                AC-->>API: Success + user data\n                API-->>Frontend: 200 OK + user data\n            end\n            deactivate User\n        end\n    end\n    \n    deactivate AC\n    deactivate API ",
+  "content_size": 1863,
+  "collected_at": "2026-02-06T01:24:02.844657",
+  "compilation_status": "success",
+  "augmentation_domain": "Infra",
+  "seed_id": "gh_sequence_00008",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在API (Infra_IngressController)、AuthController完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "API (Infra_IngressController)、AuthController主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "API",
+        "AC"
+      ],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含User Model、Database这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，User Model、Database的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "User",
+        "DB",
+        "msg_0"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有login(Infra_RedisCache)、Validate input。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是login(Infra_RedisCache)、Validate input应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "login(Infra_RedisCache)、Validate input和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_1",
+        "msg_2"
+      ],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "findByUsername(Infra_IngressController)、SELECT query主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，findByUsername(Infra_IngressController)、SELECT query是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_3",
+        "msg_4"
+      ],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理authenticate(Infra_RedisCache)、toArray(Infra_IngressController)？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，authenticate(Infra_RedisCache)、toArray(Infra_IngressController)是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理authenticate(Infra_RedisCache)、toArray(Infra_IngressController)？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在authenticate(Infra_RedisCache)、toArray(Infra_IngressController)完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_5",
+        "msg_6"
+      ],
+      "timestamp_offset": 240
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 16,
+    "speaker_distribution": {
+      "Speaker_B": 8,
+      "Speaker_A": 8
+    },
+    "speech_act_distribution": {
+      "sequential": 3,
+      "inform": 2,
+      "classification": 2,
+      "structural": 2,
+      "clarify": 2,
+      "contrastive": 1,
+      "confirm": 2,
+      "request": 2
+    },
+    "avg_turn_length": 49.0625,
+    "dialogue_duration": 240
+  }
+}

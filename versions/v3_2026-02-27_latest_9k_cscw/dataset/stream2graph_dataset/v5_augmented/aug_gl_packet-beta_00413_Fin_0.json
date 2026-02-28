@@ -1,0 +1,18 @@
+{
+  "id": "aug_gl_packet-beta_00413_Fin_0",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/sean-galloway/RTLDesignSherpa/blob/47f8a16641658f570a69c3af3c9724b29ea39187/projects/components/stream/docs/stream_mas/assets/mermaid/12_scheduler_group_array_block.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "sean-galloway/RTLDesignSherpa",
+  "diagram_type": "packet-beta",
+  "code": "graph TB\n    APB0[FinTech_TransactionQueue] --> GRP0[FinTech_AuthVault]\n    APB1[FinTech_FraudDetection] --> GRP1[FinTech_TransactionQueue]\n    APB7[FinTech_AuthVault] --> GRP7[FinTech_LedgerService]\n\n    CFG[FinTech_LedgerService] --> GRP0\n    CFG --> GRP1\n    CFG --> GRP7\n\n    subgraph \"Scheduler Group Array\"\n        GRP0 --> |desc_ar_*| AR_ARB[FinTech_TransactionQueue]\n        GRP1 --> |desc_ar_*| AR_ARB\n        GRP7 --> |desc_ar_*| AR_ARB\n\n        AR_ARB --> |desc_axi_ar_*| DESC_AXI[FinTech_PaymentGateway]\n        DESC_AXI --> |desc_axi_r_*| R_BCAST[FinTech_PaymentGateway]\n\n        R_BCAST --> |desc_r_* ID-based claim| GRP0\n        R_BCAST --> |desc_r_*| GRP1\n        R_BCAST --> |desc_r_*| GRP7\n\n        DESC_AXI --> MON_TAP[FinTech_AuthVault]\n\n        GRP0 --> |datard/wr_valid| DATA_IF[FinTech_LedgerService]\n        GRP1 --> |datard/wr_valid| DATA_IF\n        GRP7 --> |datard/wr_valid| DATA_IF\n\n        GRP0 --> |mon_valid/packet| MON_AGG[FinTech_LedgerService]\n        GRP1 --> |mon_valid/packet| MON_AGG\n        GRP7 --> |mon_valid/packet| MON_AGG\n        MON_TAP --> |mon_valid/packet| MON_AGG\n\n        MON_AGG --> |mon_valid/ready/packet| MON_OUT[FinTech_PaymentGateway]\n    end\n\n    DATA_IF --> |\"datard[FinTech_PaymentGateway]\"| RD_ENG[FinTech_FraudDetection]\n    DATA_IF --> |\"datawr[FinTech_TransactionQueue]\"| WR_ENG[FinTech_LedgerService]\n\n    RD_ENG --> |\"datard_done[FinTech_FraudDetection]\"| DATA_IF\n    WR_ENG --> |\"datawr_done[FinTech_TransactionQueue]\"| DATA_IF\n\n    style AR_ARB fill:#f9f,stroke:#333,stroke-width:3px\n    style DESC_AXI fill:#bbf,stroke:#333,stroke-width:2px\n    style MON_AGG fill:#bfb,stroke:#333,stroke-width:2px\n    style DATA_IF fill:#ffb,stroke:#333,stroke-width:2px",
+  "content_size": 1765,
+  "collected_at": "2026-02-06T14:09:12.660802",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "FinTech",
+  "seed_id": "gl_packet-beta_00413"
+}

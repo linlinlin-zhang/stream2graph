@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00715",
+  "source": "github",
+  "source_url": "https://github.com/CPU-JIA/Flotilla/blob/002b7757d8792695a487c8d016779cb04a1d06bb/UML/diagrams/Mermaid/03-Git-Push%E6%B5%81%E7%A8%8B%E5%9B%BE.mmd",
+  "github_repo": "CPU-JIA/Flotilla",
+  "github_file_path": "UML/diagrams/Mermaid/03-Git-Push流程图.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant GitClient as Git Client\n    participant GitHTTP as Git HTTP Service\n    participant RaftService as Raft Consensus\n    participant Storage as MinIO Storage\n    participant Database as PostgreSQL\n\n    GitClient->>GitHTTP: GET /info/refs?service=git-receive-pack\n    GitHTTP->>Database: 验证权限\n    GitHTTP-->>GitClient: 返回引用列表\n\n    GitClient->>GitHTTP: POST /git-receive-pack (pack data)\n    GitHTTP->>GitHTTP: 解析pack文件\n\n    GitHTTP->>RaftService: 提交元数据变更\n    RaftService->>RaftService: Leader复制到Followers\n    RaftService-->>GitHTTP: 提交成功\n\n    GitHTTP->>Storage: 存储Git对象\n    Storage-->>GitHTTP: OK\n\n    GitHTTP->>Database: 更新引用\n    GitHTTP-->>GitClient: 推送成功\n",
+  "content_size": 686,
+  "collected_at": "2026-02-06T01:36:04.054905",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 2,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

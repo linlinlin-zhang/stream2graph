@@ -1,0 +1,566 @@
+{
+  "id": "gh_architecture_01396",
+  "source": "github",
+  "source_url": "https://github.com/IEEE-PES-TF-Cloud4PowerGrid/cloud_adoption_tutorials/blob/4429392329ed15932fac4d184a8b8a70009718a1/smart_meter_analytics/architecture/diagram.mmd",
+  "github_repo": "IEEE-PES-TF-Cloud4PowerGrid/cloud_adoption_tutorials",
+  "github_file_path": "smart_meter_analytics/architecture/diagram.mmd",
+  "diagram_type": "architecture",
+  "code": "%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4285F4', 'secondaryColor': '#34A853', 'tertiaryColor': '#FBBC05'}}}%%\nflowchart TB\n    subgraph Edge[\"Edge Layer (Power Poles)\"]\n        direction TB\n        M1[(\"AMI 2.0 Meter 1<br/>1Hz Sampling\")]\n        M2[(\"AMI 2.0 Meter 2<br/>1Hz Sampling\")]\n        M3[(\"AMI 2.0 Meter N<br/>1Hz Sampling\")]\n        SIM[\"simulator.py<br/>Synthetic Data Generator\"]\n        GW[\"gateway_relay.py<br/>Pole Gateway\"]\n        \n        M1 --> SIM\n        M2 --> SIM\n        M3 --> SIM\n        SIM --> GW\n    end\n    \n    subgraph Backhaul[\"Network Backhaul\"]\n        direction LR\n        NET[\"5G / Satellite / Wired<br/>(Simulated Jitter & Latency)\"]\n    end\n    \n    subgraph Ingestion[\"Cloud Ingestion Layer\"]\n        direction TB\n        TOPIC[\"Pub/Sub Topic<br/>ami-meter-data\"]\n        SUB[\"Pub/Sub Subscription<br/>ami-meter-data-sub\"]\n        DLQ[\"Dead Letter Queue<br/>(Optional)\"]\n        \n        TOPIC --> SUB\n        TOPIC --> DLQ\n    end\n    \n    subgraph Processing[\"Stream Processing Layer\"]\n        direction TB\n        DF[\"Dataflow Pipeline<br/>(Apache Beam)\"]\n        PARSE[\"Parse & Validate<br/>JSON\"]\n        ENRICH[\"Enrich with<br/>Ingest Timestamp\"]\n        \n        DF --> PARSE\n        PARSE --> ENRICH\n    end\n    \n    subgraph Storage[\"Storage Layer\"]\n        direction TB\n        GCS[\"Cloud Storage<br/>Raw Archive (JSONL/CSV)\"]\n        BQ[\"BigQuery<br/>smart_grid_analytics\"]\n        RAW[\"raw_meter_readings<br/>(Partitioned by Day)\"]\n        AGG[\"Aggregated Views<br/>(5-min, Hourly)\"]\n        \n        BQ --> RAW\n        BQ --> AGG\n    end\n    \n    subgraph Analytics[\"Analytics Layer\"]\n        direction TB\n        VOLT[\"Voltage Anomaly<br/>Detection\"]\n        DR[\"DR Baseline<br/>Computation\"]\n        HEALTH[\"Feeder Health<br/>Summary\"]\n        SCHED[\"Cloud Scheduler<br/>(Periodic Jobs)\"]\n        \n        SCHED --> VOLT\n        SCHED --> DR\n        SCHED --> HEALTH\n    end\n    \n    subgraph API[\"Serving Layer\"]\n        direction TB\n        RUN[\"Cloud Run API<br/>(FastAPI)\"]\n        ENDPOINTS[\"Endpoints:<br/>/health<br/>/pole/{id}/summary<br/>/anomalies<br/>/dr/compute\"]\n        \n        RUN --> ENDPOINTS\n    end\n    \n    %% Connections\n    GW --> NET\n    NET --> TOPIC\n    SUB --> DF\n    ENRICH --> GCS\n    ENRICH --> BQ\n    RAW --> VOLT\n    RAW --> DR\n    RAW --> HEALTH\n    AGG --> RUN\n    RAW --> RUN\n    \n    %% Styling\n    classDef meter fill:#E8F5E9,stroke:#2E7D32\n    classDef gateway fill:#E3F2FD,stroke:#1565C0\n    classDef network fill:#FFF3E0,stroke:#E65100\n    classDef pubsub fill:#FCE4EC,stroke:#AD1457\n    classDef dataflow fill:#F3E5F5,stroke:#7B1FA2\n    classDef storage fill:#E1F5FE,stroke:#0277BD\n    classDef analytics fill:#FFF8E1,stroke:#FF8F00\n    classDef api fill:#E8EAF6,stroke:#3F51B5\n    \n    class M1,M2,M3 meter\n    class SIM,GW gateway\n    class NET network\n    class TOPIC,SUB,DLQ pubsub\n    class DF,PARSE,ENRICH dataflow\n    class GCS,BQ,RAW,AGG storage\n    class VOLT,DR,HEALTH,SCHED analytics\n    class RUN,ENDPOINTS api\n",
+  "content_size": 3046,
+  "collected_at": "2026-02-06T01:45:42.514582",
+  "license": "mit",
+  "license_name": "MIT License",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 16,
+  "repo_forks": 5,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Edge Layer (Power Poles 和 (\"AMI 2.0 Meter 1<br/>1Hz Sampling\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Edge Layer (Power Poles 和 (\"AMI 2.0 Meter 1<br/>1Hz Sampling\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Edge",
+        "M1"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 (\"AMI 2.0 Meter 2<br/>1Hz Sampling\" 和 (\"AMI 2.0 Meter N<br/>1Hz Sampling\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '(\"AMI 2.0 Meter 2<br/>1Hz Sampling\" 和 (\"AMI 2.0 Meter N<br/>1Hz Sampling\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "M2",
+        "M3"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"simulator.py<br/>Synthetic Data Generator\" 和 \"gateway_relay.py<br/>Pole Gateway\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"simulator.py<br/>Synthetic Data Generator\" 和 \"gateway_relay.py<br/>Pole Gateway\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SIM",
+        "GW"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Network Backhaul\" 和 \"5G / Satellite / Wired<br/>(Simulated Jitter & Latency 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Network Backhaul\" 和 \"5G / Satellite / Wired<br/>(Simulated Jitter & Latency'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Backhaul",
+        "NET"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Cloud Ingestion Layer\" 和 \"Pub/Sub Topic<br/>ami-meter-data\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Cloud Ingestion Layer\" 和 \"Pub/Sub Topic<br/>ami-meter-data\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Ingestion",
+        "TOPIC"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Pub/Sub Subscription<br/>ami-meter-data-sub\" 和 \"Dead Letter Queue<br/>(Optional 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 \"Pub/Sub Subscription<br/>ami-meter-data-sub\"处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Pub/Sub Subscription<br/>ami-meter-data-sub\"处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SUB",
+        "DLQ"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Stream Processing Layer\" 和 \"Dataflow Pipeline<br/>(Apache Beam 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Stream Processing Layer\" 和 \"Dataflow Pipeline<br/>(Apache Beam'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Processing",
+        "DF"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Parse & Validate<br/>JSON\" 和 \"Enrich with<br/>Ingest Timestamp\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Parse & Validate<br/>JSON\" 和 \"Enrich with<br/>Ingest Timestamp\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PARSE",
+        "ENRICH"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Storage Layer\" 和 \"Cloud Storage<br/>Raw Archive (JSONL/CSV 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Storage Layer\" 和 \"Cloud Storage<br/>Raw Archive (JSONL/CSV'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Storage",
+        "GCS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"BigQuery<br/>smart_grid_analytics\" 和 \"raw_meter_readings<br/>(Partitioned by Day 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"BigQuery<br/>smart_grid_analytics\" 和 \"raw_meter_readings<br/>(Partitioned by Day'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BQ",
+        "RAW"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Aggregated Views<br/>(5-min, Hourly 和 \"Analytics Layer\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Aggregated Views<br/>(5-min, Hourly 和 \"Analytics Layer\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AGG",
+        "Analytics"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Voltage Anomaly<br/>Detection\" 和 \"DR Baseline<br/>Computation\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"Voltage Anomaly<br/>Detection\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Voltage Anomaly<br/>Detection\"处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "VOLT",
+        "DR"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Feeder Health<br/>Summary\" 和 \"Cloud Scheduler<br/>(Periodic Jobs 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Feeder Health<br/>Summary\" 和 \"Cloud Scheduler<br/>(Periodic Jobs'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "HEALTH",
+        "SCHED"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Serving Layer\" 和 \"Cloud Run API<br/>(FastAPI 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Serving Layer\" 和 \"Cloud Run API<br/>(FastAPI'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "API",
+        "RUN"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Endpoints:<br/>/health<br/>/pole/{id 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Endpoints:<br/>/health<br/>/pole/{id'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ENDPOINTS"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 62,
+    "repair_count": 2,
+    "grounding_acts_count": 30,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

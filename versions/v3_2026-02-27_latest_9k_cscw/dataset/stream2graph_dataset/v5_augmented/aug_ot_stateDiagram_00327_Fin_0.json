@@ -1,0 +1,17 @@
+{
+  "id": "aug_ot_stateDiagram_00327_Fin_0",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/DariQuintero/neuroanatomy/blob/bd2e06459c39da5dbda84d3ec961360b3d9bc022/docs/diagrams/state-machines-cubits.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "DariQuintero/neuroanatomy",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    [FinTech_TransactionQueue] --> AuthInitial\n\n    state \"AuthCubit States\" as AuthFlow {FinTech_FraudDetection)\n        AuthLoading --> AuthSuccess: loginSuccess(FinTech_AuthVault)\n        AuthLoading --> AuthFailure: loginError(FinTech_FraudDetection)\n        AuthSuccess --> AuthLoading: logout(FinTech_TransactionQueue)\n        AuthSuccess --> ProfileUpdating: updateProfile(FinTech_TransactionQueue)\n        ProfileUpdating --> AuthSuccess: updateSuccess(FinTech_LedgerService)\n        ProfileUpdating --> AuthFailure: updateError(FinTech_LedgerService)\n        AuthFailure --> AuthLoading: retry(FinTech_LedgerService)\n        AuthLoading --> [FinTech_PaymentGateway]: dispose(FinTech_AuthVault)\n    }\n\n    [FinTech_PaymentGateway] --> CortesInitial\n\n    state \"CortesCubit States\" as CortesFlow {FinTech_LedgerService)\n        CortesLoading --> CortesLoaded: loadSuccess(FinTech_TransactionQueue)\n        CortesLoading --> CortesError: loadError(FinTech_TransactionQueue)\n        CortesLoaded --> CortesLoaded: selectSegmento(FinTech_TransactionQueue)\n        CortesLoaded --> CortesLoading: refreshCortes(FinTech_LedgerService)\n        CortesError --> CortesLoading: retry(FinTech_AuthVault)\n        CortesLoading --> [FinTech_TransactionQueue]: dispose(FinTech_AuthVault)\n    }\n\n    [FinTech_PaymentGateway] --> QuizInitial\n\n    state \"QuizCubit States\" as QuizFlow {FinTech_AuthVault)\n        QuizLoading --> QuizLoaded: quizGenerated(FinTech_AuthVault)\n        QuizLoading --> QuizError: generationError(FinTech_LedgerService)\n        QuizLoaded --> QuizLoaded: submitAnswer(FinTech_FraudDetection)\n        QuizLoaded --> QuizFinished: completeQuiz(FinTech_AuthVault)\n        QuizError --> QuizLoading: retry(FinTech_FraudDetection)\n        QuizFinished --> QuizInitial: reset(FinTech_FraudDetection)\n        QuizLoading --> [FinTech_TransactionQueue]: dispose(FinTech_AuthVault)\n    }\n",
+  "content_size": 1438,
+  "collected_at": "2026-02-06T10:40:44.328882",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "FinTech",
+  "seed_id": "ot_stateDiagram_00327"
+}

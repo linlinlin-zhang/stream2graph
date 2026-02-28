@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00535",
+  "source": "github",
+  "source_url": "https://github.com/alexandrafofel/brightfutureahead/blob/8d22d52798438fe9214acab1a54fdf6b9a143fa1/content/app-web/architecture/pre-mvp/04-data-and-security/config-versioning-and-snapshot.mmd",
+  "github_repo": "alexandrafofel/brightfutureahead",
+  "github_file_path": "content/app-web/architecture/pre-mvp/04-data-and-security/config-versioning-and-snapshot.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\n  %% Config versioning + snapshot at GET /quiz\n\n  subgraph REM[\"REMOTE_CONFIG\"]\n    rc[\"flags (JSON)\"]\n    rcv[\"version (INT)\"]\n  end\n\n  subgraph API[\"Edge Fn GET /quiz\"]\n    read[\"read flags + rcv\"]\n    build[\"build payload {questions, copy, flags_subset, quiz_version=rcv}\"]\n    snap[\"INSERT CONFIG_SNAPSHOTS\\n(session_id?, version=rcv, flags_json)\"]\n    resp[\"return 200 payload\"]\n  end\n\n  subgraph DB[\"Postgres\"]\n    qs[\"QUIZ_SESSIONS.quiz_version (INT)\"]\n    cs[\"CONFIG_SNAPSHOTS\\nid, session_id?, version, flags_json, created_at\"]\n  end\n\n  REM --> read --> build --> snap --> resp\n  resp --> qs\n\n  snap -. on fail: log + continue .- resp\n",
+  "content_size": 657,
+  "collected_at": "2026-02-06T01:44:49.963317",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 0
+}

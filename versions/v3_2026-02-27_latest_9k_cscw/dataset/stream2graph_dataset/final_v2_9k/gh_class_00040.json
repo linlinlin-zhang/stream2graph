@@ -1,0 +1,12 @@
+{
+  "id": "gh_class_00040",
+  "source": "github",
+  "source_url": "https://github.com/Catfootbeats/TysmEngine/blob/1f41dcbe399d4fa08a6b6162a1a6804da948dc6c/src/class.mmd",
+  "github_repo": "Catfootbeats/TysmEngine",
+  "github_file_path": "src/class.mmd",
+  "diagram_type": "class",
+  "code": "---\ntitle: tysm\n---\nclassDiagram\n\n    class Engine{\n        + Engine()\n        + ~Engine()\n        + run() void\n        - SDL_Event mainEvent\n        - SDL_Window* mainWindow\n        - SDL_Renderer* renderer\n        - std::unique_ptr<DialogView> dialogView\n        - std::unique_ptr<TitleView> titleView\n        - ViewManager viewManager\n        - bool isQuit\n    }\n\n    class ViewManager{\n    + ViewManager()\n    + ~ViewManager()\n    + route(VIEW) void\n    + show(SDL_Renderer*&) void\n    }\n    ViewManager --o Engine\n\n\n    class WindowManager{\n        + static ...()\n        - WindowManager()\n        - ~WindowManager()\n    }\n    <<static>> WindowManager\n    WindowManager --o Engine\n\n    class RendererManager{\n        + static ...()\n        - RendererManager()\n        - ~RendererManager()\n    }\n    <<static>> RendererManager\n    RendererManager --o Engine\n\n    class DialogView\n    DialogView --o Engine\n    DialogView --> ViewManager: pointer or reference\n    ViewBase <|-- DialogView\n\n    class TitleView{\n        +std::string title\n    }\n    TitleView --o Engine\n    TitleView --> ViewManager: pointer or reference\n    ViewBase <|-- TitleView\n\n    class ViewBase{\n        + show() void\n        + enable() void\n        + disable() void\n        + isActive() bool\n        - bool state\n        # std::list<TyObject&> objects\n    }\n    note for ViewBase \"View包含active和inactive两种状态，通过调用enable() disable()切换\"\n    note for ViewBase \"实现show()渲染objects\"\n    note for ViewBase \"子类只需要列表初始化objects并且添加TyObject\"\n    class VIEW\n    <<Enumeration>> VIEW\n    VIEW : TITLE_VIEW\n    VIEW : DIALOG_VIEW\n\n    class TyObject{\n        + render() void\n    }\n\n    class Image{\n    }\n    Image --|> TyObject\n    Image --o TitleView\n\n    class Text{\n    }\n    Text --|> TyObject\n    Text --o TitleView\n",
+  "content_size": 1784,
+  "collected_at": "2026-02-06T01:24:33.991008",
+  "compilation_status": "success"
+}

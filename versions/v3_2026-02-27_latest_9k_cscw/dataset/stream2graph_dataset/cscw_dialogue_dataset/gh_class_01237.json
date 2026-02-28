@@ -1,0 +1,235 @@
+{
+  "id": "gh_class_01237",
+  "source": "github",
+  "source_url": "https://github.com/better-together-org/community-engine-rails/blob/681b3c2767bcfb770f447e7eebd3ad2f217e2576/docs/diagrams/source/models_and_concerns_diagram.mmd",
+  "github_repo": "better-together-org/community-engine-rails",
+  "github_file_path": "docs/diagrams/source/models_and_concerns_diagram.mmd",
+  "diagram_type": "class",
+  "code": " %% Models & Concerns class diagram\n classDiagram\n   direction TB\n\n   %% Core identity\n   class Person {\n     <<Author,Contactable,Identity,Member,PrimaryCommunity,\n       FriendlySlug,Privacy,Viewable,RemoveableAttachment>>\n   }\n   class User {\n     <<DeviseUser>>\n   }\n   class Identification\n   Person \"1\" o-- \"1\" Identification : has_one\n   User \"1\" <-- Identification : agent\n\n   %% Community & Platform\n   class Community {\n     <<Contactable,Host,Joinable,Identifier,\n       Protected,Privacy,Permissible,RemoveableAttachment>>\n   }\n   class Platform {\n     <<Contactable,Host,Joinable,Identifier,\n       Protected,Privacy,Permissible>>\n   }\n   class PersonCommunityMembership {\n     <<Membership>>\n   }\n   class PersonPlatformMembership {\n     <<Membership>>\n   }\n   PersonCommunityMembership *-- Community\n   PersonCommunityMembership *-- Person\n   PersonPlatformMembership *-- Platform\n   PersonPlatformMembership *-- Person\n   Community o-- PersonCommunityMembership\n   Platform o-- PersonPlatformMembership\n   Person o-- PersonCommunityMembership\n   Person o-- PersonPlatformMembership\n\n   %% Post & Page\n   class Post {\n     <<Authorable,Categorizable,Identifier,Privacy,Publishable,\n       FriendlySlug>>\n   }\n   class Page {\n     <<Authorable,Categorizable,Identifier,Privacy,Publishable,\n       FriendlySlug>>\n   }\n   class Category\n   class Categorization\n   Post *-- Categorization\n   Category *-- Categorization\n   Page *-- Categorization\n\n   %% Conversations\n   class Conversation\n   class ConversationParticipant\n   class Message\n   Conversation \"1\" o-- \"*\" ConversationParticipant\n   ConversationParticipant \"*\" o-- \"1\" Person\n   Conversation \"1\" o-- \"*\" Message\n   Message \"*\" o-- \"1\" Person : sender\n\n   %% Events & Calendar\n   class Event {\n     <<Attachments::Images,Categorizable,Creatable,\n       FriendlySlug,Geospatial::One,Locatable::One,Identifier,\n       Privacy,TrackedActivity,Viewable>>\n   }\n   class EventCategory\n   class Calendar\n   class CalendarEntry\n   Event *-- EventCategory\n   Calendar *-- CalendarEntry\n   CalendarEntry --> Event : entry\n\n   %% Infrastructure (abbreviated)\n   class Building {\n     <<BuildingConnections>>\n   }\n   class Floor\n   class Room\n   Building \"1\" o-- \"*\" Floor\n   Floor \"1\" o-- \"*\" Room\n\n   %% Contact\n   class Address\n   class ContactDetail\n   Person \"1\" o-- \"*\" ContactDetail\n   Community \"1\" o-- \"*\" ContactDetail\n",
+  "content_size": 2389,
+  "collected_at": "2026-02-06T01:54:56.838728",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "lgpl-3.0",
+  "license_name": "GNU Lesser General Public License v3.0",
+  "license_url": "https://api.github.com/licenses/lgpl-3.0",
+  "repo_stars": 13,
+  "repo_forks": 5,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 <<Author,Contactable,Identity,Member,PrimaryCommunity,\n       FriendlySlug,Privacy,Viewable,RemoveableAttachment>>\n    和 <<DeviseUser>>\n    这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '<<Author,Contactable,Identity,Member,PrimaryCommunity,\n       FriendlySlug,Privacy,Viewable,RemoveableAttachment>>\n    和 <<DeviseUser>>\n   '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Person",
+        "User"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 <<Contactable,Host,Joinable,Identifier,\n       Protected,Privacy,Permissible,RemoveableAttachment>>\n    和 <<Contactable,Host,Joinable,Identifier,\n       Protected,Privacy,Permissible>>\n    的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '<<Contactable,Host,Joinable,Identifier,\n       Protected,Privacy,Permissible,RemoveableAttachment>>\n    和 <<Contactable,Host,Joinable,Identifier,\n       Protected,Privacy,Permissible>>\n   '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Community",
+        "Platform"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 <<Membership>>\n    和 <<Membership>>\n   。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '<<Membership>>\n    和 <<Membership>>\n   '。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PersonCommunityMembership",
+        "PersonPlatformMembership"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 <<Authorable,Categorizable,Identifier,Privacy,Publishable,\n       FriendlySlug>>\n    和 <<Authorable,Categorizable,Identifier,Privacy,Publishable,\n       FriendlySlug>>\n    的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '<<Authorable,Categorizable,Identifier,Privacy,Publishable,\n       FriendlySlug>>\n    和 <<Authorable,Categorizable,Identifier,Privacy,Publishable,\n       FriendlySlug>>\n   '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Post",
+        "Page"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 <<Attachments::Images,Categorizable,Creatable,\n       FriendlySlug,Geospatial::One,Locatable::One,Identifier,\n       Privacy,TrackedActivity,Viewable>>\n    和 abbreviated。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '<<Attachments::Images,Categorizable,Creatable,\n       FriendlySlug,Geospatial::One,Locatable::One,Identifier,\n       Privacy,TrackedActivity,Viewable>>\n    和 abbreviated'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Event",
+        "Infrastructure"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 <<BuildingConnections>>\n    这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '<<BuildingConnections>>\n   '。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Building"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 24,
+    "repair_count": 0,
+    "grounding_acts_count": 12,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "gh_sequence_00811",
+  "source": "github",
+  "source_url": "https://github.com/coherosphere/architecture/blob/598bb65467787da38ac4029e35bdead27e7799ee/assets/.mermaid_clean/C4_sequences/C4-06_Alignment_Feedback_Loop_AI_Human_Rubric_Update.mmd",
+  "github_repo": "coherosphere/architecture",
+  "github_file_path": "assets/.mermaid_clean/C4_sequences/C4-06_Alignment_Feedback_Loop_AI_Human_Rubric_Update.mmd",
+  "diagram_type": "sequence",
+  "code": "%%{init: {'theme':'base','themeVariables':{ 'sequenceNumberColor':'#334155'}}}%%\n\nsequenceDiagram\nautonumber\n\nactor R as Human Reviewer\n\nbox #8b5cf6 UI\n  participant UI as C2-12 Resonance Board UI\nend\n\nbox #fde68a Control or API\n  participant API as C2-11 Public API Gateway\nend\n\nbox #ff8b00 Core Services\n  participant ETH as C2-08 Ethics Guard\n  participant RS as C2-01 Resonance Service\n  participant MET as C2-07 Metrics and Analytics\n  participant GOV as C2-03 Governance and DAO\nend\n\nbox #e5e7eb External\n  participant AI as C1-03 AI Systems and Agents\nend\n\n%% -------- Open review task --------\nR ->> UI: Open alignment review task\nUI ->> API: getPendingAlignmentReviews()\nAPI ->> ETH: listPendingReviews()\nETH -->> API: reviewItems\nAPI -->> UI: reviewItems\n\n%% -------- AI assisted scoring --------\nUI ->> API: evaluateItem(itemId)\nAPI ->> ETH: requestEvaluation(itemId)\nETH ->> AI: runAlignmentEval(contentRef policyRef rubricVersion)\nAI -->> ETH: aiScore rationale features\nETH ->> ETH: computeAlignmentScore merge aiScore humanSignals\nETH -->> MET: event AlignmentChecked DDD EVT 03\nMET ->> MET: computeKPI\nMET -->> MET: event KPIUpdated DDD EVT 26\n\n%% -------- Optional resonance refresh for affected items --------\nalt large alignment delta\n  ETH ->> RS: updateAlignmentFactor(itemId newA)\n  RS -->> MET: publish resonance aggregates\n  MET ->> MET: compute SRI\n  MET -->> MET: event SRIComputed DDD EVT 27\nelse minor change\n  ETH ->> MET: publish alignment delta\nend\n\n%% -------- Human feedback on rubric --------\nR ->> UI: Submit rubric feedback and notes\nUI ->> API: submitRubricFeedback(itemId signals)\nAPI ->> ETH: recordRubricFeedback(itemId signals)\nETH ->> ETH: aggregate feedback and drift score\n\nalt drift above threshold\n  ETH ->> GOV: recommendRubricChange summary and evidence\n  GOV -->> ETH: ack recommendation  note right of GOV: C4 22 handles rubric versioning\nelse keep current rubric\n  ETH ->> MET: publish feedback processed\nend\n\n%% -------- Completion --------\nETH -->> API: evaluationResult status and scores\nAPI -->> UI: show result and guidance\nUI -->> R: display aiScore humanScore guidance\n\n%% Notes\nNote over ETH,MET: AlignmentChecked DDD EVT 03 and KPIUpdated DDD EVT 26 are emitted\nNote over ETH,GOV: This flow recommends change only. Formal rubric updates occur in C4 22",
+  "content_size": 2311,
+  "collected_at": "2026-02-06T01:37:23.256722",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License (Assumed)",
+  "license_url": null,
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "repo_owner": "coherosphere",
+  "repo_name": "architecture",
+  "repo_description": "The cohersphere architecture — structural blueprint of the resonance network. Defines the modular layers connecting app, API, and governance protocols. Outlines data flows for Proof-of-Contribution, c",
+  "repo_language": "Mermaid",
+  "repo_topics": [
+    "architecture",
+    "c4",
+    "distributed-systems",
+    "modular-architecture",
+    "system-design"
+  ],
+  "repo_created_at": "2025-10-29T09:30:02Z",
+  "repo_updated_at": "2026-02-06T04:58:50Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

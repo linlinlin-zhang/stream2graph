@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00662",
+  "source": "github",
+  "source_url": "https://github.com/SaintWyss/rag-corp/blob/e264d878c98fb21ebbce63ef303d1613cfefdca2/docs/architecture/diagrams/sequence-upload-async.mmd",
+  "github_repo": "SaintWyss/rag-corp",
+  "github_file_path": "docs/architecture/diagrams/sequence-upload-async.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    autonumber\n    participant U as User\n    participant FE as Frontend\n    participant API as Backend API\n    participant Redis as Redis Queue\n    participant S3 as S3/MinIO\n    participant Worker as Worker\n    participant DB as PostgreSQL\n    participant GenAI as Google GenAI\n\n    U->>FE: Select file + workspace\n    FE->>API: POST /v1/workspaces/{ws_id}/documents/upload<br/>multipart/form-data\n\n    API->>API: Validate permissions (WorkspacePolicy)\n    API->>API: Validate MIME type, file size\n    \n    alt Validation failed\n        API-->>FE: 400/403/413/415\n        FE-->>U: Show error\n    else Validation OK\n        API->>S3: PUT object (storage_key)\n        S3-->>API: OK\n        \n        API->>DB: INSERT document<br/>(status=PENDING, workspace_id)\n        DB-->>API: document_id\n        \n        API->>Redis: ENQUEUE process_document job\n        Redis-->>API: job_id\n        \n        API->>DB: INSERT audit_event<br/>(documents.upload)\n        \n        API-->>FE: 202 Accepted<br/>{document_id, status: PENDING}\n        FE-->>U: Show \"Processing...\"\n    end\n\n    Note over Worker,Redis: Async processing\n\n    Worker->>Redis: DEQUEUE job\n    Redis-->>Worker: job payload\n    \n    Worker->>DB: UPDATE document<br/>status=PROCESSING\n    \n    Worker->>S3: GET object\n    S3-->>Worker: file bytes\n    \n    Worker->>Worker: Extract text<br/>(PDF/DOCX parser)\n    Worker->>Worker: Chunk text<br/>(with overlap)\n    \n    loop For each chunk\n        Worker->>GenAI: Embed chunk\n        GenAI-->>Worker: vector[768]\n    end\n    \n    Worker->>DB: INSERT chunks<br/>(with embeddings)\n    \n    alt Success\n        Worker->>DB: UPDATE document<br/>status=READY\n    else Error\n        Worker->>DB: UPDATE document<br/>status=FAILED, error_message\n    end\n\n    Note over FE: Polling or WebSocket\n\n    FE->>API: GET /v1/workspaces/{ws_id}/documents/{doc_id}\n    API->>DB: SELECT document\n    DB-->>API: document (status=READY)\n    API-->>FE: 200 {status: READY}\n    FE-->>U: Show \"Ready\" ✓\n",
+  "content_size": 2000,
+  "collected_at": "2026-02-06T01:35:21.641250",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License (Assumed)",
+  "license_url": null,
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

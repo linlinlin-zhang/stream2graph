@@ -1,0 +1,67 @@
+{
+  "id": "gh_architecture_01766",
+  "source": "github",
+  "source_url": "https://github.com/leanguardia/provider-switcher/blob/dd3f37a5c130c1af2d5d7887db94f5f21d0f276c/diagrams/architecture2-containers.mmd",
+  "github_repo": "leanguardia/provider-switcher",
+  "github_file_path": "diagrams/architecture2-containers.mmd",
+  "diagram_type": "architecture",
+  "code": "---\ntitle: \"C4 - Level 2: Containers\"\n---\ngraph TB    \n    subgraph PaymentSystem[\"Payment Service<br/>[NestJS Application]\"]\n        API[\"PaymentsController<br/>[REST API /payments]<br/>\"]\n        \n        Orchestrator[\"PaymentsService<br/>[Service]<br/>Payment processing\"]\n        \n        Switcher[\"ProviderSwitcherService<br/>[Service]<br/>Manages the chain\"]\n        \n        ChainHandler[\"PaymentHandler<br/>[abstract]<br/><br/>Chain of Responsibility<br/>base class\"]\n        \n        Exception[\"PaymentProvidersUnavailableException<br/>[Custom Exception]<br/>503 Service Unavailable\"]\n        \n        subgraph Handlers[\"Handler Chain\"]\n            HA[\"ProviderHandler<br/>[Concrete Handler]<br/>Wraps ProviderAService\"]\n            HB[\"ProviderHandler<br/>[Concrete Handler]<br/>Wraps ProviderBService\"]\n            HC[\"ProviderHandler<br/>[Concrete Handler]<br/>Wraps ProviderCService\"]\n        end\n    end\n    \n    ExtA[\"Provider A API<br/>[External REST API]\"]\n    ExtB[\"Provider B API<br/>[External REST API]\"]\n    ExtC[\"Provider C API<br/>[External REST API]\"]\n    \n    API --> Orchestrator\n    Orchestrator --> Switcher\n    Switcher --> ChainHandler\n    ChainHandler -.-> HA\n    HA -->|\"on failure\"| HB\n    HB -->|\"on failure\"| HC\n    HC -.->|\"all failed\"| Exception\n    Exception -.->|\"503 response\"| API\n    \n    HA -->|\"HTTP Request\"| ExtA\n    HB -->|\"HTTP Request\"| ExtB\n    HC -->|\"HTTP Request\"| ExtC\n\n",
+  "content_size": 1424,
+  "collected_at": "2026-02-06T02:03:04.015119",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Generic Diagram应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Generic Diagram的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "最后，流程到达Generic Diagram结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "root"
+      ],
+      "timestamp_offset": 60
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 4,
+    "speaker_distribution": {
+      "Speaker_B": 2,
+      "Speaker_A": 2
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "clarify": 2
+    },
+    "avg_turn_length": 26.5,
+    "dialogue_duration": 60
+  }
+}

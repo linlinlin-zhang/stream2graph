@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00626",
+  "source": "github",
+  "source_url": "https://github.com/ncerny/basketball-video-analyzer/blob/9387ac9ee7195c4ea5a53bdd59c82e0264325563/docs/diagrams/batch-processing.mmd",
+  "github_repo": "ncerny/basketball-video-analyzer",
+  "github_file_path": "docs/diagrams/batch-processing.mmd",
+  "diagram_type": "flowchart",
+  "code": "%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4f46e5'}}}%%\nflowchart TB\n    subgraph JobSystem[\"Job System\"]\n        JobManager[\"Job Manager\"]\n        Worker[\"Detection Worker\"]\n    end\n\n    subgraph Orchestration[\"Batch Orchestration\"]\n        Orchestrator[\"SequentialOrchestrator\"]\n        Resume[\"Resume Logic<br/>Find incomplete batch\"]\n        Extend[\"Extend Logic<br/>Add batches for new range\"]\n    end\n\n    subgraph BatchProcessing[\"Batch Processing\"]\n        subgraph Batch1[\"Batch 1: Frames 0-89\"]\n            Det1[\"Detection<br/>YOLO/RF-DETR + Tracking\"]\n            OCR1[\"OCR<br/>Parallel ThreadPool\"]\n        end\n        subgraph Batch2[\"Batch 2: Frames 90-179\"]\n            Det2[\"Detection\"]\n            OCR2[\"OCR\"]\n        end\n        subgraph BatchN[\"Batch N: Frames ...\"]\n            DetN[\"Detection\"]\n            OCRN[\"OCR\"]\n        end\n    end\n\n    subgraph Checkpointing[\"Database Checkpoints\"]\n        BatchTable[(\"processing_batches<br/>Status per batch\")]\n        DetTable[(\"player_detections<br/>Persisted immediately\")]\n        OCRTable[(\"jersey_numbers<br/>Persisted immediately\")]\n    end\n\n    subgraph PostProcess[\"Post-Processing\"]\n        TrackMerge[\"Track Merger<br/>Consolidate fragments\"]\n    end\n\n    JobManager --> Worker\n    Worker --> Orchestrator\n    Orchestrator --> Resume\n    Orchestrator --> Extend\n    \n    Resume --> Batch1\n    Extend --> BatchN\n    \n    Det1 --> OCR1\n    Det2 --> OCR2\n    DetN --> OCRN\n    \n    Batch1 --> Batch2\n    Batch2 --> BatchN\n    \n    Det1 -.-> DetTable\n    OCR1 -.-> OCRTable\n    Det1 -.-> BatchTable\n    OCR1 -.-> BatchTable\n    \n    BatchN --> TrackMerge\n    TrackMerge -.-> DetTable\n\n    style Resume fill:#22c55e\n    style Extend fill:#22c55e\n    style BatchTable fill:#f59e0b\n    style DetTable fill:#f59e0b\n    style OCRTable fill:#f59e0b\n",
+  "content_size": 1837,
+  "collected_at": "2026-02-06T01:46:04.285338",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

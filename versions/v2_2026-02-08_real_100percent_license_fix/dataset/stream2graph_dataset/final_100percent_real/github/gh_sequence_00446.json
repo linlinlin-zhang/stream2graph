@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00446",
+  "source": "github",
+  "source_url": "https://github.com/zone17/sovren/blob/d3da3358e52da6ae6b2365e89401eca50f337a0c/docs/architecture/diagrams/us-e5-023-data-flow.mmd",
+  "github_repo": "zone17/sovren",
+  "github_file_path": "docs/architecture/diagrams/us-e5-023-data-flow.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant User\n    participant API\n    participant Analytics as UserAnalyticsService\n    participant Cache as Redis Cache\n    participant DB as PostgreSQL\n    participant EventBus as Event Bus\n    participant Worker as Background Worker\n\n    Note over User,Worker: Real-time Activity Tracking\n    User->>API: User Action\n    API->>EventBus: Publish user.activity event\n    EventBus->>Analytics: Event Handler\n    Analytics->>Analytics: Buffer Event\n\n    Note over Analytics: Buffer reaches threshold\n    Analytics->>DB: Batch Insert Events\n\n    Note over User,Worker: Analytics Query Flow\n    User->>API: Request Metrics\n    API->>Analytics: getEngagementMetrics()\n\n    Analytics->>Cache: Check Cache\n    alt Cache Hit\n        Cache-->>Analytics: Return Cached Data\n        Analytics-->>API: Return Metrics\n    else Cache Miss\n        Analytics->>DB: Query Raw Data\n        DB-->>Analytics: Return Results\n        Analytics->>Analytics: Calculate Metrics\n        Analytics->>Cache: Store in Cache\n        Analytics-->>API: Return Metrics\n    end\n\n    API-->>User: Display Metrics\n\n    Note over Worker,DB: Background Aggregation\n    Worker->>Analytics: processAggregations('hourly')\n    Analytics->>DB: Aggregate User Activity\n    Analytics->>DB: Update Aggregate Tables\n    Analytics->>Cache: Invalidate Stale Cache\n    Analytics->>DB: Cleanup Old Data\n",
+  "content_size": 1376,
+  "collected_at": "2026-02-06T01:32:23.718169",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

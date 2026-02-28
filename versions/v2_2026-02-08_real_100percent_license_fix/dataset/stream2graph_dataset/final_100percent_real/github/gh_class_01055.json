@@ -1,0 +1,18 @@
+{
+  "id": "gh_class_01055",
+  "source": "github",
+  "source_url": "https://github.com/GFTCOMS/WRK25COMMUNICATION/blob/b18a63f16657156266f4393ca2db0447b2fb486d/docs/diagram.mmd",
+  "github_repo": "GFTCOMS/WRK25COMMUNICATION",
+  "github_file_path": "docs/diagram.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\nclass User {\n- String id\n- String email\n- String name\n}\n\nclass Cart {\n- String id\n- String userId\n- List~CartItem~ items\n}\n\nclass CartItem {\n- String productId\n- int quantity\n- BigDecimal price\n}\n\nclass NotificationEvent {\n- String userId\n- String message\n- LocalDateTime timestamp\n- String eventType\n}\n\nclass Notification {\n- String userId\n- String message\n- LocalDateTime timestamp\n- boolean important\n+ markAsImportant()\n+ isOlderThan(int days)\n}\n\nclass NotificationRepository {\n<<interface>>\n+ save(Notification notification)\n+ List~Notification~ findByUserId(String userId)\n+ deleteOlderThan(int days)\n}\n\nclass RabbitMQProducer {\n- RabbitTemplate rabbitTemplate\n- Queue queue\n+ sendNotification(NotificationEvent event)\n}\n\nclass RabbitMQConsumer {\n- NotificationRepository repository\n+ receive(NotificationEvent event)\n}\n\nclass NotificationService {\n- RabbitMQProducer producer\n+ notifyUser(String userId, String message)\n+ List~Notification~ getNotificationsForUser(String userId)\n}\n\nclass NotificationRestController {\n- NotificationService service\n+ sendNotification(String userId, String message)\n+ getNotificationsForUser(String userId)\n}\n\nclass NotificationJPARepository {\n+ save(Notification notification)\n+ List~Notification~ findByUserId(String userId)\n+ deleteOlderThan(int days)\n}\n\nclass NotificationEntity {\n- Long id\n- String userId\n- String message\n- LocalDateTime timestamp\n- boolean important\n}\n\nclass RabbitMQConfig {\n+ Queue productQueue()\n+ Queue orderQueue()\n+ Queue cartQueue()\n+ Queue userQueue()\n}\n\nclass Queue {\n- String name\n}\n\nUser --> Cart : has\nCart --> CartItem : contains\nNotificationEvent --> Notification : transforms into\nNotification --> NotificationRepository : persisted by\nNotificationService --> NotificationRepository : uses\nNotificationService --> RabbitMQProducer : sends events\nRabbitMQProducer --> Queue : sends to\nRabbitMQConsumer --> Queue : listens to\nRabbitMQConsumer --> NotificationRepository : stores\nNotificationJPARepository --> NotificationEntity : persists as\nNotificationEntity --> Notification : maps to\nNotificationRestController --> NotificationService : invokes\nRabbitMQConfig --> Queue : creates\n",
+  "content_size": 2173,
+  "collected_at": "2026-02-06T01:52:20.794881",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

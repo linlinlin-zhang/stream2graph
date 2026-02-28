@@ -1,0 +1,352 @@
+{
+  "id": "gh_flowchart_00686",
+  "source": "github",
+  "source_url": "https://github.com/bcgov/nr-rec-resources/blob/338aba0489c221837b283aa3db6e167dcab6ba14/docs/admin-architecture/admin-architecture-flowchart-animated.mmd",
+  "github_repo": "bcgov/nr-rec-resources",
+  "github_file_path": "docs/admin-architecture/admin-architecture-flowchart-animated.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\n  subgraph Container[\" \"]\n    direction TB\n    classDef container fill:#f5f5f5,stroke:#bdbdbd,stroke-width:4px\n    class Container container;\n    subgraph subGraph0[\"Admin Frontend\"]\n      UI[\"Admin UI\"]\n      UI@{ icon: \"azure:users\", pos: \"b\" }\n    end\n    subgraph subGraphAssets[\"Frontend Assets (CDN)\"]\n      S3[\"AWS S3\"]\n      S3@{ icon: \"aws:arch-amazon-simple-storage-service\", pos: \"b\" }\n      CFAssets[\"CloudFront CDN (Assets)\"]\n      CFAssets@{ icon: \"aws:arch-amazon-cloudfront\", pos: \"b\" }\n    end\n    subgraph subGraph1[\"Admin Backend\"]\n      CDN[\"CloudFront CDN\"]\n      CDN@{ icon: \"aws:arch-amazon-cloudfront\", pos: \"b\" }\n      ALB[\"App Load Balancer\"]\n      ALB@{ icon: \"aws:arch-elastic-load-balancing\", pos: \"b\" }\n      Gateway[\"API Gateway\"]\n      Gateway@{ icon: \"aws:arch-amazon-api-gateway\", pos: \"b\" }\n      API[\"Admin API\"]\n      API@{ icon: \"aws:arch-aws-fargate\", pos: \"b\" }\n    end\n    subgraph Database[\"Database\"]\n      DB[(\"AWS Aurora PostgreSQL<br>PostGIS\")]\n      DB@{ icon: \"aws:arch-amazon-aurora\", pos: \"b\" }\n    end\n    subgraph subGraph4[\"External Services\"]\n      KeycloakExt[\"BcGov SSO\"]\n      KeycloakExt@{ icon: \"azure:multifactor-authentication\", pos: \"b\" }\n      DAMExt[\"ResourceSpace DAM\"]\n    end\n    UI e1@-->|\"SSO Auth\"| KeycloakExt\n    UI e2@-->|\"API Call\"| CDN\n    CDN e5@-->|\"API Routing\"| Gateway\n    Gateway e6@-->|\"Load Balancing\"| ALB\n    ALB e7@--> API\n    API e13@-->|\"DB Query\"| DB\n    API e14@-->|\"User Info\"| KeycloakExt\n    API e15@-.->|\"Media Fetch (images/docs)\"| DAMExt\n    UI e16@-->|\"Asset Fetch\"| CFAssets\n    CFAssets e17@--> |\"Asset Origin\"| S3\n    UI:::frontend\n    API:::backend\n    DB:::database\n    CDN:::aws\n    ALB:::aws\n    Gateway:::aws\n    KeycloakExt:::external\n    DAMExt:::external\n    S3:::aws\n    CFAssets:::aws\n  end\n\n  class Container container;\n  e1@{ animation: fast }\n  e2@{ animation: fast }\n  e5@{ animation: slow }\n  e6@{ animation: slow }\n  e7@{ animation: slow }\n  e13@{ animation: fast }\n  e14@{ animation: fast }\n  e15@{ animation: fast }\n  e16@{ animation: fast }\n  e17@{ animation: fast }\n",
+  "content_size": 2099,
+  "collected_at": "2026-02-06T01:46:47.762354",
+  "compilation_status": "success",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 6,
+  "repo_forks": 0,
+  "repo_owner": "bcgov",
+  "repo_name": "nr-rec-resources",
+  "repo_description": "Product to support managing recreation resources across the province, within the Parks & Recreation division. Focused on Rec Sites and Trails BC.",
+  "repo_language": "TypeScript",
+  "repo_topics": [
+    "alb",
+    "apigateway",
+    "aurora",
+    "aws",
+    "cloudfront"
+  ],
+  "repo_created_at": "2024-09-26T18:35:00Z",
+  "repo_updated_at": "2026-02-05T20:45:18Z",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \" \" 和 \"Admin Frontend\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\" \" 和 \"Admin Frontend\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Container",
+        "subGraph0"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Admin UI\" 和 \"Frontend Assets (CDN 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Admin UI\" 和 \"Frontend Assets (CDN'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "UI",
+        "subGraphAssets"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"AWS S3\" 和 \"CloudFront CDN (Assets 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"AWS S3\" 和 \"CloudFront CDN (Assets'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "S3",
+        "CFAssets"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Admin Backend\" 和 \"CloudFront CDN\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Admin Backend\" 和 \"CloudFront CDN\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "subGraph1",
+        "CDN"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"App Load Balancer\" 和 \"API Gateway\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"App Load Balancer\" 和 \"API Gateway\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ALB",
+        "Gateway"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Admin API\" 和 \"Database\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Admin API\" 和 \"Database\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "API",
+        "Database"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 (\"AWS Aurora PostgreSQL<br>PostGIS\" 和 \"External Services\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '(\"AWS Aurora PostgreSQL<br>PostGIS\" 和 \"External Services\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DB",
+        "subGraph4"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"BcGov SSO\" 和 \"ResourceSpace DAM\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"BcGov SSO\" 和 \"ResourceSpace DAM\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "KeycloakExt",
+        "DAMExt"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 images/docs 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'images/docs'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Fetch"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 36,
+    "repair_count": 0,
+    "grounding_acts_count": 18,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

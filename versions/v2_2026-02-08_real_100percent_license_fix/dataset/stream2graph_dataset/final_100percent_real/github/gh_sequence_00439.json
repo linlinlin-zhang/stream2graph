@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00439",
+  "source": "github",
+  "source_url": "https://github.com/tientien1103/quan-ly-bao-hiem/blob/077ad0874f341d721fb31bb7010267e8fb764176/project_01/systerm-modeling/sequenceDiagram/Customer%20Registration%20Flow.mmd",
+  "github_repo": "tientien1103/quan-ly-bao-hiem",
+  "github_file_path": "project_01/systerm-modeling/sequenceDiagram/Customer Registration Flow.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Agent as Agent User\n    participant API as Django API\n    participant Validator as Data Validator\n    participant DB as Database\n    participant AddressService as Address Service\n    participant NotificationService as Notification Service\n\n    Agent->>API: POST /khachhang/ {customer_data, address_data}\n    API->>Validator: validate_customer_data()\n    \n    Validator->>Validator: validate_cmnd_format()\n    Validator->>Validator: validate_phone_format()\n    Validator->>Validator: validate_email_format()\n    Validator->>Validator: validate_age_constraints()\n    \n    alt Validation successful\n        Validator-->>API: Validation passed\n        \n        API->>DB: CHECK duplicate CMND\n        DB-->>API: No duplicate found\n        \n        API->>AddressService: create_address(address_data)\n        AddressService->>DB: INSERT INTO address\n        DB-->>AddressService: Address created (address_id)\n        AddressService-->>API: Address object\n        \n        API->>DB: INSERT INTO khach_hang\n        DB->>DB: Generate ma_kh (auto)\n        DB-->>API: Customer created (ma_kh)\n        \n        API->>NotificationService: send_welcome_email(customer)\n        NotificationService-->>API: Email queued\n        \n        API-->>Agent: 201 Created {ma_kh, customer_data}\n        \n    else Validation failed\n        Validator-->>API: Validation errors\n        API-->>Agent: 400 Bad Request {validation_errors}\n    end\n\n    alt Duplicate CMND\n        DB-->>API: Duplicate CMND found\n        API-->>Agent: 400 Bad Request {error: \"CMND already exists\"}\n    end\n",
+  "content_size": 1588,
+  "collected_at": "2026-02-06T01:32:18.616317",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

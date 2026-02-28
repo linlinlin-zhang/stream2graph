@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01895",
+  "source": "github",
+  "source_url": "https://github.com/ftn-projects/security-development-lifecycle/blob/1dfeabc6980f93af11b779f0977b7ec3b83a7341/MiniKms/docs/context-diagram.mmd",
+  "github_repo": "ftn-projects/security-development-lifecycle",
+  "github_file_path": "MiniKms/docs/context-diagram.mmd",
+  "diagram_type": "architecture",
+  "code": "flowchart TB\n\n    subgraph Internet\n        X[\"fa:fa-desktop Angular @ localhost:4200<br/>Postman @ localhost\"]\n    end\n\n    subgraph DMZ [\"API - Spring Boot\"]\n        direction LR\n\n        CRYPTO[\"fa:fa-lock Cryptography<br/>POST /api/v1/crypto<br/>encrypt/decrypt (AES/RSA)<br/>sign/verify (RSA)<br/>compute/verify (HMAC)\"]\n        MANAGEMENT[\"fa:fa-key Key management /api/v1/keys<br/>POST /create<br/>POST /rotate<br/>GET/DELETE /{id}\"]\n\n        subgraph RootKeyRealm[Root-key realm]\n            RKM[\"RootKeyManager<br/>AES-GCM wrap/unwrap<br/>AAD=id:version\"]\n        end\n\n        AUTH[\"fa:fa-shield-alt Authentication<br/>POST /api/v1/auth\"]\n    end\n\n    subgraph Persistence[\"Persistence\"]\n        direction LR\n\n        subgraph Database[PostgreSQL]\n            direction LR\n            METADATA[(Key metadata)]\n            WRAPPED[(Wrapped key material)]\n            USERS[(Users)]\n        end\n\n        subgraph Logs[Logging]\n            LOGS[(File logs)]\n        end\n    end\n\n\n    %% Client to API\n    X -- HTTPS --> AUTH\n    AUTH -- JWT token --> X\n    X -- HTTPS + JWT --> MANAGEMENT\n    X -- HTTPS + JWT --> CRYPTO\n    CRYPTO -- compute (AES/RSA/HMAC) --> X\n\n    %% Database connections\n    CRYPTO -- fetch metadata/version --> METADATA\n    MANAGEMENT -- read/write --> METADATA\n    MANAGEMENT -- store wrapped bytes --> WRAPPED\n    AUTH -- verify creds --> USERS\n    \n    %% Root key operations\n    CRYPTO -- unwrap key bytes --> RKM\n    MANAGEMENT -- wrap created key bytes --> RKM\n\n    %% Logging\n    DMZ -- structured events --> LOGS",
+  "content_size": 1549,
+  "collected_at": "2026-02-06T02:04:41.078170",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00363",
+  "source": "github",
+  "source_url": "https://github.com/dudwhd20/airbridge/blob/0fb1fdabb726f5e0a9e054fe001f21c31fac2395/docs/sequence.mmd",
+  "github_repo": "dudwhd20/airbridge",
+  "github_file_path": "docs/sequence.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant User\n    participant ReservationSvc\n    participant Kafka\n    participant PaymentSvc\n    participant TicketingSvc\n\n    User->>ReservationSvc: 예약 요청\n    ReservationSvc->>ReservationSvc: 예약 데이터 저장 (PENDING)\n    ReservationSvc->>Kafka: reservation.created\n\n    Kafka->>PaymentSvc: consume reservation.created\n    PaymentSvc->>PaymentSvc: 결제 시도\n\n    alt 결제 성공\n        PaymentSvc->>Kafka: payment.completed\n        Kafka->>TicketingSvc: consume payment.completed\n        TicketingSvc->>TicketingSvc: 발권 시도\n\n        alt 발권 성공\n            TicketingSvc->>Kafka: ticket.issued\n            Kafka->>ReservationSvc: 최종 상태 → COMPLETED\n        else 발권 실패\n            TicketingSvc->>Kafka: ticket.failed\n            Kafka->>ReservationSvc: 보상 트랜잭션 → 예약 취소\n            Kafka->>PaymentSvc: 보상 트랜잭션 → 결제 취소\n        end\n\n    else 결제 실패\n        PaymentSvc->>Kafka: payment.failed\n        Kafka->>ReservationSvc: 보상 트랜잭션 → 예약 취소\n    endㅌ",
+  "content_size": 948,
+  "collected_at": "2026-02-06T01:31:14.814220",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

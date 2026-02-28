@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00141",
+  "source": "github",
+  "source_url": "https://github.com/Daryoush1989/ecs-fargate-web-with-alb/blob/2e33815d21fc2c578a0a72d8c1cff21b2363efa8/docs/architecture/architecture.mmd",
+  "github_repo": "Daryoush1989/ecs-fargate-web-with-alb",
+  "github_file_path": "docs/architecture/architecture.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TB\n  Internet((Internet))\n\n  subgraph Region[\"eu-west-2 (London)\"]\n    subgraph VPC[\"acme-dev-network-vpc<br/>10.10.0.0/16\"]\n      IGW[\"Internet Gateway<br/>acme-dev-network-igw\"]\n\n      subgraph AZA[\"eu-west-2a\"]\n        PubA[\"Public Subnet<br/>10.10.0.0/24<br/>public-euw2a\"]\n        PrivA[\"Private Subnet<br/>10.10.10.0/24<br/>private-euw2a\"]\n        NAT1[\"NAT Gateway<br/>acme-dev-network-nat-euw2a\"]\n      end\n\n      subgraph AZB[\"eu-west-2b\"]\n        PubB[\"Public Subnet<br/>10.10.1.0/24<br/>public-euw2b\"]\n        PrivB[\"Private Subnet<br/>10.10.11.0/24<br/>private-euw2b\"]\n      end\n\n      ALB[\"ALB<br/>acme-dev-ecs-alb-public<br/>HTTP :80\"]\n      TG[\"Target Group (IP)<br/>acme-dev-ecs-tg-http<br/>Health check: /\"]\n      ECS[\"ECS Service (Fargate)<br/>acme-dev-ecs-svc-web\"]\n      CW[\"CloudWatch Logs\"]\n\n      PubA --- ALB\n      PubB --- ALB\n      PrivA --- ECS\n      PrivB --- ECS\n      PubA --- NAT1\n      IGW --- PubA\n      IGW --- PubB\n    end\n  end\n\n  Internet -->|HTTP 80| ALB\n  ALB --> TG\n  TG --> ECS\n  ECS -->|egress| NAT1\n  NAT1 --> IGW\n  IGW --> Internet\n  ECS --> CW\n",
+  "content_size": 1099,
+  "collected_at": "2026-02-06T01:42:12.597871",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

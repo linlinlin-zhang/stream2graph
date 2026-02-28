@@ -1,0 +1,417 @@
+{
+  "id": "gl_packet-beta_00402",
+  "source": "gitlab",
+  "source_url": "https://github.com/FrancoBre/mesh-routing-framework/blob/c4aa7b71d6bebf0c4c578f0be1d19f9f2c26c017/assets/diagrams/class_diagram.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "FrancoBre/mesh-routing-framework",
+  "diagram_type": "packet-beta",
+  "code": "---\nconfig:\n  layout: elk\n---\nclassDiagram\ndirection LR\n    class Main {\n\t    +Simulation\n\t    +main(args)\n    }\n    class TopologyType {\n\t    +GRID_6x6\n    }\n    class AlgorithmType {\n\t    +Q_ROUTING\n\t    +DIJKSTRA\n    }\n    class MetricType {\n\t    +AVG_DELIVERY_TIME\n    }\n    class ExportType {\n\t    +JSON\n\t    +CSV\n\t    +LOGS\n    }\n    class Simulation {\n\t    -config: SimulationConfig\n\t    -network: Network\n\t    -scheduler: Scheduler\n\t    -time: int\n\t    +tick()\n\t    +run()\n    }\n    class Registry {\n\t    +registerHop(Packet)\n\t    +registerReceived(Packet)\n    }\n    class Scheduler {\n\t    +pendingSends: List[Packet]\n\t    +flushPending()\n\t    +schedule(Packet, Node)\n    }\n    class SimulationConfig {\n\t    +topology: TopologyType\n\t    +algorithm: List[AlgorithmType]\n\t    +totalPackets: int\n\t    +packetInjectGap: int\n\t    +seed: long\n\t    +metrics: List[MetricType]\n\t    +exportTo: List[ExportType]\n    }\n    class Application {\n\t    +onTick()\n    }\n    class Network {\n\t    +nodes: List[Node]\n\t    +create(topology)\n\t    +sendPacket(Packet, NodeId)\n    }\n    class Packet {\n\t    +id: PacketId\n\t    +origin: Node\n\t    +destination: Node\n\t    +reachedDestination: bool\n\t    +timeInQueue: int\n    }\n    class Hop {\n\t    +packet: Packet\n\t    +from: NodeId\n\t    +to: NodeId\n\t    +sent: int\n\t    +received: int\n    }\n    class Node {\n\t    +id: NodeId\n\t    +neighbors: List\n\t    +application: Application\n\t    +queue: Queue[Packet]\n\t    +network: Network\n\t    +sendPacket(Packet, Node)\n\t    +receivePacket(Packet, Node)\n\t    +onTick()\n    }\n\t<<singleton>> Registry\n\t<<singleton>> Scheduler\n\t<<interface>> Application\n    Main --> Simulation\n    Simulation --> SimulationConfig\n    Simulation --> Network\n    Simulation --> Scheduler\n    Simulation --> Registry\n    Network --> Node\n    Node --> Packet\n    Node --> Application\n    Registry --> Hop\n    Scheduler --> Packet\n",
+  "content_size": 1878,
+  "collected_at": "2026-02-06T14:09:02.102103",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 +Simulation\n\t    +main(args 和 +GRID_6x6\n    。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '+Simulation\n\t    +main(args 和 +GRID_6x6\n    '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Main",
+        "TopologyType"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 +Q_ROUTING\n\t    +DIJKSTRA\n     和 +AVG_DELIVERY_TIME\n     这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '+Q_ROUTING\n\t    +DIJKSTRA\n     和 +AVG_DELIVERY_TIME\n    '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AlgorithmType",
+        "MetricType"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 +JSON\n\t    +CSV\n\t    +LOGS\n     和 -config: SimulationConfig\n\t    -network: Network\n\t    -scheduler: Scheduler\n\t    -time: int\n\t    +tick( 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '+JSON\n\t    +CSV\n\t    +LOGS\n     和 -config: SimulationConfig\n\t    -network: Network\n\t    -scheduler: Scheduler\n\t    -time: int\n\t    +tick('，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ExportType",
+        "Simulation"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 +registerHop(Packet 和 Packet 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '+registerHop(Packet 和 Packet'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Registry",
+        "registerReceived"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 +pendingSends: List[Packet 和 Packet, Node 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '+pendingSends: List[Packet 和 Packet, Node'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Scheduler",
+        "schedule"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 +topology: TopologyType\n\t    +algorithm: List[AlgorithmType 和 MetricType 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '+topology: TopologyType\n\t    +algorithm: List[AlgorithmType 和 MetricType'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SimulationConfig",
+        "List"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 ExportType 和 +onTick( 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'ExportType 和 +onTick('，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "List",
+        "Application"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 +nodes: List[Node 和 topology 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '+nodes: List[Node 和 topology'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Network",
+        "create"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Packet, NodeId 和 +id: PacketId\n\t    +origin: Node\n\t    +destination: Node\n\t    +reachedDestination: bool\n\t    +timeInQueue: int\n     的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Packet, NodeId 和 +id: PacketId\n\t    +origin: Node\n\t    +destination: Node\n\t    +reachedDestination: bool\n\t    +timeInQueue: int\n    '。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sendPacket",
+        "Packet"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 +packet: Packet\n\t    +from: NodeId\n\t    +to: NodeId\n\t    +sent: int\n\t    +received: int\n     和 +id: NodeId\n\t    +neighbors: List\n\t    +application: Application\n\t    +queue: Queue[Packet。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '+packet: Packet\n\t    +from: NodeId\n\t    +to: NodeId\n\t    +sent: int\n\t    +received: int\n     和 +id: NodeId\n\t    +neighbors: List\n\t    +application: Application\n\t    +queue: Queue[Packet'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Hop",
+        "Node"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Packet, Node 和 Packet, Node 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 Packet, Node处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Packet, Node处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sendPacket",
+        "receivePacket"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 45,
+    "repair_count": 1,
+    "grounding_acts_count": 22,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

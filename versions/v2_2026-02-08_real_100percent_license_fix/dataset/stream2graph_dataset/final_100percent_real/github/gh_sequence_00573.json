@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00573",
+  "source": "github",
+  "source_url": "https://github.com/vosbek/processmaster/blob/d369390cb8987b3c7fa7252e92835f4c09f88fd7/docs/diagrams/data-flow.mmd",
+  "github_repo": "vosbek/processmaster",
+  "github_file_path": "docs/diagrams/data-flow.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant U as User\n    participant E as Chrome Extension\n    participant W as Web App\n    participant API as API Server\n    participant Q as Job Queue\n    participant AI as AWS Bedrock\n    participant S3 as S3 Storage\n    participant DB as PostgreSQL\n    participant WS as WebSocket\n    \n    Note over U,DB: Screen Capture & Guide Generation Flow\n    \n    %% Start capture session\n    U->>E: Click \"Start Capture\"\n    E->>API: POST /api/capture/start\n    API->>DB: Create capture session\n    API->>S3: Generate presigned URLs\n    API-->>E: Session ID & upload URLs\n    E->>WS: Subscribe to session updates\n    \n    %% Capture process\n    loop Screen Capture\n        E->>E: Capture screenshot\n        E->>S3: Upload screenshot (direct)\n        E->>API: POST /api/capture/interaction\n        API->>DB: Store interaction data\n        API->>WS: Broadcast progress update\n        WS-->>E: Real-time progress\n    end\n    \n    %% Stop capture and process\n    U->>E: Click \"Stop Capture\"\n    E->>API: POST /api/capture/stop\n    API->>DB: Update session status\n    API->>Q: Queue AI processing job\n    API-->>E: Processing started\n    \n    %% AI Processing\n    Q->>AI: Process screenshots & interactions\n    AI-->>Q: Generated guide content\n    Q->>DB: Store guide data\n    Q->>WS: Broadcast completion\n    WS-->>E: Guide ready notification\n    \n    %% View generated guide\n    U->>E: View guide\n    E->>W: Open guide in web app\n    W->>API: GET /api/guides/:id\n    API->>DB: Fetch guide data\n    API-->>W: Guide content & metadata\n    W-->>U: Display guide\n    \n    Note over U,DB: Real-time Collaboration Flow\n    \n    %% User starts editing\n    U->>W: Edit guide\n    W->>API: PUT /api/guides/:id/lock\n    API->>DB: Create edit lock\n    API->>WS: Broadcast edit start\n    WS-->>W: Show other users editing status\n    \n    %% Real-time editing\n    loop Live Editing\n        U->>W: Make changes\n        W->>WS: Send change delta\n        WS->>API: Validate and apply changes\n        API->>DB: Store incremental changes\n        WS-->>W: Broadcast changes to other users\n        W-->>U: Show live updates\n    end\n    \n    %% Save and unlock\n    U->>W: Save changes\n    W->>API: POST /api/guides/:id/save\n    API->>DB: Commit all changes\n    API->>WS: Broadcast save complete\n    API->>API: Release edit lock\n    API-->>W: Save confirmed\n    WS-->>W: Update editing status for all users",
+  "content_size": 2396,
+  "collected_at": "2026-02-06T01:34:08.186961",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

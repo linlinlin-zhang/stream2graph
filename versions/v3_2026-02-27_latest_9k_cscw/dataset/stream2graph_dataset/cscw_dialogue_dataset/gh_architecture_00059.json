@@ -1,0 +1,272 @@
+{
+  "id": "gh_architecture_00059",
+  "source": "github",
+  "source_url": "https://github.com/cadet/CADET-HD-chromoo/blob/93a295584204c3ec8ca89fdc21d196d193fffaa2/docs/dataflow.mmd",
+  "github_repo": "cadet/CADET-HD-chromoo",
+  "github_file_path": "docs/dataflow.mmd",
+  "diagram_type": "architecture",
+  "code": "---\ntitle: Chromatography ROM Parameter Estimation\n---\n%%{init: {'theme': 'base', 'flowchart': {'curve': 'basis', 'diagramPadding': 10, \"htmlLabels\": false }}}%%\nflowchart TB\n%%{config: { 'fontFamily': 'Menlo', 'fontSize': 18, 'fontWeight': 400 } }%%\n    column([\"`**Column Model**\n_geometry | flowrate | adsorption model_ ...`\"])\n\n    rom{{\"Reduced-order\n        model template\n        in Cadet\"}}\n\n    subgraph hdsim[HD Workflow]\n    packGen[[Packing generation]] \n    meshGen[[Mesh generation]]\n    sim[[HD Simulation]]\n    post[[Post-processing]]\n    end\n\n    column --> hdsim\n\n    packGen --> meshGen --> sim --> post\n    packGen --> post\n\n    chromoo[[Chromoo]]\n    post2[[Post-processing]]\n    best([\"Best fit(s)\"])\n\n    params([\"`**Model Parameters**\n_velocity | porosity | particle size distribution_`\"])\n\n    refs([\"`**Reference Data**\n            _breakthrough curve | solute mass_`\"])\n\n    inputs([\"`**Optimization Inputs**\n_Parameter bounds | Objectives | Scores_`\"])\n\n    post --> refs --> chromoo\n    inputs --> chromoo\n    post --> params\n    rom --> chromoo\n    params --> rom\n    column --> rom\n\n    chromoo --> post2 --> best\n    classDef data fill:#fff,stroke:#333\n    classDef process fill:#fff,stroke:#333\n    class inputs,params,refs,column,rom,best,vel,por,mass,psd data\n    class packGen,meshGen,sim,post,chromoo,post2 process\n    style hdsim fill:#aec7e8,stroke-dasharray: 5 5,stroke-width:1px,stroke:#333\n\n",
+  "content_size": 1433,
+  "collected_at": "2026-02-06T01:24:56.936457",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 [\"`**Column Model**\n_geometry | flowrate | adsorption model_ ...`\" 和 {\"Reduced-order\n        model template\n        in Cadet\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '[\"`**Column Model**\n_geometry | flowrate | adsorption model_ ...`\" 和 {\"Reduced-order\n        model template\n        in Cadet\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "column",
+        "rom"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 HD Workflow 和 [Packing generation。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HD Workflow 和 [Packing generation'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "hdsim",
+        "packGen"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 [Mesh generation 和 [HD Simulation 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '[Mesh generation 和 [HD Simulation'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "meshGen",
+        "sim"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 [Post-processing 和 [Chromoo 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '[Post-processing 和 [Chromoo'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "post",
+        "chromoo"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 [Post-processing 和 [\"Best fit(s 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 [Post-processing处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '[Post-processing处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "post2",
+        "best"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 [\"`**Model Parameters**\n_velocity | porosity | particle size distribution_`\" 和 [\"`**Reference Data**\n            _breakthrough curve | solute mass_`\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '[\"`**Model Parameters**\n_velocity | porosity | particle size distribution_`\" 和 [\"`**Reference Data**\n            _breakthrough curve | solute mass_`\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "params",
+        "refs"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 [\"`**Optimization Inputs**\n_Parameter bounds | Objectives | Scores_`\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '[\"`**Optimization Inputs**\n_Parameter bounds | Objectives | Scores_`\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "inputs"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 29,
+    "repair_count": 1,
+    "grounding_acts_count": 14,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

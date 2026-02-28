@@ -1,0 +1,31 @@
+{
+  "id": "gh_flowchart_00445",
+  "source": "github",
+  "source_url": "https://github.com/forepath/agenstra/blob/6a2b5d1006fcb07aeb873ca3cd0c6f8e184b2b85/libs/domains/framework/backend/feature-agent-manager/docs/architecture-vnc.mmd",
+  "github_repo": "forepath/agenstra",
+  "github_file_path": "libs/domains/framework/backend/feature-agent-manager/docs/architecture-vnc.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TB\n    subgraph AgentManager[\"Agent Manager Service\"]\n        direction TB\n        AgentsService[\"AgentsService\"]\n        DockerService[\"DockerService\"]\n        AgentsRepo[\"AgentsRepository\"]\n        DB[(PostgreSQL Database)]\n    end\n\n    subgraph DockerHost[\"Docker Host\"]\n        direction TB\n\n        subgraph AgentContainer[\"Agent Container\"]\n            direction TB\n            AgentProcess[\"Cursor Agent Process\"]\n            WorkspaceVolume[\"/app<br/>(Workspace Volume)\"]\n        end\n\n        subgraph VNCContainer[\"VNC Container\"]\n            direction TB\n            TigerVNC[\"TigerVNC Server<br/>:1 (Port 5901)\"]\n            WebSockify[\"websockify<br/>Port 6080\"]\n            XFCE4[\"XFCE4 Desktop\"]\n            Chromium[\"Chromium Browser<br/>(Auto-started)\"]\n            VNCWorkspace[\"/app<br/>(Shared Workspace)\"]\n        end\n\n        DockerNetwork[\"Docker Network<br/>(Isolated Network)\"]\n    end\n\n    subgraph Client[\"Client Browser\"]\n        direction TB\n        NoVNC[\"noVNC Client<br/>(HTTPS)\"]\n    end\n\n    AgentsService -->|\"1. Create Agent\"| DockerService\n    DockerService -->|\"2. Create Container\"| AgentContainer\n    DockerService -->|\"3. Create VNC Container\"| VNCContainer\n    DockerService -->|\"4. Create Network\"| DockerNetwork\n    DockerService -->|\"5. Connect Containers\"| DockerNetwork\n\n    AgentsService -->|\"6. Store VNC Info\"| AgentsRepo\n    AgentsRepo -->|\"7. Persist\"| DB\n\n    AgentContainer -.->|\"Shared Volume\"| WorkspaceVolume\n    VNCContainer -.->|\"Shared Volume\"| VNCWorkspace\n    WorkspaceVolume -.->|\"Same Volume\"| VNCWorkspace\n\n    AgentContainer -->|\"Network Communication\"| DockerNetwork\n    VNCContainer -->|\"Network Communication\"| DockerNetwork\n\n    XFCE4 -->|\"Starts\"| Chromium\n    TigerVNC -->|\"VNC Protocol\"| WebSockify\n    WebSockify -->|\"WebSocket/HTTPS\"| NoVNC\n    Client -->|\"HTTPS Request\"| NoVNC\n\n    style AgentManager fill:#e6f0ff,stroke:#4a90e2,stroke-width:3px\n    style DockerHost fill:#e6ffe6,stroke:#4a9e2,stroke-width:3px\n    style Client fill:#fff4e6,stroke:#ff8c42,stroke-width:3px\n    style AgentContainer fill:#f0f7ff,stroke:#4a90e2\n    style VNCContainer fill:#f0fff0,stroke:#4a9e2\n    style DockerNetwork fill:#ffe6cc,stroke:#ff8c42\n    style DB fill:#f5f5f5,stroke:#666\n",
+  "content_size": 2252,
+  "collected_at": "2026-02-06T01:44:07.385794",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License (Assumed)",
+  "license_url": null,
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "repo_owner": "forepath",
+  "repo_name": "agenstra",
+  "repo_description": "Centralized management platform for distributed AI agent infrastructure with real-time interaction, code editing, and automated provisioning.",
+  "repo_language": "TypeScript",
+  "repo_topics": [
+    "angular",
+    "bootstrap",
+    "clarity",
+    "forepath",
+    "framework"
+  ],
+  "repo_created_at": "2025-09-24T22:34:48Z",
+  "repo_updated_at": "2026-02-04T23:08:27Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

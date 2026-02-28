@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00324",
+  "source": "github",
+  "source_url": "https://github.com/MelodicAlbuild/hackuta-2025-monorepo/blob/9019ff6af0db389bc1648bd2bf8b3697ed2955f0/docs/diagrams/portal_flows.mmd",
+  "github_repo": "MelodicAlbuild/hackuta-2025-monorepo",
+  "github_file_path": "docs/diagrams/portal_flows.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n  participant U as User (Browser)\n  participant MW as Portal Middleware\n  participant API1 as portal /api/user-group\n  participant API2 as portal /api/my-qr\n  participant SSR as Supabase SSR Client\n  participant Supa as Supabase\n\n  U->>MW: Request any route\n  MW->>SSR: getSession()\n  alt No session\n    MW-->>U: 302 to auth /login?redirect_to=...\n  else Has session\n    MW-->>U: Proceed\n  end\n\n  U->>API1: GET\n  API1->>SSR: auth.getUser()\n  API1->>Supa: from(user_groups).select(user_group).eq(user_id)\n  API1-->>U: { group }\n\n  U->>API2: GET\n  API2->>SSR: auth.getUser()\n  API2->>Supa: query identity/QR data as needed\n  API2-->>U: image/png (generated via QRCode)\n",
+  "content_size": 683,
+  "collected_at": "2026-02-06T01:30:41.459921",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 1,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

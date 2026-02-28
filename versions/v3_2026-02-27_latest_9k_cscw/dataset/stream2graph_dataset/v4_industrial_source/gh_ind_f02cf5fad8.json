@@ -1,0 +1,9 @@
+{
+  "id": "gh_ind_f02cf5fad8",
+  "source": "github_industrial",
+  "repo": "dontloseyourheadsu/DistributedShoppingStore",
+  "license": "gpl-3.0",
+  "code": "%% DistributedShoppingStore – Sequence: Cached Item List with ETag\nsequenceDiagram\n    participant U as Client\n    participant API as REST API\n    participant C as Cache\n    participant S as Trading Service\n    participant D as Database\n\n    U->>API: GET /rooms/roomId/items with If-None-Match header\n    API->>C: GET room:roomId:items\n    alt Cache hit and ETag matches\n        C-->>API: items + etag\n        API-->>U: 304 Not Modified\n    else Cache miss or stale\n        API->>S: GetItems(roomId)\n        S->>D: SELECT items WHERE roomId\n        D-->>S: rows\n        S-->>API: items, version\n        API->>C: SET room:roomId:items with TTL\n        API-->>U: 200 OK items with ETag header\n    end",
+  "diagram_type": "sequence size:600..900",
+  "collected_at": "2026-02-27T04:26:22.878009"
+}

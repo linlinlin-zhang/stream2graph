@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00722",
+  "source": "github",
+  "source_url": "https://github.com/shwetalj/executioner/blob/ebfd7f212ea22656ecc53a6808ae213727862d28/docs/diagrams/diagram-3-data-flow.mmd",
+  "github_repo": "shwetalj/executioner",
+  "github_file_path": "docs/diagrams/diagram-3-data-flow.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant CLI as executioner.py\n    participant JE as JobExecutioner\n    participant EO as ExecutionOrchestrator\n    participant QM as QueueManager\n    participant SM as StateManager\n    participant JR as JobRunner\n    participant EHM as ExecutionHistoryManager\n    participant DB as SQLite Database\n    \n    CLI->>JE: Initialize with config\n    JE->>SM: Initialize state & get run ID\n    SM->>EHM: Get new run ID\n    EHM->>DB: Query max run ID\n    DB-->>EHM: Return max ID\n    EHM-->>SM: Return new run ID\n    \n    JE->>QM: Initialize job queue\n    QM->>QM: Queue initial jobs\n    \n    JE->>EO: Start execution\n    EO->>QM: Get next job\n    QM-->>EO: Return job ID\n    \n    EO->>JR: Execute job\n    JR->>JR: Run command & monitor\n    JR-->>EO: Return result\n    \n    EO->>QM: Mark job complete\n    QM->>QM: Queue dependent jobs\n    \n    EO->>SM: Update execution state\n    SM->>EHM: Record job status\n    EHM->>DB: Persist to database",
+  "content_size": 957,
+  "collected_at": "2026-02-06T01:36:09.185516",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

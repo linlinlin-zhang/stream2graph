@@ -1,0 +1,16 @@
+{
+  "id": "gl_flowchart_00648",
+  "source": "gitlab",
+  "source_url": "https://github.com/carrowmw/phd-project-gnn/blob/07a2695df02fe44b7507c15b3ae9b069b0bca0d7/docs/archive/dataflow.mmd",
+  "source_note": "collected_from_github_final",
+  "github_repo": "carrowmw/phd-project-gnn",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\n    subgraph Data_Collection\n        A[Private UOAPI] --> |Get Sensor Locations| B[sensor_locations]\n        A --> |Get Traffic Data| C[count_data]\n        C --> |Convert to DataFrame| D[counts_df]\n        D --> |Transform to time series dict| E[results_containing_data]\n    end\n\n    subgraph Graph_Processing\n        F[Load Graph Data] --> |\"load_graph_data(prefix='25022025_test')\"| G[adj_matrix, node_ids]\n        G --> |\"compute_adjacency_matrix()\"| H[weighted_adj]\n    end\n\n    subgraph Data_Preprocessing\n        E --> |\"TimeSeriesPreprocessor.create_windows()\"| I[X_by_sensor, masks_by_sensor]\n        I --> |\"Filter valid nodes\"| J[valid_sensors]\n        J --> |\"Create subgraph for valid nodes\"| K[valid_adj, valid_node_ids]\n        K --> |\"Split data into train/val\"| L[train/val datasets]\n        L --> |\"create_dataloader()\"| M[train_loader, val_loader]\n    end\n\n    subgraph Model_Training\n        M --> |\"train_model()\"| N[STGNN model]\n        N --> |\"Train each epoch\"| O[Trained model]\n        O --> |\"Save model\"| P[stgnn_model.pth]\n    end\n\n    B -.-> E\n    G -.-> K\n    H -.-> K",
+  "content_size": 1110,
+  "collected_at": "2026-02-06T14:18:26.241600",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

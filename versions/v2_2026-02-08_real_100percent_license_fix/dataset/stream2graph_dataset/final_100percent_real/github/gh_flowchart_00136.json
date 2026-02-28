@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00136",
+  "source": "github",
+  "source_url": "https://github.com/RamziT/campus/blob/dd14c24a5fd589b10a2d37ee86b5b7b3d1e43a51/diagrammes/composant2.mmd",
+  "github_repo": "RamziT/campus",
+  "github_file_path": "diagrammes/composant2.mmd",
+  "diagram_type": "flowchart",
+  "code": "%%{\n  init: {\n    'theme': 'base',\n    'themeVariables': {\n      'fontSize': '18px',\n      'fontFamily': 'Arial',\n      'primaryTextColor': '#000',\n      'primaryColor': '#fff',\n      'lineColor': '#333'\n    }\n  }\n}%%\n\nflowchart TB\n  subgraph Frontend[\"Frontend\"]\n        UI[\"Interface Utilisateur Web\"]\n        Mobile[\"Application Mobile\"]\n  end\n\n  subgraph Auth[\"Authentification\"]\n        KC[\"Keycloak<br>Identity Provider\"]\n  end\n\n  subgraph subGraph1[\"API Gateway\"]\n        APIGW[\"API Gateway<br>+ JWT Validation\"]\n  end\n\n  subgraph Microservices[\"Microservices\"]\n        MS_INE[\"Microservice<br>Gestion des comptes INE\"]\n        MS_Inscription[\"Microservice<br>Gestion des orientations et inscriptions administratives\"]\n        MS_Academic[\"Microservice<br>Gestion académiques et administratives\"]\n        MS_Payments[\"Microservice<br>Gestion des allocations\"]\n  end\n\n  subgraph subGraph4[\"Stockage de données\"]\n        DB_INE[(\"Base de données<br>Comptes INE\")]\n        DB_Inscription[(\"Base de données<br>Inscriptions\")]\n        DB_Academic[(\"Base de données<br>Académique\")]\n        DB_Payments[(\"Base de données<br>Allocations\")]\n        DB_KC[(\"Base de données<br>Keycloak\")]\n  end\n\n  %% Relations Frontend -> Keycloak (authentification)\n  UI -.->|\"1- Login/SSO\"| KC\n  Mobile -.->|\"1- Login/SSO\"| KC\n  KC -.->|\"2- JWT Token\"| UI\n  KC -.->|\"2- JWT Token\"| Mobile\n\n  %% Relations Frontend -> API Gateway\n  UI -->|\"3- Requêtes + JWT\"| APIGW\n  Mobile -->|\"3- Requêtes + JWT\"| APIGW\n\n  %% Validation JWT par API Gateway\n  APIGW -.->|\"Validate JWT\"| KC\n\n  %% Relations API Gateway -> Microservices\n  APIGW -->|\"Route\"| MS_INE\n  APIGW -->|\"Route\"| MS_Inscription\n  APIGW -->|\"Route\"| MS_Academic\n  APIGW -->|\"Route\"| MS_Payments\n\n  %% Relations Microservices -> API Gateway\n  MS_INE -.->|\"4- Requêtes + JWT\"| APIGW\n  MS_Inscription -.->|\"4- Requêtes + JWT\"| APIGW\n  MS_Academic -.->|\"4- Requêtes + JWT\"| APIGW\n  MS_Payments -.->|\"4- Requêtes + JWT\"| APIGW\n\n  %% Relations Microservices -> Bases de données\n  MS_INE -->|\"CRUD\"| DB_INE\n  MS_Inscription -->|\"CRUD\"| DB_Inscription\n  MS_Academic -->|\"CRUD\"| DB_Academic\n  MS_Payments -->|\"CRUD\"| DB_Payments\n  KC -->|\"CRUD\"| DB_KC\n\n  %% Styles personnalisés\n  UI:::frontend\n  Mobile:::frontend\n  KC:::auth\n  APIGW:::gateway\n  MS_INE:::microservice\n  MS_Inscription:::microservice\n  MS_Academic:::microservice\n  MS_Payments:::microservice\n  DB_INE:::database\n  DB_Inscription:::database\n  DB_Academic:::database\n  DB_Payments:::database\n  DB_KC:::database\n\n  %% Classes de style\n  classDef frontend fill:#e6ccff,stroke:#5500cc,stroke-width:2px,color:#333,font-weight:bold\n  classDef auth fill:#ffcc99,stroke:#ff6600,stroke-width:3px,color:#333,font-weight:bold\n  classDef gateway fill:#ff99cc,stroke:#cc0066,stroke-width:3px,color:#333,font-weight:bold\n  classDef microservice fill:#99ccff,stroke:#0066cc,stroke-width:2px,color:#333,font-weight:bold\n  classDef database fill:#99ff99,stroke:#009900,stroke-width:2px,color:#333,font-weight:bold\n",
+  "content_size": 2992,
+  "collected_at": "2026-02-06T01:42:10.668886",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

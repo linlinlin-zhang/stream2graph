@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00512",
+  "source": "github",
+  "source_url": "https://github.com/AiBunty/fitness-club-telegram-bot/blob/45db24387e77a19abddf6aa2fe129953e3770d6a/diagrams/payment_sequence.mmd",
+  "github_repo": "AiBunty/fitness-club-telegram-bot",
+  "github_file_path": "diagrams/payment_sequence.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant U as User\n    participant B as Bot\n    participant DB as Database\n    participant A as Admin\n    participant S as Scheduler\n\n    U->>B: Checkout (FULL/PARTIAL/CREDIT)\n    B->>DB: create_order(user, items, payment_method)\n    DB-->>B: order_id, total, balance\n    B->>A: notify admins (Open Order button)\n    Note right of A: Admin reviews order\n    A->>B: Record payment / Set credit terms\n    B->>DB: apply_order_payment(order_id, amount)\n    DB-->>B: updated order (payment_status, balance)\n    B->>U: Notify user (payment recorded / partial / credit terms)\n\n    S->>DB: find overdue credit orders\n    DB-->>S: list of pending_credit_orders\n    S->>U: send reminder message (Mark as Paid button)\n    U->>B: clicks Mark as Paid\n    B->>DB: apply_order_payment(order_id, amount=balance)\n    DB-->>B: order marked PAID\n    B->>A: optional admin notification (payment cleared)\n",
+  "content_size": 907,
+  "collected_at": "2026-02-06T01:33:18.672670",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

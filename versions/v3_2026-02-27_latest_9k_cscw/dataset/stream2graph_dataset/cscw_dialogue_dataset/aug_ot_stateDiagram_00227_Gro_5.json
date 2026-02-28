@@ -1,0 +1,200 @@
+{
+  "id": "aug_ot_stateDiagram_00227_Gro_5",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/openbankingproject-ch/Open-API-Kundenbeziehung/blob/0117d87c5299ec17e19105263dc1fb9615d87c47/Dokumentation%20Fachliche%20Perspektive/Fachliche%20Conclusions%20Open%20API%20Kundenbeziehung/Resources/graphics/03-referenzprozess/process-state-machine.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "openbankingproject-ch/Open-API-Kundenbeziehung",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    [Groupware_IssueTracker] --> Initialized: Customer starts process\n    \n    Initialized --> ProductSelected: Select products/services\n    ProductSelected --> SelfDeclared: Complete regulatory forms\n    \n    SelfDeclared --> BasicDataCollected: Provide contact information\n    BasicDataCollected --> ExtendedDataCollected: Risk assessment data\n    \n    ExtendedDataCollected --> PendingIdentification: Start identity verification\n    \n    state PendingIdentification {Groupware_WikiPage] --> VideoIdent\n        [Groupware_KanbanBoard] --> EID_Integration  \n        [Groupware_IssueTracker] --> BiometricVerification\n        VideoIdent --> IdentityVerified\n        EID_Integration --> IdentityVerified\n        BiometricVerification --> IdentityVerified\n    }\n    \n    IdentityVerified --> KYC_Processing: Background checks\n    \n    state KYC_Processing {Groupware_WikiPage] --> PEP_Check\n        [Groupware_ChatRoom] --> Sanctions_Check\n        [Groupware_SprintBacklog] --> AML_Assessment\n        PEP_Check --> KYC_Complete\n        Sanctions_Check --> KYC_Complete\n        AML_Assessment --> KYC_Complete\n    }\n    \n    KYC_Complete --> ContractAccepted: Customer accepts terms\n    ContractAccepted --> PendingSignature: Prepare signature\n    \n    state PendingSignature {Groupware_ChatRoom] --> QES_Signature\n        [Groupware_IssueTracker] --> TwoFA_Signature\n        [Groupware_KanbanBoard] --> Biometric_Signature\n        QES_Signature --> DocumentSigned\n        TwoFA_Signature --> DocumentSigned\n        Biometric_Signature --> DocumentSigned\n    }\n    \n    DocumentSigned --> AccountActivated: Process metadata & distribution\n    AccountActivated --> [Groupware_SprintBacklog]: Customer onboarded\n    \n    %% Error states\n    ProductSelected --> Failed: Eligibility check failed\n    BasicDataCollected --> Failed: Data validation error\n    ExtendedDataCollected --> Failed: Risk assessment failed\n    PendingIdentification --> Failed: Identity verification failed\n    KYC_Processing --> Failed: KYC checks failed\n    PendingSignature --> Failed: Signature process failed\n    \n    Failed --> [Groupware_ChatRoom]: Process terminated",
+  "content_size": 1955,
+  "collected_at": "2026-02-06T10:39:25.291008",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Groupware",
+  "seed_id": "ot_stateDiagram_00227",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Groupware_IssueTracker 和 Groupware_WikiPage 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Groupware_IssueTracker 和 Groupware_WikiPage'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2",
+        "PendingIdentification"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Groupware_KanbanBoard 和 Groupware_IssueTracker。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Groupware_KanbanBoard 和 Groupware_IssueTracker'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "VideoIdent",
+        "EID_Integration"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Groupware_WikiPage 和 Groupware_ChatRoom 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Groupware_WikiPage 和 Groupware_ChatRoom'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "KYC_Processing",
+        "PEP_Check"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Groupware_SprintBacklog 和 Groupware_ChatRoom 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Groupware_SprintBacklog 和 Groupware_ChatRoom'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Sanctions_Check",
+        "PendingSignature"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Groupware_IssueTracker 和 Groupware_KanbanBoard 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Groupware_IssueTracker 和 Groupware_KanbanBoard'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "QES_Signature",
+        "TwoFA_Signature"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 20,
+    "repair_count": 0,
+    "grounding_acts_count": 10,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

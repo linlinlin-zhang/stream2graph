@@ -1,0 +1,15 @@
+{
+  "id": "ot_stateDiagram_00159",
+  "source": "other",
+  "source_url": "https://github.com/hispafox/260922-MicroserviciosNET-001/blob/ba7ec3b191746e569c359fdee8add32a5bedc43d/Test1/src/Demo.Api/Diagramas/Diagrama%20de%20estados%20de%20la%20Saga.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "hispafox/260922-MicroserviciosNET-001",
+  "diagram_type": "stateDiagram",
+  "code": "﻿stateDiagram-v2\ndirection LR\n\n[*] --> OrderSubmitted\nOrderSubmitted --> PaymentProcessing : ProcessPaymentCommand\nPaymentProcessing --> StockReserving : PaymentProcessedEvent\nPaymentProcessing --> OrderFailed : PaymentFailedEvent / CancelOrder\nPaymentProcessing --> OrderFailed : PaymentTimeoutEvent / CancelPayment + CancelOrder\n\nStockReserving --> ShipmentCreating : StockReservedEvent\nStockReserving --> OrderFailed : StockReservationFailedEvent / RefundPayment + CancelOrder\nStockReserving --> OrderFailed : StockTimeoutEvent / CancelOrder\n\nShipmentCreating --> OrderCompleted : ShipmentCreatedEvent / OrderCompletedEvent\nShipmentCreating --> OrderFailed : ShipmentFailedEvent / ReleaseStock + RefundPayment + CancelOrder\n\nOrderCompleted --> [*]\nOrderFailed --> [*]\n\nnote right of PaymentProcessing\n  Timeout: 5 min\n  Reintentos: exponencial (1s..5m)\nend note\n\nnote right of StockReserving\n  Timeout: 2 min\n  Compensación si falla:\n  - RefundPayment\n  - CancelOrder\nend note\n",
+  "content_size": 980,
+  "collected_at": "2026-02-06T10:38:34.705447",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

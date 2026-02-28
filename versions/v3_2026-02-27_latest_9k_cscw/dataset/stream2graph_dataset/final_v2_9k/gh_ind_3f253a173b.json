@@ -1,0 +1,9 @@
+{
+  "id": "gh_ind_3f253a173b",
+  "source": "github_industrial",
+  "repo": "JayceeB1/Klipper-Auto-Power-Off",
+  "license": "gpl-3.0",
+  "code": "sequenceDiagram\n    participant U as User\n    participant K as Klipper\n    participant APO as Auto Power Off\n    participant T as Timer (Reactor)\n    participant P as Power Device\n\n    Note over APO,T: Timer initiation\n    alt Print completed\n        K->>APO: _handle_print_complete()\n    else START command\n        U->>K: AUTO_POWEROFF START\n        K->>APO: cmd_AUTO_POWEROFF(option=\"start\")\n    end\n    \n    APO->>T: reactor.register_timer(_check_conditions, waketime)\n    APO->>APO: Record countdown_end\n    \n    loop Until shutdown or cancellation\n        T-->>APO: _check_conditions(eventtime)\n        \n        alt Conditions not met\n            APO->>T: Return new delay (+60s)\n        else Conditions met\n            APO->>APO: _power_off()\n            APO->>P: Actual device shutdown\n            APO->>T: Return NEVER (end timer)\n        end\n    end\n    \n    opt Manual cancellation\n        U->>K: AUTO_POWEROFF CANCEL\n        K->>APO: cmd_AUTO_POWEROFF(option=\"cancel\")\n        APO->>T: reactor.unregister_timer(shutdown_timer)\n        APO->>APO: shutdown_timer = None\n    end\n    \n    opt Cancellation by print detection\n        Note over K,APO: Print started\n        APO->>APO: Print detection in _check_conditions\n        APO->>T: Return NEVER (end timer)\n    end\n",
+  "diagram_type": "actor size:900..1500",
+  "collected_at": "2026-02-27T04:27:30.383253"
+}

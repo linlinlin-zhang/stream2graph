@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00543",
+  "source": "github",
+  "source_url": "https://github.com/oscarmarcussen/master_diagram/blob/a007e7cf51e7a0c13518c89f18f939cb16028c60/sequence_diagrams/09_provisionCloudInfra.mmd",
+  "github_repo": "oscarmarcussen/master_diagram",
+  "github_file_path": "sequence_diagrams/09_provisionCloudInfra.mmd",
+  "diagram_type": "sequence",
+  "code": "---\nconfig:\n  theme: default\n  look: classic\n---\nsequenceDiagram\n    participant WE as WorkflowEngine\n    participant TF as TerraformCli\n    \n    box Remote Services\n    participant AzureCloud as Microsoft<br>Azure\n    participant GCPCloud as Google Cloud<br>Platform\n    participant TFExec as Terraform<br>Executable\n    end\n    \n    note right of WE: Step 9: provisionCloudInfra\n    WE->>TF: apply(\"infrastructure\")\n    activate TF\n    TF->>TFExec: $ terraform init (infrastructure config)\n    activate TFExec\n    TFExec-->>TF: Infrastructure config initialized\n    deactivate TFExec\n    \n    TF->>TFExec: $ terraform apply (infrastructure config)\n    activate TFExec\n    \n    alt Azure Selected\n        TFExec->>AzureCloud: provision complete infrastructure\n        activate AzureCloud\n        note over AzureCloud: • Resource group & container registry<br>• Service principal & OIDC federation<br>• Container Apps environment & service<br>• PostgreSQL Flexible Server (optional)\n        AzureCloud-->>TFExec: all resources created\n        deactivate AzureCloud\n    else GCP Selected\n        TFExec->>GCPCloud: provision complete infrastructure\n        activate GCPCloud\n        note over GCPCloud: • Project creation & API enablement<br>• IAM & Workload Identity Federation<br>• Cloud Run service<br>• CloudSQL instance (optional)\n        GCPCloud-->>TFExec: all resources created\n        deactivate GCPCloud\n    end\n    TFExec-->>TF: Infrastructure provisioned\n    deactivate TFExec\n    TF-->>WE: Infrastructure provisioning complete\n    deactivate TF",
+  "content_size": 1556,
+  "collected_at": "2026-02-06T01:33:43.651337",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01616",
+  "source": "github",
+  "source_url": "https://github.com/afborges/FluxoCaixa/blob/f050782c4fd3076ed72051c52e8042a11ff9a83f/doc/diagrams/architecture.mmd",
+  "github_repo": "afborges/FluxoCaixa",
+  "github_file_path": "doc/diagrams/architecture.mmd",
+  "diagram_type": "architecture",
+  "code": "flowchart LR\n  %% Arquitetura geral com observability e infra\n  Client[Cliente] --> LB[Load Balancer / Ingress]\n\n  LB --> Lancamentos[\"Lançamentos Service\\n(port: 5001)\\n(AuthController, Outbox)\"]\n  LB --> Consolidado[\"Consolidado Service\\n(port: 5002)\\n(AuthController, Cache)\"]\n\n  subgraph Infra [Infraestrutura (Docker Compose / Kubernetes)]\n    direction TB\n    PostgresL[\"PostgreSQL\\nlancamentos:5432\"]\n    PostgresC[\"PostgreSQL\\nconsolidado:5433\"]\n    RabbitMQ[\"RabbitMQ\\n(AMQP 5672)\\nManagement 15672\"]\n    Redis[\"Redis\\n(6379)\\n(IDistributedCache)\"]\n    Prometheus[\"Prometheus\\n(9090)\"]\n    Grafana[\"Grafana\\n(3000)\"]\n    Jaeger[\"Jaeger / OTLP Collector\"]\n  end\n\n  %% principais dependências\n  Lancamentos --> PostgresL\n  Consolidado --> PostgresC\n\n  %% Outbox pattern: Lancamentos grava outbox -> publica no RabbitMQ\n  Lancamentos -.-> Outbox[(Outbox Table)]\n  Outbox --> RabbitMQ\n  Lancamentos --> RabbitMQ\n  RabbitMQ --> Consolidado\n\n  %% Cache\n  Consolidado --> Redis\n\n  %% Observability\n  Lancamentos --> Prometheus\n  Consolidado --> Prometheus\n  Prometheus --> Grafana\n  Lancamentos --> Jaeger\n  Consolidado --> Jaeger\n\n  %% Nota: componentes opcionais (API Gateway, Service Mesh)\n  subgraph Optional [Opcional]\n    direction LR\n    APIGW[\"API Gateway / YARP (opcional)\"]\n    ServiceMesh[\"Service Mesh (Istio/Linkerd)\"]\n  end\n\n  LB --- APIGW\n  APIGW --- ServiceMesh",
+  "content_size": 1379,
+  "collected_at": "2026-02-06T01:48:37.116147",
+  "license": "mit",
+  "license_name": "MIT License",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

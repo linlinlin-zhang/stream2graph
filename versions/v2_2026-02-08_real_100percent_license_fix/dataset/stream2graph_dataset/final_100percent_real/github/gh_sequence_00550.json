@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00550",
+  "source": "github",
+  "source_url": "https://github.com/Behordeun/biometric_authentication_system/blob/66b7e53473f7a9db5cb12cb3718088a88ce874be/diagrams/login-sequence.mmd",
+  "github_repo": "Behordeun/biometric_authentication_system",
+  "github_file_path": "diagrams/login-sequence.mmd",
+  "diagram_type": "sequence",
+  "code": "%%{init: { 'theme': 'default', 'themeVariables': { 'background': '#ffffff' } }}%%\nsequenceDiagram\n    participant User\n    participant Browser\n    participant Frontend\n    participant AuthAPI\n    participant Redis\n    participant WebAuthn\n    participant Database\n    participant Device\n\n    User->>Browser: Enter email\n    User->>Browser: Click Login with Biometric\n    \n    Browser->>Frontend: Submit form\n    Frontend->>AuthAPI: POST /auth/login/options\n    \n    AuthAPI->>Database: SELECT user\n    Database->>AuthAPI: Return user\n    \n    AuthAPI->>Database: SELECT credentials\n    Database->>AuthAPI: Return credentials\n    \n    AuthAPI->>WebAuthn: Generate auth options\n    WebAuthn->>WebAuthn: Create challenge\n    \n    WebAuthn->>AuthAPI: Return options\n    AuthAPI->>Redis: SETEX challenge 300\n    Redis->>AuthAPI: OK\n    \n    AuthAPI->>Frontend: Return options\n    \n    Frontend->>Browser: navigator.credentials.get()\n    Browser->>Device: Request biometric\n    Device->>User: Show Touch ID prompt\n    \n    User->>Device: Authenticate\n    Device->>Device: Sign challenge\n    \n    Device->>Browser: Return assertion\n    Browser->>Frontend: Authentication successful\n    \n    Frontend->>AuthAPI: POST /auth/login/verify\n    \n    AuthAPI->>Redis: GET challenge\n    Redis->>AuthAPI: Return challenge\n    \n    AuthAPI->>Database: SELECT credential\n    Database->>AuthAPI: Return credential\n    \n    AuthAPI->>WebAuthn: Verify response\n    WebAuthn->>WebAuthn: Verify signature\n    WebAuthn->>WebAuthn: Verify counter\n    \n    WebAuthn->>AuthAPI: Verification successful\n    \n    AuthAPI->>Database: BEGIN TRANSACTION\n    \n    AuthAPI->>Database: UPDATE credential counter\n    Database->>AuthAPI: Updated\n    \n    AuthAPI->>AuthAPI: Generate tokens\n    \n    AuthAPI->>Database: INSERT session\n    Database->>AuthAPI: Session created\n    \n    AuthAPI->>Database: COMMIT\n    Database->>AuthAPI: Committed\n    \n    AuthAPI->>Redis: DEL challenge\n    \n    AuthAPI->>Frontend: Return tokens\n    \n    Frontend->>Browser: Store tokens\n    Browser->>User: Login successful\n",
+  "content_size": 2069,
+  "collected_at": "2026-02-06T01:33:50.188962",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 1,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

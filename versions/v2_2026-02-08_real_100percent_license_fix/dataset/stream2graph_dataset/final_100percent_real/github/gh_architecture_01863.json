@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01863",
+  "source": "github",
+  "source_url": "https://github.com/LaughingJackalope/skyhook/blob/774880b1f99d127b07dec17d82b069b3b6cbd6a1/site/internal/design/diagrams/04_efa_networking.mmd",
+  "github_repo": "LaughingJackalope/skyhook",
+  "github_file_path": "site/internal/design/diagrams/04_efa_networking.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TB\n    subgraph \"Application Layer\"\n        APP[Training Code<br/>PyTorch DDP]\n    end\n    \n    subgraph \"Communication Library\"\n        NCCL[NCCL<br/>Collective Operations<br/>All-Reduce, All-Gather]\n    end\n    \n    subgraph \"Fabric Interface\"\n        LIBFABRIC[libfabric<br/>Fabric Abstraction]\n        EFA_PROVIDER[EFA Provider<br/>FI_PROVIDER=efa]\n    end\n    \n    subgraph \"Network Stack Comparison\"\n        direction LR\n        \n        subgraph \"Traditional TCP Path\"\n            TCP[TCP/IP Stack]\n            KERNEL[Kernel Space<br/>Context Switches]\n            NIC_TCP[Standard NIC]\n        end\n        \n        subgraph \"EFA OS-Bypass Path\"\n            SRD[SRD Protocol<br/>Scalable Reliable<br/>Datagram]\n            RDMA[RDMA Operations<br/>Direct Memory Access]\n            EFA_HW[EFA Hardware<br/>Network Interface]\n        end\n    end\n    \n    subgraph \"Physical Network\"\n        AWS_NET[AWS Network Fabric<br/>ECMP Multi-path<br/>400 Gbps per EFA]\n    end\n    \n    APP -->|Gradient Sync| NCCL\n    NCCL -->|Transport| LIBFABRIC\n    LIBFABRIC --> EFA_PROVIDER\n    \n    EFA_PROVIDER -.->|Legacy Fallback<br/>10x Slower| TCP\n    EFA_PROVIDER -->|High Performance| SRD\n    \n    TCP --> KERNEL\n    KERNEL --> NIC_TCP\n    NIC_TCP --> AWS_NET\n    \n    SRD --> RDMA\n    RDMA -->|Zero-copy<br/>Bypass Kernel| EFA_HW\n    EFA_HW -->|Direct Access| AWS_NET\n    \n    style SRD fill:#85C88A,stroke:#2D5F3E,stroke-width:3px\n    style RDMA fill:#85C88A,stroke:#2D5F3E,stroke-width:3px\n    style EFA_HW fill:#85C88A,stroke:#2D5F3E,stroke-width:3px\n    \n    style TCP fill:#F8D7DA\n    style KERNEL fill:#F8D7DA\n    style NIC_TCP fill:#F8D7DA\n    \n    style NCCL fill:#4A90E2\n    style APP fill:#4A90E2\n",
+  "content_size": 1707,
+  "collected_at": "2026-02-06T02:04:15.662304",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

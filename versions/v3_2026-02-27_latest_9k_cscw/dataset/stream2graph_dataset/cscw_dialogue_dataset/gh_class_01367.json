@@ -1,0 +1,652 @@
+{
+  "id": "gh_class_01367",
+  "source": "github",
+  "source_url": "https://github.com/CMPUT301F25rocket/rocket-radar/blob/65f6037820e80d56572facc2a17751b625e026be/doc/uml/admin.mmd",
+  "github_repo": "CMPUT301F25rocket/rocket-radar",
+  "github_file_path": "doc/uml/admin.mmd",
+  "diagram_type": "class",
+  "code": "---\ntitle: admin package\nconfig:\n  htmlLabels: false\numlink:\n  select:\n    - field: package\n      pattern: com.rocket.radar.admin\n---\n\nclassDiagram\ndirection LR\n\n%% =========================\n%% Core Admin Management\n%% =========================\n\nclass AdminModeManager {\n    - static AdminModeManager instance\n    - SharedPreferences prefs\n    - MutableLiveData~Boolean~ adminModeLiveData\n    - FirebaseFirestore db\n    - FirebaseAuth auth\n    - DocumentReference userDocListener\n    - NavController navController\n    - Context context\n\n    + static getInstance(Context)\n    + setNavController(NavController)\n    + startMonitoringAdminStatus()\n    + stopMonitoringAdminStatus()\n    + isAdminModeOn() Boolean\n    + setAdminModeOn(Boolean)\n    + getAdminModeLiveData() LiveData~Boolean~\n}\n%% citations\n%%  :contentReference[oaicite:0]{index=0}\n\n%% =========================\n%% Repository\n%% =========================\n\nclass AdminRepository {\n    - FirebaseFirestore db\n\n    + getAllUsers(OnCompleteListener)\n    + deleteUser(ProfileModel, DeleteUserCallback)\n    + updateUserRole(ProfileModel, UserRole, updateCallback)\n    + deleteEvent(String, DeleteEventCallback)\n    + cleanupNotifications()\n}\n\nclass OnCompleteListener~T~ {\n    <<interface>>\n    + onComplete(T)\n}\n\nclass DeleteUserCallback {\n    <<interface>>\n    + onSuccess()\n    + onError(Exception)\n}\n\nclass updateCallback {\n    <<interface>>\n    + onSuccess()\n    + onError(Exception)\n}\n\nclass DeleteEventCallback {\n    <<interface>>\n    + onSuccess()\n    + onError(Exception)\n}\n\nclass OnErrorCallback {\n    <<interface>>\n    + onError(Exception)\n}\n\n%% citations\n%%  :contentReference[oaicite:1]{index=1}\n\n%% =========================\n%% UI Fragments\n%% =========================\n\nclass AllNotificationsFragment {\n    - RecyclerView notificationRecyclerView\n    - TextView emptyNotificationsTextView\n    - Button backButton\n    - NotificationAdapter adapter\n    - NotificationRepository notificationRepository\n    - AdapterDataObserver adapterObserver\n\n    + onCreateView()\n    + onViewCreated()\n    - setupRecyclerView()\n    - observeNotifications()\n    - updateEmptyState()\n    - updateHeaderCount(int)\n}\n%% citation: :contentReference[oaicite:2]{index=2}\n\nclass BrowseImageFragment {\n    - FragmentBrowseImagesBinding binding\n    - List~Event~ events\n    - Event dialogContextEvent\n\n    + onCreateView()\n    + onViewCreated()\n    + startDeleteDialog(int)\n    + onClick(DialogInterface,int)\n}\n%% citation: :contentReference[oaicite:3]{index=3}\n\nclass BrowseUsersFragment {\n    - ListView usersListView\n    - UsersListAdapter adapter\n    - List~ProfileModel~ users\n    - AdminRepository adminRepository\n\n    + onCreateView()\n}\n%% citation: :contentReference[oaicite:4]{index=4}\n\nclass UserFragment {\n    - ProfileModel userProfile\n    - AdminRepository adminRepository\n    - ImageButton deleteButton\n    - MaterialButton backButton\n    - TextView profileName\n    - TextView profilePhone\n    - TextView profileEmail\n    - RecyclerView myEventRecyclerView\n    - EventAdapter adapter\n    - List~Event~ allEvents\n    - List~Event~ displayedEvents\n    - EventRepository eventRepository\n    - AutoCompleteTextView roleDropdown\n\n    + newInstance(ProfileModel)\n    + onCreate()\n    + onCreateView()\n    + onViewCreated()\n    + onEventClick(int, View)\n    + confirmAccountDelete()\n}\n%% citation: :contentReference[oaicite:5]{index=5}\n\n%% =========================\n%% Adapters\n%% =========================\n\nclass ImageAdapter {\n    - List~Bitmap~ images\n    + onCreateViewHolder()\n    + onBindViewHolder()\n    + addOnItemClickListener()\n    + addOnItemLongClickListener()\n}\n\nclass UsersListAdapter {\n    - Context context\n    - List~ProfileModel~ users\n\n    + getView(int,View,ViewGroup)\n}\n%% citations: :contentReference[oaicite:6]{index=6}  and  :contentReference[oaicite:7]{index=7}\n\n%% =========================\n%% Relationships\n%% =========================\n\nAdminRepository --> ProfileModel : uses\nAdminRepository --> Event : mutates\nAdminRepository --> Notification : mutates\nAdminRepository --> OnCompleteListener : callback\nAdminRepository --> DeleteUserCallback : callback\nAdminRepository --> DeleteEventCallback : callback\n\nBrowseUsersFragment --> AdminRepository : 1..1\nBrowseUsersFragment --> UsersListAdapter : 1..1\n\nUserFragment --> AdminRepository : 1..1\nUserFragment --> EventRepository : 1..1\nUserFragment --> EventAdapter : 1..1\n\nBrowseImageFragment --> ImageAdapter : 1..1\nBrowseImageFragment --> EventRepository : uses\n\nAllNotificationsFragment --> NotificationAdapter : 1..1\nAllNotificationsFragment --> NotificationRepository : 1..1\n\nAdminModeManager --> FirebaseFirestore : uses\nAdminModeManager --> FirebaseAuth : uses\nAdminModeManager --> NavController : optional 0..1 navigation\n\n",
+  "content_size": 4756,
+  "collected_at": "2026-02-06T01:56:49.975681",
+  "compilation_status": "failed",
+  "license": "gpl-3.0",
+  "license_name": "GNU General Public License v3.0",
+  "license_url": "https://api.github.com/licenses/gpl-3.0",
+  "repo_stars": 2,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 - static AdminModeManager instance\n    - SharedPreferences prefs\n    - MutableLiveData~Boolean~ adminModeLiveData\n    - FirebaseFirestore db\n    - FirebaseAuth auth\n    - DocumentReference userDocListener\n    - NavController navController\n    - Context context\n\n    + static getInstance(Context 和 NavController 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '- static AdminModeManager instance\n    - SharedPreferences prefs\n    - MutableLiveData~Boolean~ adminModeLiveData\n    - FirebaseFirestore db\n    - FirebaseAuth auth\n    - DocumentReference userDocListener\n    - NavController navController\n    - Context context\n\n    + static getInstance(Context 和 NavController'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AdminModeManager",
+        "setNavController"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Boolean 和 oaicite:0 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Boolean 和 oaicite:0'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "setAdminModeOn",
+        "contentReference"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 - FirebaseFirestore db\n\n    + getAllUsers(OnCompleteListener 和 ProfileModel, DeleteUserCallback 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 - FirebaseFirestore db\n\n    + getAllUsers(OnCompleteListener处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '- FirebaseFirestore db\n\n    + getAllUsers(OnCompleteListener处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AdminRepository",
+        "deleteUser"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 ProfileModel, UserRole, updateCallback 和 String, DeleteEventCallback 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'ProfileModel, UserRole, updateCallback 和 String, DeleteEventCallback'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "updateUserRole",
+        "deleteEvent"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 T 和 <<interface>>\n    + onSuccess( 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 T处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'T处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "onComplete",
+        "DeleteUserCallback"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Exception 和 <<interface>>\n    + onSuccess( 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 Exception处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Exception处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "onError",
+        "updateCallback"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Exception 和 <<interface>>\n    + onSuccess( 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Exception 和 <<interface>>\n    + onSuccess('，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "onError",
+        "DeleteEventCallback"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Exception 和 <<interface>>\n    + onError(Exception 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Exception 和 <<interface>>\n    + onError(Exception'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "onError",
+        "OnErrorCallback"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 oaicite:1 和 - RecyclerView notificationRecyclerView\n    - TextView emptyNotificationsTextView\n    - Button backButton\n    - NotificationAdapter adapter\n    - NotificationRepository notificationRepository\n    - AdapterDataObserver adapterObserver\n\n    + onCreateView( 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'oaicite:1 和 - RecyclerView notificationRecyclerView\n    - TextView emptyNotificationsTextView\n    - Button backButton\n    - NotificationAdapter adapter\n    - NotificationRepository notificationRepository\n    - AdapterDataObserver adapterObserver\n\n    + onCreateView('？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "contentReference",
+        "AllNotificationsFragment"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 int 和 oaicite:2 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'int 和 oaicite:2'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "updateHeaderCount",
+        "contentReference"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 - FragmentBrowseImagesBinding binding\n    - List~Event~ events\n    - Event dialogContextEvent\n\n    + onCreateView( 和 int。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '- FragmentBrowseImagesBinding binding\n    - List~Event~ events\n    - Event dialogContextEvent\n\n    + onCreateView( 和 int'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BrowseImageFragment",
+        "startDeleteDialog"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 DialogInterface,int 和 oaicite:3 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'DialogInterface,int 和 oaicite:3'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "onClick",
+        "contentReference"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 - ListView usersListView\n    - UsersListAdapter adapter\n    - List~ProfileModel~ users\n    - AdminRepository adminRepository\n\n    + onCreateView( 和 oaicite:4 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 - ListView usersListView\n    - UsersListAdapter adapter\n    - List~ProfileModel~ users\n    - AdminRepository adminRepository\n\n    + onCreateView(处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '- ListView usersListView\n    - UsersListAdapter adapter\n    - List~ProfileModel~ users\n    - AdminRepository adminRepository\n\n    + onCreateView(处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BrowseUsersFragment",
+        "contentReference"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 - ProfileModel userProfile\n    - AdminRepository adminRepository\n    - ImageButton deleteButton\n    - MaterialButton backButton\n    - TextView profileName\n    - TextView profilePhone\n    - TextView profileEmail\n    - RecyclerView myEventRecyclerView\n    - EventAdapter adapter\n    - List~Event~ allEvents\n    - List~Event~ displayedEvents\n    - EventRepository eventRepository\n    - AutoCompleteTextView roleDropdown\n\n    + newInstance(ProfileModel 和 int, View。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '- ProfileModel userProfile\n    - AdminRepository adminRepository\n    - ImageButton deleteButton\n    - MaterialButton backButton\n    - TextView profileName\n    - TextView profilePhone\n    - TextView profileEmail\n    - RecyclerView myEventRecyclerView\n    - EventAdapter adapter\n    - List~Event~ allEvents\n    - List~Event~ displayedEvents\n    - EventRepository eventRepository\n    - AutoCompleteTextView roleDropdown\n\n    + newInstance(ProfileModel 和 int, View'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "UserFragment",
+        "onEventClick"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 oaicite:5 和 - List~Bitmap~ images\n    + onCreateViewHolder( 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'oaicite:5 和 - List~Bitmap~ images\n    + onCreateViewHolder('，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "contentReference",
+        "ImageAdapter"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 - Context context\n    - List~ProfileModel~ users\n\n    + getView(int,View,ViewGroup 和 oaicite:6 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '- Context context\n    - List~ProfileModel~ users\n\n    + getView(int,View,ViewGroup 和 oaicite:6'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "UsersListAdapter",
+        "contentReference"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 oaicite:7 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'oaicite:7'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "contentReference"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 72,
+    "repair_count": 4,
+    "grounding_acts_count": 34,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

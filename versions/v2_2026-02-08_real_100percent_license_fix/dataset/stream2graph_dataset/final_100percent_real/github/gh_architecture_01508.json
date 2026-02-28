@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01508",
+  "source": "github",
+  "source_url": "https://github.com/0bvim/ft_transcendence/blob/5455e756e5d0297d3660d380dc1bbaf6e484b3ee/docs/architecture/system-architecture.mmd",
+  "github_repo": "0bvim/ft_transcendence",
+  "github_file_path": "docs/architecture/system-architecture.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TB\n    %% External Services\n    Google[Google OAuth]\n    Avalanche[Avalanche Blockchain]\n    \n\n    \n    %% Frontend\n    Frontend[Frontend Service<br/>Vite + TypeScript<br/>Port 3010]\n    \n    %% Core Backend Services\n    Auth[Authentication Service<br/>Fastify + Prisma<br/>Port 3001]\n    Tournament[Tournament Service<br/>Fastify + Prisma<br/>Port 3002]\n    Game[Game Service<br/>p5.js + Fastify<br/>Port 3003]\n    Blockchain[Blockchain Service<br/>Hardhat + Solidity<br/>Port 3004]\n    \n    %% Databases\n    AuthDB[(Auth Database<br/>SQLite)]\n    TournamentDB[(Tournament Database<br/>SQLite)]\n    \n    %% Monitoring Stack\n    subgraph \"Observability Stack\"\n        Prometheus[Prometheus<br/>Metrics Collection<br/>Port 9090]\n        Grafana[Grafana<br/>Dashboards<br/>Port 3000]\n        Elasticsearch[Elasticsearch<br/>Log Storage<br/>Port 9200]\n        Logstash[Logstash<br/>Log Processing<br/>Port 5000]\n        Kibana[Kibana<br/>Log Visualization<br/>Port 5601]\n    end\n    \n    %% Client connections\n    Client[Web Browser<br/>Firefox/Chrome] --> Frontend\n    \n    %% Frontend API calls\n    Frontend -->|Auth APIs| Auth\n    Frontend -->|Tournament APIs| Tournament\n    Frontend -->|Game APIs| Game\n    Frontend -->|Blockchain APIs| Blockchain\n    \n    %% Service-to-service communication\n    Auth -->|OAuth Flow| Google\n    Tournament -->|Match Results| Blockchain\n    Game -->|Match Data| Tournament\n    Game -->|Results Submission| Tournament\n    Blockchain -->|Smart Contracts| Avalanche\n    \n    %% Database connections\n    Auth --> AuthDB\n    Tournament --> TournamentDB\n    \n    %% Monitoring connections\n    Auth -->|Logs| Logstash\n    Tournament -->|Logs| Logstash\n    Game -->|Logs| Logstash\n    Blockchain -->|Logs| Logstash\n    Frontend -->|Logs| Logstash\n    \n    Logstash --> Elasticsearch\n    Kibana --> Elasticsearch\n    \n    Auth -->|Metrics| Prometheus\n    Tournament -->|Metrics| Prometheus\n    Game -->|Metrics| Prometheus\n    Blockchain -->|Metrics| Prometheus\n    \n    Grafana --> Prometheus\n    \n    %% Styling\n    classDef frontend fill:#e1f5fe\n    classDef backend fill:#f3e5f5\n    classDef database fill:#e8f5e8\n    classDef external fill:#fff3e0\n    classDef monitoring fill:#fce4ec\n    \n    class Frontend frontend\n    class Auth,Tournament,Game,Blockchain backend\n    class AuthDB,TournamentDB database\n    class Google,Avalanche external\n    class Prometheus,Grafana,Elasticsearch,Logstash,Kibana monitoring",
+  "content_size": 2449,
+  "collected_at": "2026-02-06T01:47:10.161935",
+  "license": "none",
+  "license_name": "No License",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 0
+}

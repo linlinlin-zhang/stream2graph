@@ -1,0 +1,74 @@
+{
+  "id": "aug_ot_stateDiagram_00168_Edu_4",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/coherosphere/architecture/blob/598bb65467787da38ac4029e35bdead27e7799ee/docs.coherosphere.io/static/assets/diagrams/C3_states/SM-07.01_Snapshot_KPI_Aggregation.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "coherosphere/architecture",
+  "diagram_type": "stateDiagram",
+  "code": "%%{Education_ClassroomService}}}%%\nstateDiagram-v2\ntitle: SM-07.01 — Snapshot & KPI Aggregation (Education_ContentCDN)\n\n[Education_ContentCDN] --> SNAPSHOT_INIT : SnapshotStarted (Education_StudentDB)\nnote right of SNAPSHOT_INIT\n  Initialize aggregation window:\n  • wall-clock or governance-driven snapshot\n  • bind ParamVersion (Education_ClassroomService)\n  • allocate run-id for auditability\nend note\n\nSNAPSHOT_INIT --> LOAD_INPUTS : WindowBound\nnote right of LOAD_INPUTS\n  Fetch inputs from services:\n  • PoC CP/W deltas (Education_ClassroomService)\n  • Resonance samples (Education_ContentCDN)\n  • Treasury payouts & reserves (Education_ContentCDN)\n  • Governance decisions (Education_GradeSync)\n  • Hub/project signals (Education_ContentCDN)\nend note\n\nLOAD_INPUTS --> COMPUTE_FEATURES : InputsValidated\nnote right of COMPUTE_FEATURES\n  Build feature store:\n  • rolling sums / EMA / decay transforms\n  • outlier clipping & normalization\n  • join by canonical ids\nend note\n\nCOMPUTE_FEATURES --> COMPUTE_SRI : FeaturesReady\nnote right of COMPUTE_SRI\n  Compute Systemic Resonance Index (Education_GradeSync):\n  • aggregate R across domains\n  • weighting & alignment factors\n  • produce SRI_t and deltas\nend note\n\nCOMPUTE_SRI --> AGGREGATE_KPIS : SRIComputed (Education_ClassroomService)\nnote right of AGGREGATE_KPIS\n  Aggregate KPIs:\n  • CP_i, W_i, project A_j, funding stats\n  • coherence trends & alerts\nend note\n\nAGGREGATE_KPIS --> PUBLISH : KPIUpdated (Education_StudentDB)\nnote right of PUBLISH\n  Publish to:\n  • UI (Education_GradeSync) — dashboards / heatmaps\n  • Gov (Education_GradeSync) — decision support\n  • Treasury (Education_ClassroomService) — rebalancing\n  • Ethics (Education_LMS_Portal) — coherence signals\nend note\n\nPUBLISH --> [Education_GradeSync] : SnapshotClosed\n\n%% ---- Integrity / reconciliation paths ----\nLOAD_INPUTS --> GAP_DETECTED : MissingInputs / HashMismatch\nGAP_DETECTED --> RECONCILE : BackfillRequested\nRECONCILE --> LOAD_INPUTS : BackfillCompleted\n\nCOMPUTE_FEATURES --> REVIEW : AnomalyDetected\nREVIEW --> COMPUTE_FEATURES : ClearedByReview\nREVIEW --> FAILED : IntegrityBreach\n\nPUBLISH --> RETRY : PublishError\nRETRY --> PUBLISH : PublishRetried\n\nFAILED --> [Education_ContentCDN] : SnapshotFailed\n\n%% ===== Styling =====\nclassDef core fill:#ff8b00,stroke:#333,color:#fff,font-weight:bold;\nclass SNAPSHOT_INIT,LOAD_INPUTS,COMPUTE_FEATURES,COMPUTE_SRI,AGGREGATE_KPIS,PUBLISH,GAP_DETECTED,RECONCILE,REVIEW,RETRY,FAILED core;",
+  "content_size": 2305,
+  "collected_at": "2026-02-06T10:38:41.001570",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "license_url": null,
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "repo_owner": "coherosphere",
+  "repo_name": "architecture",
+  "repo_description": "The cohersphere architecture — structural blueprint of the resonance network. Defines the modular layers connecting app, API, and governance protocols. Outlines data flows for Proof-of-Contribution, c",
+  "repo_language": "Mermaid",
+  "repo_topics": [
+    "architecture",
+    "c4",
+    "distributed-systems",
+    "modular-architecture",
+    "system-design"
+  ],
+  "repo_created_at": "2025-10-29T09:30:02Z",
+  "repo_updated_at": "2026-02-06T04:58:50Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Education",
+  "seed_id": "ot_stateDiagram_00168",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Generic Diagram的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达Generic Diagram结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "root"
+      ],
+      "timestamp_offset": 45
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 3,
+    "speaker_distribution": {
+      "Speaker_B": 2,
+      "Speaker_A": 1
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "clarify": 1
+    },
+    "avg_turn_length": 25.666666666666668,
+    "dialogue_duration": 45
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "id": "gl_packet-beta_00364",
+  "source": "gitlab",
+  "source_url": "https://github.com/chris-arsenault/the-glass-frontier/blob/c0f4b7e7c333793aa3c28dc25e3bac325a56605c/docs/design/diagrams/DES-EDGE-01-contested-move-flow.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "chris-arsenault/the-glass-frontier",
+  "diagram_type": "packet-beta",
+  "code": "sequenceDiagram\n    participant PlayerA as Player A\n    participant PlayerB as Player B / Rival\n    participant NarrativeEngine as Narrative Engine (LangGraph)\n    participant ContestCoordinator as Contest Coordinator\n    participant Temporal as Temporal Check Runner\n    participant CompQueue as Shared Complication Queue\n    participant NarrativeWeaver as Narrative Weaver\n    participant WebUI as Web UI Shell\n    participant Admin as Admin Console\n\n    PlayerA->>NarrativeEngine: Utterance + context (intent A)\n    PlayerB->>NarrativeEngine: Utterance + context (intent B)\n    NarrativeEngine->>NarrativeEngine: Detect collision hints (target, stakes, timing)\n    NarrativeEngine->>ContestCoordinator: intent.checkRequest (A, collisionHints)\n    NarrativeEngine->>ContestCoordinator: intent.checkRequest (B, collisionHints)\n    ContestCoordinator->>ContestCoordinator: Wait 8s/2 turns for matching hints\n    ContestCoordinator->>ContestCoordinator: Create contestId + contestSeed\n    ContestCoordinator->>Temporal: contest.bundle (A,B metadata, shared seeds)\n\n    loop For each participant\n        Temporal->>Temporal: Spawn contest.check child workflow\n        Temporal->>Temporal: Derive dice seed hash(contestSeed + participantId)\n        Temporal->>Temporal: Resolve roll + modifiers\n        Temporal-->>ContestCoordinator: contest.checkResult (tier, total, complications)\n    end\n\n    ContestCoordinator->>ContestCoordinator: Rank results (tier > total > momentum > stat)\n    ContestCoordinator->>CompQueue: Upsert shared complications\n    ContestCoordinator->>NarrativeWeaver: contest.resolution (ordered outcomes + queue refs)\n    ContestCoordinator->>Admin: telemetry.contest.start/resolved (auditRef)\n\n    NarrativeWeaver->>WebUI: Contested turn packet (per participant outcomes, complications)\n    NarrativeWeaver->>Admin: contest.override hooks + safety flags\n    WebUI->>PlayerA: Display contested badge + breakdown\n    WebUI->>PlayerB: Display contested badge + breakdown\n\n    Admin-->>NarrativeWeaver: moderation.decision (optional override)\n    NarrativeWeaver-->>WebUI: Updated contest narration (if override triggered)\n",
+  "content_size": 2140,
+  "collected_at": "2026-02-06T14:08:18.772733",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

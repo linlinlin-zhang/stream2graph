@@ -1,0 +1,789 @@
+{
+  "id": "aug_gh_sequence_00510_Log_9",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/DREAMSCAPE-AI/dreamscape-docs/blob/24aa5a14265601b36ddbbb02c958eea524e6eb11/architecture/docker/hybride-bigpods/orderVoyage.mmd",
+  "github_repo": "DREAMSCAPE-AI/dreamscape-docs",
+  "github_file_path": "architecture/docker/hybride-bigpods/orderVoyage.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    autonumber\n    actor User as 👤 Utilisateur\n    participant WC as Web Client\n    participant CN as Core NGINX<br/>:80\n    participant Voyage as Voyage Service<br/>:3003\n    participant Payment as Payment Service<br/>:3005\n    participant AI as AI Service<br/>:3004\n    participant PG as PostgreSQL<br/>:5432\n    participant Redis as Redis<br/>:6379\n    participant Kafka as Kafka<br/>:9092\n    participant Stripe as 💳 Stripe API\n\n    rect rgb(Logistics_Warehouse)\n        Note over User,Voyage: Phase 1: Sélection Vol\n        User->>WC: Sélectionne vol<br/>(Logistics_StockLevel)\n        WC->>WC: Add to cart<br/>(Logistics_Warehouse)\n        User->>WC: Click \"Réserver\"\n        \n        WC->>CN: POST /api/v1/bookings<br/>{Logistics_StockLevel}<br/>Authorization: Bearer JWT\n        CN->>CN: Validate JWT (Logistics_StockLevel)\n        CN->>Voyage: Forward to Voyage<br/>localhost:3003/bookings\n    end\n\n    rect rgb(Logistics_FleetManagement)\n        Note over Voyage,Kafka: Phase 2: Création Réservation\n        Voyage->>Voyage: Extract userId from JWT\n        Voyage->>PG: BEGIN transaction\n        Note right of PG: 🔄 ACID transaction<br/>pour cohérence\n        \n        Voyage->>PG: INSERT booking<br/>{Logistics_DeliveryRoute}\n        PG-->>Voyage: Booking created (Logistics_TrackingNumber)\n        \n        Voyage->>Redis: Store booking temp<br/>key: \"booking:temp:bookingId\"<br/>TTL: 15min\n        Note right of Redis: ⏱️ Timeout si paiement<br/>échoue après 15min\n        \n        Voyage->>Kafka: Publish event<br/>Topic: \"voyage.booking.created\"<br/>{Logistics_TrackingNumber}\n        Note left of Kafka: Event-Driven Architecture<br/>- Decoupling services<br/>- Async processing<br/>- Audit trail\n        \n        Voyage-->>CN: 201 Created<br/>{Logistics_Warehouse}\n        CN-->>WC: 201 Created\n    end\n\n    rect rgb(Logistics_FleetManagement)\n        Note over WC,Stripe: Phase 3: Demande Paiement\n        WC->>CN: POST /api/v1/payments/intent<br/>{Logistics_TrackingNumber}<br/>Authorization: Bearer JWT\n        CN->>Payment: Forward to Payment<br/>localhost:3005/payments/intent\n        \n        Payment->>Payment: Extract userId from JWT\n        Payment->>PG: Verify booking exists<br/>SELECT * FROM bookings<br/>WHERE id = bookingId AND userId = userId\n        \n        alt Booking Non Trouvé ❌\n            PG-->>Payment: null\n            Payment-->>CN: 404 Not Found<br/>{Logistics_TrackingNumber}\n            CN-->>WC: 404 Error\n            WC->>User: ❌ Erreur réservation\n        else Booking Trouvé ✅\n            PG-->>Payment: Booking found\n            Payment->>Stripe: Create PaymentIntent<br/>POST /v1/payment_intents<br/>{Logistics_DeliveryRoute),<br/>currency: \"eur\",<br/>metadata: {Logistics_StockLevel}}\n            \n            Stripe-->>Payment: PaymentIntent created<br/>{Logistics_TrackingNumber}\n            \n            Payment->>PG: INSERT payment<br/>{Logistics_DeliveryRoute}\n            Payment->>Kafka: Publish event<br/>Topic: \"payment.intent.created\"<br/>{Logistics_TrackingNumber}\n            \n            Payment-->>CN: 200 OK<br/>{Logistics_TrackingNumber}\n            CN-->>WC: 200 OK\n        end\n    end\n\n    rect rgb(Logistics_FleetManagement)\n        Note over WC,Stripe: Phase 4: Paiement Stripe (Logistics_FleetManagement)\n        WC->>WC: Initialize Stripe.js<br/>with clientSecret\n        WC->>User: Affiche formulaire carte<br/>(Logistics_TrackingNumber)\n        \n        User->>WC: Saisit infos carte<br/>(Logistics_DeliveryRoute)\n        WC->>Stripe: POST /v1/payment_intents/:id/confirm<br/>(Logistics_DeliveryRoute)<br/>{Logistics_DeliveryRoute}\n        \n        Note right of Stripe: 🔒 Sécurité PCI-DSS<br/>- Carte jamais envoyée à notre backend<br/>- Stripe gère tout<br/>- Tokenization automatique\n        \n        alt Paiement Réussi ✅\n            Stripe-->>WC: PaymentIntent succeeded\n            WC->>WC: Display success message\n            WC->>User: ✅ Paiement accepté\n        else Paiement Échoué ❌\n            Stripe-->>WC: PaymentIntent failed<br/>(Logistics_StockLevel)\n            WC->>User: ❌ \"Paiement refusé\"<br/>(Logistics_Warehouse)\n        end\n    end\n\n    rect rgb(Logistics_StockLevel)\n        Note over Stripe,Kafka: Phase 5: Webhook Stripe (Logistics_TrackingNumber)\n        Stripe->>Payment: POST /webhooks/stripe<br/>Stripe-Signature header<br/>{Logistics_TrackingNumber}}\n        \n        Payment->>Payment: Verify signature<br/>stripe.webhooks.constructEvent(Logistics_FleetManagement)\n        \n        alt Signature Invalide ❌\n            Payment-->>Stripe: 400 Bad Request\n            Note right of Payment: Protection contre<br/>webhooks forgés\n        else Signature Valide ✅\n            Payment->>PG: UPDATE payment<br/>SET status = \"SUCCEEDED\"<br/>WHERE stripePaymentIntentId = id\n            \n            Payment->>PG: UPDATE booking<br/>SET status = \"CONFIRMED\"<br/>WHERE id = bookingId\n            \n            Payment->>Redis: Delete temp booking<br/>DEL \"booking:temp:bookingId\"\n            \n            Payment->>Kafka: Publish event<br/>Topic: \"payment.succeeded\"<br/>{Logistics_Warehouse}\n            \n            Payment-->>Stripe: 200 OK\n        end\n    end\n\n    rect rgb(Logistics_DeliveryRoute)\n        Note over Kafka,User: Phase 6: Traitement Async (Logistics_Warehouse)\n        Kafka->>Voyage: Consume event<br/>\"payment.succeeded\"\n        Voyage->>PG: SELECT booking details\n        Voyage->>Voyage: Generate confirmation email<br/>(Logistics_StockLevel)\n        Voyage->>User: 📧 Email confirmation<br/>+ PDF billet\n        \n        Kafka->>AI: Consume event<br/>\"voyage.booking.created\"\n        AI->>PG: Get user profile<br/>+ booking history\n        AI->>AI: Update ML model<br/>(Logistics_FleetManagement)\n        Note right of AI: 🤖 AI learning<br/>from user behavior\n        AI->>Redis: Update recommendations<br/>key: \"reco:userId\"\n    end\n\n    rect rgb(Logistics_Warehouse)\n        Note over WC,User: Phase 7: Confirmation Frontend\n        loop Polling every 2s\n            WC->>CN: GET /api/v1/bookings/:bookingId\n            CN->>Voyage: Forward request\n            Voyage->>PG: SELECT booking<br/>WHERE id = bookingId\n            \n            alt Status = CONFIRMED ✅\n                PG-->>Voyage: Booking confirmed\n                Voyage-->>CN: 200 OK<br/>{Logistics_Warehouse}\n                CN-->>WC: 200 OK\n                WC->>WC: Stop polling\n                WC->>WC: Redirect /bookings/:id\n                WC->>User: ✅ Affiche confirmation<br/>+ détails voyage\n            else Status = PENDING ⏳\n                PG-->>Voyage: Booking still pending\n                Voyage-->>CN: 200 OK<br/>{Logistics_Warehouse}\n                CN-->>WC: 200 OK (Logistics_StockLevel)\n                Note right of WC: ⏱️ Après 15min<br/>réservation annulée<br/>automatiquement\n            end\n        end\n    end\n\n    Note over User,Kafka: 📊 Performance Réservation<br/>Create booking: ~100-150ms<br/>Payment intent: ~500-800ms (Logistics_TrackingNumber)<br/>Confirmation: ~1-2s (Logistics_TrackingNumber)<br/>Email: ~3-5s (Logistics_FleetManagement)<br/><br/>🔒 Fiabilité<br/>- Transaction ACID (Logistics_DeliveryRoute)<br/>- Idempotency keys (Logistics_StockLevel)<br/>- Webhook retry (Logistics_StockLevel)<br/>- Event sourcing (Logistics_DeliveryRoute)",
+  "content_size": 7218,
+  "collected_at": "2026-02-06T01:33:16.963511",
+  "compilation_status": "failed",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Logistics",
+  "seed_id": "gh_sequence_00510",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Web Client、Core NGINX<br/>:80的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达Web Client、Core NGINX<br/>:80结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "在Web Client、Core NGINX<br/>:80中，我们需要定义核心逻辑。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "WC",
+        "CN",
+        "Voyage"
+      ],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含Payment Service<br/>:3005、AI Service<br/>:3004这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Payment Service<br/>:3005、AI Service<br/>:3004就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "Payment",
+        "AI"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下PostgreSQL<br/>:5432吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "PG"
+      ],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "Redis<br/>:6379主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Redis<br/>:6379应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "Redis"
+      ],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "Kafka<br/>:9092、💳 Stripe API主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Kafka<br/>:9092、💳 Stripe API就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "关于Kafka<br/>:9092、💳 Stripe API，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Kafka<br/>:9092、💳 Stripe API就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "Kafka",
+        "Stripe"
+      ],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "Sélectionne vol<br/>(Logistics_StockLevel)、Add to cart<br/>(Logistics_Warehouse)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Sélectionne vol<br/>(Logistics_StockLevel)、Add to cart<br/>(Logistics_Warehouse)应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含Sélectionne vol<br/>(Logistics_StockLevel)、Add to cart<br/>(Logistics_Warehouse)这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_0",
+        "msg_1"
+      ],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "关于Click \"Réserver\"，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Click \"Réserver\"就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_2"
+      ],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "POST /api/v1/bookings<br/>{Logistics_StockLevel}<br/>Authorization: Bearer JWT、Validate JWT (Logistics_StockLevel)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，POST /api/v1/bookings<br/>{Logistics_StockLevel}<br/>Authorization: Bearer JWT、Validate JWT (Logistics_StockLevel)是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_3",
+        "msg_4",
+        "msg_5"
+      ],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "Extract userId from JWT主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "Extract userId from JWT和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_6"
+      ],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "BEGIN transaction、INSERT booking<br/>{Logistics_DeliveryRoute}主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_7",
+        "msg_8"
+      ],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含Store booking temp<br/>key: \"booking:temp:bookingId\"<br/>TTL: 15min、Publish event<br/>Topic: \"voyage.booking.created\"<br/>{Logistics_TrackingNumber}这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Store booking temp<br/>key: \"booking:temp:bookingId\"<br/>TTL: 15min、Publish event<br/>Topic: \"voyage.booking.created\"<br/>{Logistics_TrackingNumber}就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Store booking temp<br/>key: \"booking:temp:bookingId\"<br/>TTL: 15min、Publish event<br/>Topic: \"voyage.booking.created\"<br/>{Logistics_TrackingNumber}分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "msg_9",
+        "msg_10",
+        "msg_11"
+      ],
+      "timestamp_offset": 495
+    },
+    {
+      "turn_id": 34,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下Forward to Payment<br/>localhost:3005/payments/intent、Extract userId from JWT吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 510
+    },
+    {
+      "turn_id": 35,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Forward to Payment<br/>localhost:3005/payments/intent、Extract userId from JWT就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 525
+    },
+    {
+      "turn_id": 36,
+      "speaker": "Speaker_A",
+      "utterance": "相较于方案A，Forward to Payment<br/>localhost:3005/payments/intent、Extract userId from JWT有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_12",
+        "msg_13",
+        "msg_14"
+      ],
+      "timestamp_offset": 540
+    },
+    {
+      "turn_id": 37,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由❌ Erreur réservation、Create PaymentIntent<br/>POST /v1/payment_intents<br/>{Logistics_DeliveryRoute),<br/>currency: \"eur\",<br/>metadata: {Logistics_StockLevel}}组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 555
+    },
+    {
+      "turn_id": 38,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，❌ Erreur réservation、Create PaymentIntent<br/>POST /v1/payment_intents<br/>{Logistics_DeliveryRoute),<br/>currency: \"eur\",<br/>metadata: {Logistics_StockLevel}}的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 570
+    },
+    {
+      "turn_id": 39,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 585
+    },
+    {
+      "turn_id": 40,
+      "speaker": "Speaker_A",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_15",
+        "msg_16",
+        "msg_17"
+      ],
+      "timestamp_offset": 600
+    },
+    {
+      "turn_id": 41,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有Publish event<br/>Topic: \"payment.intent.created\"<br/>{Logistics_TrackingNumber}、Initialize Stripe.js<br/>with clientSecret。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 615
+    },
+    {
+      "turn_id": 42,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Publish event<br/>Topic: \"payment.intent.created\"<br/>{Logistics_TrackingNumber}、Initialize Stripe.js<br/>with clientSecret的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 630
+    },
+    {
+      "turn_id": 43,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，Publish event<br/>Topic: \"payment.intent.created\"<br/>{Logistics_TrackingNumber}、Initialize Stripe.js<br/>with clientSecret有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 645
+    },
+    {
+      "turn_id": 44,
+      "speaker": "Speaker_A",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_18",
+        "msg_19"
+      ],
+      "timestamp_offset": 660
+    },
+    {
+      "turn_id": 45,
+      "speaker": "Speaker_B",
+      "utterance": "Affiche formulaire carte<br/>(Logistics_TrackingNumber)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 675
+    },
+    {
+      "turn_id": 46,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_20"
+      ],
+      "timestamp_offset": 690
+    },
+    {
+      "turn_id": 47,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含Saisit infos carte<br/>(Logistics_DeliveryRoute)、POST /v1/payment_intents/:id/confirm<br/>(Logistics_DeliveryRoute)<br/>{Logistics_DeliveryRoute}这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 705
+    },
+    {
+      "turn_id": 48,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Saisit infos carte<br/>(Logistics_DeliveryRoute)、POST /v1/payment_intents/:id/confirm<br/>(Logistics_DeliveryRoute)<br/>{Logistics_DeliveryRoute}的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 720
+    },
+    {
+      "turn_id": 49,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_21",
+        "msg_22"
+      ],
+      "timestamp_offset": 735
+    },
+    {
+      "turn_id": 50,
+      "speaker": "Speaker_A",
+      "utterance": "Display success message、✅ Paiement accepté主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 750
+    },
+    {
+      "turn_id": 51,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_23",
+        "msg_24"
+      ],
+      "timestamp_offset": 765
+    },
+    {
+      "turn_id": 52,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含❌ \"Paiement refusé\"<br/>(Logistics_Warehouse)、POST /webhooks/stripe<br/>Stripe-Signature header<br/>{Logistics_TrackingNumber}}这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 780
+    },
+    {
+      "turn_id": 53,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 795
+    },
+    {
+      "turn_id": 54,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，❌ \"Paiement refusé\"<br/>(Logistics_Warehouse)、POST /webhooks/stripe<br/>Stripe-Signature header<br/>{Logistics_TrackingNumber}}的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 810
+    },
+    {
+      "turn_id": 55,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，❌ \"Paiement refusé\"<br/>(Logistics_Warehouse)、POST /webhooks/stripe<br/>Stripe-Signature header<br/>{Logistics_TrackingNumber}}的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_25",
+        "msg_26",
+        "msg_27"
+      ],
+      "timestamp_offset": 825
+    },
+    {
+      "turn_id": 56,
+      "speaker": "Speaker_A",
+      "utterance": "UPDATE payment<br/>SET status = \"SUCCEEDED\"<br/>WHERE stripePaymentIntentId = id主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 840
+    },
+    {
+      "turn_id": 57,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，UPDATE payment<br/>SET status = \"SUCCEEDED\"<br/>WHERE stripePaymentIntentId = id是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_28"
+      ],
+      "timestamp_offset": 855
+    },
+    {
+      "turn_id": 58,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由UPDATE booking<br/>SET status = \"CONFIRMED\"<br/>WHERE id = bookingId、Delete temp booking<br/>DEL \"booking:temp:bookingId\"组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 870
+    },
+    {
+      "turn_id": 59,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是UPDATE booking<br/>SET status = \"CONFIRMED\"<br/>WHERE id = bookingId、Delete temp booking<br/>DEL \"booking:temp:bookingId\"应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 885
+    },
+    {
+      "turn_id": 60,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由UPDATE booking<br/>SET status = \"CONFIRMED\"<br/>WHERE id = bookingId、Delete temp booking<br/>DEL \"booking:temp:bookingId\"组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_29",
+        "msg_30"
+      ],
+      "timestamp_offset": 900
+    },
+    {
+      "turn_id": 61,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由Publish event<br/>Topic: \"payment.succeeded\"<br/>{Logistics_Warehouse}组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 915
+    },
+    {
+      "turn_id": 62,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，Publish event<br/>Topic: \"payment.succeeded\"<br/>{Logistics_Warehouse}是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 930
+    },
+    {
+      "turn_id": 63,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Publish event<br/>Topic: \"payment.succeeded\"<br/>{Logistics_Warehouse}分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 945
+    },
+    {
+      "turn_id": 64,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，Publish event<br/>Topic: \"payment.succeeded\"<br/>{Logistics_Warehouse}是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_31"
+      ],
+      "timestamp_offset": 960
+    },
+    {
+      "turn_id": 65,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Consume event<br/>\"payment.succeeded\"分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 975
+    },
+    {
+      "turn_id": 66,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 990
+    },
+    {
+      "turn_id": 67,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Consume event<br/>\"payment.succeeded\"的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_32"
+      ],
+      "timestamp_offset": 1005
+    },
+    {
+      "turn_id": 68,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理SELECT booking details？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1020
+    },
+    {
+      "turn_id": 69,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，SELECT booking details就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_33"
+      ],
+      "timestamp_offset": 1035
+    },
+    {
+      "turn_id": 70,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Generate confirmation email<br/>(Logistics_StockLevel)、📧 Email confirmation<br/>+ PDF billet组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1050
+    },
+    {
+      "turn_id": 71,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_34",
+        "msg_35",
+        "msg_36"
+      ],
+      "timestamp_offset": 1065
+    },
+    {
+      "turn_id": 72,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Get user profile<br/>+ booking history分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1080
+    },
+    {
+      "turn_id": 73,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Get user profile<br/>+ booking history应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_37"
+      ],
+      "timestamp_offset": 1095
+    },
+    {
+      "turn_id": 74,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有Update ML model<br/>(Logistics_FleetManagement)、Update recommendations<br/>key: \"reco:userId\"。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1110
+    },
+    {
+      "turn_id": 75,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1125
+    },
+    {
+      "turn_id": 76,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含Update ML model<br/>(Logistics_FleetManagement)、Update recommendations<br/>key: \"reco:userId\"这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1140
+    },
+    {
+      "turn_id": 77,
+      "speaker": "Speaker_B",
+      "utterance": "Update ML model<br/>(Logistics_FleetManagement)、Update recommendations<br/>key: \"reco:userId\"负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_38",
+        "msg_39"
+      ],
+      "timestamp_offset": 1155
+    },
+    {
+      "turn_id": 78,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下GET /api/v1/bookings/:bookingId吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1170
+    },
+    {
+      "turn_id": 79,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是GET /api/v1/bookings/:bookingId应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_40"
+      ],
+      "timestamp_offset": 1185
+    },
+    {
+      "turn_id": 80,
+      "speaker": "Speaker_A",
+      "utterance": "Forward request、SELECT booking<br/>WHERE id = bookingId主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1200
+    },
+    {
+      "turn_id": 81,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_41",
+        "msg_42"
+      ],
+      "timestamp_offset": 1215
+    },
+    {
+      "turn_id": 82,
+      "speaker": "Speaker_A",
+      "utterance": "关于Stop polling、Redirect /bookings/:id，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1230
+    },
+    {
+      "turn_id": 83,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在Stop polling、Redirect /bookings/:id完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_43",
+        "msg_44",
+        "msg_45"
+      ],
+      "timestamp_offset": 1245
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 83,
+    "speaker_distribution": {
+      "Speaker_B": 42,
+      "Speaker_A": 41
+    },
+    "speech_act_distribution": {
+      "sequential": 6,
+      "clarify": 12,
+      "structural": 15,
+      "confirm": 15,
+      "request": 7,
+      "classification": 14,
+      "inform": 11,
+      "contrastive": 3
+    },
+    "avg_turn_length": 67.6987951807229,
+    "dialogue_duration": 1245
+  }
+}

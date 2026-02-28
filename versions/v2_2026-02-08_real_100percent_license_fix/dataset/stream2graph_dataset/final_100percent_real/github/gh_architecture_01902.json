@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01902",
+  "source": "github",
+  "source_url": "https://github.com/sage-base/sagebase/blob/6b7ae62c050417c56b69a6edf140da51fe97be03/docs/diagrams/layer-dependency.mmd",
+  "github_repo": "sage-base/sagebase",
+  "github_file_path": "docs/diagrams/layer-dependency.mmd",
+  "diagram_type": "architecture",
+  "code": "```mermaid\ngraph TB\n    subgraph interfaces[\"🖥️ Interfaces Layer\"]\n        direction LR\n        CLI[\"CLI Commands<br/>(src/interfaces/cli/)\"]\n        WEB[\"Streamlit UI<br/>(src/interfaces/web/)\"]\n    end\n\n    subgraph application[\"⚙️ Application Layer\"]\n        direction LR\n        UC[\"Use Cases (15)<br/>ProcessMinutesUseCase<br/>MatchSpeakersUseCase\"]\n        DTO[\"DTOs (13)<br/>Data Transfer Objects\"]\n    end\n\n    subgraph domain[\"🎯 Domain Layer (Core)\"]\n        direction TB\n        ENT[\"Entities (21)<br/>Politician, Speaker<br/>Meeting, Conference\"]\n        DS[\"Domain Services (18)<br/>SpeakerDomainService<br/>PoliticianDomainService\"]\n        RI[\"Repository Interfaces (22)<br/>BaseRepository<br/>ISessionAdapter\"]\n        SI[\"Service Interfaces (8)<br/>ILLMService<br/>IStorageService\"]\n\n        ENT --- DS\n        DS --- RI\n        DS --- SI\n    end\n\n    subgraph infrastructure[\"🔧 Infrastructure Layer\"]\n        direction TB\n        PERSIST[\"Persistence (22+)<br/>BaseRepositoryImpl<br/>AsyncSessionAdapter\"]\n        EXT[\"External Services<br/>GeminiLLMService<br/>GCSStorageService<br/>WebScraperService\"]\n        SUPPORT[\"Support<br/>DI Container<br/>Logging, Monitoring\"]\n\n        PERSIST --- EXT\n        EXT --- SUPPORT\n    end\n\n    %% Dependencies (arrows point FROM dependent TO dependency)\n    CLI --> UC\n    WEB --> UC\n    UC --> DS\n    UC --> RI\n    UC --> SI\n\n    PERSIST -.implements.-> RI\n    EXT -.implements.-> SI\n\n    %% Styling\n    classDef interfaceStyle fill:#e1f5ff,stroke:#01579b,stroke-width:2px\n    classDef applicationStyle fill:#fff3e0,stroke:#e65100,stroke-width:2px\n    classDef domainStyle fill:#f3e5f5,stroke:#4a148c,stroke-width:3px\n    classDef infrastructureStyle fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px\n\n    class interfaces interfaceStyle\n    class application applicationStyle\n    class domain domainStyle\n    class infrastructure infrastructureStyle\n\n    %% Notes\n    note1[\"Note: Solid arrows = direct dependencies<br/>Dotted arrows = implements interface\"]\n\n    style note1 fill:#fff9c4,stroke:#f57f17,stroke-width:1px\n```\n\n## Clean Architecture Layers\n\nThis diagram shows the four layers of Polibase's Clean Architecture and their dependencies.\n\n### Key Principles\n\n1. **Dependency Rule**: Dependencies point inward (toward Domain layer)\n   - Interfaces → Application → Domain ← Infrastructure\n\n2. **Domain Independence**: Domain layer has no external dependencies\n   - Contains only business logic and abstractions\n   - Defines interfaces that Infrastructure implements\n\n3. **Testability**: Easy to mock and test each layer independently\n   - Domain logic can be tested without external services\n   - Infrastructure can be swapped without changing domain\n\n### Layer Responsibilities\n\n- **Interfaces**: User interaction (CLI, Web UI)\n- **Application**: Use cases and application workflows\n- **Domain**: Core business logic and rules (framework-independent)\n- **Infrastructure**: External service implementations (Database, APIs, etc.)\n",
+  "content_size": 2992,
+  "collected_at": "2026-02-06T02:04:46.027227",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

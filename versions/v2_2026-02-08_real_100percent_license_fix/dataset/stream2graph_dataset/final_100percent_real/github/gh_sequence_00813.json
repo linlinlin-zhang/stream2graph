@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00813",
+  "source": "github",
+  "source_url": "https://github.com/gupta-soham/AI-Voice-Receptionist/blob/8c6b5b9cc743e98cda3163d7a02caf118b94056b/docs/sequence-diagram.mmd",
+  "github_repo": "gupta-soham/AI-Voice-Receptionist",
+  "github_file_path": "docs/sequence-diagram.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant C as 📞 Phone Caller\n    participant L as ☁️ LiveKit Cloud\n    participant VA as 🤖 Voice Agent\n    participant STT as 🎤 Deepgram STT\n    participant LLM as 🧠 Gemini 2.0 Flash\n    participant TTS as 🔊 ElevenLabs TTS\n    participant API as ⚛️ Next.js API\n    participant DB as 🗄️ PostgreSQL\n    participant S as 👨💼 Supervisor\n    participant D as 🖥️ Dashboard\n\n    Note over C,D: Phase 1: Text-Based Escalation Flow\n\n    %% Call Initiation\n    C->>L: 1. Phone Call\n    L->>VA: 2. WebRTC Audio Stream\n    \n    %% Voice Processing\n    VA->>STT: 3. Audio Data\n    STT->>VA: Transcribed Text\n    \n    %% Knowledge Query\n    VA->>API: 4. Query Knowledge Base\n    API->>DB: Search existing knowledge\n    DB->>API: Knowledge results\n    API->>VA: Knowledge response\n    \n    %% AI Processing\n    VA->>LLM: 5. Process with context + knowledge\n    LLM->>VA: Response + Confidence Score\n    \n    %% Decision Point\n    alt High Confidence (≥ 0.7)\n        VA->>TTS: Generate direct answer\n        TTS->>VA: Audio response\n        VA->>L: Audio stream\n        L->>C: Direct answer delivered\n    else Low Confidence (< 0.7)\n        %% Escalation Flow\n        rect rgb(255, 240, 240)\n            Note over VA,S: Escalation to Human Supervisor\n            \n            VA->>API: 6. Create Help Request\n            API->>DB: Store help request (PENDING)\n            DB->>API: Request ID\n            API->>VA: Escalation confirmed\n            \n            %% Inform Caller\n            VA->>TTS: 7. \"Let me connect you with supervisor...\"\n            TTS->>VA: Hold message audio\n            VA->>L: Hold message\n            L->>C: Escalation message\n            \n            %% Supervisor Notification\n            API->>D: 8. Real-time notification\n            D->>S: Dashboard alert\n            \n            %% Supervisor Response\n            S->>D: 9. Review request\n            S->>D: 10. Provide answer\n            D->>API: Submit resolution\n            API->>DB: Update request (RESOLVED)\n            \n            %% Webhook Delivery\n            API->>VA: 11. Webhook: Answer ready\n            VA->>TTS: 12. Generate answer audio\n            TTS->>VA: Answer audio\n            VA->>L: Final answer\n            L->>C: Answer delivered\n        end\n    end\n    \n    Note over C,D: Call completed with resolution",
+  "content_size": 2324,
+  "collected_at": "2026-02-06T01:37:24.604430",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

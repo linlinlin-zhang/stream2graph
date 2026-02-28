@@ -1,0 +1,15 @@
+{
+  "id": "ot_journey_01103",
+  "source": "other",
+  "source_url": "https://github.com/ik-workshop/naglfar-analytics/blob/2ff359b7b80b238f0b039374ec84a4f8152fadc1/docs/assets/diagrams/06-data-pipeline.mmd",
+  "source_type": "github_search",
+  "github_repo": "ik-workshop/naglfar-analytics",
+  "diagram_type": "journey",
+  "code": "graph TB\n    subgraph Stage1[STAGE 1: COLLECTION - Real-time]\n        ValidationSvc[Naglfar Validation Service<br/>Captures: IP, token, endpoint, query]\n        BookstoreSvc[Book Store Backend<br/>Captures: User actions with email]\n    end\n\n    subgraph Kafka[Message Broker - Apache Kafka]\n        ValidationTopic[naglfar-validation-topic<br/>Request metadata]\n        JourneyTopic[naglfar-user-journey-topic<br/>User actions]\n    end\n\n    subgraph Stage2[STAGE 2: INGESTION - Near real-time &lt; 1s]\n        Worker[Naglfar Worker<br/>.NET Consumer<br/>• Enriches data<br/>• Correlates events]\n    end\n\n    subgraph Storage[Graph Database]\n        Neo4j[(Neo4j<br/>Nodes: IP, Token, Account, Request, Action<br/>Relationships: MADE_REQUEST, USED_TOKEN, etc.)]\n    end\n\n    subgraph Stage3[STAGE 3: ANALYSIS - Batch/Streaming]\n        Analytics[Analytics Worker<br/>Pattern Detection:<br/>• Token reuse<br/>• Similar journeys<br/>• High frequency<br/>• Account compromise]\n    end\n\n    subgraph Stage4[STAGE 4: ACTION - Real-time &lt; 100ms]\n        Redis[(Redis Cache<br/>blocked_ips<br/>blocked_tokens<br/>TTL: 5 min)]\n    end\n\n    ValidationSvc -->|Publish<br/>< 5ms| ValidationTopic\n    BookstoreSvc -->|Publish<br/>< 5ms| JourneyTopic\n\n    ValidationTopic -->|Consume| Worker\n    JourneyTopic -->|Consume| Worker\n\n    Worker -->|Write graph<br/>< 1s| Neo4j\n\n    Neo4j -->|Query patterns<br/>Every 30s-5min| Analytics\n\n    Analytics -->|Write blocks<br/>< 100ms| Redis\n\n    Redis -.->|Check blocks<br/>< 1ms| ValidationSvc\n\n    style Stage1 fill:#e1f5ff\n    style Kafka fill:#e1d5e7\n    style Stage2 fill:#fff4cc\n    style Storage fill:#ffe6cc\n    style Stage3 fill:#d5e8d4\n    style Stage4 fill:#f8cecc\n    style Redis fill:#ffcccc",
+  "content_size": 1737,
+  "collected_at": "2026-02-06T11:04:26.678635",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

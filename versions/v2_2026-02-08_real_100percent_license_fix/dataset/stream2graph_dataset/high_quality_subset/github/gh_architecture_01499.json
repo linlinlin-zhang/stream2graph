@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01499",
+  "source": "github",
+  "source_url": "https://github.com/btdat2506/HCMUS_GraduationThesis/blob/47db851504e730ca700f1eee39ead8e8f2cd3067/Images/MermaidDiagram/dia2.mmd",
+  "github_repo": "btdat2506/HCMUS_GraduationThesis",
+  "github_file_path": "Images/MermaidDiagram/dia2.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TD\n    subgraph SD_Detail[\"SD Card Controller (axi_sdc_controller.v)\"]\n        direction TB\n        \n        subgraph SD_AXI_Interfaces[\"AXI Interfaces\"]\n            SD_SLAVE[\"S_AXI_LITE<br/>(Control Interface)<br/>• Command/Argument Registers<br/>• Status/Response Registers<br/>• Configuration Registers<br/>• Block Size/Count<br/>• DMA Address<br/>• Clock Divider<br/>• Interrupt Control\"]\n            SD_MASTER[\"M_AXI<br/>(DMA Master Interface)<br/>• Burst Read/Write<br/>• Configurable Address Width<br/>• AXI4 Full Protocol<br/>• Automatic FIFO Management\"]\n        end\n        \n        subgraph SD_Core_Logic[\"SD Card Core Logic\"]\n            SD_CMD_MASTER[\"sd_cmd_master<br/>• Command State Machine<br/>• Response Handling<br/>• Timeout Management<br/>• CRC/Index Checking\"]\n            SD_CMD_SERIAL[\"sd_cmd_serial_host<br/>• CMD Line Protocol<br/>• CRC-7 Generation<br/>• Serial Bit Transmission\"]\n            SD_DATA_MASTER[\"sd_data_master<br/>• Data Transfer Control<br/>• FIFO Management<br/>• Multi-block Support<br/>• Error Handling\"]\n            SD_DATA_SERIAL[\"sd_data_serial_host<br/>• 1-bit/4-bit Data Mode<br/>• CRC-16 per Data Line<br/>• Block Transfer Protocol\"]\n        end\n        \n        subgraph SD_Internal_FIFO[\"Internal FIFO System\"]\n            SD_FIFO_MEM[\"FIFO Memory<br/>• Configurable Depth (fifo_addr_bits=7)<br/>• 128 x 32-bit entries<br/>• Dual-port access<br/>• Flow control\"]\n            SD_FIFO_CTRL[\"FIFO Control<br/>• Almost Full/Empty flags<br/>• Overflow/Underflow protection<br/>• Clock domain crossing\"]\n        end\n        \n        subgraph SD_Clock_Gen[\"Clock Generation\"]\n            SD_CLK_DIV[\"Programmable Clock Divider<br/>• Default: 400KHz (div=124)<br/>• Up to 50MHz (div=0)<br/>• Dynamic flow control<br/>• FIFO-aware throttling\"]\n        end\n        \n        subgraph SD_Physical[\"Physical SD Interface\"]\n            SD_PINS[\"SD Card Pins<br/>• sdio_cmd (bidirectional)<br/>• sdio_dat[3:0] (bidirectional)<br/>• sdio_clk (output)<br/>• sdio_cd (card detect input)<br/>• sdio_reset (output)\"]\n        end\n    end\n    \n    SD_SLAVE --> SD_CMD_MASTER\n    SD_SLAVE --> SD_DATA_MASTER\n    SD_CMD_MASTER --> SD_CMD_SERIAL\n    SD_DATA_MASTER --> SD_DATA_SERIAL\n    SD_DATA_MASTER --> SD_FIFO_CTRL\n    SD_MASTER --> SD_FIFO_MEM\n    SD_FIFO_MEM --> SD_DATA_SERIAL\n    SD_CLK_DIV --> SD_CMD_SERIAL\n    SD_CLK_DIV --> SD_DATA_SERIAL\n    SD_CMD_SERIAL --> SD_PINS\n    SD_DATA_SERIAL --> SD_PINS",
+  "content_size": 2446,
+  "collected_at": "2026-02-06T01:47:03.299364",
+  "license": "none",
+  "license_name": "No License",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

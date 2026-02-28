@@ -1,0 +1,20 @@
+{
+  "id": "aug_gh_architecture_01394_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/cdot65/paloaltonetworks-automation-examples/blob/81203f54d542b4295e14fcbfe7f0ece37f3161f3/python/threatvault-hash-lookup/threatvault.mmd",
+  "github_repo": "cdot65/paloaltonetworks-automation-examples",
+  "github_file_path": "python/threatvault-hash-lookup/threatvault.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TD\n    A[Infra_LoadBalancer] --> B[Infra_RedisCache]\n    B --> C{Infra_WorkerNode}\n    C -->|FileNotFoundError| D[Infra_EtcdCluster]\n    C --> E{Infra_IngressController}\n    E -->|No| F[Infra_LoadBalancer]\n    F --> D\n    E -->|Yes| G[Infra_WorkerNode]\n    G --> H{Infra_RedisCache}\n    H -->|Yes| I[Infra_LoadBalancer]\n    H -->|No| J[Infra_IngressController]\n    I --> K[Infra_EtcdCluster]\n    K --> L{Infra_WorkerNode}\n    L -->|Yes| M[Infra_WorkerNode]\n    L -->|No| N[Infra_RedisCache]\n    M --> O[Infra_WorkerNode]\n    N --> O\n\n    subgraph threat_vault_lookup\n        G1[Infra_RedisCache] --> G2[Infra_LoadBalancer]\n        G2 --> G3{Infra_WorkerNode}\n        G3 -->|Success| G4[Infra_RedisCache]\n        G3 -->|Error| G5[Infra_EtcdCluster]\n        G4 -->|Success| G6[Infra_IngressController]\n        G4 -->|Error| G7[Infra_WorkerNode]\n    end\n\n    subgraph get_file_hashes\n        C1[Infra_RedisCache] --> C2{Infra_WorkerNode}\n        C2 -->|Yes| C3[Infra_LoadBalancer]\n        C3 --> C4{Infra_WorkerNode}\n        C4 -->|File| C5[Infra_LoadBalancer]\n        C5 --> C6[Infra_LoadBalancer]\n        C6 --> C4\n        C4 -->|No more files| C7[Infra_WorkerNode]\n        C2 -->|No| C8[Infra_RedisCache]\n        C8 --> C9[Infra_EtcdCluster]\n        C9 --> C10[Infra_EtcdCluster]\n    end\n\n    subgraph calculate_sha256\n        A1[Infra_LoadBalancer] --> B1[Infra_IngressController]\n        B1 --> C1[Infra_IngressController]\n        C1 --> D1{Infra_RedisCache}\n        D1 -->|Chunk read| E1[Infra_IngressController]\n        E1 --> D1\n        D1 -->|End of file| F1[Infra_RedisCache]\n        F1 --> G1[Infra_RedisCache]\n        G1 --> H1[Infra_RedisCache]\n    end",
+  "content_size": 2043,
+  "collected_at": "2026-02-06T01:45:40.810285",
+  "license": "mit",
+  "license_name": "MIT License",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 18,
+  "repo_forks": 11,
+  "augmentation_domain": "Infra",
+  "seed_id": "gh_architecture_01394"
+}

@@ -1,0 +1,303 @@
+{
+  "id": "gl_flowchart_00701",
+  "source": "gitlab",
+  "source_url": "https://github.com/0bvim/ft_transcendence/blob/5455e756e5d0297d3660d380dc1bbaf6e484b3ee/docs/architecture/deployment-infrastructure.mmd",
+  "source_note": "collected_from_github_final",
+  "github_repo": "0bvim/ft_transcendence",
+  "diagram_type": "flowchart",
+  "code": "%%{init: {'theme':'neutral'}}%%\nflowchart TD\n    subgraph \"Docker Environment\"\n        subgraph \"Application Services\"\n            Frontend[Frontend Service<br/>Node.js + Vite<br/>:3010]\n            Auth[Auth Service<br/>Fastify + Prisma<br/>:3001]\n            Tournament[Tournament Service<br/>Fastify + Prisma<br/>:3002]\n            Game[Game Service<br/>p5.js + Fastify<br/>:3003]\n            Blockchain[Blockchain Service<br/>Hardhat + Express<br/>:3004]\n        end\n        \n        subgraph \"Data Layer\"\n            AuthDB[(SQLite<br/>Auth Database<br/>File-based)]\n            TournamentDB[(SQLite<br/>Tournament Database<br/>File-based)]\n        end\n        \n        subgraph \"Monitoring Stack\"\n            Prometheus[Prometheus<br/>Metrics Collection<br/>:9090]\n            Grafana[Grafana<br/>Dashboards<br/>:3000]\n            Elasticsearch[Elasticsearch<br/>Log Storage<br/>:9200]\n            Logstash[Logstash<br/>Log Processing<br/>:5001]\n            Kibana[Kibana<br/>Log Visualization<br/>:5601]\n        end\n        \n\n    end\n    \n    subgraph \"External Services\"\n        Google[Google OAuth API]\n        Avalanche[Avalanche Blockchain]\n    end\n    \n    %% Request Flow\n    Client[Web Clients] -->|Direct HTTP| Frontend\n    Frontend --> Auth\n    Frontend --> Tournament\n    Frontend --> Game\n    Frontend --> Blockchain\n    \n    %% Database Connections\n    Auth --> AuthDB\n    Tournament --> TournamentDB\n    \n    %% External Integrations\n    Auth --> Google\n    Blockchain --> Avalanche\n    \n    %% Monitoring Connections\n    Frontend -->|Metrics| Prometheus\n    Auth -->|Metrics| Prometheus\n    Tournament -->|Metrics| Prometheus\n    Game -->|Metrics| Prometheus\n    Blockchain -->|Metrics| Prometheus\n    \n    Frontend -->|Logs| Logstash\n    Auth -->|Logs| Logstash\n    Tournament -->|Logs| Logstash\n    Game -->|Logs| Logstash\n    Blockchain -->|Logs| Logstash\n    \n    Logstash --> Elasticsearch\n    Kibana --> Elasticsearch\n    Grafana --> Prometheus\n    \n    %% Styling\n    style Client fill:#e3f2fd,stroke:#1976d2\n\n    style Frontend fill:#4caf50,color:#fff,stroke:#2e7d32\n    style Auth fill:#ff9800,color:#fff,stroke:#ef6c00\n    style Tournament fill:#9c27b0,color:#fff,stroke:#6a1b9a\n    style Game fill:#e91e63,color:#fff,stroke:#ad1457\n    style Blockchain fill:#009688,color:#fff,stroke:#00695c\n    style AuthDB fill:#fbc02d,stroke:#f57f17\n    style TournamentDB fill:#fbc02d,stroke:#f57f17\n\n    style Prometheus fill:#ff6f00,color:#fff,stroke:#e65100\n    style Grafana fill:#ff5722,color:#fff,stroke:#d84315\n    style Elasticsearch fill:#795548,color:#fff,stroke:#5d4037\n    style Logstash fill:#607d8b,color:#fff,stroke:#455a64\n    style Kibana fill:#3f51b5,color:#fff,stroke:#303f9f\n    style Google fill:#f5f5f5,stroke:#757575\n    style Avalanche fill:#f5f5f5,stroke:#757575 ",
+  "content_size": 2808,
+  "collected_at": "2026-02-06T14:19:11.695835",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Frontend Service<br/>Node.js + Vite<br/>:3010 和 Auth Service<br/>Fastify + Prisma<br/>:3001。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Frontend Service<br/>Node.js + Vite<br/>:3010 和 Auth Service<br/>Fastify + Prisma<br/>:3001'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Frontend",
+        "Auth"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Tournament Service<br/>Fastify + Prisma<br/>:3002 和 Game Service<br/>p5.js + Fastify<br/>:3003 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Tournament Service<br/>Fastify + Prisma<br/>:3002 和 Game Service<br/>p5.js + Fastify<br/>:3003'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Tournament",
+        "Game"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Blockchain Service<br/>Hardhat + Express<br/>:3004 和 (SQLite<br/>Auth Database<br/>File-based 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Blockchain Service<br/>Hardhat + Express<br/>:3004 和 (SQLite<br/>Auth Database<br/>File-based'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Blockchain",
+        "AuthDB"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 (SQLite<br/>Tournament Database<br/>File-based 和 Prometheus<br/>Metrics Collection<br/>:9090 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '(SQLite<br/>Tournament Database<br/>File-based 和 Prometheus<br/>Metrics Collection<br/>:9090'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TournamentDB",
+        "Prometheus"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Grafana<br/>Dashboards<br/>:3000 和 Elasticsearch<br/>Log Storage<br/>:9200 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Grafana<br/>Dashboards<br/>:3000 和 Elasticsearch<br/>Log Storage<br/>:9200'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Grafana",
+        "Elasticsearch"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Logstash<br/>Log Processing<br/>:5001 和 Kibana<br/>Log Visualization<br/>:5601 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Logstash<br/>Log Processing<br/>:5001 和 Kibana<br/>Log Visualization<br/>:5601'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Logstash",
+        "Kibana"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Google OAuth API 和 Avalanche Blockchain 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Google OAuth API 和 Avalanche Blockchain'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Google",
+        "Avalanche"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Web Clients 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Web Clients'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Client"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 32,
+    "repair_count": 0,
+    "grounding_acts_count": 16,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

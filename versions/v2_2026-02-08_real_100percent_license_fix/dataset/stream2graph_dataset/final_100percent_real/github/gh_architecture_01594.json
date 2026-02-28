@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01594",
+  "source": "github",
+  "source_url": "https://github.com/madalin-fr/noise-monitor/blob/264d9e7f5b6e71b84bd2a17188a7b787ffa3c034/docs/thesis/diagrams/system_architecture.mmd",
+  "github_repo": "madalin-fr/noise-monitor",
+  "github_file_path": "docs/thesis/diagrams/system_architecture.mmd",
+  "diagram_type": "architecture",
+  "code": "%%{init: {'theme':'base', 'themeVariables': {'primaryColor': '#f8fafc', 'primaryTextColor': '#1f2937', 'primaryBorderColor': '#374151', 'lineColor': '#6b7280', 'sectionBkgColor': '#ffffff', 'altSectionBkgColor': '#f9fafb', 'gridColor': '#e5e7eb', 'mainBkg': '#ffffff', 'fontSize': '16px'}}}%%\ngraph TB\n    subgraph \"Edge Layer\"\n        ESP32[ESP32 Microcontroller<br/>Sensor Node]\n        INMP441[INMP441 I2S Microphone<br/>Digital Audio Sensor]\n        ESP32 -.->|I2S Interface| INMP441\n    end\n\n    subgraph \"Event Streaming\"\n        Kafka[Apache Kafka<br/>on Confluent Cloud]\n        Topics[Topics:<br/>• noise-measurements<br/>• device-events<br/>• alerts]\n        Kafka --- Topics\n    end\n\n    subgraph \"Backend Services (Go)\"\n        API[REST API<br/>Go Fiber]\n        WS[WebSocket Service]\n        StreamProcessor[Stream Processor<br/>Kafka Producer/Consumer]\n    end\n\n    subgraph \"Database Layer\"\n        PostgreSQL[PostgreSQL<br/>on Aiven]\n        Tables[Tables:<br/>• devices<br/>• noise_measurements]\n        PostgreSQL --- Tables\n    end\n\n    subgraph \"Frontend (SolidJS)\"\n        SolidJS[SolidJS Application<br/>Reactive UI]\n        Dashboard[Real-time Dashboard]\n        DeviceMgmt[Device Management]\n        SolidJS --- Dashboard & DeviceMgmt\n    end\n\n    %% Data Flow\n    ESP32 -- HTTP POST /api/noise --> API\n    API -- Produces to --> Kafka\n    StreamProcessor -- Consumes from --> Kafka\n    StreamProcessor -- Writes to --> PostgreSQL\n    StreamProcessor -- Pushes to --> WS\n    WS -- Real-time Connection --> SolidJS\n    API <-- HTTP Requests --> SolidJS\n\n    %% Styling\n    classDef edgeStyle fill:#dbeafe,stroke:#2563eb,stroke-width:2px\n    classDef streamingStyle fill:#fed7aa,stroke:#f97316,stroke-width:2px\n    classDef backendStyle fill:#fef3c7,stroke:#f59e0b,stroke-width:2px\n    classDef dbStyle fill:#e0e7ff,stroke:#6366f1,stroke-width:2px\n    classDef frontendStyle fill:#fce7f3,stroke:#ec4899,stroke-width:2px\n\n    class ESP32,INMP441 edgeStyle\n    class Kafka,Topics streamingStyle\n    class API,WS,StreamProcessor backendStyle\n    class PostgreSQL,Tables dbStyle\n    class SolidJS,Dashboard,DeviceMgmt frontendStyle",
+  "content_size": 2149,
+  "collected_at": "2026-02-06T01:48:20.805382",
+  "license": "none",
+  "license_name": "No License",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

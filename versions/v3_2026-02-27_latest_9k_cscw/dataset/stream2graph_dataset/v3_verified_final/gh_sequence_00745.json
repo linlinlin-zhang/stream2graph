@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00745",
+  "source": "github",
+  "source_url": "https://github.com/hmrc/agent-client-relationships/blob/a371649ba48b4a3f171ef881758141379c20ea30/service-dependency-map/agent-client-relationships/diagrams/RemoveAuthorisationController.POST.remove-authorisation.mmd",
+  "github_repo": "hmrc/agent-client-relationships",
+  "github_file_path": "service-dependency-map/agent-client-relationships/diagrams/RemoveAuthorisationController.POST.remove-authorisation.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    autonumber\n    participant Upstream\n    participant agent-client-relationships\n    participant agent-fi-relationship\n    participant Database\n    participant enrolment-store-proxy\n\n    Upstream->>+agent-client-relationships: POST /agent/:arn/remove-authorisation\n    alt PIR Service\n        agent-client-relationships->>+agent-fi-relationship: DELETE /agent-fi-relationship/relationships/agent/:arn/service/:service/client/:clientId\n        agent-fi-relationship-->>-agent-client-relationships: Response\n    end\n    alt Alt-ITSA Service\n        agent-client-relationships->>Database: Delete: Remove the partial-auth record.\n    end\n    agent-client-relationships->>Database: Update: Find the original invitation and mark it as relationship ended.\n    alt Default Services\n        agent-client-relationships->>+enrolment-store-proxy: DELETE /enrolment-store-proxy/enrolment-store/groups/:groupId/enrolments/:enrolmentKey\n        enrolment-store-proxy-->>-agent-client-relationships: Response\n    end\n    agent-client-relationships-->>-Upstream: Final Response\n",
+  "content_size": 1079,
+  "collected_at": "2026-02-06T01:36:26.245576",
+  "compilation_status": "failed",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 1,
+  "repo_forks": 1,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

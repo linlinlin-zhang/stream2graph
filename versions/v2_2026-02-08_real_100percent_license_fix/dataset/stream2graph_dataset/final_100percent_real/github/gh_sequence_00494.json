@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00494",
+  "source": "github",
+  "source_url": "https://github.com/pagopa/p4pa-doc/blob/7e7885cceb7021d36015482fc7455c44951d6b3f/design/io-notification/sequence_createService.mmd",
+  "github_repo": "pagopa/p4pa-doc",
+  "github_file_path": "design/io-notification/sequence_createService.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Payhub_Be\n    participant IONotification\n    participant IONotification_DB\n    participant Backend_IO\n\n    Payhub_Be ->> IONotification: richiesta creazione servizio <br/>POST /create/service/{enteId}/{tipoDovutoId}\n    activate IONotification\n    note left of IONotification: Payhub invia payload per la <br/>creazione del servizio nella request\n    IONotification ->> IONotification_DB: salva richiesta createService (se non esiste)\n\n    alt esiste db\n        IONotification ->> Backend_IO: getAll services da IO <br/>GET /manage/services\n\n        activate Backend_IO\n            Backend_IO -->> IONotification: lista di servizi\n        deactivate Backend_IO\n\n        alt servizio esiste su IO\n            IONotification ->> IONotification_DB: aggiorna servizio <br/>(serviceId, stato)\n            IONotification -->> Payhub_Be: 201 CREATED\n        else servizio NON esiste su IO\n            IONotification ->> Backend_IO: creare sevizio <br/>POST /api/v1/manage/services\n\n            activate Backend_IO\n                Backend_IO -->> IONotification: servizio\n            deactivate Backend_IO\n\n            IONotification ->> IONotification_DB: aggiorna servizio <br/>(serviceId, stato)\n            IONotification -->> Payhub_Be: 201 CREATED\n        end\n\n    else NON esiste db\n        IONotification ->> Backend_IO: creare sevizio <br/>POST /api/v1/manage/services\n\n        activate Backend_IO\n            Backend_IO -->> IONotification: servizio\n        deactivate Backend_IO\n\n        IONotification ->> IONotification_DB: aggiorna servizio <br/>(serviceId, stato)\n        IONotification -->> Payhub_Be: 201 CREATED\n\n    else error\n        IONotification_DB -->> IONotification: 429\n        IONotification -->> Payhub_Be: retry\n    else chiamata IO fallita\n        Backend_IO -->> IONotification: error\n        IONotification -->> Payhub_Be: retry\n    end\n\n    deactivate IONotification\n",
+  "content_size": 1925,
+  "collected_at": "2026-02-06T01:33:04.578282",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

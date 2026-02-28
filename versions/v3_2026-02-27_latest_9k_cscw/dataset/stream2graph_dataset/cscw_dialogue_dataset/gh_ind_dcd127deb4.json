@@ -1,0 +1,51 @@
+{
+  "id": "gh_ind_dcd127deb4",
+  "source": "github_industrial",
+  "repo": "sidetrip-ai/ici-core",
+  "license": "mit",
+  "code": "sequenceDiagram\n    participant IngestionPipeline\n    participant Ingestor\n    participant Logger\n\n    loop Retry up to 3 times\n        IngestionPipeline->>Ingestor: fetch_new_data(since=last_timestamp)\n        alt Fetch succeeds\n            Ingestor-->>IngestionPipeline: raw_data\n            IngestionPipeline->>Logger: Log successful fetch\n        else Fetch fails\n            Ingestor-->>IngestionPipeline: IngestorError\n            IngestionPipeline->>Logger: Log error and retry\n        end\n    end\n    alt Max retries exceeded\n        IngestionPipeline->>Logger: Log critical error, skip cycle\n    end",
+  "diagram_type": "participant size:600..900",
+  "collected_at": "2026-02-27T03:35:53.351806",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 since=last_timestamp 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'since=last_timestamp'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "fetch_new_data"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

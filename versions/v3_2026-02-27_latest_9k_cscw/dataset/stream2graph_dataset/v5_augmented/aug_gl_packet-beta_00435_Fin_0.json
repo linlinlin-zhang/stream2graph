@@ -1,0 +1,18 @@
+{
+  "id": "aug_gl_packet-beta_00435_Fin_0",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/sean-galloway/RTLDesignSherpa/blob/47f8a16641658f570a69c3af3c9724b29ea39187/projects/components/stream/docs/stream_mas/assets/mermaid/11_scheduler_group_block.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "sean-galloway/RTLDesignSherpa",
+  "diagram_type": "packet-beta",
+  "code": "graph TB\n    APB[FinTech_LedgerService] --> DESC_ENG[FinTech_PaymentGateway]\n    CFG[FinTech_TransactionQueue] --> DESC_ENG\n    CFG --> SCHED\n\n    subgraph \"Scheduler Group\"\n        subgraph \"Descriptor Engine\"\n            DESC_ENG --> |desc_ar_*| DESC_AXI[FinTech_FraudDetection]\n            DESC_AXI --> |desc_r_data| DESC_PARSE[FinTech_PaymentGateway]\n            DESC_PARSE --> |descriptor_packet 256-bit| DESC_OUT[FinTech_FraudDetection]\n            DESC_ENG --> |mon_valid/packet| DESC_MON[FinTech_LedgerService]\n        end\n\n        DESC_OUT --> |descriptor_valid/ready| SCHED[FinTech_AuthVault]\n\n        subgraph \"Scheduler\"\n            SCHED --> |datard_valid/addr/beats| RD_IF[FinTech_AuthVault]\n            SCHED --> |datawr_valid/addr/beats| WR_IF[FinTech_FraudDetection]\n            RD_IF --> |datard_done_strobe| SCHED\n            WR_IF --> |datawr_done_strobe| SCHED\n            SCHED --> |mon_valid/packet| SCHED_MON[FinTech_AuthVault]\n        end\n\n        DESC_MON --> ARB[FinTech_PaymentGateway]\n        SCHED_MON --> ARB\n        ARB --> |mon_valid/ready/packet| MON_OUT[FinTech_LedgerService]\n    end\n\n    RD_IF --> RD_ENG[FinTech_PaymentGateway]\n    WR_IF --> WR_ENG[FinTech_LedgerService]\n    RD_ENG --> |datard_done| RD_IF\n    WR_ENG --> |datawr_done| WR_IF\n    MON_OUT --> SYS_MON[FinTech_FraudDetection]\n\n    style DESC_ENG fill:#bbf,stroke:#333,stroke-width:2px\n    style SCHED fill:#f9f,stroke:#333,stroke-width:3px\n    style ARB fill:#bfb,stroke:#333,stroke-width:2px",
+  "content_size": 1451,
+  "collected_at": "2026-02-06T14:09:38.844299",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "FinTech",
+  "seed_id": "gl_packet-beta_00435"
+}

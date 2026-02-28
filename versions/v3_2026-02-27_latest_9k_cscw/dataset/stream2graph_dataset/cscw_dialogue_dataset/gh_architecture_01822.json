@@ -1,0 +1,287 @@
+{
+  "id": "gh_architecture_01822",
+  "source": "github",
+  "source_url": "https://github.com/andreashappe/cochise/blob/06449a1ad0e13446b310893734c157f0faef266e/overview.mmd",
+  "github_repo": "andreashappe/cochise",
+  "github_file_path": "overview.mmd",
+  "diagram_type": "architecture",
+  "code": "---\nconfig:\n  theme: redux\n---\nflowchart TD\n subgraph planner[\"planner\"]\n        replan[\"Update Plan (o3-mini)\"]\n        next{\"Select Next Task (o3-mini)\"}\n        ptt[\"Pentest Task Tree\"]\n  end\n subgraph executor[\"executor\"]\n        execute[\"Perform Task (gpt-4o)\"]\n        execute_decide{\"Tool or Finished?\"}\n        tool_call@{shape: procs, lable: \"tool-call: SSH\"}\n        shell_history[\"Episodic Shell History\"]\n        message_history[\"Episodic Message History\"]\n  end\n\n    invalid_commands[\"Invalid Commands (cmd, descr, fix)\"]\n    findings@{ shape: lin-cyl, label: \"Target Environment Knowlege\"}\n\n    update_knowledge[\"Update Knowledge (o3-mini)\"]\n  \n  \n    start((\"Start\")) -- \"plan=None,task=None,summary='',knowledge='',leads=[]\" --> replan\n    replan <-. plan .-> ptt\n    ptt -. plan .-> next\n    replan --> next\n    next -- task, context --> execute\n    next --> finish(((\"done\")))\n    next -. task, context .-> summarizer[\"Summarizer (o3-mini)\"] & replan\n    execute --> execute_decide\n    execute_decide -- cmd --> tool_call\n    tool_call -- shell output --> execute_decide\n    execute_decide -- result --> summarizer\n    summarizer -. summary, leads .-> replan\n    summarizer -. invalid commands .-> invalid_commands\n    invalid_commands -. invalid commands and fixes .-> execute\n    findings -. knowledge .-> execute\n    findings -. knowledge .-> replan\n    findings -. knowledge .-> next\n    execute_decide <-. cmd, cmd output .-> message_history\n    execute_decide -. cmd, cmd output .-> shell_history\n    shell_history -. cmd, cmd_output .-> summarizer\n    ptt@{ shape: lin-cyl}\n    shell_history@{ shape: lin-cyl}\n    message_history@{ shape: lin-cyl}\n    invalid_commands@{ shape: lin-cyl}\n    summarizer -- new findings --> update_knowledge\n    update_knowledge <-. knowledge .-> findings\n    update_knowledge --> replan\n",
+  "content_size": 1844,
+  "collected_at": "2026-02-06T02:03:46.801438",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 37,
+  "repo_forks": 3,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"planner\" 和 \"Update Plan (o3-mini 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"planner\" 和 \"Update Plan (o3-mini'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "planner",
+        "replan"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Select Next Task (o3-mini 和 \"Pentest Task Tree\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Select Next Task (o3-mini 和 \"Pentest Task Tree\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "next",
+        "ptt"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"executor\" 和 \"Perform Task (gpt-4o 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"executor\" 和 \"Perform Task (gpt-4o'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "executor",
+        "execute"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Tool or Finished?\" 和 \"Episodic Shell History\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Tool or Finished?\" 和 \"Episodic Shell History\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "execute_decide",
+        "shell_history"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Episodic Message History\" 和 \"Invalid Commands (cmd, descr, fix 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Episodic Message History\" 和 \"Invalid Commands (cmd, descr, fix'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "message_history",
+        "invalid_commands"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Update Knowledge (o3-mini 和 (\"Start\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 \"Update Knowledge (o3-mini处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Update Knowledge (o3-mini处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "update_knowledge",
+        "start"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 ((\"done\" 和 \"Summarizer (o3-mini 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 ((\"done\"处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '((\"done\"处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "finish",
+        "summarizer"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 30,
+    "repair_count": 2,
+    "grounding_acts_count": 14,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

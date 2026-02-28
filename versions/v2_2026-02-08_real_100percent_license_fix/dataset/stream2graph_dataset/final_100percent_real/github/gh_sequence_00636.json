@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00636",
+  "source": "github",
+  "source_url": "https://github.com/Meammi/Group-2-CS261-TU-Booking-Sport/blob/45755d9f53d1e9e91f4191b46c6b7ebce2805d3b/docs/diagrams/notification-reservation-create.mmd",
+  "github_repo": "Meammi/Group-2-CS261-TU-Booking-Sport",
+  "github_file_path": "docs/diagrams/notification-reservation-create.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    autonumber\n    participant F as Frontend (TU Booking UI)\n    participant B as Spring Boot API\n    participant DB as PostgreSQL\n    participant SMTP as Mail Server (SMTP)\n    participant Sch as Scheduler (Spring)\n\n    F->>B: POST /reservation/create {userId, slotId}\n    B->>B: Validate input + role (authenticated)\n    B->>DB: SELECT slot by id\n    B->>B: Check slot.status != BOOKED\n    B->>DB: UPDATE slot SET status='BOOKED'\n    B->>DB: INSERT reservations (status=PENDING/CONFIRMED, reminderSent=false)\n    alt Price > 0 (payment required)\n        B-->>F: 201 {message: \"Reservation created\", reservation}\n    else Free/zero price\n        B-->>F: 201 {message: \"Reservation confirmed\", reservation}\n    end\n\n    Note over F,B: Reminder e-mail sent later by scheduler\n\n    Sch->>B: @Scheduled reminder check\n    B->>B: Compute windowStart/windowEnd\n    B->>DB: Find upcoming CONFIRMED with reminderSent=false\n    B->>DB: Load user + room details\n    B->>SMTP: Send reminder e-mail(to, displayName, roomName, startTime)\n    alt Mail accepted\n        B->>DB: UPDATE reservations SET reminderSent=true\n    else Mail failed\n        B-->>Sch: Log error (do not flip reminderSent)\n    end\n\n%% Notes:\n%% - Excludes any DevTools-related components or flows.\n%% - Mirrors current backend: ReservationService + ReservationReminderService + EmailService.\n%% - Payment flow not expanded here; only status impact.\n\n",
+  "content_size": 1425,
+  "collected_at": "2026-02-06T01:35:03.255739",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 3,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

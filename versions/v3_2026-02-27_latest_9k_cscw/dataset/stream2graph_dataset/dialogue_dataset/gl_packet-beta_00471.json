@@ -1,0 +1,517 @@
+{
+  "id": "gl_packet-beta_00471",
+  "source": "gitlab",
+  "source_url": "https://github.com/sean-galloway/RTLDesignSherpa/blob/47f8a16641658f570a69c3af3c9724b29ea39187/docs/markdown/assets/RTLAmba/arbiter_wrr_pwm_monbus.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "sean-galloway/RTLDesignSherpa",
+  "diagram_type": "packet-beta",
+  "code": "%%{init: {'theme': 'neutral', 'themeVariables': { 'fontSize': '14px'}}}%%\nflowchart TB\n    subgraph Inputs[\"Monitor Bus Inputs\"]\n        REQ[\"req[N-1:0]\"]\n        DATA[\"data[N-1:0][63:0]\"]\n        WEIGHT[\"weight[N-1:0][W-1:0]\"]\n    end\n\n    subgraph arbiter_wrr_pwm_monbus[\"arbiter_wrr_pwm_monbus\"]\n        subgraph Arbiter[\"Weighted Round-Robin\"]\n            WRR[\"arbiter_round_robin_weighted\\nPriority by weight\"]\n        end\n\n        subgraph Credits[\"Credit Management\"]\n            CRED[\"Per-requestor credits\\nRefill on exhaustion\"]\n        end\n\n        subgraph PWM[\"PWM Modulation\"]\n            PWM_CTRL[\"Bandwidth limiting\\nper requestor\"]\n        end\n\n        subgraph Mux[\"Output Mux\"]\n            MUX[\"Select winning\\npacket data\"]\n        end\n    end\n\n    subgraph Outputs[\"Arbitrated Output\"]\n        GNT[\"grant[N-1:0]\"]\n        OUT_V[\"out_valid\"]\n        OUT_D[\"out_data[63:0]\"]\n    end\n\n    REQ --> Arbiter\n    WEIGHT --> Credits\n    Credits --> Arbiter\n    Arbiter --> PWM\n    PWM --> GNT\n    GNT --> Mux\n    DATA --> Mux\n    Mux --> OUT_V\n    Mux --> OUT_D\n",
+  "content_size": 1075,
+  "collected_at": "2026-02-06T14:10:23.203939",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 8,
+  "repo_forks": 1,
+  "repo_owner": "sean-galloway",
+  "repo_name": "RTLDesignSherpa",
+  "repo_description": "This site is hopefully a springboard for others to learn about coding in System Verilog and experimenting with FPGAs.",
+  "repo_language": "C++",
+  "repo_topics": [
+    "amba-apb",
+    "amba-axi",
+    "cocotb",
+    "crossbar",
+    "dma"
+  ],
+  "repo_created_at": "2023-06-15T21:56:48Z",
+  "repo_updated_at": "2026-02-06T00:19:01Z",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "Inputs",
+        "REQ"
+      ],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "\"data[N-1:0、\"weight[N-1:0主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，\"data[N-1:0、\"weight[N-1:0的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "DATA",
+        "WEIGHT"
+      ],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下\"arbiter_wrr_pwm_monbus\"、\"Weighted Round-Robin\"吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，\"arbiter_wrr_pwm_monbus\"、\"Weighted Round-Robin\"是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "arbiter_wrr_pwm_monbus",
+        "Arbiter"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由\"arbiter_round_robin_weighted\\nPriority by weight\"、\"Credit Management\"组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，\"arbiter_round_robin_weighted\\nPriority by weight\"、\"Credit Management\"的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下\"arbiter_round_robin_weighted\\nPriority by weight\"、\"Credit Management\"吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "WRR",
+        "Credits"
+      ],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "\"Per-requestor credits\\nRefill on exhaustion\"主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "CRED"
+      ],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将\"PWM Modulation\"分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是\"PWM Modulation\"应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有\"PWM Modulation\"。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "\"PWM Modulation\"和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "PWM"
+      ],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理\"Bandwidth limiting\\nper requestor\"？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，\"Bandwidth limiting\\nper requestor\"就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "\"Bandwidth limiting\\nper requestor\"主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "关于\"Bandwidth limiting\\nper requestor\"，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "PWM_CTRL"
+      ],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将\"Output Mux\"分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，\"Output Mux\"就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "\"Output Mux\"和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "Mux"
+      ],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "关于\"Select winning\\npacket data\"、\"Arbitrated Output\"，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "相较于方案A，\"Select winning\\npacket data\"、\"Arbitrated Output\"有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "\"Select winning\\npacket data\"、\"Arbitrated Output\"主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "MUX",
+        "Outputs"
+      ],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有\"grant[N-1:0。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，\"grant[N-1:0的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由\"grant[N-1:0组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "关于\"grant[N-1:0，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "GNT"
+      ],
+      "timestamp_offset": 495
+    },
+    {
+      "turn_id": 34,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下\"out_valid\"、\"out_data[63:0吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 510
+    },
+    {
+      "turn_id": 35,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，\"out_valid\"、\"out_data[63:0是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 525
+    },
+    {
+      "turn_id": 36,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是\"out_valid\"、\"out_data[63:0应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 540
+    },
+    {
+      "turn_id": 37,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "OUT_V",
+        "OUT_D"
+      ],
+      "timestamp_offset": 555
+    },
+    {
+      "turn_id": 38,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下、吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 570
+    },
+    {
+      "turn_id": 39,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 585
+    },
+    {
+      "turn_id": 40,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理、？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "edge_0",
+        "edge_1"
+      ],
+      "timestamp_offset": 600
+    },
+    {
+      "turn_id": 41,
+      "speaker": "Speaker_B",
+      "utterance": "关于、，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 615
+    },
+    {
+      "turn_id": 42,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，、的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 630
+    },
+    {
+      "turn_id": 43,
+      "speaker": "Speaker_B",
+      "utterance": "、和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 645
+    },
+    {
+      "turn_id": 44,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将、分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "edge_2",
+        "edge_3"
+      ],
+      "timestamp_offset": 660
+    },
+    {
+      "turn_id": 45,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有、。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 675
+    },
+    {
+      "turn_id": 46,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_4",
+        "edge_5"
+      ],
+      "timestamp_offset": 690
+    },
+    {
+      "turn_id": 47,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 705
+    },
+    {
+      "turn_id": 48,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 720
+    },
+    {
+      "turn_id": 49,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 735
+    },
+    {
+      "turn_id": 50,
+      "speaker": "Speaker_A",
+      "utterance": "负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "edge_6"
+      ],
+      "timestamp_offset": 750
+    },
+    {
+      "turn_id": 51,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含、这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 765
+    },
+    {
+      "turn_id": 52,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 780
+    },
+    {
+      "turn_id": 53,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达、结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "edge_7",
+        "edge_8"
+      ],
+      "timestamp_offset": 795
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 53,
+    "speaker_distribution": {
+      "Speaker_B": 27,
+      "Speaker_A": 26
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "inform": 9,
+      "classification": 7,
+      "clarify": 6,
+      "request": 11,
+      "confirm": 6,
+      "structural": 8,
+      "contrastive": 4
+    },
+    "avg_turn_length": 28.849056603773583,
+    "dialogue_duration": 795
+  }
+}

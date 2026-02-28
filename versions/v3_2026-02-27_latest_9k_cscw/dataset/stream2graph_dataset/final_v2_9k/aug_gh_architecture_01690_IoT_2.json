@@ -1,0 +1,20 @@
+{
+  "id": "aug_gh_architecture_01690_IoT_2",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/cdot65/paloaltonetworks-automation-examples/blob/81203f54d542b4295e14fcbfe7f0ece37f3161f3/python/threatvault-hash-lookup/threatvault.mmd",
+  "github_repo": "cdot65/paloaltonetworks-automation-examples",
+  "github_file_path": "python/threatvault-hash-lookup/threatvault.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TD\n    A[IoT_Industrial_EdgeNode] --> B[IoT_Industrial_MQTT_Broker]\n    B --> C{IoT_Industrial_TelemetryStream}\n    C -->|FileNotFoundError| D[IoT_Industrial_PLC_Logic]\n    C --> E{IoT_Industrial_EdgeNode}\n    E -->|No| F[IoT_Industrial_TelemetryStream]\n    F --> D\n    E -->|Yes| G[IoT_Industrial_ActuatorController]\n    G --> H{IoT_Industrial_ActuatorController}\n    H -->|Yes| I[IoT_Industrial_EdgeNode]\n    H -->|No| J[IoT_Industrial_MQTT_Broker]\n    I --> K[IoT_Industrial_ActuatorController]\n    K --> L{IoT_Industrial_PLC_Logic}\n    L -->|Yes| M[IoT_Industrial_PLC_Logic]\n    L -->|No| N[IoT_Industrial_MQTT_Broker]\n    M --> O[IoT_Industrial_ActuatorController]\n    N --> O\n\n    subgraph threat_vault_lookup\n        G1[IoT_Industrial_PLC_Logic] --> G2[IoT_Industrial_TelemetryStream]\n        G2 --> G3{IoT_Industrial_TelemetryStream}\n        G3 -->|Success| G4[IoT_Industrial_MQTT_Broker]\n        G3 -->|Error| G5[IoT_Industrial_ActuatorController]\n        G4 -->|Success| G6[IoT_Industrial_ActuatorController]\n        G4 -->|Error| G7[IoT_Industrial_EdgeNode]\n    end\n\n    subgraph get_file_hashes\n        C1[IoT_Industrial_MQTT_Broker] --> C2{IoT_Industrial_TelemetryStream}\n        C2 -->|Yes| C3[IoT_Industrial_EdgeNode]\n        C3 --> C4{IoT_Industrial_TelemetryStream}\n        C4 -->|File| C5[IoT_Industrial_EdgeNode]\n        C5 --> C6[IoT_Industrial_EdgeNode]\n        C6 --> C4\n        C4 -->|No more files| C7[IoT_Industrial_MQTT_Broker]\n        C2 -->|No| C8[IoT_Industrial_EdgeNode]\n        C8 --> C9[IoT_Industrial_PLC_Logic]\n        C9 --> C10[IoT_Industrial_PLC_Logic]\n    end\n\n    subgraph calculate_sha256\n        A1[IoT_Industrial_TelemetryStream] --> B1[IoT_Industrial_EdgeNode]\n        B1 --> C1[IoT_Industrial_TelemetryStream]\n        C1 --> D1{IoT_Industrial_EdgeNode}\n        D1 -->|Chunk read| E1[IoT_Industrial_MQTT_Broker]\n        E1 --> D1\n        D1 -->|End of file| F1[IoT_Industrial_MQTT_Broker]\n        F1 --> G1[IoT_Industrial_ActuatorController]\n        G1 --> H1[IoT_Industrial_EdgeNode]\n    end",
+  "content_size": 2043,
+  "collected_at": "2026-02-06T02:02:10.982037",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 18,
+  "repo_forks": 11,
+  "augmentation_domain": "IoT_Industrial",
+  "seed_id": "gh_architecture_01690"
+}

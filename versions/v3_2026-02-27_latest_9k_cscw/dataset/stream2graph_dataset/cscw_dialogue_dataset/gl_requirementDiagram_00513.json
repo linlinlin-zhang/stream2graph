@@ -1,0 +1,572 @@
+{
+  "id": "gl_requirementDiagram_00513",
+  "source": "gitlab",
+  "source_url": "https://github.com/SWM16-SlowStarter/DYNAMI_AI/blob/d280a7687341f609f2e96392d2496102571dd5d9/docs/present/04-database-erd.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "SWM16-SlowStarter/DYNAMI_AI",
+  "diagram_type": "requirementDiagram",
+  "code": "erDiagram\n    %% Foundation Entities\n    ProjectEntity {\n        bigint id PK\n        uuid uuid \"common_key - Spring communication\"\n        string name\n        string domain\n        text context\n        timestamp created_at\n        timestamp updated_at\n    }\n\n    UseCaseEntity {\n        bigint id PK\n        uuid common_key\n        string code UK \"e.g. dashboard_suggestion\"\n        string domain \"dashboard/widget/query/resource/common\"\n        string name\n        text description\n        text example_usage\n        jsonb required_placeholders\n        timestamp created_at\n        timestamp updated_at\n    }\n\n    PromptTemplateEntity {\n        bigint id PK\n        uuid common_key\n        bigint use_case_id FK\n        string version\n        text system_prompt\n        text user_prompt\n        boolean is_default\n        timestamp created_at\n        timestamp updated_at\n    }\n\n    PromptActiveMappingEntity {\n        bigint id PK\n        bigint use_case_id FK\n        bigint prompt_template_id FK\n        timestamp activated_at\n    }\n\n    %% Configuration Entities\n    LLMConfigurationEntity {\n        bigint id PK\n        uuid common_key\n        bigint use_case_id FK \"UNIQUE\"\n        string provider \"openai/anthropic/google\"\n        string model\n        numeric temperature\n        integer max_tokens\n        jsonb additional_config\n        timestamp created_at\n        timestamp updated_at\n    }\n\n    LLMProviderEntity {\n        bigint id PK\n        uuid common_key\n        string name UK\n        text description\n        boolean is_active\n    }\n\n    LLMModelEntity {\n        bigint id PK\n        uuid common_key\n        bigint provider_id FK\n        string name\n        text description\n        boolean is_active\n    }\n\n    GridSettingsEntity {\n        bigint id PK\n        uuid common_key\n        integer horizontal_columns\n        integer horizontal_px\n        integer vertical_columns\n        integer vertical_px\n        timestamp created_at\n        timestamp updated_at\n    }\n\n    %% Resource Entities\n    ResourceEntity {\n        bigint id PK\n        uuid uuid \"common_key\"\n        bigint project_id FK\n        string name\n        string category\n        text detail\n        text context\n        timestamp created_at\n        timestamp updated_at\n    }\n\n    %% Dashboard Entities\n    DashboardEntity {\n        bigint id PK\n        bigint project_id FK\n        uuid common_key\n        string name\n        text context\n        timestamp created_at\n        timestamp updated_at\n        timestamp deleted_at\n    }\n\n    DashboardSuggestionEntity {\n        bigint id PK\n        bigint project_id FK\n        uuid common_key \"suggestion record ID\"\n        uuid session_id \"conversation tracking\"\n        text requirement\n        jsonb dashboard_list\n        text context\n        timestamp created_at\n    }\n\n    %% Widget Entities\n    WidgetCategoryEntity {\n        bigint id PK\n        string code UK\n        string display_name\n    }\n\n    WidgetTypeEntity {\n        bigint id PK\n        string code UK\n        bigint category_id FK\n        boolean has_template\n        boolean is_active\n        integer default_height\n        integer sort_order\n    }\n\n    WidgetEntity {\n        bigint id PK\n        bigint dashboard_id FK\n        bigint project_id FK\n        bigint resource_id FK\n        uuid common_key\n        bigint widget_type_id FK\n        string name\n        text context\n        timestamp created_at\n        timestamp updated_at\n        timestamp deleted_at\n    }\n\n    WidgetSuggestionEntity {\n        bigint id PK\n        uuid common_key UK\n        bigint project_id FK\n        bigint dashboard_id FK\n        uuid session_id\n        bigint widget_type_id FK\n        text requirement\n        text explanation\n        text rendering_plan\n        jsonb actions\n        text context\n    }\n\n    WidgetTemplateEntity {\n        bigint id PK\n        uuid common_key\n        bigint widget_type_id FK\n        string name\n        text source_code\n        text description\n    }\n\n    %% Query Entities\n    QueryHistoryEntity {\n        bigint id PK\n        bigint project_id \"indexed\"\n        bigint resource_id \"indexed\"\n        text requirement\n        text original_query\n        text generated_query\n        text impact\n        timestamp created_at\n    }\n\n    %% Common Domain Entities\n    RequestLogEntity {\n        bigint id PK\n        string request_id\n        text endpoint\n        text method\n        jsonb request_body\n        integer response_status\n        timestamp created_at\n    }\n\n    %% Relationships\n\n    %% Foundation relationships\n    UseCaseEntity ||--o{ PromptTemplateEntity : \"has templates\"\n    UseCaseEntity ||--o{ PromptActiveMappingEntity : \"has mappings\"\n    UseCaseEntity ||--o{ LLMConfigurationEntity : \"has config\"\n    PromptTemplateEntity ||--o{ PromptActiveMappingEntity : \"mapped in\"\n\n    %% LLM Configuration relationships\n    LLMProviderEntity ||--o{ LLMModelEntity : \"provides models\"\n\n    %% Project relationships (CASCADE deletes)\n    ProjectEntity ||--o{ ResourceEntity : \"has resources (CASCADE)\"\n    ProjectEntity ||--o{ DashboardEntity : \"has dashboards (CASCADE)\"\n    ProjectEntity ||--o{ WidgetEntity : \"has widgets (CASCADE)\"\n    ProjectEntity ||--o{ DashboardSuggestionEntity : \"has suggestions (CASCADE)\"\n    ProjectEntity ||--o{ WidgetSuggestionEntity : \"has suggestions (CASCADE)\"\n    ProjectEntity ||--o{ QueryHistoryEntity : \"has query history\"\n\n    %% Dashboard-Widget relationships\n    DashboardEntity ||--o{ WidgetEntity : \"contains widgets (CASCADE)\"\n    DashboardEntity ||--o| WidgetSuggestionEntity : \"suggested for (SET NULL)\"\n\n    %% Widget Type relationships (RESTRICT - prevent orphans)\n    WidgetCategoryEntity ||--o{ WidgetTypeEntity : \"categorizes\"\n    WidgetTypeEntity ||--o{ WidgetEntity : \"defines type (RESTRICT)\"\n    WidgetTypeEntity ||--o{ WidgetSuggestionEntity : \"suggests type\"\n    WidgetTypeEntity ||--o{ WidgetTemplateEntity : \"has templates\"\n\n    %% Resource relationships\n    ResourceEntity ||--o{ WidgetEntity : \"powers widget (SET NULL)\"\n    ResourceEntity ||--o{ QueryHistoryEntity : \"used in queries\"\n",
+  "content_size": 6086,
+  "collected_at": "2026-02-06T14:11:24.385532",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 bigint id PK\n        uuid uuid \"common_key - Spring communication\"\n        string name\n        string domain\n        text context\n        timestamp created_at\n        timestamp updated_at\n     和 bigint id PK\n        uuid common_key\n        string code UK \"e.g. dashboard_suggestion\"\n        string domain \"dashboard/widget/query/resource/common\"\n        string name\n        text description\n        text example_usage\n        jsonb required_placeholders\n        timestamp created_at\n        timestamp updated_at\n     的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'bigint id PK\n        uuid uuid \"common_key - Spring communication\"\n        string name\n        string domain\n        text context\n        timestamp created_at\n        timestamp updated_at\n     和 bigint id PK\n        uuid common_key\n        string code UK \"e.g. dashboard_suggestion\"\n        string domain \"dashboard/widget/query/resource/common\"\n        string name\n        text description\n        text example_usage\n        jsonb required_placeholders\n        timestamp created_at\n        timestamp updated_at\n    '。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ProjectEntity",
+        "UseCaseEntity"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 bigint id PK\n        uuid common_key\n        bigint use_case_id FK\n        string version\n        text system_prompt\n        text user_prompt\n        boolean is_default\n        timestamp created_at\n        timestamp updated_at\n     和 bigint id PK\n        bigint use_case_id FK\n        bigint prompt_template_id FK\n        timestamp activated_at\n     这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'bigint id PK\n        uuid common_key\n        bigint use_case_id FK\n        string version\n        text system_prompt\n        text user_prompt\n        boolean is_default\n        timestamp created_at\n        timestamp updated_at\n     和 bigint id PK\n        bigint use_case_id FK\n        bigint prompt_template_id FK\n        timestamp activated_at\n    '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PromptTemplateEntity",
+        "PromptActiveMappingEntity"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 bigint id PK\n        uuid common_key\n        bigint use_case_id FK \"UNIQUE\"\n        string provider \"openai/anthropic/google\"\n        string model\n        numeric temperature\n        integer max_tokens\n        jsonb additional_config\n        timestamp created_at\n        timestamp updated_at\n     和 bigint id PK\n        uuid common_key\n        string name UK\n        text description\n        boolean is_active\n     的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'bigint id PK\n        uuid common_key\n        bigint use_case_id FK \"UNIQUE\"\n        string provider \"openai/anthropic/google\"\n        string model\n        numeric temperature\n        integer max_tokens\n        jsonb additional_config\n        timestamp created_at\n        timestamp updated_at\n     和 bigint id PK\n        uuid common_key\n        string name UK\n        text description\n        boolean is_active\n    '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "LLMConfigurationEntity",
+        "LLMProviderEntity"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 bigint id PK\n        uuid common_key\n        bigint provider_id FK\n        string name\n        text description\n        boolean is_active\n     和 bigint id PK\n        uuid common_key\n        integer horizontal_columns\n        integer horizontal_px\n        integer vertical_columns\n        integer vertical_px\n        timestamp created_at\n        timestamp updated_at\n     这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'bigint id PK\n        uuid common_key\n        bigint provider_id FK\n        string name\n        text description\n        boolean is_active\n     和 bigint id PK\n        uuid common_key\n        integer horizontal_columns\n        integer horizontal_px\n        integer vertical_columns\n        integer vertical_px\n        timestamp created_at\n        timestamp updated_at\n    '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "LLMModelEntity",
+        "GridSettingsEntity"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 bigint id PK\n        uuid uuid \"common_key\"\n        bigint project_id FK\n        string name\n        string category\n        text detail\n        text context\n        timestamp created_at\n        timestamp updated_at\n     和 bigint id PK\n        bigint project_id FK\n        uuid common_key\n        string name\n        text context\n        timestamp created_at\n        timestamp updated_at\n        timestamp deleted_at\n     的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'bigint id PK\n        uuid uuid \"common_key\"\n        bigint project_id FK\n        string name\n        string category\n        text detail\n        text context\n        timestamp created_at\n        timestamp updated_at\n     和 bigint id PK\n        bigint project_id FK\n        uuid common_key\n        string name\n        text context\n        timestamp created_at\n        timestamp updated_at\n        timestamp deleted_at\n    '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ResourceEntity",
+        "DashboardEntity"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 bigint id PK\n        bigint project_id FK\n        uuid common_key \"suggestion record ID\"\n        uuid session_id \"conversation tracking\"\n        text requirement\n        jsonb dashboard_list\n        text context\n        timestamp created_at\n     和 bigint id PK\n        string code UK\n        string display_name\n     的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'bigint id PK\n        bigint project_id FK\n        uuid common_key \"suggestion record ID\"\n        uuid session_id \"conversation tracking\"\n        text requirement\n        jsonb dashboard_list\n        text context\n        timestamp created_at\n     和 bigint id PK\n        string code UK\n        string display_name\n    '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DashboardSuggestionEntity",
+        "WidgetCategoryEntity"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 bigint id PK\n        string code UK\n        bigint category_id FK\n        boolean has_template\n        boolean is_active\n        integer default_height\n        integer sort_order\n     和 bigint id PK\n        bigint dashboard_id FK\n        bigint project_id FK\n        bigint resource_id FK\n        uuid common_key\n        bigint widget_type_id FK\n        string name\n        text context\n        timestamp created_at\n        timestamp updated_at\n        timestamp deleted_at\n    。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 bigint id PK\n        string code UK\n        bigint category_id FK\n        boolean has_template\n        boolean is_active\n        integer default_height\n        integer sort_order\n    处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'bigint id PK\n        string code UK\n        bigint category_id FK\n        boolean has_template\n        boolean is_active\n        integer default_height\n        integer sort_order\n    处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "WidgetTypeEntity",
+        "WidgetEntity"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 bigint id PK\n        uuid common_key UK\n        bigint project_id FK\n        bigint dashboard_id FK\n        uuid session_id\n        bigint widget_type_id FK\n        text requirement\n        text explanation\n        text rendering_plan\n        jsonb actions\n        text context\n     和 bigint id PK\n        uuid common_key\n        bigint widget_type_id FK\n        string name\n        text source_code\n        text description\n     的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'bigint id PK\n        uuid common_key UK\n        bigint project_id FK\n        bigint dashboard_id FK\n        uuid session_id\n        bigint widget_type_id FK\n        text requirement\n        text explanation\n        text rendering_plan\n        jsonb actions\n        text context\n     和 bigint id PK\n        uuid common_key\n        bigint widget_type_id FK\n        string name\n        text source_code\n        text description\n    '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "WidgetSuggestionEntity",
+        "WidgetTemplateEntity"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 bigint id PK\n        bigint project_id \"indexed\"\n        bigint resource_id \"indexed\"\n        text requirement\n        text original_query\n        text generated_query\n        text impact\n        timestamp created_at\n     和 bigint id PK\n        string request_id\n        text endpoint\n        text method\n        jsonb request_body\n        integer response_status\n        timestamp created_at\n     的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'bigint id PK\n        bigint project_id \"indexed\"\n        bigint resource_id \"indexed\"\n        text requirement\n        text original_query\n        text generated_query\n        text impact\n        timestamp created_at\n     和 bigint id PK\n        string request_id\n        text endpoint\n        text method\n        jsonb request_body\n        integer response_status\n        timestamp created_at\n    '。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "QueryHistoryEntity",
+        "RequestLogEntity"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 PromptTemplateEntity : \"has templates\"\n    UseCaseEntity ||--o{ PromptActiveMappingEntity : \"has mappings\"\n    UseCaseEntity ||--o{ LLMConfigurationEntity : \"has config\"\n    PromptTemplateEntity ||--o{ PromptActiveMappingEntity : \"mapped in\"\n\n    %% LLM Configuration relationships\n    LLMProviderEntity ||--o{ LLMModelEntity : \"provides models\"\n\n    %% Project relationships (CASCADE deletes 和 ResourceEntity : \"has resources (CASCADE 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'PromptTemplateEntity : \"has templates\"\n    UseCaseEntity ||--o{ PromptActiveMappingEntity : \"has mappings\"\n    UseCaseEntity ||--o{ LLMConfigurationEntity : \"has config\"\n    PromptTemplateEntity ||--o{ PromptActiveMappingEntity : \"mapped in\"\n\n    %% LLM Configuration relationships\n    LLMProviderEntity ||--o{ LLMModelEntity : \"provides models\"\n\n    %% Project relationships (CASCADE deletes 和 ResourceEntity : \"has resources (CASCADE'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "o",
+        "o"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 DashboardEntity : \"has dashboards (CASCADE 和 WidgetEntity : \"has widgets (CASCADE 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 DashboardEntity : \"has dashboards (CASCADE处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'DashboardEntity : \"has dashboards (CASCADE处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "o",
+        "o"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 DashboardSuggestionEntity : \"has suggestions (CASCADE 和 WidgetSuggestionEntity : \"has suggestions (CASCADE 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'DashboardSuggestionEntity : \"has suggestions (CASCADE 和 WidgetSuggestionEntity : \"has suggestions (CASCADE'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "o",
+        "o"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 QueryHistoryEntity : \"has query history\"\n\n    %% Dashboard-Widget relationships\n    DashboardEntity ||--o{ WidgetEntity : \"contains widgets (CASCADE 和 SET NULL 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 QueryHistoryEntity : \"has query history\"\n\n    %% Dashboard-Widget relationships\n    DashboardEntity ||--o{ WidgetEntity : \"contains widgets (CASCADE处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 53,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'QueryHistoryEntity : \"has query history\"\n\n    %% Dashboard-Widget relationships\n    DashboardEntity ||--o{ WidgetEntity : \"contains widgets (CASCADE处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "o",
+        "for"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 RESTRICT - prevent orphans 和 WidgetTypeEntity : \"categorizes\"\n    WidgetTypeEntity ||--o{ WidgetEntity : \"defines type (RESTRICT 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'RESTRICT - prevent orphans 和 WidgetTypeEntity : \"categorizes\"\n    WidgetTypeEntity ||--o{ WidgetEntity : \"defines type (RESTRICT'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "relationships",
+        "o"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 WidgetSuggestionEntity : \"suggests type\"\n    WidgetTypeEntity ||--o{ WidgetTemplateEntity : \"has templates\"\n\n    %% Resource relationships\n    ResourceEntity ||--o{ WidgetEntity : \"powers widget (SET NULL 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'WidgetSuggestionEntity : \"suggests type\"\n    WidgetTypeEntity ||--o{ WidgetTemplateEntity : \"has templates\"\n\n    %% Resource relationships\n    ResourceEntity ||--o{ WidgetEntity : \"powers widget (SET NULL'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "o"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 63,
+    "repair_count": 3,
+    "grounding_acts_count": 30,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

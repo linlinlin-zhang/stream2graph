@@ -1,0 +1,162 @@
+{
+  "id": "aug_gh_sequence_00008_Edu_4",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/m9xxx/stepik_parser_test/blob/d536e191f149c760d2c453e9a73a2c2a9293d434/auth_sequence.mmd",
+  "github_repo": "m9xxx/stepik_parser_test",
+  "github_file_path": "auth_sequence.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Frontend\n    participant API as API (Education_GradeSync)\n    participant AC as AuthController\n    participant User as User Model\n    participant DB as Database\n    \n    %% Успешный вход\n    Frontend->>API: POST /api/v1/auth/login\n    Note over Frontend,API: {Education_LMS_Portal}\n    activate API\n    API->>AC: login(Education_LMS_Portal)\n    activate AC\n    \n    %% Валидация входных данных\n    AC->>AC: Validate input\n    \n    alt Missing fields\n        AC-->>API: Error: Не все поля заполнены\n        API-->>Frontend: 400 Bad Request\n    else Has all fields\n        AC->>User: findByUsername(Education_StudentDB)\n        activate User\n        User->>DB: SELECT query\n        activate DB\n        Note over DB: SELECT * FROM users WHERE username = email\n        DB-->>User: user data (Education_ContentCDN)\n        deactivate DB\n        Note over User: Create User object with DB data\n        User-->>AC: User object\n        deactivate User\n        \n        alt User not found\n            AC-->>API: Error: Пользователь не найден\n            API-->>Frontend: 400 Bad Request\n        else User exists\n            AC->>User: authenticate(Education_ContentCDN)\n            activate User\n            Note over User: Compare password hash\\nwith stored hash\\n(Education_ClassroomService)\n            \n            alt Invalid password\n                User-->>AC: false\n                AC-->>API: Error: Неверный пароль\n                API-->>Frontend: 400 Bad Request\n            else Valid password\n                User-->>AC: true\n                AC->>User: toArray(Education_LMS_Portal)\n                Note over User: Convert object data to array\\n(Education_LMS_Portal)\n                User-->>AC: user data\n                AC-->>API: Success + user data\n                API-->>Frontend: 200 OK + user data\n            end\n            deactivate User\n        end\n    end\n    \n    deactivate AC\n    deactivate API ",
+  "content_size": 1863,
+  "collected_at": "2026-02-06T01:24:02.844657",
+  "compilation_status": "success",
+  "augmentation_domain": "Education",
+  "seed_id": "gh_sequence_00008",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Education_GradeSync 和 Education_LMS_Portal 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Education_GradeSync 和 Education_LMS_Portal'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "API",
+        "login"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Education_StudentDB 和 Education_ContentCDN 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Education_StudentDB 和 Education_ContentCDN'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "findByUsername",
+        "data"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Education_ContentCDN 和 Education_ClassroomService 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Education_ContentCDN 和 Education_ClassroomService'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "authenticate",
+        "n"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Education_LMS_Portal 和 Education_LMS_Portal 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Education_LMS_Portal 和 Education_LMS_Portal'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "toArray",
+        "n"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 16,
+    "repair_count": 0,
+    "grounding_acts_count": 8,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

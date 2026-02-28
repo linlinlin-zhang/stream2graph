@@ -1,0 +1,279 @@
+{
+  "id": "gh_architecture_01647",
+  "source": "github",
+  "source_url": "https://github.com/NigudhaLoka/documentation/blob/cdb026ece6997b2017184daefa7d05094c551a7f/Design.mmd",
+  "github_repo": "NigudhaLoka/documentation",
+  "github_file_path": "Design.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TD\n    subgraph \"User Layer\"\n        User([\"<br><b>User</b><br>Interacts with<br>Web/Mobile App\"])\n    end\n\n    subgraph \"Client Applications\"\n        direction LR\n        WebApp[\"<br><b>frontend-web</b><br>Next.js & Tailwind\"]\n        MobileApp[\"<br><b>frontend-mobile</b><br>React Native / Flutter\"]\n    end\n\n    subgraph \"Gateway & Security\"\n        direction TB\n        Cloudflare[\"<br><b>Cloudflare</b><br>DDoS, WAF\"]\n        Gateway[\"<br><b>gateway-php</b><br>PHP Intermediary<br>Captcha Validation\"]\n    end\n\n    subgraph \"Core Backend Services\"\n        direction TB\n        BackendAPI[\"<br><b>backend-api</b><br>Python (FastAPI)<br>Core Business Logic\"]\n    end\n\n    subgraph \"Data & Storage Platform (Firebase & MySQL)\"\n        direction LR\n        FirebasePlatform[(\"<b>Firebase Platform</b>\")]\n        MySQLDB[\"<br><b>MySQL Database</b><br>Snapshot Queue<br>Gateway-specific tasks\"]\n    end\n    \n    subgraph FirebasePlatform\n        direction TB\n        FirebaseAuth[\"<br><b>Firebase Authentication</b><br>User Identity\"]\n        Firestore[\"<br><b>Firestore</b><br>Profiles, Metadata, Threads\"]\n        CloudStorage[\"<br><b>Cloud Storage</b><br>Media & Snapshots\"]\n        CloudFunctions[\"<br><b>Cloud Functions</b><br>Async Tasks<br>(e.g., Snapshot Generation)\"]\n    end\n\n    %% Defining Connections\n    User --> WebApp\n    User --> MobileApp\n    \n    WebApp -- \"HTTP/S Requests\" --> Cloudflare\n    MobileApp -- \"HTTP/S Requests\" --> Cloudflare\n    \n    Cloudflare --> Gateway\n    Gateway -- \"Forwards Validated Requests (w/ JWT)\" --> BackendAPI\n    Gateway -- \"Manages Snapshot Queue\" --> MySQLDB\n\n    BackendAPI -- \"Handles Logic & Data Operations\" --> FirebasePlatform\n    \n    subgraph \"Backend to Firebase Interactions\"\n        direction TB\n        BackendAPI -- \"Uses\" --> FirebaseAuth\n        BackendAPI -- \"Uses\" --> Firestore\n        BackendAPI -- \"Reads/Writes to\" --> CloudStorage\n        BackendAPI -- \"Triggers / Is deployed as\" --> CloudFunctions\n    end\n",
+  "content_size": 1988,
+  "collected_at": "2026-02-06T02:01:39.971496",
+  "license": "cc0-1.0",
+  "license_name": "Creative Commons Zero v1.0 Universal",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "https://api.github.com/licenses/cc0-1.0",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 [\"<br><b>User</b><br>Interacts with<br>Web/Mobile App\" 和 \"<br><b>frontend-web</b><br>Next.js & Tailwind\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '[\"<br><b>User</b><br>Interacts with<br>Web/Mobile App\" 和 \"<br><b>frontend-web</b><br>Next.js & Tailwind\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "User",
+        "WebApp"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"<br><b>frontend-mobile</b><br>React Native / Flutter\" 和 \"<br><b>Cloudflare</b><br>DDoS, WAF\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"<br><b>frontend-mobile</b><br>React Native / Flutter\" 和 \"<br><b>Cloudflare</b><br>DDoS, WAF\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MobileApp",
+        "Cloudflare"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"<br><b>gateway-php</b><br>PHP Intermediary<br>Captcha Validation\" 和 \"<br><b>backend-api</b><br>Python (FastAPI 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"<br><b>gateway-php</b><br>PHP Intermediary<br>Captcha Validation\" 和 \"<br><b>backend-api</b><br>Python (FastAPI'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Gateway",
+        "BackendAPI"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Firebase & MySQL 和 (\"<b>Firebase Platform</b>\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 Firebase & MySQL处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Firebase & MySQL处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Platform",
+        "FirebasePlatform"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"<br><b>MySQL Database</b><br>Snapshot Queue<br>Gateway-specific tasks\" 和 \"<br><b>Firebase Authentication</b><br>User Identity\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"<br><b>MySQL Database</b><br>Snapshot Queue<br>Gateway-specific tasks\" 和 \"<br><b>Firebase Authentication</b><br>User Identity\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MySQLDB",
+        "FirebaseAuth"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"<br><b>Firestore</b><br>Profiles, Metadata, Threads\" 和 \"<br><b>Cloud Storage</b><br>Media & Snapshots\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"<br><b>Firestore</b><br>Profiles, Metadata, Threads\" 和 \"<br><b>Cloud Storage</b><br>Media & Snapshots\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Firestore",
+        "CloudStorage"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"<br><b>Cloud Functions</b><br>Async Tasks<br>(e.g., Snapshot Generation 和 w/ JWT 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"<br><b>Cloud Functions</b><br>Async Tasks<br>(e.g., Snapshot Generation 和 w/ JWT'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CloudFunctions",
+        "Requests"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 29,
+    "repair_count": 1,
+    "grounding_acts_count": 14,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

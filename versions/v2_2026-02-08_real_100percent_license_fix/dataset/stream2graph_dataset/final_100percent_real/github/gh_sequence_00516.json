@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00516",
+  "source": "github",
+  "source_url": "https://github.com/grzlz/icarus/blob/96f66d958c1307ce601b7fe4f625b378d1677cd4/static/ariadna/docs/sequence-diagram.mmd",
+  "github_repo": "grzlz/icarus",
+  "github_file_path": "static/ariadna/docs/sequence-diagram.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    actor Usuario\n    participant Terminal\n    participant Neovim\n    participant InitLua as init.lua\n    participant LazyConfig as config/lazy.lua\n    participant LazyNvim as Lazy.nvim\n    participant Plugins\n    participant Mason\n    participant LSP as LSP Servers\n    participant Dashboard\n\n    Usuario->>Terminal: nvim\n    Terminal->>Neovim: Iniciar Neovim\n\n    Note over Neovim: Primera vez: Bootstrap Lazy.nvim\n    Neovim->>InitLua: Ejecutar punto de entrada\n    InitLua->>LazyConfig: require(\"config.lazy\")\n\n    alt Primera instalación\n        LazyConfig->>LazyConfig: Verificar lazy.nvim\n        LazyConfig->>Terminal: git clone lazy.nvim\n        Note over LazyConfig: Instalar gestor de plugins\n    end\n\n    LazyConfig->>LazyNvim: setup({ spec = ... })\n    LazyNvim->>LazyNvim: Cargar configuración LazyVim\n    LazyNvim->>Plugins: Importar plugins personalizados\n\n    par Carga paralela de plugins\n        Plugins->>Plugins: colorscheme.lua (Kanagawa)\n        Plugins->>Plugins: ariadna.lua (Dashboard + Mason)\n        Plugins->>Plugins: svelte.lua (Treesitter + LSP)\n        Plugins->>Plugins: tailwind.lua (LSP config)\n        Plugins->>Plugins: markdown.lua (Preview)\n    end\n\n    Note over Plugins: Primera vez: Sincronizar plugins\n\n    alt Primera instalación\n        LazyNvim->>LazyNvim: Descargar plugins (~2 min)\n        Note over LazyNvim: Instalar Telescope, Neo-tree,<br/>Treesitter, Mason, etc.\n    end\n\n    Plugins->>Mason: Configurar LSP servers\n    Mason->>Mason: ensure_installed = { vtsls, svelte-ls, ... }\n\n    alt Primera instalación\n        Mason->>LSP: Instalar vtsls\n        Mason->>LSP: Instalar svelte-language-server\n        Mason->>LSP: Instalar tailwindcss-language-server\n        Mason->>LSP: Instalar prettier, eslint, stylua\n        Note over Mason,LSP: Instalación automática (~1 min)\n    end\n\n    LazyNvim->>Dashboard: Mostrar pantalla de bienvenida\n    Dashboard->>Dashboard: Renderizar logo Ariadna\n    Dashboard->>Dashboard: Calcular tiempo de carga\n    Dashboard->>Terminal: Mostrar dashboard\n\n    Note over Terminal: ⚡ Ariadna cargado en ~XXms<br/>📦 XX/XX plugins<br/>🏛️ icarus.mx\n\n    Usuario->>Terminal: Space Space (buscar archivo)\n    Terminal->>Neovim: Activar keybinding\n    Neovim->>Plugins: Ejecutar Telescope\n    Plugins->>Terminal: Mostrar fuzzy finder\n\n    Usuario->>Terminal: Abrir archivo .svelte\n    Terminal->>Neovim: Abrir buffer\n    Neovim->>LSP: Activar svelte-language-server\n    LSP->>Neovim: Proveer autocompletado, diagnósticos\n\n    Note over Usuario,LSP: Usuario programa en SvelteKit<br/>con soporte completo de LSP\n\n    Usuario->>Terminal: :w (guardar)\n    Neovim->>LSP: Ejecutar Prettier\n    LSP->>Neovim: Formatear código\n    Neovim->>Terminal: Archivo guardado\n\n    Usuario->>Terminal: :q (salir)\n    Terminal->>Neovim: Cerrar\n    Neovim->>Usuario: Sesión finalizada\n",
+  "content_size": 2857,
+  "collected_at": "2026-02-06T01:33:21.574528",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

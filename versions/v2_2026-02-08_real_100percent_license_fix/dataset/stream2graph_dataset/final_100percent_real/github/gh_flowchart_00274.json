@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00274",
+  "source": "github",
+  "source_url": "https://github.com/ShieldedLabs/crosslink_monolith/blob/c08bc610d5857bb628cce35aa455d6bae69ba8b4/zingo-lib/pepper-sync/diagrams/sync.mmd",
+  "github_repo": "ShieldedLabs/crosslink_monolith",
+  "github_file_path": "zingo-lib/pepper-sync/diagrams/sync.mmd",
+  "diagram_type": "flowchart",
+  "code": "\nflowchart LR\n  %% SYNC\n  START([Start sync]) --> INIT[\"Initialization\"]\n  INIT --> S0\n  S0{Batcher idle?}\n  S0 -- No --> S6\n  S0 -- Yes --> S1{All ranges in wallet state are 'scanned'?}\n  S1 -- Yes --> SHUTDOWN([Shutdown sync])\n  S1 -- No --> S2[\"Pick highest-priority scan range\"]\n  S2 --> S3{Priority is 'historic'?}\n  S3 -- Yes --> S4[\"Split orchard shard range off lower end\"] --> S5[\"Set range to 'scanning' and send to batcher\"]\n  S3 -- No --> S5\n  S5 --> S6\n  S6[\"Batcher: stream compact blocks until fixed output threshold; store batch; when entire scan range batched, set batcher idle\"]\n  subgraph WORKERS[Scan workers]\n    direction LR\n    W1[\"Scan Worker 1\"]\n    W2[\"Scan Worker 2\"]\n    Wn[\"Scan Worker N\"]\n  end\n  S6 --> W1\n  S6 --> W2\n  S6 --> Wn\n  W1 --> PROC_RES[\"Process scan results\"]\n  W2 --> PROC_RES\n  Wn --> PROC_RES\n\n  PROC_RES --> S7[\"Scan mempool transactions\"]\n  S7 --> S0\n",
+  "content_size": 899,
+  "collected_at": "2026-02-06T01:43:05.670834",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 1,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

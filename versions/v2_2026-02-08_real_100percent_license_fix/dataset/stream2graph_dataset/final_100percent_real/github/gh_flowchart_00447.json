@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00447",
+  "source": "github",
+  "source_url": "https://github.com/quantumlife-canon/core/blob/9a5b6a7619a53892e8dc9b12119a2179db7faf80/docs/diagrams/11_data_stores_and_ownership.mmd",
+  "github_repo": "quantumlife-canon/core",
+  "github_file_path": "docs/diagrams/11_data_stores_and_ownership.mmd",
+  "diagram_type": "flowchart",
+  "code": "%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#E8F5E9', 'primaryBorderColor': '#2E7D32', 'secondaryColor': '#FFF3E0', 'secondaryBorderColor': '#E65100', 'lineColor': '#424242'}}}%%\nflowchart TB\n    subgraph PRIMITIVES[\"CANON PRIMITIVES\"]\n        direction TB\n        CIRCLE((Circle))\n        INTERSECTION((Intersection))\n        AUTH_GRANT[\"Authority Grant\"]\n        PROPOSAL[\"Proposal\"]\n        COMMITMENT[\"Commitment\"]\n        ACTION[\"Action\"]\n        SETTLEMENT[\"Settlement\"]\n        MEMORY[\"Memory\"]\n    end\n\n    subgraph POSTGRES[\"POSTGRESQL (Authoritative)\"]\n        direction TB\n\n        subgraph CIRCLE_OWNED[\"Circle-Owned Schema\"]\n            PG_IDENTITY[\"circles.identity\"]\n            PG_POLICY[\"circles.policy\"]\n            PG_MEMORY[\"circles.memory\"]\n            PG_KEYS[\"circles.keys (encrypted)\"]\n        end\n\n        subgraph INTERSECTION_OWNED[\"Intersection-Owned Schema\"]\n            PG_CONTRACTS[\"intersections.contracts\"]\n            PG_VERSIONS[\"intersections.versions\"]\n            PG_GRANTS[\"intersections.authority_grants\"]\n            PG_PROPOSALS[\"intersections.proposals\"]\n            PG_COMMITMENTS[\"intersections.commitments\"]\n            PG_ACTIONS[\"intersections.actions\"]\n            PG_SETTLEMENTS[\"intersections.settlements\"]\n        end\n\n        subgraph AUDIT_SCHEMA[\"Audit Schema (Append-Only)\"]\n            PG_AUDIT[\"audit.log\"]\n            PG_HASH[\"audit.hash_chain\"]\n            PG_EXPLAIN[\"audit.explanations\"]\n        end\n    end\n\n    subgraph QDRANT[\"QDRANT (Assistive Only)\"]\n        direction TB\n        QD_SEMANTIC[\"Semantic Memory Index\"]\n        QD_EMBED[\"Embeddings\"]\n        QD_NOTE[\"NOT authoritative<br/>Regenerable from Postgres\"]\n    end\n\n    subgraph REDIS[\"REDIS (Ephemeral)\"]\n        direction TB\n        RD_CACHE[\"Query Cache\"]\n        RD_SESSION[\"Session State\"]\n        RD_NOTE[\"Non-authoritative<br/>Evictable\"]\n    end\n\n    CIRCLE --> CIRCLE_OWNED\n    INTERSECTION --> INTERSECTION_OWNED\n    AUTH_GRANT --> PG_GRANTS\n    PROPOSAL --> PG_PROPOSALS\n    COMMITMENT --> PG_COMMITMENTS\n    ACTION --> PG_ACTIONS\n    SETTLEMENT --> PG_SETTLEMENTS\n    MEMORY --> PG_MEMORY\n    MEMORY -.->|\"Semantic index\"| QDRANT\n\n    subgraph ENCRYPTION[\"ENCRYPTION MODEL\"]\n        direction LR\n        KMS[\"Azure Key Vault<br/>(KEK per tenant)\"]\n        DEK[\"Data Encryption Keys<br/>(per circle)\"]\n        ENV[\"Envelope Encryption\"]\n        KMS --> DEK --> ENV\n    end\n\n    subgraph OWNERSHIP_RULES[\"OWNERSHIP INVARIANTS\"]\n        direction TB\n        OWN1[\"Circle data: circle-owned only\"]\n        OWN2[\"Intersection data: intersection-scoped\"]\n        OWN3[\"Audit: immutable, append-only\"]\n        OWN4[\"Qdrant: assistive, not source of truth\"]\n        OWN5[\"Redis: ephemeral, no authoritative state\"]\n    end\n",
+  "content_size": 2772,
+  "collected_at": "2026-02-06T01:44:08.045844",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

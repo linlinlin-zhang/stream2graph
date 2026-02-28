@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01601",
+  "source": "github",
+  "source_url": "https://github.com/lumide/devsecops-assessment/blob/121089554cf3c17dd293921c837cf2f0a97567ab/docs/architecture-diagrams/monitoring-architecture.mmd",
+  "github_repo": "lumide/devsecops-assessment",
+  "github_file_path": "docs/architecture-diagrams/monitoring-architecture.mmd",
+  "diagram_type": "architecture",
+  "code": "---\nconfig:\n  theme: base\n  look: classic\n---\nflowchart LR\n    subgraph Applications[Kubernetes Applications]\n        Apps_Dev[Dev Environment Apps]\n        Apps_UAT[UAT Environment Apps]\n        Apps_Prod[Production Environment Apps]\n    end\n\n    subgraph Data_Collection[Observability Data Collection]\n        %% Metrics Flow\n        Apps_Dev -->|metrics| Prometheus_Dev\n        Apps_UAT -->|metrics| Prometheus_UAT\n        Apps_Prod -->|metrics| Prometheus_Prod\n        \n        %% Logs Flow\n        Apps_Dev -->|logs| FluentBit_Dev\n        Apps_UAT -->|logs| FluentBit_UAT\n        Apps_Prod -->|logs| FluentBit_Prod\n        \n        %% Traces Flow\n        Apps_Dev -->|traces| OTEL_Dev[OTEL Collector]\n        Apps_UAT -->|traces| OTEL_UAT[OTEL Collector]\n        Apps_Prod -->|traces| OTEL_Prod[OTEL Collector]\n    end\n\n    subgraph Central_Platform[Central Observability Platform]\n        Prometheus_Central[Prometheus - Central]\n        Thanos[Thanos Query]\n        Alertmanager[Alertmanager]\n        \n        OpenSearch[OpenSearch Cluster]\n        Kibana[Kibana]\n        \n        Jaeger[Jaeger]\n        Grafana[Grafana - Unified Dashboards]\n    end\n\n    subgraph Alerting_Destinations[Alert Destinations]\n        Slack_Dev[Slack - Dev Alerts]\n        Slack_Prod[Slack - Prod Alerts]\n        PagerDuty[PagerDuty - Critical]\n    end\n\n    %% Data Aggregation to Central Platform\n    Prometheus_Dev --> Thanos\n    Prometheus_UAT --> Thanos\n    Prometheus_Prod --> Thanos\n    \n    FluentBit_Dev --> OpenSearch\n    FluentBit_UAT --> OpenSearch\n    FluentBit_Prod --> OpenSearch\n    \n    OTEL_Dev --> Jaeger\n    OTEL_UAT --> Jaeger\n    OTEL_Prod --> Jaeger\n\n    %% Dashboard & Alerting Flow\n    Thanos --> Grafana\n    OpenSearch --> Grafana\n    OpenSearch --> Kibana\n    \n    Prometheus_Central --> Alertmanager\n    Alertmanager --> Slack_Dev\n    Alertmanager --> Slack_Prod\n    Alertmanager --> PagerDuty\n\n    %% Deployment Health Monitoring\n    ArgoCD[ArgoCD] -->|sync status| Prometheus_Central\n    Grafana --> Deployment_Dash[Deployment Health Dashboard]\n    Grafana --> Compliance_Dash[Compliance Dashboard]\n    \n    classDef dev fill:#e3f2fd\n    classDef uat fill:#f3e5f5\n    classDef prod fill:#ffebee\n    classDef platform fill:#e8f5e8\n    \n    class Apps_Dev,Prometheus_Dev,FluentBit_Dev,OTEL_Dev dev\n    class Apps_UAT,Prometheus_UAT,FluentBit_UAT,OTEL_UAT uat\n    class Apps_Prod,Prometheus_Prod,FluentBit_Prod,OTEL_Prod prod\n    class Central_Platform,Alerting_Destinations platform",
+  "content_size": 2495,
+  "collected_at": "2026-02-06T01:48:25.628084",
+  "license": "none",
+  "license_name": "No License",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00282",
+  "source": "github",
+  "source_url": "https://github.com/danao0623/-Graduation-AI-Project/blob/318a0120760c3804ccbb71fdaf2cbfd44b4ffc32/.home/3/%E5%A4%A7%E5%AD%B8%E9%81%B8%E8%AA%B2%E7%B3%BB%E7%B5%B1/MMD/%E9%80%80%E8%AA%B2_sequence.mmd",
+  "github_repo": "danao0623/-Graduation-AI-Project",
+  "github_file_path": ".home/3/大學選課系統/MMD/退課_sequence.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    actor User\n    participant LoginUI\n    participant AuthenticationController\n    participant Student\n    participant CourseSelectionUI\n    participant DropCourseController\n    participant DropCourseConfirmationUI\n    participant SystemLog\n    participant Course\n\n    User->>LoginUI: username, password\n    LoginUI->>AuthenticationController: getUsername(), getPassword()\n    AuthenticationController->>Student: authenticate(username, password)\n    alt Authentication successful\n        Student-->>AuthenticationController: Student object\n        AuthenticationController-->>LoginUI: displayLoginSuccess()\n        LoginUI->>CourseSelectionUI: displayCourseList(Student.getEnrolledCourses())\n    else Authentication failed\n        AuthenticationController-->>LoginUI: displayLoginError()\n    end\n\n    alt Student has enrolled courses\n        CourseSelectionUI->>User: displayCourseList\n        User->>CourseSelectionUI: getSelectedCourse()\n        CourseSelectionUI->>DropCourseController: selectedCourse\n        DropCourseController->>Course: getCourseName(), getCredits()\n        Course-->>DropCourseController: courseName, credits\n        DropCourseController->>DropCourseConfirmationUI: displayConfirmationWindow(courseName, credits)\n        DropCourseConfirmationUI->>User: getConfirmation()\n        alt User confirms\n            User->>DropCourseController: Confirmation\n            DropCourseController->>AuthenticationController: checkDropDeadline(selectedCourse.courseID)\n            alt Drop deadline not passed\n                AuthenticationController-->>DropCourseController: true\n                DropCourseController->>Student: updateEnrolledCourses(remove selectedCourse)\n                Student-->>DropCourseController: updated enrolledCourses\n                DropCourseController->>SystemLog: logDropCourse(studentID, courseID)\n                DropCourseController->>CourseSelectionUI: displaySuccessMessage()\n            else Drop deadline passed\n                AuthenticationController-->>DropCourseController: false\n                DropCourseController->>DropCourseConfirmationUI: displayErrorMessage(\"Drop deadline passed\")\n            end\n        else User cancels\n            DropCourseController->>CourseSelectionUI: displayCourseList(Student.getEnrolledCourses())\n        end\n    else Student has no enrolled courses\n        CourseSelectionUI->>User: displayErrorMessage(\"No courses enrolled\")\n    end\n",
+  "content_size": 2444,
+  "collected_at": "2026-02-06T01:30:11.110751",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

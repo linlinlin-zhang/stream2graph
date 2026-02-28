@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00806",
+  "source": "github",
+  "source_url": "https://github.com/ayushdh96/Food-Delivery-App-on-Mern-Stack/blob/6d7a600823542ebb67b2da5b1df492e521555393/diagrams/sequence-3-orders-stripe.mmd",
+  "github_repo": "ayushdh96/Food-Delivery-App-on-Mern-Stack",
+  "github_file_path": "diagrams/sequence-3-orders-stripe.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant User\n    participant Frontend\n    participant Backend\n    participant Database\n    participant Stripe\n\n    %% Place Order with Stripe\n    Note over User,Stripe: Place Order - Stripe Payment Flow\n    User->>Frontend: Navigate to checkout\n    Frontend->>Frontend: Check if authenticated\n    User->>Frontend: Fill delivery information\n    User->>Frontend: Select Stripe payment\n    User->>Frontend: Submit order\n    Frontend->>Backend: POST /api/order/place (with token & order data)\n    Backend->>Backend: Verify JWT token\n    Backend->>Database: Create new order\n    Database-->>Backend: Order created\n    Backend->>Database: Clear user cart\n    Backend->>Stripe: Create checkout session\n    Stripe-->>Backend: Session URL\n    Backend-->>Frontend: Return session URL\n    Frontend->>Stripe: Redirect to payment page\n    User->>Stripe: Enter payment details\n    Stripe-->>Frontend: Redirect to success/cancel URL\n    Frontend->>Backend: POST /api/order/verify\n    Backend->>Database: Update payment status\n    Database-->>Backend: Order updated\n    Backend-->>Frontend: Verification response\n    Frontend-->>User: Order confirmation\n\n    %% Place Order with COD\n    Note over User,Database: Place Order - Cash on Delivery Flow\n    User->>Frontend: Select COD payment\n    User->>Frontend: Submit order\n    Frontend->>Backend: POST /api/order/placecod (with token)\n    Backend->>Backend: Verify JWT token\n    Backend->>Database: Create order (payment: true)\n    Database-->>Backend: Order created\n    Backend->>Database: Clear user cart\n    Database-->>Backend: Cart cleared\n    Backend-->>Frontend: Success response\n    Frontend->>Frontend: Navigate to My Orders\n    Frontend-->>User: Order placed successfully\n\n    %% View My Orders\n    Note over User,Database: View Order History Flow\n    User->>Frontend: Navigate to My Orders\n    Frontend->>Backend: POST /api/order/userorders (with token)\n    Backend->>Backend: Verify JWT token\n    Backend->>Database: Find orders by userId\n    Database-->>Backend: User orders\n    Backend-->>Frontend: Return orders\n    Frontend-->>User: Display order history with status\n",
+  "content_size": 2140,
+  "collected_at": "2026-02-06T01:37:19.927573",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

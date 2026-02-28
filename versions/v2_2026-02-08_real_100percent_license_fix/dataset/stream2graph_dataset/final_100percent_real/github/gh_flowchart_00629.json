@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00629",
+  "source": "github",
+  "source_url": "https://github.com/Kizunad/Guzhenren-ext/blob/948f793b12bf77342385ba3c6a455d5c7bb37ccd/docs/customNPCs/graphs/sensor_to_action.mmd",
+  "github_repo": "Kizunad/Guzhenren-ext",
+  "github_file_path": "docs/customNPCs/graphs/sensor_to_action.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart LR\n      subgraph Sensors[传感器层]\n          VISION[VisionSensor<br/>可见/距离/阵营分类<br/>InterruptThrottle 去重]\n          DAMAGE[DamageSensor<br/>受击/攻击者 UUID<br/>重要/关键中断]\n          SAFETY[SafetySensor<br/>危险方块/IN_DANGER<br/>去重节流]\n      end\n\n      subgraph Mind[NpcMind]\n          MEM[MemoryModule<br/>短期威胁/距离桶/可见状态]\n          STATUS[NpcStatus/Personality<br/>状态衰减]\n          TRIGGER[triggerInterrupt(eventType)<br/>10t 冷却，记录最后类型]\n          STATE[getCurrentWorldState<br/>has_threat/in_danger/has_ranged_weapon...]\n      end\n\n      subgraph Selector[UtilityGoalSelector]\n          REEVAL[forceReevaluate<br/>CRITICAL 0 阈值抢占<br/>IMPORTANT 滞后保护]\n          GOALS[注册目标: Defend/Flee/...<br/>按优先级选择并激活]\n      end\n\n      subgraph Execution[ActionExecutor/Actions]\n          DEFEND[DefendGoal<br/>距离分支: 远程/格挡/近战]\n          FLEE[FleeGoal<br/>反向安全点/冷却]\n          BLOCK[BlockWithShieldAction<br/>举盾保持到时限]\n          RANGED[RangedAttackItemAction<br/>拉弓/弩，弹药检查，距离窗]\n          MELEE[AttackAction 近战]\n      end\n\n      VISION -->|写入威胁记忆/距离桶| MEM\n      DAMAGE -->|写入 current_threat_id/IN_DANGER| MEM\n      SAFETY -->|写入 hazard_detected/IN_DANGER| MEM\n\n      VISION -.节流OK触发.-> TRIGGER\n      DAMAGE -.节流OK触发.-> TRIGGER\n      SAFETY -.节流OK触发.-> TRIGGER\n\n      MEM --> STATE\n      STATUS --> STATE\n\n      TRIGGER --> REEVAL\n      STATE --> REEVAL\n      REEVAL --> GOALS\n\n      GOALS -->|激活| DEFEND\n      GOALS -->|激活| FLEE\n\n      DEFEND -->|选择模式| BLOCK\n      DEFEND -->|选择模式| RANGED\n      DEFEND -->|选择模式| MELEE\n\n      BLOCK -->|tick/stop| ActionExecutor\n      RANGED -->|tick/stop| ActionExecutor\n      MELEE -->|tick/stop| ActionExecutor\n      FLEE -->|tick/stop| ActionExecutor\n",
+  "content_size": 1661,
+  "collected_at": "2026-02-06T01:46:06.256680",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

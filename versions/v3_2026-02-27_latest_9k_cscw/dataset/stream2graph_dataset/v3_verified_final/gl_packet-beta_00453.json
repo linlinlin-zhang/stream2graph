@@ -1,0 +1,16 @@
+{
+  "id": "gl_packet-beta_00453",
+  "source": "gitlab",
+  "source_url": "https://github.com/asmund20/in4230-mip/blob/791c34e926d22caef6c6cf7103c7265f86db82cc/design/tp.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "asmund20/in4230-mip",
+  "diagram_type": "packet-beta",
+  "code": "---\ntitle: MIP TP daemon\n---\nflowchart TB\n    Start((Start))\n    Init[Setup sockets, structures and accept connections]\n    Timeouts[Check timeouts and disconnects]\n    ReadyFd{Which fd?}\n    RecvLower{Ack?}\n    ReceiveData{Expected?}\n    RecvUpper{Is in-flight full \\nor first packet\\n not yet acked?}\n    ReceiveAck{NACK?}\n    HandleNack{In-flight?}\n    HandleAck{In-flight?}\n    Retransmit1[Retransmit non-acked in-flight packets\\n if holddown timer is expired]\n    Retransmit2[Retransmit non-acked in-flight packets\\n if holddown timer is expired]\n    SendPacket[Send packet and send\\n ready to upper]\n    Enque[Add packet to queue]\n    SendQueue1[Send packets from queue until in-flight is\\n full, sending request for each send]\n    SendQueue2[Send packets from queue until in-flight is\\n full, sending request for each send]\n    CummulativeAck[Remove all packets with seqno before\\nNACK-no from in-flight]\n    RemoveFirst[Remove first packet from in-flight]\n    CorrectData[Send up, ACK]\n    Store[Store in buffer, send ACK and NACK]\n    SendAck[Send ack, ignore content]\n    MarkAcked[Mark in-flight packet as acked]\n\n    Start --> Init --> Poll --> Timeouts --> ReadyFd\n    ReadyFd-- Mip daemon -->RecvLower\n        RecvLower-- Yes --> ReceiveAck\n            ReceiveAck-- Yes -->HandleNack\n                HandleNack-- First in-flight --> Retransmit1 --> Poll\n                HandleNack-- Other in-flight --> CummulativeAck --> Retransmit2 --> SendQueue1 --> Poll\n                HandleNack-- Not in-flight --> Poll\n            ReceiveAck-- No -->HandleAck\n                HandleAck-- First --> RemoveFirst --> SendQueue2 --> Poll\n                HandleAck-- In-flight --> MarkAcked --> Poll\n                HandleAck-- Not in-flight --> Poll\n        RecvLower-- No --> ReceiveData\n            ReceiveData-- Yes -->CorrectData -->Poll\n            ReceiveData-- In-window --> Store -->Poll\n            ReceiveData-- Recent seqno -->SendAck -->Poll\n    ReadyFd-- Upper -->RecvUpper\n        RecvUpper-- Yes -->Enque --> Poll\n        RecvUpper-- NO -->SendPacket --> Poll\n\n",
+  "content_size": 2077,
+  "collected_at": "2026-02-06T14:10:01.974436",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

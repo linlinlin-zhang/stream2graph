@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00480",
+  "source": "github",
+  "source_url": "https://github.com/khai2k/99tech-code-challenge-backend/blob/fb7baa15c476005b07bf88b00dc3799a542f8910/src/problem6/end-to-end.mmd",
+  "github_repo": "khai2k/99tech-code-challenge-backend",
+  "github_file_path": "src/problem6/end-to-end.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n  autonumber\n  participant U as User Browser/App\n  participant API as API Service\n  participant R as Redis (ZSET + Pub/Sub)\n  participant W as Worker (Persist)\n  participant DB as PostgreSQL\n\n  U->>API: POST /v1/scores/award {action_type, action_id, idempotency_key}\n  API->>API: Validate JWT, schema, rate limit\n  API->>API: Check idempotency & action replay\n  API->>API: points = rules[action_type]\n  API->>R: ZINCRBY leaderboard:global (user, +points)\n  API->>R: PUBLISH stream:leaderboard {user_id, delta, new_total}\n  API->>W: Enqueue persist({award_id, user_id, points, ...})\n  API-->>U: 200 {total, rank, leaderboard_top}\n  W->>DB: INSERT score_awards, UPSERT user_scores\n  Note over R,U: Other clients receive live `leaderboard.update` via SSE/WebSocket",
+  "content_size": 777,
+  "collected_at": "2026-02-06T01:32:53.548132",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

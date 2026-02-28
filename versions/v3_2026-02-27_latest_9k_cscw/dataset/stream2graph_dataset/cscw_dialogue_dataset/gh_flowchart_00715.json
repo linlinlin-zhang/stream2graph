@@ -1,0 +1,488 @@
+{
+  "id": "gh_flowchart_00715",
+  "source": "github",
+  "source_url": "https://github.com/pawafulu7/techtrend/blob/12fca8f1e5d47a4c38328a261acca80ee3021dec/docs/presentations/assets/techtrend-architecture.mmd",
+  "github_repo": "pawafulu7/techtrend",
+  "github_file_path": "docs/presentations/assets/techtrend-architecture.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart LR\n    subgraph Sources[\"情報ソース\"]\n        RSS[\"RSSフィード<br/>（AI/LLM・企業ブログ・技術メディア）\"]\n        Scrape[\"スクレイピング対象<br/>（Speaker Deck ・ Docswell）\"]\n        API[\"API提供ソース\"]\n    end\n\n    subgraph Scheduler[\"取得・処理スケジューラ\"]\n        Cron[\"ローカル cron ・ PM2 Scheduler\"]\n        GitHubActions[\"GitHub Actions Workflows<br/>（RSS毎時 ・ スクレイピング12h ・ 品質日次）\"]\n    end\n\n    subgraph Pipeline[\"収集・要約パイプライン\"]\n        Fetchers[\"Fetchers 41種<br/>（Node.js ・ TypeScript）\"]\n        Enrichers[\"Enrichers<br/>（本文取得 ・ サムネ ・ メタデータ）\"]\n        Summarizer[\"AI Summary Service<br/>Transport → Adapter → Service<br/>QualityChecker ・ PostProcessor\"]\n    end\n\n    subgraph Persistence[\"データレイヤ\"]\n        Postgres[\"PostgreSQL<br/>Prisma ORM\"]\n        Redis[\"Redis<br/>L1/L2キャッシュ\"]\n        ProcessingLog[\"ProcessingLog ・ 差分タイムスタンプ\"]\n    end\n\n    subgraph Application[\"アプリケーション\"]\n        NextAPI[\"Next.js 15 App Router<br/>API Routes ・ Auth.js\"]\n        Client[\"React 19 UI<br/>Tailwind + shadcn/ui\"]\n        Metrics[\"ダッシュボード ・ トレンド ・ お気に入り\"]\n    end\n\n    subgraph Observability[\"監視・運用\"]\n        OTel[\"OpenTelemetry Collectors\"]\n        Grafana[\"Grafana + Loki + Tempo\"]\n        NewRelic[\"New Relic APM\"]\n        CI[\"Dockerベース CI ・ Tests\"]\n    end\n\n    Sources -->|記事情報| Fetchers\n    Scheduler -->|収集トリガー| Fetchers\n    Fetchers --> Enrichers --> Summarizer\n    Summarizer -->|要約・品質| Postgres\n    Enrichers -->|本文/サムネ| Postgres\n    Postgres -->|キャッシュ投入| Redis\n    ProcessingLog --> Scheduler\n    Postgres --> NextAPI --> Client\n    Redis --> NextAPI\n    NextAPI --> Metrics\n    Summarizer -->|Gemini API| ExternalAI((\"Google Gemini 2.5 Flash\"))\n    ExternalAI -. テレメトリ .-> OTel\n\n    Fetchers -. ログ .-> OTel\n    Postgres --> CI\n    Scheduler --> CI\n    OTel --> Grafana\n    OTel --> NewRelic\n",
+  "content_size": 1752,
+  "collected_at": "2026-02-06T01:47:09.378903",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"情報ソース\" 和 \"RSSフィード<br/>（AI/LLM・企業ブログ・技術メディア）\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"情報ソース\" 和 \"RSSフィード<br/>（AI/LLM・企業ブログ・技術メディア）\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Sources",
+        "RSS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"スクレイピング対象<br/>（Speaker Deck ・ Docswell）\" 和 \"API提供ソース\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"スクレイピング対象<br/>（Speaker Deck ・ Docswell）\" 和 \"API提供ソース\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Scrape",
+        "API"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"取得・処理スケジューラ\" 和 \"ローカル cron ・ PM2 Scheduler\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 \"取得・処理スケジューラ\"处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"取得・処理スケジューラ\"处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Scheduler",
+        "Cron"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"GitHub Actions Workflows<br/>（RSS毎時 ・ スクレイピング12h ・ 品質日次）\" 和 \"収集・要約パイプライン\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"GitHub Actions Workflows<br/>（RSS毎時 ・ スクレイピング12h ・ 品質日次）\" 和 \"収集・要約パイプライン\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "GitHubActions",
+        "Pipeline"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Fetchers 41種<br/>（Node.js ・ TypeScript）\" 和 \"Enrichers<br/>（本文取得 ・ サムネ ・ メタデータ）\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Fetchers 41種<br/>（Node.js ・ TypeScript）\" 和 \"Enrichers<br/>（本文取得 ・ サムネ ・ メタデータ）\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Fetchers",
+        "Enrichers"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"AI Summary Service<br/>Transport → Adapter → Service<br/>QualityChecker ・ PostProcessor\" 和 \"データレイヤ\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"AI Summary Service<br/>Transport → Adapter → Service<br/>QualityChecker ・ PostProcessor\" 和 \"データレイヤ\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Summarizer",
+        "Persistence"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"PostgreSQL<br/>Prisma ORM\" 和 \"Redis<br/>L1/L2キャッシュ\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"PostgreSQL<br/>Prisma ORM\" 和 \"Redis<br/>L1/L2キャッシュ\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Postgres",
+        "Redis"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"ProcessingLog ・ 差分タイムスタンプ\" 和 \"アプリケーション\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"ProcessingLog ・ 差分タイムスタンプ\" 和 \"アプリケーション\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ProcessingLog",
+        "Application"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Next.js 15 App Router<br/>API Routes ・ Auth.js\" 和 \"React 19 UI<br/>Tailwind + shadcn/ui\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Next.js 15 App Router<br/>API Routes ・ Auth.js\" 和 \"React 19 UI<br/>Tailwind + shadcn/ui\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "NextAPI",
+        "Client"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"ダッシュボード ・ トレンド ・ お気に入り\" 和 \"監視・運用\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"ダッシュボード ・ トレンド ・ お気に入り\" 和 \"監視・運用\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Metrics",
+        "Observability"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"OpenTelemetry Collectors\" 和 \"Grafana + Loki + Tempo\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"OpenTelemetry Collectors\" 和 \"Grafana + Loki + Tempo\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OTel",
+        "Grafana"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"New Relic APM\" 和 \"Dockerベース CI ・ Tests\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"New Relic APM\" 和 \"Dockerベース CI ・ Tests\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "NewRelic",
+        "CI"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 (\"Google Gemini 2.5 Flash\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '(\"Google Gemini 2.5 Flash\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ExternalAI"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 53,
+    "repair_count": 1,
+    "grounding_acts_count": 26,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

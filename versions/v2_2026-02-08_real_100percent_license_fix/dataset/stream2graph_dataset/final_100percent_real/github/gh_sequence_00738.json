@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00738",
+  "source": "github",
+  "source_url": "https://github.com/debugthings/dnd-unitygame/blob/7a14993d8a40bd7624c06ec456e36138b9ee4b3d/docs/diagrams/MoveThatAffectsOtherPlayers.mmd",
+  "github_repo": "debugthings/dnd-unitygame",
+  "github_file_path": "docs/diagrams/MoveThatAffectsOtherPlayers.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\r\n    participant h as Host (Game)\r\n    participant s as Service (Azure)\r\n    participant g as Active Player (Game)\r\n    participant n as Next Player (Game)\r\n    participant a as All Players (Game)\r\n    loop Main Game Loop\r\n            h->>s: Notify Player it's their turn\r\n            s->>g: It's your turn\r\n            activate g\r\n            g->>s: Ack\r\n            s->>h: Ack\r\n            loop Wait for Player\r\n                h->>s: Ping\r\n                s->>h: Ack\r\n            end\r\n            loop Wait for Human\r\n                g->>s: Ping\r\n                s->>g: Ack\r\n            end\r\n            g->>s: Make play with valid card\r\n            s->>h: Here is Player n's move\r\n        h->>h: Validate move\r\n        h->>s: Ack\r\n        s->>g: Ack\r\n        deactivate g\r\n        h->>h: Play card against discard\r\n        h->>h: Put card on discard pile\r\n        Note right of h: Card is a Draw 2\r\n        h->>h: Pull two cards from deal pile\r\n        h->>s: Player n gets two new cards\r\n        s->>n: Here are two new cards\r\n        activate n\r\n        n->>s: Ack\r\n        deactivate n\r\n        s->>h: Player n Ack'd new cards\r\n        rect rgba(0, 0, 255, .1)\r\n        Note over h,a: Can be sent as one message\r\n            loop Move is Valid\r\n                par Discard\r\n                    h->>s: Card X is on Discard\r\n                    s->>a: Card X is on Discard\r\n                    activate a\r\n                    a->>s: Ack\r\n                    deactivate a\r\n                    s->>h: Player Ack'd\r\n                and Update Player 1..n\r\n                    h->>s: Here are the current player card numbers\r\n                    s->>a: Here are the current player card numbers\r\n                    activate a\r\n                    a->>s: Ack\r\n                    deactivate a\r\n                    s->>h: Player Ack'd\r\n                end\r\n            end\r\n        end\r\n        h->>h: All Players Ack'd\r\n        h->>h: Advance to next player\r\n    end",
+  "content_size": 1982,
+  "collected_at": "2026-02-06T01:36:21.471625",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

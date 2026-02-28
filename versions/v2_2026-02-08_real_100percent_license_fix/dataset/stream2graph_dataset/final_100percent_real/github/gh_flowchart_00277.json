@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00277",
+  "source": "github",
+  "source_url": "https://github.com/ilmoi/reth_smol/blob/54cf72f6fe6ac94c80a4bc12455d1203342fa0bd/crates/engine/tree/docs/mermaid/state-root-task.mmd",
+  "github_repo": "ilmoi/reth_smol",
+  "github_file_path": "crates/engine/tree/docs/mermaid/state-root-task.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\n    subgraph StateRootTaskMessages[State Root Task messages]\n        StateRootMessage::StateUpdate\n        StateRootMessage::PrefetchProofs\n        StateRootMessage::EmptyProof\n        StateRootMessage::ProofCalculated\n        StataRootMessage::FinishedStateUpdates\n    end\n\n    subgraph StateRootTask[State Root Task thread]\n        DeduplicateProofTargets[Deduplicate proof targets according to the list of already fetched proofs]\n        GenerateProofTargets[Generate proof targets from state update]\n            --> DeduplicateProofTargets\n\n        NewProof[New proof calculated]\n            -->|Add new proof| ProofSequencer\n            --> EndCondition1\n        ProofSequencer --> ProofSequencerCondition{{Has sequential proofs?}}\n\n        EndCondition1{{All updates processed?}}\n            --> EndCondition2{{All pending proofs requested?}}\n            --> EndCondition3{{All proofs finished processing?}}\n    end\n\n    subgraph SparseTrieTask[Sparse Trie thread]\n        SparseTrieUpdate([SparseTrieUpdate channel])\n    end\n\n    subgraph MultiProofManager[MultiProofManager]\n        MultiProofCompletion[on_calculation_complete]\n        MultiProofSpawn[spawn_or_queue]\n    end\n\n    StateRootMessage::PrefetchProofs --> DeduplicateProofTargets\n    StateRootMessage::StateUpdate --> GenerateProofTargets\n\n    DeduplicateProofTargets -----> MultiProofSpawn\n\n    StateRootMessage::EmptyProof --> NewProof\n    StateRootMessage::ProofCalculated --> NewProof\n    NewProof ---> MultiProofCompletion\n    ProofSequencerCondition -->|Yes, send multiproof and state update| SparseTrieUpdate\n    StataRootMessage::FinishedStateUpdates --> EndCondition1\n    EndCondition3 -->|Close SparseTrieUpdate channel| SparseTrieUpdate\n",
+  "content_size": 1732,
+  "collected_at": "2026-02-06T01:43:06.968923",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

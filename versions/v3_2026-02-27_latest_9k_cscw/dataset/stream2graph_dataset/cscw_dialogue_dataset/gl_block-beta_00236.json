@@ -1,0 +1,417 @@
+{
+  "id": "gl_block-beta_00236",
+  "source": "gitlab",
+  "source_url": "https://github.com/macgyver13/silent-payments-hub/blob/ce8edc54f51b8a5c7a5959909d1f6ee034f8a5ed/diagrams/wallet_ux.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "macgyver13/silent-payments-hub",
+  "diagram_type": "block-beta",
+  "code": "---\nconfig:\n  diagramMarginY: 100\n  noteMargin: 20\n  noteAlign: center\n  mirrorActors: true\n---\n%%{init: {'themeVariables': {\n  'noteBkgColor':'#333',\n  'noteTextColor': '#cccccc',\n  'fontSize': '30px',\n  'noteFontSize': '30px',\n  'fontFamily': 'verdana'\n}}}%%\n\nsequenceDiagram\n%% autonumber\n  actor Sender\n  actor User\n  participant Wallet as Wallet (Client)\n  participant MyScanServer as Scan Server (Own)\n  participant Bitcoin as Bitcoin Network\n  participant HostedScanServer as Scan Server (Hosted)\n  actor Recipient\n\n  Note over User, Wallet: Wallet Setup\n  User->>Wallet: Generate Scan Secret + Spend Key\n  Wallet->>Wallet: Derive Silent Payment Address\n  Wallet-->>User: Share SP Address (public)\n\n  Note over Sender: Sender sends BTC to SP address\n  Sender->>Wallet: Sender computes recipient address for this transaction (tweak key)\n  Wallet->>Bitcoin: Broadcast transaction\n  \n  Note over User, Wallet: Receiving Funds\n  rect rgb(55,55,55)\n  alt Wallet Scanner (Private)\n  Note over User, MyScanServer: Wallet does all the work <br>(Least complex, Most compute)\n    Wallet->>Bitcoin: Fetch block data (All or Block Filter?)\n    Wallet->>Wallet: Scan for tweaked outputs (Scan Key)\n  else Own Scanner (Private / Fast)  \n    rect rgb(75,55,55)\n      Note over User, MyScanServer: Least wallet development requried <br> (\"Prefered\" Balance Privacy + UX, Distributed compute)\n      rect rgb(55,55,75)\n        Note over User, Wallet: Scanner Registration - one time\n        Wallet->>MyScanServer: Register Scan key\n        loop For Each Block\n          MyScanServer-->>MyScanServer: Scan for tweaked outputs (Scan Key)\n        end\n      end\n      rect rgb(55,55,95)\n        Note over User, Wallet: Typical Wallet UX\n        User->>Wallet: Check Balance\n        Wallet->>MyScanServer: Fetch new UTXOs\n        MyScanServer->>Wallet: Return matching UTXOs\n        Wallet-->>Wallet: Update Balance\n        Wallet-->>User: Show updated balance (UTXOs found)\n      end\n    end\n  else Outsourced Scanner (Fast / Trust Required)\n    rect rgb(40, 62, 53)\n      Note over User, MyScanServer: More wallet development requried <br> (Best UX for Light Clients, Least Private )\n      Bitcoin->>HostedScanServer: New Block\n      loop For Each Block\n        HostedScanServer-->>HostedScanServer: Index all tweaks that meet BIP352 spec <br> ? discard spent?\n      end\n      rect rgb(55,75,55)\n        alt Subscribe or Bulk Download?\n          rect rgb(55,75,75)\n            Wallet->>HostedScanServer: Request all tweaks from last block checked for a given Scan Key\n            HostedScanServer->>Wallet: Return matching UTXOs\n          end\n        else\n          rect rgb(75,75,55)\n            Wallet->>HostedScanServer: Request tweaks for block or range of blocks (more privacy/more data) <br> ? Should this be supported?\n            HostedScanServer->>Wallet: Return all tweaks for range\n          end\n        end\n      end\n    end\n  end\n  end\n\n  Note over User, Wallet: Spending Funds\n  Wallet->>Wallet: Derive tweak from Spend key\n  Wallet->>Bitcoin: Broadcast transaction\n  Bitcoin->>Recipient: Funds arrive (standard output)\n\nNote over Wallet: Wallet Recovery? <br> scan all taproot outputs since wallet birthday\n",
+  "content_size": 3208,
+  "collected_at": "2026-02-06T14:05:05.736687",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Client 和 Own 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Client 和 Own'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Wallet",
+        "Server"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Hosted 和 public 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Hosted 和 public'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Server",
+        "Address"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 tweak key 和 55,55,55 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'tweak key 和 55,55,55'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "transaction",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Private 和 All or Block Filter? 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Private 和 All or Block Filter?'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Scanner",
+        "data"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Scan Key 和 Private / Fast。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Scan Key 和 Private / Fast'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "outputs",
+        "Scanner"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 75,55,55 和 55,55,75 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 75,55,55处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '75,55,55处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "rgb",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Scan Key 和 55,55,95。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Scan Key 和 55,55,95'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "outputs",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 UTXOs found 和 Fast / Trust Required 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'UTXOs found 和 Fast / Trust Required'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "balance",
+        "Scanner"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 40, 62, 53 和 55,75,55 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '40, 62, 53 和 55,75,55'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "rgb",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 55,75,75 和 75,75,55 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '55,75,75 和 75,75,55'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "rgb",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 more privacy/more data 和 standard output 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'more privacy/more data 和 standard output'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "blocks",
+        "arrive"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 45,
+    "repair_count": 1,
+    "grounding_acts_count": 22,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "id": "ot_C4Context_01194",
+  "source": "other",
+  "source_url": "https://github.com/alphagov/data-community-tech-docs/blob/8b87578a3b6920cd0a3bd5abebc565a79c01e328/source/images/restoring-content-store-database.mmd",
+  "source_type": "github_search",
+  "github_repo": "alphagov/data-community-tech-docs",
+  "diagram_type": "C4Context",
+  "code": "C4Context\n    title System Context diagram for CPTO access of GOV.UK's data in AWS\n\n\n    Boundary(aws, \"AWS GOV.UK integration environment)\") {\n        System_Ext(aws_bucket, \"govuk-integration-database-backups\", \"An S3 bucket that contains daily backups of GOV.UK databases\")\n    }\n\n\n\n        Boundary(gcp_govuk_s3_mirror, \"GCP Project: govuk-s3-mirror\") {\n            System(bucket_1, \"Bucket\")\n        }\n\n        Boundary(gcp_govuk_knowledge_graph, \"GCP Project: govuk-knowledge-graph\") {\n            System(topic_2, \"Pub/Sub topic\")\n            System(subscription_2, \"Pub/Sub subscription\")\n            System(template_2, \"Instance Template\")\n            System(eventarc_2, \"EventArc trigger\")\n            System(instance_2, \"Compute Instance\")\n            System(workflow_2, \"Workflow\")\n\n            Boundary(storage_2, \"Cloud Storage\") {\n                System(bucket_repository, \"Bucket for the GitHub repo HEAD\")\n                System(bucket_data_processed, \"Bucket for the processed data\")\n            }\n\n            Boundary(registry_2, \"Artifact Registry\") {\n                System(docker_mongodb, \"Docker Image for MongoDB\")\n            }\n        }\n\n        Boundary(github_govuk_knowledge_graph_gcp, \"GitHub Repo: govuk-knowledge-graph-gcp\") {\n            System(workflow_rsync, \"rsync\")\n            System(workflow_docker, \"docker_mongodb\")\n        }\n\n        Rel(aws_bucket, bucket_1, \"Transfer service\")\n\n        Rel(bucket_1, topic_2, \"Publishes notifications<br>of new files\")\n        Rel(bucket_1, instance_2, \"Instance fetches new file\")\n        Rel(bucket_repository, instance_2, \"Instance fetches scripts\")\n        Rel(topic_2, subscription_2, \"\")\n        Rel(subscription_2, eventarc_2, \"\")\n        Rel(eventarc_2, workflow_2, \"\")\n        Rel(workflow_2, instance_2, \"\")\n\n        Rel(workflow_docker, docker_mongodb, \"\")\n        Rel(workflow_rsync, bucket_repository, \"Uploads repo HEAD\")\n        Rel(template_2, instance_2, \"\")\n        Rel(docker_mongodb, instance_2, \"\")\n\n        Rel(instance_2, bucket_data_processed, \"\")\n\n\n\nUpdateLayoutConfig($c4ShapeInRow=\"2\", $c4BoundaryInRow=\"2\")\nUpdateRelStyle(aws_bucket, bucket_1, $offsetY=\"-20\", $offsetX=\"-40\")\nUpdateRelStyle(bucket_1, topic_2, $offsetY=\"-40\", $offsetX=\"0\")\nUpdateRelStyle(bucket_1, instance_2, $offsetY=\"-160\", $offsetX=\"190\")\nUpdateRelStyle(bucket_repository, instance_2, $offsetY=\"-30\", $offsetX=\"5\")\nUpdateRelStyle(bucket_1, topic_3, $offsetY=\"-20\", $offsetX=\"60\")\nUpdateRelStyle(instance_2, bucket_data_processed, $offsetY=\"60\", $offsetX=\"10\")\n",
+  "content_size": 2537,
+  "collected_at": "2026-02-06T11:06:55.392740",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 6,
+  "repo_forks": 3,
+  "repo_owner": "alphagov",
+  "repo_name": "data-community-tech-docs",
+  "repo_description": "Data Community Technical Documentation",
+  "repo_language": "HTML",
+  "repo_topics": [
+    "govuk"
+  ],
+  "repo_created_at": "2021-08-27T13:50:11Z",
+  "repo_updated_at": "2026-02-04T10:08:00Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

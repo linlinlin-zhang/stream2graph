@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00509",
+  "source": "github",
+  "source_url": "https://github.com/THO-Gaetan/holbertonschool-system_engineering-devops/blob/21c56803ffc678969fe66d58539fadf08dab10a4/web_infrastructure_design/task_3/3-scale_up.mmd",
+  "github_repo": "THO-Gaetan/holbertonschool-system_engineering-devops",
+  "github_file_path": "web_infrastructure_design/task_3/3-scale_up.mmd",
+  "diagram_type": "flowchart",
+  "code": "---\nconfig:\n  layout: dagre\n---\n\nflowchart TD\n\n    %% Entry and Load Balancer\n    A[Users / Clients] --> B[DNS]\n    B --> C0[Firewall 1]\n    C0 --> CLB[Load Balancer HAProxy Cluster\\nwith SSL over HTTPS]\n\n    subgraph Load_Balancer_Cluster\n        CLB --> LB1[HAProxy LB1]\n        CLB --> LB2[HAProxy LB2]\n    end\n\n    %% Web Servers (Separate Machines)\n    subgraph Web_Servers\n        LB1 & LB2 --> FW_WS1[Firewall - Web Server 1]\n        LB1 & LB2 --> FW_WS2[Firewall - Web Server 2]\n        LB1 & LB2 --> FW_WS3[Firewall - Web Server 3]\n        LB1 & LB2 --> FW_WS4[Firewall - Web Server 4]\n        \n        FW_WS1 --> WS1[Nginx Web Server 1 - ports 80/443]\n        FW_WS2 --> WS2[Nginx Web Server 2 - ports 80/443]\n        FW_WS3 --> WS3[Nginx Web Server 3 - ports 80/443]\n        FW_WS4 --> WS4[Nginx Web Server 4 - ports 80/443]\n\n        MON_WS1[Monitoring Client] --> WS1 & WS2 & WS3 & WS4\n    end\n\n    %% Application Servers (Separate Machines)\n    subgraph App_Servers\n        WS1 --> AS1[App Server 1 - Flask/Django/Node]\n        WS2 --> AS2[App Server 2 - Flask/Django/Node]\n        WS3 --> AS3[App Server 3 - Flask/Django/Node]\n        WS4 --> AS4[App Server 4 - Flask/Django/Node]\n\n        AS1 --> FILES1[Application Files]\n        AS2 --> FILES2[Application Files]\n        AS3 --> FILES3[Application Files]\n        AS4 --> FILES4[Application Files]\n\n        MON_AS1[Monitoring Client] --> AS1 & AS2 & AS3 & AS4\n    end\n\n    %% Database Servers (Separate Machines)\n    subgraph Database_Servers\n        AS1 --> DB1[MySQL Database 1]\n        AS2 --> DB2[MySQL Database 2]\n        AS3 --> DB3[MySQL Database 3]\n        AS4 --> DB4[MySQL Database 4]\n\n        DB1 -->|Duplicate| DB2 & DB3 & DB4\n\n        MON_DB1[Monitoring Client] --> DB1 & DB2 & DB3 & DB4\n    end\n\n    %% Monitoring Aggregation\n    MON_WS1 & MON_AS1 & MON_DB1 -->|Send Metrics| MONS[Monitoring Service\\nSumologic]\n",
+  "content_size": 1892,
+  "collected_at": "2026-02-06T01:44:29.392154",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

@@ -1,0 +1,16 @@
+{
+  "id": "gl_packet-beta_00455",
+  "source": "gitlab",
+  "source_url": "https://github.com/hatanoojiasn/mini-usb-logic-analyzer/blob/37379434a95b43e4984d024584fe7798002d2bc3/docs/C1_DMA_block.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "hatanoojiasn/mini-usb-logic-analyzer",
+  "diagram_type": "packet-beta",
+  "code": "%% docs/C1_DMA_block.mmd\ngraph LR\n  %% --------- キャプチャ経路 ----------\n  subgraph \"Capture Path\"\n    TC0[\"TC0<br/>COUNT16<br/>Match @12 MHz\"]\n    EVSYS[\"EVSYS CH0<br/>TC0_Match Event\"]\n    DMAC[\"DMAC CH0<br/>SRCINC=0<br/>DSTINC=1<br/>CIRC\"]\n    PORT_IN[\"PORTB.IN<br/>PB16–PB21\"]\n    RAM[\"SRAM<br/>Ring Buffer<br/>8 KiB\"]\n\n    TC0 -->|event| EVSYS -->|trigger| DMAC\n    PORT_IN -- read --> DMAC\n    DMAC    -- word --> RAM\n  end\n\n  %% --------- 転送・可視化 ----------\n  CPU[\"Cortex-M4F<br/>read_ptr / write_ptr\"]\n  USB[\"USB Device<br/>EP1 BULK\"]\n\n  RAM -- bulk packet --> USB\n  CPU -- DMA 設定／USB 転送 --> USB\n  CPU --- RAM   %% 管理ポインタ更新",
+  "content_size": 625,
+  "collected_at": "2026-02-06T14:10:03.941304",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com"
+}

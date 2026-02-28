@@ -1,0 +1,334 @@
+{
+  "id": "gh_class_00026",
+  "source": "github",
+  "source_url": "https://github.com/gustavo-munhoz/rivu/blob/dee9bf0cd98e87660b7008fc4c4be22900b5686b/diagrams/core.mmd",
+  "github_repo": "gustavo-munhoz/rivu",
+  "github_file_path": "diagrams/core.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n\n  %% Instances\n  class InstanceHeader {\n    - relation_name: String\n    + attributes: Vec~Attribute~\n    - class_index: usize\n\n    + new~S~(relation_name: S, attributes: Vec~Attribute~, class_index: usize) Result~InstanceHeader, Error~\n    + relation_name() &str\n    + number_of_attributes() usize\n    + attribute_at_index(attribute_index: usize) Option~&Attribute~\n    + index_of_attribute(attribute: Attribute) Option~usize~\n    + class_index() usize\n    + class_attribute() Attribute\n    + number_of_classes() usize\n  }\n  InstanceHeader ..|> Serializable\n  InstanceHeader \"1\" --* \"many\" Attribute : contains\n  note for InstanceHeader \"S: Into<<x>String>\"\n\n  class Instance {\n    <<interface>>\n    + weight() f64\n    + set_weight(new_value: f64) Result~&#40&#41, Error~\n\n    + number_of_attributes() usize\n    + value_at_index(attribute_index: usize) Option~f64~\n    + set_value_at_index(attribute_index: usize, new_value: f64) Result~&#40&#41, Error~\n    + is_missing_at_index(attribute_index: usize) bool\n\n    + attribute_at_index(attribute_index: usize) Option~&Attribute~\n    + index_of_attribute(attribute: Attribute) Option~usize~\n\n    + class_index() usize\n    + class_value() f64\n    + set_class_value(new_value: f64) Result~&#40&#41, Error~\n    + is_class_missing() bool\n    + number_of_classes() usize\n\n    + to_vec() Vec~f64~\n\n    + header() &InstanceHeader\n  }\n  Instance ..|> Clone\n  Instance ..|> Copy\n  Instance ..|> Display\n\n  class DenseInstance {\n    - header: &InstanceHeader\n    - values: Vec~f64~\n    - weight: f64\n\n    + new(header: &InstanceHeader, values: Vec~f64~, weight: f64) Result~DenseInstance, Error~\n  }\n  DenseInstance ..|> Instance\n  DenseInstance \"many\" --o \"1\" InstanceHeader \n\n\n  %% Attributes\n  class Attribute {\n    <<interface>>\n\n    + name() &str\n    + as_any() &dyn Any\n    + arff_representation() String\n  }\n  note for NumericAttribute \"S: Into<<x>String>\"\n  Attribute ..|> Serializable\n  Attribute ..|> Display\n  Attribute ..|> Any\n  Attribute ..|> Send\n  Attribute ..|> Sync\n  \n\n  class NumericAttribute {\n    + name: String\n    + values: Vec~u32~\n    + new~S~(name: S) Result~NumericAttribute, Error~\n  }\n  NumericAttribute ..|> Attribute\n\n  class NominalAttribute {\n    - name: String\n    - values: Vec~String~\n    - label_to_index: HashMap~String, usize~\n\n    + new~S~(name: S) NominalAttribute\n    + with_values(name: S, values: Vec~String~, label_to_index: HashMap~String, usize~)\n    + get_attribute_values() Vec~String~\n    + index_of_value_mut(v: &str) Option~usize~\n    + enumerate_values() Iterator~&str~\n  }\n  NominalAttribute ..|> Attribute\n  note for NominalAttribute \"S: Into<<x>String>\"\n\n  <<interface>> Serializable\n  <<interface>> Copy\n  <<interface>> Clone\n",
+  "content_size": 2736,
+  "collected_at": "2026-02-06T01:24:20.338602",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 - relation_name: String\n    + attributes: Vec~Attribute~\n    - class_index: usize\n\n    + new~S~(relation_name: S, attributes: Vec~Attribute~, class_index: usize 和 attribute_index: usize 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '- relation_name: String\n    + attributes: Vec~Attribute~\n    - class_index: usize\n\n    + new~S~(relation_name: S, attributes: Vec~Attribute~, class_index: usize 和 attribute_index: usize'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "InstanceHeader",
+        "attribute_at_index"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 attribute: Attribute 和 <<interface>>\n    + weight(。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'attribute: Attribute 和 <<interface>>\n    + weight('，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "index_of_attribute",
+        "Instance"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 new_value: f64 和 attribute_index: usize 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'new_value: f64 和 attribute_index: usize'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "set_weight",
+        "value_at_index"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 attribute_index: usize, new_value: f64 和 attribute_index: usize 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'attribute_index: usize, new_value: f64 和 attribute_index: usize'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "set_value_at_index",
+        "is_missing_at_index"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 attribute_index: usize 和 attribute: Attribute。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'attribute_index: usize 和 attribute: Attribute'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "attribute_at_index",
+        "index_of_attribute"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 new_value: f64 和 - header: &InstanceHeader\n    - values: Vec~f64~\n    - weight: f64\n\n    + new(header: &InstanceHeader, values: Vec~f64~, weight: f64。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'new_value: f64 和 - header: &InstanceHeader\n    - values: Vec~f64~\n    - weight: f64\n\n    + new(header: &InstanceHeader, values: Vec~f64~, weight: f64'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "set_class_value",
+        "DenseInstance"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 <<interface>>\n\n    + name( 和 + name: String\n    + values: Vec~u32~\n    + new~S~(name: S 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '<<interface>>\n\n    + name( 和 + name: String\n    + values: Vec~u32~\n    + new~S~(name: S'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Attribute",
+        "NumericAttribute"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 - name: String\n    - values: Vec~String~\n    - label_to_index: HashMap~String, usize~\n\n    + new~S~(name: S 和 name: S, values: Vec~String~, label_to_index: HashMap~String, usize~ 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '- name: String\n    - values: Vec~String~\n    - label_to_index: HashMap~String, usize~\n\n    + new~S~(name: S 和 name: S, values: Vec~String~, label_to_index: HashMap~String, usize~'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "NominalAttribute",
+        "with_values"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 v: &str 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'v: &str'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "index_of_value_mut"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 36,
+    "repair_count": 0,
+    "grounding_acts_count": 18,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

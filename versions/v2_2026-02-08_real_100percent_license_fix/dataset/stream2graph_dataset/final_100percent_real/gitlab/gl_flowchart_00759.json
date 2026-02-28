@@ -1,0 +1,31 @@
+{
+  "id": "gl_flowchart_00759",
+  "source": "gitlab",
+  "source_url": "https://github.com/shahabsalehi/HVAC-Climate-Data-Pipeline/blob/38a641c5965513584de909a73aa06cfaccf92e77/diagrams/architecture.mmd",
+  "source_note": "collected_from_github_final",
+  "github_repo": "shahabsalehi/HVAC-Climate-Data-Pipeline",
+  "diagram_type": "flowchart",
+  "code": "```mermaid\nflowchart TB\n    subgraph \"Data Sources\"\n        A[Indoor Sensors<br/>JSONL Files]\n        B[Outdoor Weather<br/>JSONL Files]\n    end\n\n    subgraph \"Data Ingestion\"\n        C[Data Generator Scripts<br/>generate_indoor_data.py<br/>generate_outdoor_data.py]\n        D[Ingestion Module<br/>ingest_transform.py]\n    end\n\n    subgraph \"Bronze Layer - Raw Data\"\n        E[Bronze Indoor Events<br/>Parquet - Partitioned]\n        F[Bronze Outdoor Weather<br/>Parquet - Partitioned]\n    end\n\n    subgraph \"Silver Layer - Cleaned & Enriched\"\n        G[Silver Comfort Facts<br/>- Joined indoor/outdoor<br/>- Resampled to 5-min<br/>- Computed flags]\n    end\n\n    subgraph \"Gold Layer - Analytics Ready\"\n        H[Gold Daily Metrics<br/>- Aggregated by room/day<br/>- KPIs & percentages<br/>- Partitioned by date]\n    end\n\n    subgraph \"Orchestration\"\n        I[Apache Airflow DAG<br/>hvac_climate_dag.py]\n        J[Task: Generate Data]\n        K[Task: Run Pipeline]\n        L[Task: Quality Checks]\n    end\n\n    subgraph \"Analytics & Consumption\"\n        M[FastAPI REST API<br/>- /comfort/summary<br/>- /comfort/overcooling<br/>- /comfort/stale-air]\n        N[Jupyter Notebook<br/>exploration.ipynb<br/>- Visualizations<br/>- Dashboards]\n        O[External Clients<br/>BI Tools, Apps]\n    end\n\n    subgraph \"Data Quality\"\n        P[Quality Validation<br/>- Completeness checks<br/>- Range validation<br/>- Volume checks]\n    end\n\n    %% Data flow\n    C -->|Generate| A\n    C -->|Generate| B\n    A -->|Load JSONL| D\n    B -->|Load JSONL| D\n    D -->|Transform| E\n    D -->|Transform| F\n    E -->|Clean & Parse| G\n    F -->|Clean & Parse| G\n    G -->|Aggregate| H\n\n    %% Orchestration flow\n    I -.->|Schedule| J\n    J -->|Trigger| C\n    I -.->|Schedule| K\n    K -->|Execute| D\n    K -->|Monitor| P\n    I -.->|Schedule| L\n    L -->|Validate| H\n\n    %% Consumption flow\n    H -->|Read Parquet| M\n    H -->|Read Parquet| N\n    M -->|JSON API| O\n    N -->|Visualize| O\n\n    %% Styling\n    classDef source fill:#e1f5ff,stroke:#01579b,stroke-width:2px\n    classDef bronze fill:#fff3e0,stroke:#e65100,stroke-width:2px\n    classDef silver fill:#f3e5f5,stroke:#4a148c,stroke-width:2px\n    classDef gold fill:#fff9c4,stroke:#f57f17,stroke-width:3px\n    classDef orchestration fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px\n    classDef consumption fill:#fce4ec,stroke:#880e4f,stroke-width:2px\n    \n    class A,B,C source\n    class E,F bronze\n    class G silver\n    class H gold\n    class I,J,K,L orchestration\n    class M,N,O consumption\n```\n\n## Data Flow Description\n\n### Bronze Layer (Raw → Bronze)\n- **Input**: Raw JSONL files from sensors and weather APIs\n- **Processing**: \n  - Parse timestamps to proper datetime types\n  - Cast numeric fields to appropriate types\n  - Add ingestion metadata\n- **Output**: Parquet files with basic type cleaning\n\n### Silver Layer (Bronze → Silver)\n- **Input**: Bronze Parquet files\n- **Processing**:\n  - Pivot indoor sensor data (one row per timestamp+room)\n  - Resample outdoor data to 5-minute intervals\n  - Join indoor and outdoor data with temporal alignment\n  - Compute comfort flags:\n    - **overcooled_flag**: `indoor_temp < 21°C AND outdoor_temp > 25°C`\n    - **stale_air_flag**: `indoor_co2 > 1000 ppm`\n- **Output**: Unified comfort facts table\n\n### Gold Layer (Silver → Gold)\n- **Input**: Silver comfort facts\n- **Processing**:\n  - Aggregate by date, building, and room\n  - Calculate daily metrics:\n    - Reading counts\n    - Overcooling/stale air incident counts\n    - Percentage time in each condition\n    - Average temperature, humidity, CO₂\n- **Output**: Analytics-ready daily metrics\n\n## Partitioning Strategy\n\nAll layers use date-based partitioning:\n```\ndata/{layer}/{table}/year=YYYY/month=MM/day=DD/part-*.parquet\n```\n\nExample:\n```\ndata/gold/daily_comfort_metrics/year=2025/month=01/day=15/part-*.parquet\n```\n\nThis enables:\n- Efficient date-range queries\n- Easy data lifecycle management\n- Scalability to cloud storage (S3, ADLS)\n",
+  "content_size": 3972,
+  "collected_at": "2026-02-06T14:19:55.314226",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "repo_owner": "shahabsalehi",
+  "repo_name": "HVAC-Climate-Data-Pipeline",
+  "repo_description": "HVAC Climate Data Pipeline for monitoring and analyzing HVAC performance, Medallion architecture ETL pipeline for HVAC and climate data processing with Airflow/Prefect orchestration and FastAPI endpoi",
+  "repo_language": "Python",
+  "repo_topics": [
+    "airflow",
+    "climate-data",
+    "data-engineering",
+    "data-pipeline",
+    "hvac"
+  ],
+  "repo_created_at": "2025-11-28T19:09:28Z",
+  "repo_updated_at": "2025-11-29T12:19:41Z"
+}

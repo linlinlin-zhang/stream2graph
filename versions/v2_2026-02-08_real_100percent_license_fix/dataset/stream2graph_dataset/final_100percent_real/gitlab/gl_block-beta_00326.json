@@ -1,0 +1,16 @@
+{
+  "id": "gl_block-beta_00326",
+  "source": "gitlab",
+  "source_url": "https://github.com/sean-galloway/RTLDesignSherpa/blob/47f8a16641658f570a69c3af3c9724b29ea39187/docs/markdown/assets/RTLCommon/arbiter_round_robin.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "sean-galloway/RTLDesignSherpa",
+  "diagram_type": "block-beta",
+  "code": "%%{init: {'theme': 'neutral', 'themeVariables': { 'fontSize': '14px'}}}%%\nflowchart TB\n    subgraph Inputs\n        CLK[clk]\n        RST[rst_n]\n        BLK[block_arb]\n        REQ[\"request[N-1:0]\"]\n        ACK[\"grant_ack[N-1:0]\"]\n    end\n\n    subgraph arbiter_round_robin[\"arbiter_round_robin\"]\n        subgraph MaskGen[\"Mask Generation\"]\n            LAST[r_last_grant_id]\n            MASK[\"Mask Lookup Tables\"]\n        end\n\n        subgraph ReqProc[\"Request Processing\"]\n            MASKED[\"Masked Requests\"]\n            UNMASKED[\"Unmasked Requests\"]\n        end\n\n        subgraph PriEnc[\"arbiter_priority_encoder\"]\n            PRIO[\"Priority Selection\"]\n        end\n\n        subgraph GrantLogic[\"Grant Logic\"]\n            DECIDE[\"Grant Decision\"]\n            ONEHOT[\"One-Hot Encoder\"]\n        end\n\n        subgraph StateReg[\"State Registers\"]\n            STATE[\"r_last_grant_id\\nr_pending_ack\\nr_pending_client\"]\n        end\n    end\n\n    subgraph Outputs\n        GV[grant_valid]\n        GR[\"grant[N-1:0]\"]\n        GID[\"grant_id[W-1:0]\"]\n        LG[\"last_grant[N-1:0]\"]\n    end\n\n    CLK --> StateReg\n    RST --> StateReg\n    BLK --> ReqProc\n    REQ --> ReqProc\n    ACK --> GrantLogic\n\n    LAST --> MaskGen\n    MaskGen --> ReqProc\n    ReqProc --> MASKED\n    ReqProc --> UNMASKED\n    MASKED --> PriEnc\n    UNMASKED --> PriEnc\n    PriEnc --> GrantLogic\n    GrantLogic --> StateReg\n    StateReg --> LAST\n\n    GrantLogic --> GV\n    GrantLogic --> GR\n    GrantLogic --> GID\n    StateReg --> LG\n",
+  "content_size": 1487,
+  "collected_at": "2026-02-06T14:07:20.373740",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

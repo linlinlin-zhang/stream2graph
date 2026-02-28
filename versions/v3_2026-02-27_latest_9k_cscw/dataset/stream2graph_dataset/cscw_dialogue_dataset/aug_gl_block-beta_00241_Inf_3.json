@@ -1,0 +1,251 @@
+{
+  "id": "aug_gl_block-beta_00241_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/tonykipkemboi/crewai-anthropic-prompt-caching-cookbook/blob/89e860b389486c1f20c2ad1d6113310faa303015/prompt_caching_flow.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "tonykipkemboi/crewai-anthropic-prompt-caching-cookbook",
+  "diagram_type": "block-beta",
+  "code": "sequenceDiagram\n    autonumber\n    actor U as User / Notebook\n    participant C as Crew\n    participant A as Agent\n    participant L as AnthropicPromptCachingLLM\n    participant API as Anthropic Messages API\n    participant Cache as Anthropic Prompt Cache\n\n    Note over U: Run the notebook to demo caching\n\n    U->>C: kickoff(Infra_LoadBalancer)\n    C->>A: execute Task\n    A->>L: call(Infra_LoadBalancer)\n    Note right of L: Build payload\n    Note right of L: - model, messages, temperature, max_tokens\n    Note right of L: - system = [Infra_WorkerNode]\n    Note right of L: - last system block gets<br/>cache_control: {Infra_LoadBalancer}\n    Note right of L: - headers: anthropopic-version (Infra_IngressController)\n\n    alt First run (Infra_WorkerNode)\n        L->>API: POST /v1/messages (Infra_IngressController)\n        API->>Cache: Write cached system blocks\n        API-->>L: response + usage{Infra_RedisCache}\n    else Subsequent run within TTL (Infra_RedisCache)\n        L->>API: POST /v1/messages (Infra_WorkerNode)\n        API->>Cache: Read cached system blocks\n        API-->>L: response + usage{Infra_RedisCache}\n    end\n\n    L-->>A: assistant text\n    A-->>C: task result\n    C-->>U: result + timing\n\n    Note over Cache: TTL options\n    Note over Cache: - 5m (Infra_EtcdCluster)\n    Note over Cache: - 1h (Infra_IngressController)\n\n    Note over L,API: Cache hit requires:\n    Note over L,API: - Identical system content\n    Note over L,API: - Same model + headers\n    Note over L,API: - Within TTL window.",
+  "content_size": 1518,
+  "collected_at": "2026-02-06T14:05:12.008300",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 14,
+  "repo_forks": 1,
+  "repo_owner": "tonykipkemboi",
+  "repo_name": "crewai-anthropic-prompt-caching-cookbook",
+  "repo_description": "A comprehensive cookbook demonstrating how to implement CrewAI with Anthropic's prompt caching feature for efficient LLM operations",
+  "repo_language": "Jupyter Notebook",
+  "repo_topics": [],
+  "repo_created_at": "2025-08-11T15:37:59Z",
+  "repo_updated_at": "2025-12-25T03:49:38Z",
+  "augmentation_domain": "Infra",
+  "seed_id": "gl_block-beta_00241",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Infra_LoadBalancer 和 Infra_LoadBalancer 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Infra_LoadBalancer 和 Infra_LoadBalancer'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "kickoff",
+        "call"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Infra_IngressController 和 Infra_WorkerNode 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Infra_IngressController 和 Infra_WorkerNode'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "version",
+        "run"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Infra_IngressController 和 Infra_RedisCache 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 Infra_IngressController处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Infra_IngressController处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "messages",
+        "usage"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Infra_RedisCache 和 Infra_WorkerNode 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Infra_RedisCache 和 Infra_WorkerNode'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TTL",
+        "messages"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Infra_RedisCache 和 Infra_EtcdCluster 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Infra_RedisCache 和 Infra_EtcdCluster'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "usage",
+        "5m"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Infra_IngressController 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Infra_IngressController'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "1h"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 25,
+    "repair_count": 1,
+    "grounding_acts_count": 12,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

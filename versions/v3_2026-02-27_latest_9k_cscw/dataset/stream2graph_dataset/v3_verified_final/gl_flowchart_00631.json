@@ -1,0 +1,16 @@
+{
+  "id": "gl_flowchart_00631",
+  "source": "gitlab",
+  "source_url": "https://github.com/Sclaassen/bonmoja-devops-assignment/blob/d550ddba62864af3c347734048d1a4fa99720c4f/diagram.mmd",
+  "source_note": "collected_from_github_final",
+  "github_repo": "Sclaassen/bonmoja-devops-assignment",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\n  Internet[\"Internet\"]\n  subgraph VPC[\"VPC (10.0.0.0/16)\"]\n    direction TB\n\n    subgraph PublicSubnets[\"Public Subnets<br>10.0.1.0/24, 10.0.2.0/24\"]\n      ALB[\"Application Load Balancer\"]\n    end\n\n    subgraph PrivateSubnets[\"Private Subnets<br>10.0.11.0/24, 10.0.12.0/24\"]\n      ECS[\"ECS Service (Fargate)<br>(hashicorp/http-echo)\"]\n      RDS[\"RDS (PostgreSQL)\"]\n      SQS[\"SQS Queue\"]\n      DynamoDB[\"DynamoDB<br>(Session/Metadata)\"]\n    end\n  end\n\n  Internet --> ALB\n  ALB --> ECS\n  ECS --> SQS & DynamoDB & RDS\n  SQS --> SNS[\"SNS Topic\"]\n  SNS -- Email --> User[\"Email Subscription\"]\n\n  %% Monitoring/Observability\n  RDS -.-> CloudWatchRDS[\"CloudWatch Logs/Alarms\"]\n  SQS -.-> CloudWatchSQS[\"CloudWatch Logs/Alarms\"]\n  SNS -.-> CloudWatchSNS[\"CloudWatch Logs/Alarms\"]\n  ECS -.-> CloudWatchECS[\"CloudWatch Logs/Alarms\"]\n\n  %% Security\n  IAM[\"IAM Roles/Policies\"] -.-> ALB & ECS & RDS\n  SecurityGroups[\"Security Groups\"] -.-> ALB & ECS & RDS\n",
+  "content_size": 958,
+  "collected_at": "2026-02-06T14:18:13.606265",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00377",
+  "source": "github",
+  "source_url": "https://github.com/mpro775/tagdod-project/blob/559959d1da7616a664535f2d108100d8e7bbd888/docs/requirements/flows/payment/webhook.mmd",
+  "github_repo": "mpro775/tagdod-project",
+  "github_file_path": "docs/requirements/flows/payment/webhook.mmd",
+  "diagram_type": "flowchart",
+  "code": "%% Payment Webhook Processing Flow\n%% View at https://mermaid.live\nflowchart TD\n  A[استقبال Webhook من Payment Provider] --> B[استخراج البيانات من الطلب]\n  B --> C{التحقق من التوقيع?}\n  C -->|توقيع غير صحيح| D[إرجاع خطأ 401 - توقيع غير صحيح]\n  \n  %% Note: BANK_TRANSFER لا يستخدم webhooks\n  AA[ملاحظة: الدفع المحلي BANK_TRANSFER] --> AB[لا يستخدم webhooks]\n  AB --> AC[يتم المطابقة يدوياً من لوحة التحكم]\n  AC --> AD[انظر: Local Payment Verification Flow]\n\n  C -->|توقيع صحيح| E[البحث عن الطلب بـ paymentIntentId]\n  E --> F{وجد الطلب?}\n  F -->|لا| G[إرجاع خطأ - طلب غير موجود]\n\n  F -->|نعم| H{حالة الدفع في Webhook?}\n  H -->|SUCCESS| I[تحديث حالة الدفع إلى PAID]\n  H -->|FAILED| J[تحديث حالة الدفع إلى FAILED]\n\n  I --> K[تحديث حالة الطلب إلى CONFIRMED]\n  K --> L[تحديث confirmedAt إلى الآن]\n  L --> M[إرسال إشعار تأكيد الطلب]\n\n  J --> N[تحديث حالة الطلب إلى PAYMENT_FAILED]\n  N --> O[إرسال إشعار فشل الدفع]\n\n  M --> P[تحديث المخزون - تقليل الكميات]\n  O --> Q[لا تغيير في المخزون - الكميات محجوزة]\n\n  P --> R[إرسال إشعارات مخزون إذا لزم الأمر]\n  Q --> R\n\n  R --> S[حفظ تفاصيل Webhook في السجل]\n  S --> T[إرجاع استجابة نجاح 200]\n\n  %% Error Cases\n  D --> U[نهاية - خطأ]\n  G --> U\n\n  T --> V[نهاية - نجاح]\n\n  %% Webhook Data Structure\n  W[بيانات Webhook المتوقعة] --> W1[intentId: معرف نية الدفع]\n  W1 --> W2[status: SUCCESS أو FAILED]\n  W2 --> W3[amount: المبلغ المدفوع]\n  W3 --> W4[signature: توقيع HMAC]\n\n  %% Signature Verification\n  X[التحقق من التوقيع] --> X1[استخراج signature من headers]\n  X1 --> X2[إنشاء HMAC من البيانات]\n  X2 --> X3[مقارنة التوقيعين]\n\n  X3 -->|متطابق| Y[التوقيع صحيح]\n  X3 -->|غير متطابق| Z[التوقيع غير صحيح]\n\n  Y --> C\n  Z --> D\n",
+  "content_size": 1655,
+  "collected_at": "2026-02-06T01:43:43.808049",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

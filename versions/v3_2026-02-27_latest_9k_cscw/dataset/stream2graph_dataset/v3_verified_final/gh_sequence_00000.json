@@ -1,0 +1,12 @@
+{
+  "id": "gh_sequence_00000",
+  "source": "github",
+  "source_url": "https://github.com/build-on-aws/conversation-with-your-architecture/blob/b54f6e1449b05d8734e741425be3546ff096a994/sequencediagram.mmd",
+  "github_repo": "build-on-aws/conversation-with-your-architecture",
+  "github_file_path": "sequencediagram.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant User\n    participant ArchitectureChatDemo\n    participant BedrockRuntime\n    participant AuditInfoTool\n    participant JoyCountTool\n    participant BestPracticesTool\n\n    User->>ArchitectureChatDemo: Start conversation\n    ArchitectureChatDemo->>User: Request architecture diagram filename\n    User->>ArchitectureChatDemo: Provide filename\n\n    loop Until user exits\n        User->>ArchitectureChatDemo: Enter input\n\n        alt Has architecture diagram\n            ArchitectureChatDemo->>ArchitectureChatDemo: Read image file\n            ArchitectureChatDemo->>ArchitectureChatDemo: Create message with image and text\n        else No architecture diagram\n            ArchitectureChatDemo->>ArchitectureChatDemo: Create message with text only\n        end\n\n        ArchitectureChatDemo->>BedrockRuntime: Send conversation to Bedrock\n\n        alt Tool use requested\n            BedrockRuntime-->>ArchitectureChatDemo: Request tool execution\n            alt Audit Info requested\n                ArchitectureChatDemo->>AuditInfoTool: Invoke tool\n                AuditInfoTool-->>ArchitectureChatDemo: Return audit data\n            else Joy Count requested\n                ArchitectureChatDemo->>JoyCountTool: Invoke tool\n                JoyCountTool-->>ArchitectureChatDemo: Return joy count\n            else Best Practices requested\n                ArchitectureChatDemo->>BestPracticesTool: Invoke tool\n                BestPracticesTool-->>ArchitectureChatDemo: Return best practices\n            end\n            ArchitectureChatDemo->>BedrockRuntime: Send tool results\n        end\n\n        BedrockRuntime-->>ArchitectureChatDemo: Return response\n        ArchitectureChatDemo-->>User: Display response\n    end\n",
+  "content_size": 1738,
+  "collected_at": "2026-02-06T01:23:52.067662",
+  "compilation_status": "success"
+}

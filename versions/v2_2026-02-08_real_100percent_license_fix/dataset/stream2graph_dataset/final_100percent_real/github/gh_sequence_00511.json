@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00511",
+  "source": "github",
+  "source_url": "https://github.com/mathasilv/AgroSat-IoT/blob/43e1ce455aa03cc3da521e07d2f42e7aee829eab/docs/diagrams/anexo_h_sequencia.mmd",
+  "github_repo": "mathasilv/AgroSat-IoT",
+  "github_file_path": "docs/diagrams/anexo_h_sequencia.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    autonumber\n    participant GN as GroundNode\n    participant LS as LoRaService\n    participant GNM as GroundNodeManager\n    participant PM as PayloadManager\n    participant SM as StorageManager\n    participant CM as CommunicationManager\n    participant HTTP as HttpService\n\n    Note over GN,LS: Fase 1 - Recepção\n    GN->>LS: Transmissão LoRa 915MHz\n    LS->>LS: Validar CRC\n    LS->>GNM: Pacote Válido + RSSI + SNR\n\n    Note over GNM,PM: Fase 2 - Classificação QoS\n    GNM->>PM: Avaliar Prioridade\n    PM->>PM: Verificar Limiares Críticos\n    PM-->>GNM: Prioridade (CRITICAL/HIGH/NORMAL/LOW)\n\n    Note over GNM,SM: Fase 3 - Armazenamento\n    GNM->>GNM: Adicionar ao Buffer (máx 3 nós)\n    GNM->>SM: Persistir em mission.csv\n    SM->>SM: Calcular CRC-16\n    SM-->>GNM: Confirmação\n\n    Note over CM,HTTP: Fase 4 - Transmissão\n    CM->>PM: Ordenar por Prioridade\n    PM-->>CM: Lista Ordenada\n    CM->>LS: Enviar Pacote Binário (34B)\n    LS-->>CM: TX Completo\n\n    alt WiFi Conectado\n        CM->>PM: Criar JSON (Formato OBSAT)\n        PM-->>CM: Payload JSON\n        CM->>HTTP: POST obsat.org.br\n        HTTP-->>CM: Response 200 OK\n    end\n\n    CM->>GNM: Marcar forwarded=true\n",
+  "content_size": 1194,
+  "collected_at": "2026-02-06T01:33:17.635213",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

@@ -1,0 +1,102 @@
+{
+  "id": "gh_sequence_00381",
+  "source": "github",
+  "source_url": "https://github.com/nnao45/typermaid/blob/a07c0f4c8015b7cb141903a92bc5bd68bffca7ae/e2e/sequence/036_oauth2_flow.mmd",
+  "github_repo": "nnao45/typermaid",
+  "github_file_path": "e2e/sequence/036_oauth2_flow.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    autonumber\n    actor User\n    participant ClientApp\n    participant AuthServer\n    participant ResourceServer\n    \n    User->>ClientApp: Click \"Login with OAuth\"\n    ClientApp->>ClientApp: Generate state & PKCE challenge\n    ClientApp-->>User: Redirect to authorization URL\n    \n    User->>+AuthServer: GET /authorize?client_id&redirect_uri&state&code_challenge\n    AuthServer-->>-User: Show login page\n    \n    User->>+AuthServer: Submit credentials\n    \n    alt Valid credentials\n        AuthServer->>AuthServer: Validate & generate code\n        AuthServer-->>-User: Redirect to callback with code\n        \n        User->>+ClientApp: GET /callback?code=AUTH_CODE&state=STATE\n        ClientApp->>ClientApp: Validate state\n        ClientApp->>+AuthServer: POST /token (code, code_verifier)\n        \n        critical Token exchange\n            AuthServer->>AuthServer: Validate code & PKCE\n            AuthServer-->>ClientApp: Access token + Refresh token\n        option Invalid code\n            AuthServer-->>ClientApp: 400 Bad Request\n        end\n        \n        ClientApp-->>-User: Set session cookie\n        \n        loop Access protected resources\n            User->>+ClientApp: Request protected resource\n            ClientApp->>+ResourceServer: GET /api/data (Bearer token)\n            \n            alt Token valid\n                ResourceServer-->>-ClientApp: Protected data\n                ClientApp-->>-User: Display data\n            else Token expired\n                ResourceServer-->>ClientApp: 401 Unauthorized\n                ClientApp->>+AuthServer: POST /token (refresh_token)\n                AuthServer-->>-ClientApp: New access token\n                ClientApp->>ResourceServer: Retry with new token\n            end\n        end\n        \n    else Invalid credentials\n        AuthServer-->>User: Show error message\n    end\n",
+  "content_size": 1859,
+  "collected_at": "2026-02-06T01:31:28.677883",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "repo_owner": "nnao45",
+  "repo_name": "typermaid",
+  "repo_description": "Type-safe Mermaid-compatible diagrams powered by TypeScript, Zod, and modern renderers.",
+  "repo_language": "TypeScript",
+  "repo_topics": [],
+  "repo_created_at": "2025-11-06T13:57:03Z",
+  "repo_updated_at": "2025-11-09T22:14:09Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 code, code_verifier 和 Bearer token 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'code, code_verifier 和 Bearer token'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "token",
+        "data"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 refresh_token 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'refresh_token'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "token"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 8,
+    "repair_count": 0,
+    "grounding_acts_count": 4,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

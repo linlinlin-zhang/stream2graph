@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01457",
+  "source": "github",
+  "source_url": "https://github.com/bernardogv/Containers_k8/blob/97afa8848d2607c3d1a0d91e32fb831de0fb1f6a/book/diagrams/docker-networking-models.mmd",
+  "github_repo": "bernardogv/Containers_k8",
+  "github_file_path": "book/diagrams/docker-networking-models.mmd",
+  "diagram_type": "architecture",
+  "code": "%% D2.3: Docker Networking Models\n%% Priority: P0 | Complexity: High\n%% Chapter 2: Docker Fundamentals\n\ngraph TB\n    subgraph BRIDGE[\"Bridge Network (Default)\"]\n        direction LR\n        BR_HOST[Host Network Stack]\n        DOCKER0[docker0 bridge<br/>172.17.0.1]\n        BR_C1[Container 1<br/>172.17.0.2]\n        BR_C2[Container 2<br/>172.17.0.3]\n        BR_NAT[NAT/iptables]\n\n        BR_HOST --> DOCKER0\n        DOCKER0 --> BR_C1\n        DOCKER0 --> BR_C2\n        DOCKER0 --> BR_NAT\n        BR_NAT -->|port mapping| BR_HOST\n    end\n\n    subgraph HOST[\"Host Network\"]\n        direction LR\n        H_NET[Host Network<br/>No isolation]\n        H_C1[Container<br/>Uses host IPs]\n\n        H_NET --- H_C1\n    end\n\n    subgraph OVERLAY[\"Overlay Network (Multi-host)\"]\n        direction TB\n        OV_HOST1[Host 1]\n        OV_HOST2[Host 2]\n        OV_C1[Container A]\n        OV_C2[Container B]\n        VXLAN[VXLAN Tunnel<br/>Encapsulation]\n\n        OV_HOST1 --> OV_C1\n        OV_HOST2 --> OV_C2\n        OV_C1 <-.->|VXLAN| VXLAN\n        OV_C2 <-.->|VXLAN| VXLAN\n    end\n\n    subgraph MACVLAN[\"Macvlan Network\"]\n        direction LR\n        MAC_PHY[Physical Network]\n        MAC_C1[Container 1<br/>MAC: aa:bb:cc:01]\n        MAC_C2[Container 2<br/>MAC: aa:bb:cc:02]\n\n        MAC_PHY --- MAC_C1\n        MAC_PHY --- MAC_C2\n    end\n\n    subgraph USECASES[\"Use Cases\"]\n        UC1[\"Bridge: Isolated apps<br/>on single host\"]\n        UC2[\"Host: High performance,<br/>no isolation needed\"]\n        UC3[\"Overlay: Multi-host<br/>communication\"]\n        UC4[\"Macvlan: Legacy apps<br/>needing physical access\"]\n    end\n\n    style BRIDGE fill:#E3F2FD\n    style HOST fill:#E8F5E9\n    style OVERLAY fill:#FFF3E0\n    style MACVLAN fill:#F3E5F5\n    style USECASES fill:#FCE4EC\n    style VXLAN fill:#9013FE,color:#fff\n",
+  "content_size": 1794,
+  "collected_at": "2026-02-06T01:46:27.473751",
+  "license": "none",
+  "license_name": "No License",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

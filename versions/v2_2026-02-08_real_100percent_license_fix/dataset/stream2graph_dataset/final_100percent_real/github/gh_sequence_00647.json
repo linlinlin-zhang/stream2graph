@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00647",
+  "source": "github",
+  "source_url": "https://github.com/MesterLum/simosrevised/blob/dc8d68189c54e3cc77eaffe3b40fdb03778d948a/diagrams/sequence-diagram.mmd",
+  "github_repo": "MesterLum/simosrevised",
+  "github_file_path": "diagrams/sequence-diagram.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant User\n    participant SimosRevised\n    participant SimosUtils\n    \n    User->>+SimosRevised: generateWeights()\n    \n    SimosRevised->>SimosRevised: getWhiteCardsWithNonZeroValues()\n    \n    SimosRevised->>SimosRevised: getWhiteCardsCount()\n    \n    SimosRevised->>SimosRevised: getRatio(whiteCardsCount)\n    \n    SimosRevised->>SimosRevised: getNonNormalizedWeights(whiteCards, ratio)\n    \n    SimosRevised->>SimosRevised: getWeightsSum(nonNormalizedWeights)\n    \n    SimosRevised->>SimosRevised: getNormalizedWeights(weights, sum)\n    \n    SimosRevised->>SimosRevised: getNormalizedWeightsTruncated(weights)\n    SimosRevised->>+SimosUtils: truncateToXDecimals(value, decimals)\n    SimosUtils-->>-SimosRevised: truncated value\n    \n    SimosRevised->>SimosRevised: getWeightsSum(truncated)\n    \n    SimosRevised->>SimosRevised: getNearestUpWeights(normalized, truncated)\n    \n    SimosRevised->>SimosRevised: getNearestDownWeights(normalized, truncated)\n    \n    SimosRevised->>SimosRevised: getGreaterElements(d1, d2)\n    \n    SimosRevised->>SimosRevised: getSumGreaterElements(M)\n    SimosRevised->>SimosRevised: sortWeights(d1, asc=true)\n    SimosRevised->>SimosRevised: sortWeights(d2, asc=false)\n    SimosRevised->>SimosRevised: getCriteriaCount()\n    \n    alt Case (a): m + m̄ ≤ n\n        SimosRevised->>SimosRevised: getF1Ranks(sortedD2, M, params)\n        SimosRevised->>SimosRevised: getF2Ranks(sortedD2, M, total)\n    else Case (b): m + m̄ > n\n        SimosRevised->>SimosRevised: getF1Ranks(sortedD1, M, params)\n        SimosRevised->>SimosRevised: getF2Ranks(sortedD1, M, total)\n    end\n    \n    opt Debug Mode\n        SimosRevised->>+SimosUtils: printWeights(weights)\n        SimosUtils-->>-SimosRevised: printed\n        SimosRevised->>+SimosUtils: printRankGroups(ranks)\n        SimosUtils-->>-SimosRevised: printed\n    end\n    \n    SimosRevised->>SimosRevised: roundUp(weights, F2)\n    SimosRevised->>+SimosUtils: roundUpToXDecimals(weight, decimals)\n    SimosUtils-->>-SimosRevised: rounded up\n    \n    SimosRevised->>SimosRevised: roundDown(weights, F1)\n    SimosRevised->>+SimosUtils: truncateToXDecimals(weight, decimals)\n    SimosUtils-->>-SimosRevised: truncated\n    \n    SimosRevised->>SimosRevised: convertToRanksWeight(weights)\n    \n    opt forcedTotalElements > 0\n        SimosRevised->>SimosRevised: forceRoundUp(finalWeights, sorted, M, forced)\n        SimosRevised->>+SimosUtils: roundUpToXDecimals(weight, decimals)\n        SimosUtils-->>-SimosRevised: rounded up\n    end\n    \n    opt forcedDownElements > 0\n        SimosRevised->>SimosRevised: forceRoundDown(finalWeights, weights, F2, forced)\n        SimosRevised->>+SimosUtils: truncateToXDecimals(weight, decimals)\n        SimosUtils-->>-SimosRevised: truncated\n    end\n    \n    SimosRevised-->>-User: vector<RankWeight>\n",
+  "content_size": 2836,
+  "collected_at": "2026-02-06T01:35:11.622484",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

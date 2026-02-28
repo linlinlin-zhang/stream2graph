@@ -1,0 +1,29 @@
+{
+  "id": "gl_block-beta_00228",
+  "source": "gitlab",
+  "source_url": "https://github.com/gabriel-lau/MessageMesh/blob/9c25339f8f202e8a80cd57ab952b93757cc30f0e/diagrams/Block_Addition_Sequence_Diagram.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "gabriel-lau/MessageMesh",
+  "diagram_type": "block-beta",
+  "code": "sequenceDiagram\n    participant Client\n    participant PubSubService\n    participant BlockchainLoop\n    participant RaftConsensus\n    participant RaftOP\n    participant Blockchain\n\n    alt Message Block Flow\n        Client->>PubSubService: Send Message\n        PubSubService->>BlockchainLoop: Message via Inbound channel\n        Note over BlockchainLoop: Check if node is leader\n        BlockchainLoop->>RaftConsensus: CommitOp(ADD_MESSAGE_BLOCK)\n        RaftConsensus->>RaftOP: ApplyTo(state)\n        Note over RaftOP: Validate message:<br/>- Check sender not empty<br/>- Check receiver not empty<br/>- Check message not empty<br/>- Check sender != receiver\n        RaftOP->>Blockchain: AddMessageBlock()\n        Blockchain-->>RaftOP: Return new block\n        RaftOP-->>RaftConsensus: Return updated state\n        RaftConsensus-->>BlockchainLoop: Notify via Subscribe channel\n        BlockchainLoop->>PubSubService: Broadcast updated blockchain\n    else First Message Block Flow\n        Client->>PubSubService: Send FirstMessage\n        PubSubService->>BlockchainLoop: FirstMessage via Inbound channel\n        Note over BlockchainLoop: Check if node is leader<br/>Sort PeerIDs<br/>Check for duplicates\n        BlockchainLoop->>RaftConsensus: CommitOp(ADD_FIRST_MESSAGE_BLOCK)\n        RaftConsensus->>RaftOP: ApplyTo(state)\n        Note over RaftOP: Validate first message:<br/>- Check exactly 2 peer IDs<br/>- Check peer IDs not empty<br/>- Check peer IDs not same<br/>- Check symmetric keys not empty\n        RaftOP->>Blockchain: AddFirstMessageBlock()\n        Blockchain-->>RaftOP: Return new block\n        RaftOP-->>RaftConsensus: Return updated state\n        RaftConsensus-->>BlockchainLoop: Notify via Subscribe channel\n        BlockchainLoop->>PubSubService: Broadcast updated blockchain\n    end",
+  "content_size": 1802,
+  "collected_at": "2026-02-06T14:04:56.759041",
+  "compilation_status": "success",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 1,
+  "repo_owner": "gabriel-lau",
+  "repo_name": "MessageMesh",
+  "repo_description": "A distributed Messaging Platform built with Go, Svelte and Wails",
+  "repo_language": "Go",
+  "repo_topics": [
+    "go",
+    "libp2p",
+    "svelte",
+    "wails"
+  ],
+  "repo_created_at": "2024-11-18T07:37:28Z",
+  "repo_updated_at": "2025-03-31T15:35:11Z"
+}

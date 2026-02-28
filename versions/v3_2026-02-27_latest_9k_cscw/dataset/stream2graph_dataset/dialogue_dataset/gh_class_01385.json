@@ -1,0 +1,164 @@
+{
+  "id": "gh_class_01385",
+  "source": "github",
+  "source_url": "https://github.com/miong/pycodeanalyzer/blob/6728d8f77385a1145db67952167710cf412b2343/docs/source/code/diagrams/pycodeanalyzer_core_languages_filedispatcher_FileDispatcher.mmd",
+  "github_repo": "miong/pycodeanalyzer",
+  "github_file_path": "docs/source/code/diagrams/pycodeanalyzer_core_languages_filedispatcher_FileDispatcher.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\nclass FileDispatcher {\n<<Class>>\n+ Any logger\n+ CppAnalyzer cppAnalyzer\n+ PythonAnalyzer pythonAnalyzer\n+ JavaAnalyzer javaAnalyzer\n+ KotlinAnalyzer kotlinAnalyzer\n+ UiFileDispatcherListener uiListener\n+Constructor(CppAnalyzer cppAnalyzer, PythonAnalyzer pythonAnalyzer, JavaAnalyzer javaAnalyzer, KotlinAnalyzer kotlinAnalyzer, UiFileDispatcherListener uiListener) None\n+dispatchRoots(List&lt;Tuple&lt;str,List&lt;str&gt;&gt;&gt; roots) List~AbstractObject~\n+dispatch(str rootDir, List~str~ files) List~AbstractObject~\n+sortObjects(List~AbstractObject~ abstractObjects) List~AbstractObject~\n}\nclass CppAnalyzer {\n<<Class>>\n+ List~str~ objectPaths\n+ Encoding encoding\n+ List~str~ forceIgnoredSymbols\n+ Configuration configuration\n+ bool configured\n+ List~str~ defines\n+Constructor(Configuration config) None\n+analyze(str rootDir, str path) List~AbstractObject~\n+isHeader(str path) bool\n+handleHeader(str path, str encoding, str code, List~AbstractObject~ abstractObjects) None\n+handleClass(str path, Any klass, List~AbstractObject~ abstractObjects) None\n+addMethods(AbstractClass abstraction, Any klass, str visibility) None\n+addMembers(AbstractClass abstraction, Any klass, str visibility) None\n+addParents(AbstractClass abstraction, Any klass) None\n+handleEnum(str path, Any enum, List~AbstractObject~ abstractObjects) None\n+handleFunction(str path, Any function, List~AbstractObject~ abstractObjects) None\n+clearNamespace(str namespace) str\n+extractUnexpectedFromParseError(CppHeaderParser::CppParseError err) str\n+defineConfig() None\n+handleConfigation() None\n}\nlink CppAnalyzer \"class££pycodeanalyzer::core::languages::analyzers::cppanalyzer::CppAnalyzer\"\nclass PythonAnalyzer {\n<<Class>>\n+ List~str~ globalImports\n+Constructor() None\n+analyze(str rootDir, str path) List~AbstractObject~\n+handleEnum(str path, str namespace, ClassDef item, List~AbstractObject~ abstractObjects) None\n+handleClass(str path, str namespace, ClassDef item, List~AbstractObject~ abstractObjects) None\n+isEnumType(str type) bool\n+handleFunction(str path, str namespace, FunctionDef item, List~AbstractObject~ abstractObjects) None\n+handleMembers(Any func, AbstractClass abstraction) None\n+deduceType(FunctionDef func, Assign item) str\n+deduceReturnType(Any returnItem) str\n+deduceTypeFromTypeName(Name item) str\n+deduceTypeFromName(FunctionDef func, Name item) str\n+deduceTypeFromTuple(Tuple item) str\n+deduceTypeFromList(typeList item) str\n+deduceTypeFromDict(Dict item) str\n+deduceTypeFromConst(Const item) str\n+handleTypeAnnotation(Any typeNope) str\n+deduceNamespaceFromAttribute(Attribute attrib, bool isRoot) str\n+deduceNamespace(str path, str rootDir) str\n+getImportsNameSpace(Any item) List~str~\n}\nlink PythonAnalyzer \"class££pycodeanalyzer::core::languages::analyzers::pythonanalyzer::PythonAnalyzer\"\nclass JavaAnalyzer {\n<<Class>>\n+ List~str~ globalImports\n+Constructor() None\n+analyze(str rootDir, str path) List~AbstractObject~\n+handleClass(List~AbstractObject~ abstractObjects, str path, str currentNS, Union~javalang::ClassDeclaration,javalang::InterfaceDeclaration~ klass) None\n+handleEnum(List~AbstractObject~ abstractObjects, str path, str currentNS, javalang::EnumDeclaration enum) None\n+handleParent(Any item, AbstractClass klass) None\n+deduceVisibility(Any item) str\n+deduceType(Any item) str\n}\nlink JavaAnalyzer \"class££pycodeanalyzer::core::languages::analyzers::javaanalyzer::JavaAnalyzer\"\nclass KotlinAnalyzer {\n<<Class>>\n+ List~str~ globalImports\n+Constructor() None\n+analyze(str rootDir, str path) List~AbstractObject~\n+handleClass(List~AbstractObject~ abstractObjects, str path, str currentNS, Union~kopyt::ClassDeclaration,kopyt::InterfaceDeclaration~ klass) None\n+handleParent(AbstractClass abstraction, kopyt::DelegationSpecifiers item) None\n+handleConstuctor(AbstractClass abstraction, Union~kopyt::PrimaryConstructor,kopyt::SecondaryConstructor~ item, bool isPrimary) None\n+handleProperty(AbstractClass abstraction, kopyt::PropertyDeclaration item, bool isStatic) None\n+handleMethod(AbstractClass abstraction, kopyt::FunctionDeclaration item, bool isStatic) None\n+handleEnum(List~AbstractObject~ abstractObjects, str path, str currentNS, kopyt::EnumDeclaration enum) None\n+handleFunction(List~AbstractObject~ abstractObjects, str path, str currentNS, kopyt::FunctionDeclaration function) None\n+deduceVisibility(Any item) str\n+deduceTypeFromExpression(str expression) str\n+deduceType(str type) str\n}\nlink KotlinAnalyzer \"class££pycodeanalyzer::core::languages::analyzers::kotlinanalyzer::KotlinAnalyzer\"\nclass UiFileDispatcherListener {\n<<Class>>\n+notifyAnalyzing(str file) None\n+notifyAnalysisEnd() None\n}\nlink UiFileDispatcherListener \"class££pycodeanalyzer::ui::app::UiFileDispatcherListener\"\nclass AbstractObject {\n<<Class>>\n+ str name\n+ str type\n+ str origin\n+ List~str~ usingNS\n+ AbstractObjectLanguage objectLanguage\n+ List~str~ linkedGenericTypes\n+Constructor(str name, str origin) None\n+addUsingNamespace(str namespace) None\n}\nlink AbstractObject \"class££pycodeanalyzer::core::abstraction::objects::AbstractObject\"\nFileDispatcher ..> CppAnalyzer\nFileDispatcher ..> PythonAnalyzer\nFileDispatcher ..> JavaAnalyzer\nFileDispatcher ..> KotlinAnalyzer\nFileDispatcher ..> UiFileDispatcherListener\nFileDispatcher ..> AbstractObject\n",
+  "content_size": 5258,
+  "collected_at": "2026-02-06T01:57:07.237755",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 7,
+  "repo_forks": 0,
+  "repo_owner": "miong",
+  "repo_name": "pycodeanalyzer",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "首先，我们需要定义流程的起点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，FileDispatcher的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由FileDispatcher组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "FileDispatcher"
+      ],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下CppAnalyzer、PythonAnalyzer吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，CppAnalyzer、PythonAnalyzer有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "CppAnalyzer",
+        "PythonAnalyzer",
+        "JavaAnalyzer"
+      ],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "KotlinAnalyzer主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是KotlinAnalyzer应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "KotlinAnalyzer"
+      ],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将UiFileDispatcherListener分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "UiFileDispatcherListener"
+      ],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将AbstractObject分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在AbstractObject完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "AbstractObject"
+      ],
+      "timestamp_offset": 210
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 14,
+    "speaker_distribution": {
+      "Speaker_B": 7,
+      "Speaker_A": 7
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "clarify": 2,
+      "structural": 1,
+      "confirm": 1,
+      "request": 1,
+      "inform": 3,
+      "contrastive": 1,
+      "classification": 3
+    },
+    "avg_turn_length": 23.357142857142858,
+    "dialogue_duration": 210
+  }
+}

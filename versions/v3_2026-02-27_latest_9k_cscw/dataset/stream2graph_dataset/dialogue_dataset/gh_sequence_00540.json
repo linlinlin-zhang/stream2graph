@@ -1,0 +1,362 @@
+{
+  "id": "gh_sequence_00540",
+  "source": "github",
+  "source_url": "https://github.com/danao0623/-Graduation-AI-Project/blob/318a0120760c3804ccbb71fdaf2cbfd44b4ffc32/.home/3/%E5%A4%A7%E5%AD%B8%E9%81%B8%E8%AA%B2%E7%B3%BB%E7%B5%B1/MMD/%E7%B3%BB%E7%B5%B1%E7%B6%AD%E8%AD%B7_sequence.mmd",
+  "github_repo": "danao0623/-Graduation-AI-Project",
+  "github_file_path": ".home/3/大學選課系統/MMD/系統維護_sequence.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    actor User\n    participant LoginUI\n    participant AuthenticationController\n    participant MaintenanceMenuUI\n    participant MaintenanceController\n    participant MaintenanceTask\n    participant SystemLog\n    participant SystemResource\n    participant Database\n    participant SystemUpdate\n    participant CodeDeployment\n\n    User->>LoginUI: getLoginInfo(username, password)\n    LoginUI->>AuthenticationController: authenticate(username, password)\n    AuthenticationController->>User: authenticate(password)\n    activate User\n    User-->>AuthenticationController: authenticationResult\n    deactivate User\n    alt Authentication successful\n        AuthenticationController-->>LoginUI: displayLoginResult(success)\n        LoginUI-->>User: displayLoginResult(success)\n        User->>MaintenanceMenuUI: displayMaintenanceMenu()\n        MaintenanceMenuUI-->>MaintenanceController: displayMaintenanceMenu()\n        MaintenanceMenuUI-->>User: displayMaintenanceMenu()\n        User->>MaintenanceMenuUI: getTaskTypeSelection(taskType)\n        MaintenanceMenuUI->>MaintenanceController: selectTaskType(taskType)\n        MaintenanceController->>MaintenanceTask: prepareTask(taskType)\n        MaintenanceController-->>MaintenanceMenuUI: displaySelectedTask(task)\n        User->>MaintenanceMenuUI: confirmTask()\n        MaintenanceMenuUI->>MaintenanceController: executeTask(task)\n        loop Task execution\n            MaintenanceController->>MaintenanceTask: execute()\n            MaintenanceController->>SystemResource: monitor()\n            MaintenanceController->>MaintenanceMenuUI: displayProgress(progress)\n            alt System Resource Insufficient\n                MaintenanceController->>MaintenanceMenuUI: displayTaskResult(failure)\n                note right of MaintenanceController: Log error and notify administrator\n            else System Resource Sufficient\n                MaintenanceController->>SystemLog: logEvent(task, success)\n            end\n        end\n        MaintenanceController-->>MaintenanceMenuUI: displayTaskResult(result)\n        MaintenanceMenuUI-->>User: displayTaskResult(result)\n        User->>MaintenanceMenuUI: logout()\n        MaintenanceMenuUI->>MaintenanceController: logout()\n        MaintenanceController->>SystemLog: logEvent(logout, success)\n        MaintenanceController-->>MaintenanceMenuUI: displayLogoutMessage(success)\n    else Authentication failed\n        AuthenticationController-->>LoginUI: displayLoginResult(failure)\n        LoginUI-->>User: displayLoginResult(failure)\n    end\n\n    alt Database Backup\n        MaintenanceController->>Database: backup()\n        Database-->>MaintenanceController: backupResult\n        MaintenanceController->>SystemLog: logEvent(backup, backupResult)\n    end\n\n    alt System Update\n        MaintenanceController->>SystemUpdate: downloadAndInstall()\n        SystemUpdate-->>MaintenanceController: updateResult\n        MaintenanceController->>SystemLog: logEvent(update, updateResult)\n    end\n\n    alt Code Deployment\n        MaintenanceController->>CodeDeployment: deploy()\n        CodeDeployment-->>MaintenanceController: deployResult\n        MaintenanceController->>SystemLog: logEvent(deploy, deployResult)\n    end",
+  "content_size": 3218,
+  "collected_at": "2026-02-06T01:33:41.275565",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是getLoginInfo(username, password)、authenticate(username, password)应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_0",
+        "msg_1"
+      ],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理authenticate(password)、displayMaintenanceMenu()？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是authenticate(password)、displayMaintenanceMenu()应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_2",
+        "msg_3"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由getTaskTypeSelection(taskType)组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "关于getTaskTypeSelection(taskType)，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "getTaskTypeSelection(taskType)和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_4"
+      ],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下selectTaskType(taskType)、prepareTask(taskType)吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "selectTaskType(taskType)、prepareTask(taskType)和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_5",
+        "msg_6"
+      ],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下confirmTask()吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "confirmTask()主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "confirmTask()负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_7"
+      ],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "关于executeTask(task)、execute()，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，executeTask(task)、execute()是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_8",
+        "msg_9"
+      ],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "monitor()、displayProgress(progress)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，monitor()、displayProgress(progress)就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_10",
+        "msg_11"
+      ],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将displayTaskResult(failure)、logEvent(task, success)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，displayTaskResult(failure)、logEvent(task, success)就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将displayTaskResult(failure)、logEvent(task, success)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "displayTaskResult(failure)、logEvent(task, success)负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_12",
+        "msg_13",
+        "msg_14"
+      ],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将logout()、logEvent(logout, success)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，logout()、logEvent(logout, success)是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_15",
+        "msg_16"
+      ],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将backup()、logEvent(backup, backupResult)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，backup()、logEvent(backup, backupResult)就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，backup()、logEvent(backup, backupResult)有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是backup()、logEvent(backup, backupResult)应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_17",
+        "msg_18",
+        "msg_19"
+      ],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由logEvent(update, updateResult)组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 495
+    },
+    {
+      "turn_id": 34,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_20"
+      ],
+      "timestamp_offset": 510
+    },
+    {
+      "turn_id": 35,
+      "speaker": "Speaker_B",
+      "utterance": "deploy()、logEvent(deploy, deployResult)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 525
+    },
+    {
+      "turn_id": 36,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在deploy()、logEvent(deploy, deployResult)完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_21",
+        "msg_22"
+      ],
+      "timestamp_offset": 540
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 36,
+    "speaker_distribution": {
+      "Speaker_B": 18,
+      "Speaker_A": 18
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "clarify": 3,
+      "request": 5,
+      "inform": 6,
+      "structural": 4,
+      "contrastive": 3,
+      "confirm": 6,
+      "classification": 7
+    },
+    "avg_turn_length": 40.611111111111114,
+    "dialogue_duration": 540
+  }
+}

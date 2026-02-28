@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00565",
+  "source": "github",
+  "source_url": "https://github.com/tim-gameplan/genai-skills-workshop-tim-beermann/blob/32a6010389c3ceaa3f214b54153c6977fdd67817/challenge-05-alaska-snow-agent/diagrams/architecture.mmd",
+  "github_repo": "tim-gameplan/genai-skills-workshop-tim-beermann",
+  "github_file_path": "challenge-05-alaska-snow-agent/diagrams/architecture.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TB\n    subgraph USER[\"👤 User Interface\"]\n        Browser[Web Browser]\n    end\n\n    subgraph CLOUDRUN[\"☁️ Cloud Run\"]\n        Streamlit[Streamlit App<br/>app.py]\n        subgraph SECURITY[\"🛡️ Security Layer\"]\n            InputFilter[Input Sanitization]\n            OutputFilter[Output Sanitization]\n        end\n    end\n\n    subgraph VERTEXAI[\"🤖 Vertex AI\"]\n        Gemini[Gemini 2.5 Flash<br/>Response Generation]\n        EmbeddingModel[text-embedding-004<br/>Vector Embeddings]\n    end\n\n    subgraph BIGQUERY[\"📊 BigQuery\"]\n        FAQsRaw[snow_faqs_raw<br/>Source Data]\n        SnowVectors[snow_vectors<br/>Vector Index]\n        Logs[interaction_logs<br/>Audit Trail]\n    end\n\n    subgraph MODELARMOR[\"🔒 Model Armor\"]\n        PIJailbreak[Prompt Injection<br/>& Jailbreak Detection]\n        PIIFilter[PII / SDP<br/>Filtering]\n    end\n\n    subgraph GCS[\"📁 Cloud Storage\"]\n        SourceData[gs://labs.roitraining.com/<br/>alaska-dept-of-snow]\n    end\n\n    %% Data Flow\n    Browser -->|1. User Query| Streamlit\n    Streamlit -->|2. Security Check| InputFilter\n    InputFilter -->|3. Validate| PIJailbreak\n    PIJailbreak -->|4. Safe/Block| InputFilter\n\n    InputFilter -->|5. If Safe| Streamlit\n    Streamlit -->|6. Embed Query| EmbeddingModel\n    EmbeddingModel -->|7. Query Vector| Streamlit\n    Streamlit -->|8. Vector Search| SnowVectors\n    SnowVectors -->|9. Top-3 Results| Streamlit\n\n    Streamlit -->|10. RAG Prompt| Gemini\n    Gemini -->|11. Response| Streamlit\n    Streamlit -->|12. Security Check| OutputFilter\n    OutputFilter -->|13. Validate| PIIFilter\n    PIIFilter -->|14. Clean/Redact| OutputFilter\n\n    OutputFilter -->|15. Final Response| Streamlit\n    Streamlit -->|16. Display| Browser\n    Streamlit -->|17. Log| Logs\n\n    %% Setup (Dashed Lines)\n    SourceData -.->|Initial Load| FAQsRaw\n    FAQsRaw -.->|Generate Embeddings| SnowVectors\n\n    %% Styling\n    classDef userStyle fill:#e1f5fe,stroke:#01579b,stroke-width:2px\n    classDef cloudrunStyle fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px\n    classDef vertexStyle fill:#fff3e0,stroke:#e65100,stroke-width:2px\n    classDef bqStyle fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px\n    classDef armorStyle fill:#ffebee,stroke:#c62828,stroke-width:2px\n    classDef gcsStyle fill:#e0f2f1,stroke:#00695c,stroke-width:2px\n\n    class Browser userStyle\n    class Streamlit,InputFilter,OutputFilter cloudrunStyle\n    class Gemini,EmbeddingModel vertexStyle\n    class FAQsRaw,SnowVectors,Logs bqStyle\n    class PIJailbreak,PIIFilter armorStyle\n    class SourceData gcsStyle\n",
+  "content_size": 2543,
+  "collected_at": "2026-02-06T01:45:14.328741",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

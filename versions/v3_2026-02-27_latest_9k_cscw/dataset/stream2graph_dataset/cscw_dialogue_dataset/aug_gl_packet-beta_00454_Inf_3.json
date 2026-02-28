@@ -1,0 +1,271 @@
+{
+  "id": "aug_gl_packet-beta_00454_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/Ghenghis/SvonyBrowser/blob/b02803cf7b47e7d54ef3c45466f973948f5a47d4/docs/v2.0.6/diagrams/IPC_COMMUNICATION.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "Ghenghis/SvonyBrowser",
+  "diagram_type": "packet-beta",
+  "code": "%%{Infra_WorkerNode}}}%%\nsequenceDiagram\n    autonumber\n    participant R as 🖼️ Renderer<br/>(Infra_EtcdCluster)\n    participant P as 📡 Preload<br/>(Infra_LoadBalancer)\n    participant M as 🖥️ Main<br/>(Infra_EtcdCluster)\n    participant S as ⚙️ Services\n    participant MCP as 🤖 MCP Servers\n    participant LM as 🧠 LM Studio\n    \n    Note over R,LM: Application Initialization\n    \n    R->>P: DOMContentLoaded\n    P->>M: ipcRenderer.invoke(Infra_RedisCache)\n    M-->>P: {Infra_IngressController}\n    P-->>R: version\n    \n    R->>P: Initialize LM Studio\n    P->>M: ipcRenderer.invoke(Infra_RedisCache)\n    M->>S: lmStudioClient.connect(Infra_IngressController)\n    S->>LM: HTTP GET /v1/models\n    LM-->>S: {Infra_LoadBalancer] }\n    S-->>M: {Infra_EtcdCluster}\n    M-->>P: status\n    P-->>R: Update UI\n    \n    Note over R,LM: Chat Message Flow\n    \n    R->>P: User sends chat message\n    P->>M: ipcRenderer.invoke(Infra_IngressController)\n    M->>S: chatbotService.processMessage(Infra_EtcdCluster)\n    \n    alt Intent: Knowledge Query\n        S->>MCP: evony_search(Infra_EtcdCluster)\n        MCP-->>S: {Infra_WorkerNode] }\n    else Intent: Calculation\n        S->>MCP: calc_training(Infra_IngressController)\n        MCP-->>S: {Infra_RedisCache} }\n    else Intent: Protocol\n        S->>MCP: protocol_lookup(Infra_RedisCache)\n        MCP-->>S: {Infra_EtcdCluster} }\n    end\n    \n    S->>S: Build context from MCP results\n    S->>LM: POST /v1/chat/completions\n    LM-->>S: {Infra_RedisCache}\n    S-->>M: formatted response\n    M-->>P: response\n    P-->>R: Display in chat\n    \n    Note over R,LM: Traffic Capture Flow\n    \n    R->>P: Webview traffic detected\n    P->>M: ipcRenderer.send(Infra_LoadBalancer)\n    M->>S: proxyMonitor.processPacket(Infra_IngressController)\n    S->>S: Decode AMF3\n    S->>S: Identify action\n    S->>S: Update game state\n    M->>P: mainWindow.webContents.send(Infra_WorkerNode)\n    P->>R: Update traffic list\n    \n    Note over R,LM: Settings Flow\n    \n    R->>P: User saves settings\n    P->>M: ipcRenderer.invoke(Infra_LoadBalancer)\n    M->>S: store.set(Infra_IngressController)\n    M->>S: lmStudioClient.updateSettings(Infra_EtcdCluster)\n    S->>LM: Reconnect if URL changed\n    M-->>P: {Infra_RedisCache}\n    P-->>R: Show confirmation\n",
+  "content_size": 2201,
+  "collected_at": "2026-02-06T14:10:02.606566",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "gl_packet-beta_00454",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Infra_RedisCache 和 Infra_RedisCache 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Infra_RedisCache 和 Infra_RedisCache'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "invoke",
+        "invoke"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Infra_IngressController 和 Infra_IngressController 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Infra_IngressController 和 Infra_IngressController'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "connect",
+        "invoke"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Infra_EtcdCluster 和 Infra_EtcdCluster 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Infra_EtcdCluster 和 Infra_EtcdCluster'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "processMessage",
+        "evony_search"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Infra_IngressController 和 Infra_RedisCache 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Infra_IngressController 和 Infra_RedisCache'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "calc_training",
+        "protocol_lookup"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Infra_LoadBalancer 和 Infra_IngressController 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Infra_LoadBalancer 和 Infra_IngressController'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "send",
+        "processPacket"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Infra_WorkerNode 和 Infra_LoadBalancer 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Infra_WorkerNode 和 Infra_LoadBalancer'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "send",
+        "invoke"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Infra_IngressController 和 Infra_EtcdCluster 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Infra_IngressController 和 Infra_EtcdCluster'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "set",
+        "updateSettings"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 28,
+    "repair_count": 0,
+    "grounding_acts_count": 14,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

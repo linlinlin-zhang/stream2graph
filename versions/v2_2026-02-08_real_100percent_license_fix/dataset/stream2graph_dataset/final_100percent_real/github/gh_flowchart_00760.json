@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00760",
+  "source": "github",
+  "source_url": "https://github.com/akdokumaci/ai-papers/blob/ddb13d2a3e1c07d5f017ec66920feef66fa27b3d/blur/system-arch.mmd",
+  "github_repo": "akdokumaci/ai-papers",
+  "github_file_path": "blur/system-arch.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart LR\n    %% Pipeline\n    I[Input Tokens] --> E[Token/Positional Embeddings]\n    E --> TB1[Transformer Block 1]\n    TB1 --> TB2[Transformer Block 2]\n    TB2 -->|activations/keys/values| BML([Blur Memory Layer])\n    BML --> TB3[Transformer Block 3+]\n    TB3 --> O[Output logits / tokens]\n\n    %% Blur internals\n    subgraph S1[Blur Memory Layer (BML)]\n        A1[Sample activations] --> A2[Density/graph clustering]\n        A2 --> A3[Compute cluster centroids (μ)]\n        A3 --> A4[Reweight updates toward centroids]\n        A2 -.->|novelty| A5{New cluster?}\n        A5 -- yes --> A6[Create Blur]\n        A5 -- no --> A7[Assimilate into existing Blur]\n    end\n\n    %% Persistent graph\n    BML -.writes/reads.-> BGD[(Blur Graph DB)]\n    BGD -.->|edges: similarity, co-use, temporal| BML\n\n    %% Hierarchy\n    subgraph H[Blur Hierarchy]\n      B1((Blur α)):::blur --- B2((Blur β)):::blur\n      B2 --- B3((Blur γ)):::blur\n      B1 -. meta-links .- MB([Meta-Blur: higher abstraction]):::meta\n    end\n\n    classDef blur fill:#E8F3FF,stroke:#2F6FED,stroke-width:1.2px\n    classDef meta fill:#FFF4D6,stroke:#DFA500,stroke-width:1.2px\n",
+  "content_size": 1133,
+  "collected_at": "2026-02-06T01:47:45.557952",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

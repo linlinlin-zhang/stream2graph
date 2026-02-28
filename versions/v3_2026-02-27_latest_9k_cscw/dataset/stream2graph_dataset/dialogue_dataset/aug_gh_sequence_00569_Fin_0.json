@@ -1,0 +1,345 @@
+{
+  "id": "aug_gh_sequence_00569_Fin_0",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/MESH-Research/invenio-stats-dashboard/blob/8b96c4598deaf08814b9b0fc7c7244a297725a45/docs/event-reindexing-sequence.mmd",
+  "github_repo": "MESH-Research/invenio-stats-dashboard",
+  "github_file_path": "docs/event-reindexing-sequence.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant CLI as CLI Command\n    participant Service as EventReindexingService\n    participant OpenSearch as OpenSearch Cluster\n    participant Bookmark as Bookmark API\n    participant Metadata as RDM Records Index\n\n    CLI->>Service: reindex_events(FinTech_PaymentGateway)\n    Service->>Service: update_and_verify_templates(FinTech_FraudDetection)\n    Service->>OpenSearch: Check/Update Templates\n\n    loop For Each Event Type\n        Service->>OpenSearch: get_monthly_indices(FinTech_LedgerService)\n        OpenSearch-->>Service: List of monthly indices\n\n        loop For Each Monthly Index\n            Service->>Service: migrate_monthly_index(FinTech_TransactionQueue)\n            Service->>OpenSearch: create_enriched_index(FinTech_LedgerService)\n            OpenSearch-->>Service: New index name\n\n            Service->>Bookmark: get_bookmark(FinTech_LedgerService)\n            Bookmark-->>Service: Last processed ID\n\n            loop Batch Processing\n                Service->>Service: check_health_conditions(FinTech_LedgerService)\n                Service->>OpenSearch: process_monthly_index_batch(FinTech_AuthVault)\n                Service->>Metadata: get_metadata_for_records(FinTech_FraudDetection)\n                Metadata-->>Service: Record metadata\n                Service->>Service: enrich_events(FinTech_TransactionQueue)\n                Service->>OpenSearch: bulk_index(FinTech_PaymentGateway)\n                Service->>Bookmark: set_bookmark(FinTech_LedgerService)\n            end\n\n            Service->>Service: validate_enriched_data(FinTech_PaymentGateway)\n            Service->>OpenSearch: update_aliases(FinTech_LedgerService)\n\n            alt Current Month Index\n                Service->>OpenSearch: setup_write_alias(FinTech_FraudDetection)\n                Service->>OpenSearch: migrate_new_records(FinTech_FraudDetection)\n            end\n\n            Service->>OpenSearch: delete_old_index(FinTech_PaymentGateway)\n        end\n    end\n\n    Service-->>CLI: Migration results\n",
+  "content_size": 1663,
+  "collected_at": "2026-02-06T01:34:05.120021",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 3,
+  "repo_forks": 0,
+  "repo_owner": "MESH-Research",
+  "repo_name": "invenio-stats-dashboard",
+  "repo_description": "A usage statistics dashboard for InvenioRDM instances",
+  "repo_language": "Python",
+  "repo_topics": [],
+  "repo_created_at": "2025-05-07T13:44:58Z",
+  "repo_updated_at": "2026-01-24T04:34:06Z",
+  "augmentation_domain": "FinTech",
+  "seed_id": "gh_sequence_00569",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "CLI Command和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "CLI Command主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "CLI"
+      ],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含EventReindexingService、OpenSearch Cluster这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达EventReindexingService、OpenSearch Cluster结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "Service",
+        "OpenSearch",
+        "Bookmark"
+      ],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由RDM Records Index组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是RDM Records Index应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "Metadata"
+      ],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含reindex_events(FinTech_PaymentGateway)这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_0"
+      ],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有update_and_verify_templates(FinTech_FraudDetection)、Check/Update Templates。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，update_and_verify_templates(FinTech_FraudDetection)、Check/Update Templates就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由update_and_verify_templates(FinTech_FraudDetection)、Check/Update Templates组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_1",
+        "msg_2",
+        "msg_3"
+      ],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将migrate_monthly_index(FinTech_TransactionQueue)、create_enriched_index(FinTech_LedgerService)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_4",
+        "msg_5",
+        "msg_6"
+      ],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "check_health_conditions(FinTech_LedgerService)、process_monthly_index_batch(FinTech_AuthVault)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，check_health_conditions(FinTech_LedgerService)、process_monthly_index_batch(FinTech_AuthVault)的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是check_health_conditions(FinTech_LedgerService)、process_monthly_index_batch(FinTech_AuthVault)应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_7",
+        "msg_8",
+        "msg_9"
+      ],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有enrich_events(FinTech_TransactionQueue)。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，enrich_events(FinTech_TransactionQueue)是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_10"
+      ],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理bulk_index(FinTech_PaymentGateway)、set_bookmark(FinTech_LedgerService)？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_11",
+        "msg_12",
+        "msg_13"
+      ],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "关于update_aliases(FinTech_LedgerService)、setup_write_alias(FinTech_FraudDetection)，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由update_aliases(FinTech_LedgerService)、setup_write_alias(FinTech_FraudDetection)组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_14",
+        "msg_15"
+      ],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有migrate_new_records(FinTech_FraudDetection)、delete_old_index(FinTech_PaymentGateway)。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，migrate_new_records(FinTech_FraudDetection)、delete_old_index(FinTech_PaymentGateway)的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "关于migrate_new_records(FinTech_FraudDetection)、delete_old_index(FinTech_PaymentGateway)，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在migrate_new_records(FinTech_FraudDetection)、delete_old_index(FinTech_PaymentGateway)完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_16",
+        "msg_17"
+      ],
+      "timestamp_offset": 495
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 33,
+    "speaker_distribution": {
+      "Speaker_B": 17,
+      "Speaker_A": 16
+    },
+    "speech_act_distribution": {
+      "sequential": 3,
+      "inform": 7,
+      "contrastive": 1,
+      "classification": 3,
+      "structural": 8,
+      "clarify": 4,
+      "confirm": 4,
+      "request": 3
+    },
+    "avg_turn_length": 54.21212121212121,
+    "dialogue_duration": 495
+  }
+}

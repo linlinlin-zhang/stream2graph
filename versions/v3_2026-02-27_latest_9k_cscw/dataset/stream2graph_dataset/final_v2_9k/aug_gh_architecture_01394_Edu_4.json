@@ -1,0 +1,20 @@
+{
+  "id": "aug_gh_architecture_01394_Edu_4",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/cdot65/paloaltonetworks-automation-examples/blob/81203f54d542b4295e14fcbfe7f0ece37f3161f3/python/threatvault-hash-lookup/threatvault.mmd",
+  "github_repo": "cdot65/paloaltonetworks-automation-examples",
+  "github_file_path": "python/threatvault-hash-lookup/threatvault.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TD\n    A[Education_LMS_Portal] --> B[Education_LMS_Portal]\n    B --> C{Education_StudentDB}\n    C -->|FileNotFoundError| D[Education_ContentCDN]\n    C --> E{Education_ContentCDN}\n    E -->|No| F[Education_LMS_Portal]\n    F --> D\n    E -->|Yes| G[Education_ContentCDN]\n    G --> H{Education_ContentCDN}\n    H -->|Yes| I[Education_LMS_Portal]\n    H -->|No| J[Education_ContentCDN]\n    I --> K[Education_ContentCDN]\n    K --> L{Education_GradeSync}\n    L -->|Yes| M[Education_ContentCDN]\n    L -->|No| N[Education_ContentCDN]\n    M --> O[Education_StudentDB]\n    N --> O\n\n    subgraph threat_vault_lookup\n        G1[Education_StudentDB] --> G2[Education_ClassroomService]\n        G2 --> G3{Education_GradeSync}\n        G3 -->|Success| G4[Education_LMS_Portal]\n        G3 -->|Error| G5[Education_ContentCDN]\n        G4 -->|Success| G6[Education_StudentDB]\n        G4 -->|Error| G7[Education_ContentCDN]\n    end\n\n    subgraph get_file_hashes\n        C1[Education_StudentDB] --> C2{Education_ContentCDN}\n        C2 -->|Yes| C3[Education_StudentDB]\n        C3 --> C4{Education_StudentDB}\n        C4 -->|File| C5[Education_ClassroomService]\n        C5 --> C6[Education_GradeSync]\n        C6 --> C4\n        C4 -->|No more files| C7[Education_ContentCDN]\n        C2 -->|No| C8[Education_ContentCDN]\n        C8 --> C9[Education_StudentDB]\n        C9 --> C10[Education_ContentCDN]\n    end\n\n    subgraph calculate_sha256\n        A1[Education_ClassroomService] --> B1[Education_ClassroomService]\n        B1 --> C1[Education_StudentDB]\n        C1 --> D1{Education_LMS_Portal}\n        D1 -->|Chunk read| E1[Education_ClassroomService]\n        E1 --> D1\n        D1 -->|End of file| F1[Education_ClassroomService]\n        F1 --> G1[Education_ClassroomService]\n        G1 --> H1[Education_ClassroomService]\n    end",
+  "content_size": 2043,
+  "collected_at": "2026-02-06T01:45:40.810285",
+  "license": "mit",
+  "license_name": "MIT License",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 18,
+  "repo_forks": 11,
+  "augmentation_domain": "Education",
+  "seed_id": "gh_architecture_01394"
+}

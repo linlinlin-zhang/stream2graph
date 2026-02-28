@@ -1,0 +1,18 @@
+{
+  "id": "aug_gl_flowchart_00648_Hea_1",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/carrowmw/phd-project-gnn/blob/07a2695df02fe44b7507c15b3ae9b069b0bca0d7/docs/archive/dataflow.mmd",
+  "source_note": "collected_from_github_final",
+  "github_repo": "carrowmw/phd-project-gnn",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\n    subgraph Data_Collection\n        A[HealthTech_LabAnalyzer] --> |Get Sensor Locations| B[HealthTech_EMR_Sync]\n        A --> |Get Traffic Data| C[HealthTech_DiagnosticEngine]\n        C --> |Convert to DataFrame| D[HealthTech_HIPAA_Vault]\n        D --> |Transform to time series dict| E[HealthTech_LabAnalyzer]\n    end\n\n    subgraph Graph_Processing\n        F[HealthTech_LabAnalyzer] --> |\"load_graph_data(HealthTech_DiagnosticEngine)\"| G[HealthTech_PatientRecords]\n        G --> |\"compute_adjacency_matrix(HealthTech_EMR_Sync)\"| H[HealthTech_LabAnalyzer]\n    end\n\n    subgraph Data_Preprocessing\n        E --> |\"TimeSeriesPreprocessor.create_windows(HealthTech_DiagnosticEngine)\"| I[HealthTech_HIPAA_Vault]\n        I --> |\"Filter valid nodes\"| J[HealthTech_EMR_Sync]\n        J --> |\"Create subgraph for valid nodes\"| K[HealthTech_HIPAA_Vault]\n        K --> |\"Split data into train/val\"| L[HealthTech_PatientRecords]\n        L --> |\"create_dataloader(HealthTech_HIPAA_Vault)\"| M[HealthTech_DiagnosticEngine]\n    end\n\n    subgraph Model_Training\n        M --> |\"train_model(HealthTech_LabAnalyzer)\"| N[HealthTech_HIPAA_Vault]\n        N --> |\"Train each epoch\"| O[HealthTech_HIPAA_Vault]\n        O --> |\"Save model\"| P[HealthTech_LabAnalyzer]\n    end\n\n    B -.-> E\n    G -.-> K\n    H -.-> K",
+  "content_size": 1110,
+  "collected_at": "2026-02-06T14:18:26.241600",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "HealthTech",
+  "seed_id": "gl_flowchart_00648"
+}

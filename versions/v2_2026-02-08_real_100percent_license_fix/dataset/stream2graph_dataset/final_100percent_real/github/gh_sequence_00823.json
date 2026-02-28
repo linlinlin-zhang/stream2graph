@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00823",
+  "source": "github",
+  "source_url": "https://github.com/govuk-one-login/authentication-api/blob/a4c68710b6177665c4625f1c8789455deca7b26b/docs/diagrams/authentication/login/account-interventions/pre-authenticated.mmd/authenticated-sms-no-intervention.mmd",
+  "github_repo": "govuk-one-login/authentication-api",
+  "github_file_path": "docs/diagrams/authentication/login/account-interventions/pre-authenticated.mmd/authenticated-sms-no-intervention.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant orch_api as Orchestration\n    participant auth_frontend as Authentication Frontend\n    participant auth_external_api as Authentication External API\n    participant auth_internal_api as Authentication Internal API\n    participant account_interventions as Account Interventions API\n    participant notification_queue as NotificationHandler.java Lambda   \n    participant notify as Notify   \n    orch_api ->> auth_frontend : OAuth 2.0 Authorization request 302 redirect to /authorize\n    auth_frontend ->> auth_frontend : Decrypt and validate request and create session   \n    auth_frontend ->> auth_internal_api : Request to /start (StartHandler.java)\n    auth_internal_api ->> auth_internal_api : Start helps calculate current state\n    auth_internal_api ->> auth_frontend : StartResponse.java object returned\n    auth_frontend ->> auth_frontend : State machine works out where to send user based on start response\n    auth_frontend ->> auth_internal_api : Request to /account-interventions (AccountInterventionsHandler.java)\n    auth_internal_api ->> account_interventions : Request to account interventions api (AccountInterventionsRequest.java)\n    account_interventions ->> auth_internal_api : Response from Account Interventions containing suspension=false & passwordReset=false & blocked=false\n    auth_internal_api ->> auth_internal_api : Checks response to see if any intervention is required\n    auth_internal_api ->> auth_frontend: AccountInterventions.java object returned\n    auth_frontend ->> auth_frontend : Validates that no intervention is required\n    auth_frontend ->> auth_internal_api : Request to /orch-auth-code (AuthenticationAuthCodeHandler.java)\n    auth_internal_api ->> auth_internal_api : Generates and store Authorization Code with 5 min TTL\n    auth_internal_api ->> auth_frontend: AuthCodeResponse.java object returned\n    auth_frontend ->> orch_api : Authorisation response via browser to /orchestration-redirect URL\n    orch_api ->> auth_external_api: Token request to /token (TokenHandler.java)\n    auth_external_api ->> auth_external_api : Validates token request, then generates and stores access token with 3 min TTL\n    auth_external_api ->> orch_api : Token response containing access token\n    orch_api ->> auth_external_api: Userinfo request to /userinfo (UserInfoHandler.java)\n    auth_external_api ->> auth_external_api: Returns authenticated level, internal pairwise and other details\n    auth_external_api ->> orch_api : Userinfo response\n",
+  "content_size": 2515,
+  "collected_at": "2026-02-06T01:37:32.806671",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 16,
+  "repo_forks": 10,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

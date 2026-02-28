@@ -1,0 +1,16 @@
+{
+  "id": "gl_flowchart_00788",
+  "source": "gitlab",
+  "source_url": "https://github.com/Romainkul/PBD/blob/c3dc7cb7f3dc4252f23a1bcf8d31f603a3733f3f/DfdMonaiLabel.mmd",
+  "source_note": "collected_from_github_final",
+  "github_repo": "Romainkul/PBD",
+  "diagram_type": "flowchart",
+  "code": "%%{init: {'flowchart': { 'curve': 'basis', 'htmlLabels': true, 'nodeSpacing': 90, 'rankSpacing': 120, 'useMaxWidth': false }, 'themeVariables': { 'fontSize': '16px' }}}%%\nflowchart LR\n  %% ======================= Concise MONAI Label DFD (Simplified) =======================\n  %% Shapes: Processes = ovals ( ), Actors = rectangles [ ], Storage = cylinders [( )]\n\n  %% -------- Hospital Scope (background) --------\n  subgraph HOSP[Hospital Scope]\n\n    %% -------- Client Device (actors) --------\n    subgraph CLIENT[Client Device]\n      patient2[Patient]\n      user[Annotator/Admin]\n      ui([Viewer UI<br/> 3D Slicer · MITK · OHIF])\n      sdk([Client SDK<br/> HTTP wrapper])\n      user --> ui\n      ui --> sdk\n      patient2 --> ui\n    end\n\n    %% -------- MONAI Label Server (processes + storage) --------\n    subgraph SERVER[MONAI Label Server]\n      core([Server Core<br/>FastAPI · Auth · App])\n      ml([ML Tasks<br/>Infer · Train · Score · AL])\n      proxy([DICOM Proxy])\n      storage[(Images · Labels · Models · Sessions)]\n    end\n\n    %% -------- Additional internal actors --------\n    mluser[Data Scientist/ML Engineer]\n    itops[IT Infrastructure/DevOps]\n\n  end\n\n  %% -------- External Services (outside Hospital) --------\n  subgraph EXTERNAL[External Services]\n    dicom[(DICOMweb/PACS)]\n    dsa[(DSA)]\n    xnat[(XNAT)]\n    idp[(IdP/OIDC)]\n    patient[Patient]\n  end\n\n  %% =================== Consolidated Flows (one edge per direction) =====================\n  %% Client <-> Core\n  sdk -->|API calls: info · datastore · infer · train · scoring · AL · session · auth · proxy| core\n  core -->|Responses: JSON · files · tokens| sdk\n\n  %% Core <-> ML (single pair)\n  core -->|Dispatch tasks| ml\n  ml -->|Results/metrics| core\n\n  %% Core <-> Storage (single; read/write implied)\n  core -->|R/W dataset · labels · models · sessions| storage\n\n  %% ML <-> Storage (single; read/write implied)\n  ml -->|R/W images · labels · artifacts| storage\n\n  %% Proxy <-> DICOMweb (single pair)\n  sdk -->|\"DICOMweb ops (qido/wado/stow)\"| proxy\n  proxy -->|HTTP DICOMweb| dicom\n  proxy -->|Streamed response| sdk\n\n  %% External Datastores (optional import/export)\n  storage -->|\"Import/Export (optional)\"| dsa\n  storage -->|\"Import/Export (optional)\"| xnat\n\n  %% Auth (single pair)\n  core -->|Token exchange| idp\n  idp -->|JWT/claims| core\n\n  %% Added actors interactions\n  mluser -->|Train/Score/Admin| core\n  core -->|Results/metrics| mluser\n  itops -->|Deploy/Monitor| core\n  itops -->|Backup/Monitoring| storage\n  itops -->|Provision/Policy| idp\n  patient -->|Imaging/PHI source| dicom",
+  "content_size": 2578,
+  "collected_at": "2026-02-06T14:20:22.283772",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

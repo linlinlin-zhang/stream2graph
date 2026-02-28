@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00535",
+  "source": "github",
+  "source_url": "https://github.com/brodul/zerotrust_presentation/blob/2b70481696fbf58f16ff0d1075945eca4db774e1/aws_sts_diagram.mmd",
+  "github_repo": "brodul/zerotrust_presentation",
+  "github_file_path": "aws_sts_diagram.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant User as User/Application\n    participant IdP as Identity Provider<br/>(SAML/OIDC)\n    participant STS as AWS STS\n    participant IAM as AWS IAM\n    participant AWS as AWS Services\n\n    User->>IdP: 1. Authenticate with credentials\n    IdP->>User: 2. Return identity token/assertion<br/>(SAML assertion or OIDC token)\n    \n    User->>STS: 3. AssumeRoleWithSAML/AssumeRoleWithWebIdentity<br/>+ Identity token + Role ARN\n    \n    STS->>IdP: 4. Validate token/assertion\n    IdP->>STS: 5. Confirm token validity\n    \n    STS->>IAM: 6. Check trust policy on target role<br/>Can this identity assume this role?\n    IAM->>STS: 7. Trust policy evaluation result\n    \n    alt Trust policy allows assumption\n        STS->>User: 8. Return temporary credentials<br/>• Access Key ID<br/>• Secret Access Key<br/>• Session Token<br/>• Expiration time\n        \n        User->>AWS: 9. Make API calls with temporary credentials\n        AWS->>IAM: 10. Check role permissions/policies<br/>for requested action\n        IAM->>AWS: 11. Permission evaluation result\n        \n        AWS->>User: 12. Return successful response\n    end\n",
+  "content_size": 1140,
+  "collected_at": "2026-02-06T01:33:37.148534",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

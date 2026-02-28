@@ -1,0 +1,494 @@
+{
+  "id": "gh_flowchart_00436",
+  "source": "github",
+  "source_url": "https://github.com/astenios/ledger/blob/c6579e87e4ae85da3022e459922a1269ef0e50e1/docs/diagrams/async-flow.mmd",
+  "github_repo": "astenios/ledger",
+  "github_file_path": "docs/diagrams/async-flow.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TB\n    subgraph Clients[\"Clients\"]\n        C1[Web/Mobile App]\n        C2[Internal Services]\n        C3[Batch Systems]\n    end\n\n    subgraph Ingress[\"Ingress Layer\"]\n        REST[REST API<br/>POST /v1/transactions]\n        CONSUMER[Kafka Consumer<br/>transactions.requests]\n    end\n\n    subgraph Processing[\"Transaction Processing\"]\n        WORKER[TransactionWorker<br/>CreateTransactionUseCase]\n    end\n\n    subgraph DB[\"PostgreSQL\"]\n        TXN[(transaction)]\n        LEDGER[(ledger_entry)]\n        OUTBOX[(outbox)]\n    end\n\n    subgraph CDC[\"CDC Layer\"]\n        DEB[Debezium]\n    end\n\n    subgraph EventTopic[\"Kafka - Event Topics\"]\n        EVENTS[ledger.transactions]\n    end\n\n    subgraph Downstream[\"Downstream Services\"]\n        NOTIF[Notifications]\n        FRAUD[Fraud Detection]\n        REWARDS[Rewards]\n    end\n\n    %% Sync path (REST)\n    C1 -->|\"Sync\"| REST\n    REST -->|\"Call\"| WORKER\n    REST -.->|\"Response\"| C1\n\n    %% Async path (Kafka)\n    C2 & C3 -->|\"Async\"| CONSUMER\n    CONSUMER -->|\"Call\"| WORKER\n\n    %% Processing\n    WORKER -->|\"Persist\"| DB\n    TXN --- LEDGER --- OUTBOX\n\n    %% CDC to events\n    DEB -->|\"Read WAL\"| OUTBOX\n    DEB -->|\"Publish\"| EVENTS\n\n    %% Downstream\n    EVENTS --> NOTIF & FRAUD & REWARDS\n\n    %% Status polling\n    C1 -.->|\"Poll status\"| REST\n",
+  "content_size": 1303,
+  "collected_at": "2026-02-06T01:44:04.467200",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，\"Clients\"、Web/Mobile App的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "Clients",
+        "C1"
+      ],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "Internal Services、Batch Systems主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Internal Services、Batch Systems就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "C2",
+        "C3"
+      ],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将\"Ingress Layer\"分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将\"Ingress Layer\"分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "Ingress"
+      ],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下REST API<br/>POST /v1/transactions、Kafka Consumer<br/>transactions.requests吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，REST API<br/>POST /v1/transactions、Kafka Consumer<br/>transactions.requests是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "REST",
+        "CONSUMER"
+      ],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "关于\"Transaction Processing\"、TransactionWorker<br/>CreateTransactionUseCase，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由\"Transaction Processing\"、TransactionWorker<br/>CreateTransactionUseCase组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "Processing",
+        "WORKER"
+      ],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由\"PostgreSQL\"、(transaction组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将\"PostgreSQL\"、(transaction分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "DB",
+        "TXN",
+        "LEDGER"
+      ],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "(outbox主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，(outbox就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达(outbox结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "OUTBOX"
+      ],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理\"CDC Layer\"、Debezium？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "\"CDC Layer\"、Debezium主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "CDC",
+        "DEB"
+      ],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "关于\"Kafka - Event Topics\"、ledger.transactions，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，\"Kafka - Event Topics\"、ledger.transactions就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "\"Kafka - Event Topics\"、ledger.transactions和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "EventTopic",
+        "EVENTS"
+      ],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由\"Downstream Services\"组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，\"Downstream Services\"是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "Downstream"
+      ],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理Notifications、Fraud Detection？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "Notifications、Fraud Detection主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "Notifications、Fraud Detection主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "NOTIF",
+        "FRAUD",
+        "REWARDS"
+      ],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "Kafka主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 495
+    },
+    {
+      "turn_id": 34,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，Kafka是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 510
+    },
+    {
+      "turn_id": 35,
+      "speaker": "Speaker_B",
+      "utterance": "Kafka和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 525
+    },
+    {
+      "turn_id": 36,
+      "speaker": "Speaker_A",
+      "utterance": "Kafka主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "path"
+      ],
+      "timestamp_offset": 540
+    },
+    {
+      "turn_id": 37,
+      "speaker": "Speaker_B",
+      "utterance": "\"Sync\"、\"Call\"主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 555
+    },
+    {
+      "turn_id": 38,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，\"Sync\"、\"Call\"的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 570
+    },
+    {
+      "turn_id": 39,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是\"Sync\"、\"Call\"应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 585
+    },
+    {
+      "turn_id": 40,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_0",
+        "edge_1"
+      ],
+      "timestamp_offset": 600
+    },
+    {
+      "turn_id": 41,
+      "speaker": "Speaker_B",
+      "utterance": "\"Async\"、\"Call\"主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 615
+    },
+    {
+      "turn_id": 42,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，\"Async\"、\"Call\"就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 630
+    },
+    {
+      "turn_id": 43,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是\"Async\"、\"Call\"应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_2",
+        "edge_3"
+      ],
+      "timestamp_offset": 645
+    },
+    {
+      "turn_id": 44,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理\"Persist\"？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 660
+    },
+    {
+      "turn_id": 45,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_4"
+      ],
+      "timestamp_offset": 675
+    },
+    {
+      "turn_id": 46,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理\"Read WAL\"、\"Publish\"？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 690
+    },
+    {
+      "turn_id": 47,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，\"Read WAL\"、\"Publish\"的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_5",
+        "edge_6"
+      ],
+      "timestamp_offset": 705
+    },
+    {
+      "turn_id": 48,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 720
+    },
+    {
+      "turn_id": 49,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 735
+    },
+    {
+      "turn_id": 50,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 750
+    },
+    {
+      "turn_id": 51,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "edge_7"
+      ],
+      "timestamp_offset": 765
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 51,
+    "speaker_distribution": {
+      "Speaker_B": 26,
+      "Speaker_A": 25
+    },
+    "speech_act_distribution": {
+      "sequential": 3,
+      "clarify": 6,
+      "classification": 12,
+      "confirm": 9,
+      "request": 7,
+      "inform": 7,
+      "structural": 5,
+      "contrastive": 2
+    },
+    "avg_turn_length": 29.392156862745097,
+    "dialogue_duration": 765
+  }
+}

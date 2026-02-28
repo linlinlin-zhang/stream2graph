@@ -1,0 +1,51 @@
+{
+  "id": "gh_ind_9fa0360978",
+  "source": "github_industrial",
+  "repo": "securefederatedai/openfederatedlearning",
+  "license": "apache-2.0",
+  "code": "sequenceDiagram\nTitle: Collaborator Certificate Signing Flow \n  participant A as Alice\n  participant AC as Alice's Collaborator Node\n  participant B as Bob\n  participant BG as Bob's Certificate Signing System\n  A->>AC: Alice runs<br>`fx collaborator generate-cert-request`<br>to create .key and .csr file\n  AC->>A: PKI script outputs a hash to the screen\n  A->>B: Alice sends the .csr to Bob\n  B->>BG: Bob moves the .csr<br/> to the signing system with<br>`fx collaborator certify --request-pkg`\n  B-->>A: Bob Calls Alice to confirm PKI\n  Note over A,B: This is the **root of trust** : Bob called Alice to verify the hash \n  A-->>B: Alice reads the hash to Bob\n  Note over A,B: This ensures Bob is signing the same .csr Alice generated\n  B->>BG: Bob runs script to sign .csr,<br/> confirming the hash as input,<br/> creating the .crt file\n  B->>A: Bob sends the .crt file back to Alice\n  A->>AC: Alice copies the signed certificate (.crt)<br/>to her collaborator node.<br/>She now has a signed certificate.\n",
+  "diagram_type": "node size:900..1500",
+  "collected_at": "2026-02-27T05:29:38.082707",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 .crt 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '.crt'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "certificate"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

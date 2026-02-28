@@ -1,0 +1,659 @@
+{
+  "id": "gh_architecture_01587",
+  "source": "github",
+  "source_url": "https://github.com/OS-Simulator-Mystery-Game/senior-design-wiki/blob/306e6d1f60e6ff92700d036bbc18185fce95b110/docs/charts/use-case-diagram.mmd",
+  "github_repo": "OS-Simulator-Mystery-Game/senior-design-wiki",
+  "github_file_path": "docs/charts/use-case-diagram.mmd",
+  "diagram_type": "architecture",
+  "code": "flowchart TB\n\nclassDef actor fill:#e8f4f8,stroke:#0077b6,stroke-width:2px,color:#000;\nclassDef usecase fill:#fff8e1,stroke:#f57c00,stroke-width:2px,shape:rounded;\nclassDef system fill:#f0f0f0,stroke:#555,stroke-width:1px;\n\n%% Actors\nPlayer[Player / User]:::actor\nApplication[Application Instance]:::actor\nTerminal[Terminal / Debug User]:::actor\n\n%% System Boundary\nsubgraph OS_System[Operating System]\n  direction TB\n  \n  %% Core Use Cases\n  OpenFile((Open File)):::usecase\n  CloseWindow((Close Window)):::usecase\n  MinimizeWindow((Minimize/Maximize Window)):::usecase\n  DragWindow((Drag Window)):::usecase\n  ResizeWindow((Resize Window)):::usecase\n  PinWindow((Pin Window)):::usecase\n  ChangeTheme((Change Theme)):::usecase\n  DoubleClickIcon((Double-Click Desktop Icon)):::usecase\n  ExecuteTerminalCommand((Execute Terminal Command)):::usecase\n  BrowseFilesystem((Browse Filesystem)):::usecase\n  OrganizeDesktop((Organize Desktop Icons)):::usecase\n  DisplayTooltip((Display Tooltip)):::usecase\n  SendSystemMessage((Send System Message)):::usecase\n  IssueSystemCommand((Issue System Command)):::usecase\n  ProcessCommandQueue((Process Command Queue)):::usecase\n  ManageWindowFocus((Manage Window Focus)):::usecase\n  UpdateMouseCursor((Update Mouse Cursor)):::usecase\n  CreateMouseTrail((Create Mouse Trail)):::usecase\n  CreateWindowTrail((Create Window Trail)):::usecase\n  LoadDirectory((Load Directory)):::usecase\n  InstantiateApplication((Instantiate Application)):::usecase\n  UpdateTaskbar((Update Taskbar)):::usecase\nend\n\n%% Player interactions\nPlayer --> DoubleClickIcon\nPlayer --> DragWindow\nPlayer --> ResizeWindow\nPlayer --> MinimizeWindow\nPlayer --> CloseWindow\nPlayer --> PinWindow\nPlayer --> ChangeTheme\nPlayer --> ExecuteTerminalCommand\nPlayer --> BrowseFilesystem\n\n%% Application interactions\nApplication --> IssueSystemCommand\nApplication --> OpenFile\nApplication --> SendSystemMessage\nApplication --> BrowseFilesystem\n\n%% Terminal/Debug interactions\nTerminal --> ExecuteTerminalCommand\nTerminal --> IssueSystemCommand\n\n%% System internal relationships (includes/extends)\nDoubleClickIcon -.->|triggers| OpenFile\nDragWindow -.->|creates| CreateWindowTrail\nResizeWindow -.->|creates| CreateWindowTrail\nDragWindow -.->|updates| UpdateMouseCursor\nResizeWindow -.->|updates| UpdateMouseCursor\nPlayer -.->|moves mouse| UpdateMouseCursor\nUpdateMouseCursor -.->|may create| CreateMouseTrail\nIssueSystemCommand -.->|queues to| ProcessCommandQueue\nProcessCommandQueue -.->|executes| OpenFile\nProcessCommandQueue -.->|executes| CloseWindow\nProcessCommandQueue -.->|executes| MinimizeWindow\nProcessCommandQueue -.->|executes| ChangeTheme\nProcessCommandQueue -.->|executes| PinWindow\nOpenFile -.->|may trigger| InstantiateApplication\nInstantiateApplication -.->|triggers| UpdateTaskbar\nCloseWindow -.->|triggers| UpdateTaskbar\nMinimizeWindow -.->|triggers| ManageWindowFocus\nCloseWindow -.->|triggers| ManageWindowFocus\nPinWindow -.->|affects| ManageWindowFocus\nBrowseFilesystem -.->|uses| LoadDirectory\nLoadDirectory -.->|creates| OrganizeDesktop\nPlayer -.->|hovers| DisplayTooltip\n\n%% Notes\nnote1[System processes commands via queue]:::system\nnote2[Mouse trails optional via OSManager settings]:::system\nnote3[Applications extend Application base class]:::system\n\nProcessCommandQueue -.- note1\nCreateMouseTrail -.- note2\nApplication -.- note3\n",
+  "content_size": 3345,
+  "collected_at": "2026-02-06T01:48:14.496902",
+  "license": "none",
+  "license_name": "No License",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "首先，我们需要定义流程的起点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "Player"
+      ],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "Application Instance、Terminal / Debug User主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含Application Instance、Terminal / Debug User这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Application Instance、Terminal / Debug User的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "Application",
+        "Terminal"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由Operating System组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有Operating System。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，Operating System是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "OS_System"
+      ],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理(Open File、(Close Window？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理(Open File、(Close Window？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是(Open File、(Close Window应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "OpenFile",
+        "CloseWindow",
+        "MinimizeWindow"
+      ],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将(Drag Window、(Resize Window分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由(Drag Window、(Resize Window组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，(Drag Window、(Resize Window就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "DragWindow",
+        "ResizeWindow"
+      ],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有(Pin Window、(Change Theme。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，(Pin Window、(Change Theme的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，(Pin Window、(Change Theme的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "(Pin Window、(Change Theme负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "PinWindow",
+        "ChangeTheme",
+        "DoubleClickIcon"
+      ],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由(Execute Terminal Command、(Browse Filesystem组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，(Execute Terminal Command、(Browse Filesystem是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "(Execute Terminal Command、(Browse Filesystem和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "ExecuteTerminalCommand",
+        "BrowseFilesystem",
+        "OrganizeDesktop"
+      ],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "(Display Tooltip、(Send System Message主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是(Display Tooltip、(Send System Message应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由(Display Tooltip、(Send System Message组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "DisplayTooltip",
+        "SendSystemMessage",
+        "IssueSystemCommand"
+      ],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有(Process Command Queue、(Manage Window Focus。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，(Process Command Queue、(Manage Window Focus就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "ProcessCommandQueue",
+        "ManageWindowFocus"
+      ],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "关于(Update Mouse Cursor、(Create Mouse Trail，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 495
+    },
+    {
+      "turn_id": 34,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是(Update Mouse Cursor、(Create Mouse Trail应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 510
+    },
+    {
+      "turn_id": 35,
+      "speaker": "Speaker_B",
+      "utterance": "(Update Mouse Cursor、(Create Mouse Trail主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "UpdateMouseCursor",
+        "CreateMouseTrail",
+        "CreateWindowTrail"
+      ],
+      "timestamp_offset": 525
+    },
+    {
+      "turn_id": 36,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由(Load Directory、(Instantiate Application组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 540
+    },
+    {
+      "turn_id": 37,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 555
+    },
+    {
+      "turn_id": 38,
+      "speaker": "Speaker_A",
+      "utterance": "关于(Load Directory、(Instantiate Application，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "LoadDirectory",
+        "InstantiateApplication"
+      ],
+      "timestamp_offset": 570
+    },
+    {
+      "turn_id": 39,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将(Update Taskbar、includes/extends分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 585
+    },
+    {
+      "turn_id": 40,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 600
+    },
+    {
+      "turn_id": 41,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 615
+    },
+    {
+      "turn_id": 42,
+      "speaker": "Speaker_A",
+      "utterance": "(Update Taskbar、includes/extends和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "UpdateTaskbar",
+        "relationships"
+      ],
+      "timestamp_offset": 630
+    },
+    {
+      "turn_id": 43,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含System processes commands via queue、Mouse trails optional via OSManager settings这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 645
+    },
+    {
+      "turn_id": 44,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "note1",
+        "note2",
+        "note3"
+      ],
+      "timestamp_offset": 660
+    },
+    {
+      "turn_id": 45,
+      "speaker": "Speaker_B",
+      "utterance": "关于，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 675
+    },
+    {
+      "turn_id": 46,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_0"
+      ],
+      "timestamp_offset": 690
+    },
+    {
+      "turn_id": 47,
+      "speaker": "Speaker_B",
+      "utterance": "关于、，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 705
+    },
+    {
+      "turn_id": 48,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_1",
+        "edge_2",
+        "edge_3"
+      ],
+      "timestamp_offset": 720
+    },
+    {
+      "turn_id": 49,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 735
+    },
+    {
+      "turn_id": 50,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_4"
+      ],
+      "timestamp_offset": 750
+    },
+    {
+      "turn_id": 51,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 765
+    },
+    {
+      "turn_id": 52,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 780
+    },
+    {
+      "turn_id": 53,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_5"
+      ],
+      "timestamp_offset": 795
+    },
+    {
+      "turn_id": 54,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 810
+    },
+    {
+      "turn_id": 55,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 825
+    },
+    {
+      "turn_id": 56,
+      "speaker": "Speaker_A",
+      "utterance": "相较于方案A，有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 840
+    },
+    {
+      "turn_id": 57,
+      "speaker": "Speaker_B",
+      "utterance": "关于，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "edge_6"
+      ],
+      "timestamp_offset": 855
+    },
+    {
+      "turn_id": 58,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 870
+    },
+    {
+      "turn_id": 59,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_7"
+      ],
+      "timestamp_offset": 885
+    },
+    {
+      "turn_id": 60,
+      "speaker": "Speaker_A",
+      "utterance": "关于，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 900
+    },
+    {
+      "turn_id": 61,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_8"
+      ],
+      "timestamp_offset": 915
+    },
+    {
+      "turn_id": 62,
+      "speaker": "Speaker_A",
+      "utterance": "关于，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 930
+    },
+    {
+      "turn_id": 63,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_9"
+      ],
+      "timestamp_offset": 945
+    },
+    {
+      "turn_id": 64,
+      "speaker": "Speaker_A",
+      "utterance": "关于、，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 960
+    },
+    {
+      "turn_id": 65,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是、应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_10",
+        "edge_11",
+        "edge_12"
+      ],
+      "timestamp_offset": 975
+    },
+    {
+      "turn_id": 66,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有、。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 990
+    },
+    {
+      "turn_id": 67,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1005
+    },
+    {
+      "turn_id": 68,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，、的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1020
+    },
+    {
+      "turn_id": 69,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达、结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "edge_13",
+        "edge_14"
+      ],
+      "timestamp_offset": 1035
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 69,
+    "speaker_distribution": {
+      "Speaker_B": 35,
+      "Speaker_A": 34
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "confirm": 11,
+      "classification": 6,
+      "inform": 11,
+      "structural": 15,
+      "clarify": 11,
+      "request": 10,
+      "contrastive": 3
+    },
+    "avg_turn_length": 27.28985507246377,
+    "dialogue_duration": 1035
+  }
+}

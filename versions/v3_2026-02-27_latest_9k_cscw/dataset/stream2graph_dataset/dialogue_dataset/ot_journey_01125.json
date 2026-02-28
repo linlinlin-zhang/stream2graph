@@ -1,0 +1,1370 @@
+{
+  "id": "ot_journey_01125",
+  "source": "other",
+  "source_url": "https://github.com/frankxai/frankx.ai-vercel-website/blob/89e30df2d8854de565f8d4c5ff08d97af82961d7/docs/diagrams/13-user-flow-sequences.mmd",
+  "source_type": "github_search",
+  "github_repo": "frankxai/frankx.ai-vercel-website",
+  "diagram_type": "journey",
+  "code": "sequenceDiagram\r\n    %% User Interaction Sequences - Key Flows\r\n    %% Demonstrates time-based interactions\r\n\r\n    participant U as 👤 User\r\n    participant UI as 🎨 Web UI\r\n    participant API as ⚙️ API\r\n    participant AUTH as 🔐 Auth Service\r\n    participant DB as 🗄️ Database\r\n    participant AI as 🤖 AI Service\r\n    participant EMAIL as 📧 Email Service\r\n    participant STRIPE as 💳 Stripe\r\n\r\n    %% ========================================\r\n    %% FLOW 1: User Signup & Guardian Selection\r\n    %% ========================================\r\n\r\n    Note over U,STRIPE: Flow 1: User Signup & Guardian Selection\r\n\r\n    U->>UI: Visit signup page\r\n    UI->>U: Show signup form\r\n    U->>UI: Submit email & password\r\n    UI->>API: POST /auth/signup\r\n    API->>AUTH: Create user account\r\n    AUTH->>DB: Insert user record\r\n    DB-->>AUTH: User created (id: 123)\r\n    AUTH-->>API: Auth token + user_id\r\n    API->>EMAIL: Send welcome email\r\n    EMAIL-->>U: Welcome to FrankX! 📧\r\n    API-->>UI: Success + redirect\r\n\r\n    UI->>U: Show Guardian selection\r\n    U->>UI: Choose \"Lumina\" guardian\r\n    UI->>API: POST /guardians/select\r\n    API->>AI: Initialize Lumina personality\r\n    AI->>DB: Create guardian record\r\n    DB-->>AI: Guardian created\r\n    AI-->>API: Guardian ready\r\n    API-->>UI: Success\r\n\r\n    UI->>U: Show personalized dashboard\r\n    U->>UI: Create first post\r\n    UI->>API: POST /posts/create\r\n    API->>DB: Insert post\r\n    DB-->>API: Post created (id: 456)\r\n    API->>AI: Guardian response\r\n    AI-->>API: \"Welcome message from Lumina\"\r\n    API-->>UI: Post + Guardian response\r\n    UI->>U: Display feed with Guardian interaction\r\n\r\n    Note over U: User onboarding complete! ✅\r\n\r\n    %% ========================================\r\n    %% FLOW 2: Vibe OS Session Purchase\r\n    %% ========================================\r\n\r\n    Note over U,STRIPE: Flow 2: Vibe OS Session Purchase\r\n\r\n    U->>UI: Browse Vibe OS sessions\r\n    UI->>API: GET /vibe-os/sessions\r\n    API->>DB: Query sessions\r\n    DB-->>API: Session list\r\n    API-->>UI: Display sessions\r\n\r\n    U->>UI: Click \"Courage Frequency\" session\r\n    UI->>API: GET /vibe-os/sessions/courage-frequency\r\n    API->>DB: Get session details\r\n    DB-->>API: Session data + preview\r\n    API-->>UI: Show session page\r\n\r\n    UI->>U: Display: $47, includes music + guide\r\n    U->>UI: Click \"Purchase\"\r\n    UI->>API: POST /checkout/create\r\n    API->>STRIPE: Create checkout session\r\n    STRIPE-->>API: Checkout URL\r\n    API-->>UI: Redirect to Stripe\r\n\r\n    UI->>U: Stripe payment form\r\n    U->>STRIPE: Enter card & complete payment\r\n    STRIPE->>API: Webhook: payment.succeeded\r\n    API->>DB: Update purchase record\r\n    DB-->>API: Purchase confirmed\r\n    API->>EMAIL: Send download link\r\n    EMAIL-->>U: Your Vibe OS session is ready! 🎵\r\n\r\n    U->>UI: Access download page\r\n    UI->>API: GET /vibe-os/download/courage-frequency\r\n    API->>AUTH: Verify purchase\r\n    AUTH-->>API: Authorized\r\n    API-->>UI: Download links + guide PDF\r\n    UI->>U: Download music + guide\r\n\r\n    Note over U: Transformation begins! 🚀\r\n\r\n    %% ========================================\r\n    %% FLOW 3: Course Enrollment & First Module\r\n    %% ========================================\r\n\r\n    Note over U,STRIPE: Flow 3: AI Music Academy Enrollment\r\n\r\n    U->>UI: View course sales page\r\n    UI->>API: GET /courses/ai-music-academy\r\n    API->>DB: Get course info\r\n    DB-->>API: Course details + testimonials\r\n    API-->>UI: Render sales page\r\n\r\n    U->>UI: Click \"Enroll Now - $297\"\r\n    UI->>API: POST /checkout/course\r\n    API->>STRIPE: Create checkout\r\n    STRIPE-->>API: Checkout URL\r\n    API-->>UI: Redirect to Stripe\r\n\r\n    U->>STRIPE: Complete payment\r\n    STRIPE->>API: Webhook: payment.succeeded\r\n    API->>DB: Create enrollment record\r\n    DB-->>API: Enrollment created\r\n    API->>DB: Grant course access\r\n    API->>EMAIL: Send onboarding sequence\r\n    EMAIL-->>U: Welcome to AI Music Academy! 🎓\r\n\r\n    U->>UI: Click email link → course dashboard\r\n    UI->>API: GET /courses/dashboard\r\n    API->>AUTH: Verify enrollment\r\n    AUTH-->>API: Enrolled\r\n    API->>DB: Get progress\r\n    DB-->>API: Progress: 0%\r\n    API-->>UI: Show curriculum\r\n\r\n    U->>UI: Click \"Module 1: Foundations\"\r\n    UI->>API: GET /courses/modules/1\r\n    API->>DB: Get module content\r\n    DB-->>API: Videos + workbook\r\n    API-->>UI: Render module\r\n\r\n    U->>UI: Watch video lesson\r\n    U->>UI: Download workbook\r\n    U->>UI: Mark lesson complete\r\n    UI->>API: POST /progress/lesson-complete\r\n    API->>DB: Update progress\r\n    DB-->>API: Progress: 5%\r\n    API-->>UI: Next lesson unlocked\r\n\r\n    Note over U: Learning journey started! 📚\r\n\r\n    %% ========================================\r\n    %% FLOW 4: Newsletter to Product Journey\r\n    %% ========================================\r\n\r\n    Note over U,EMAIL: Flow 4: Newsletter → Product Conversion\r\n\r\n    U->>UI: Visit blog post\r\n    UI->>U: Show popup: \"Get Weekly AI Insights\"\r\n    U->>UI: Enter email\r\n    UI->>API: POST /newsletter/subscribe\r\n    API->>DB: Insert subscriber\r\n    DB-->>API: Subscriber added\r\n    API->>EMAIL: Send confirmation\r\n    EMAIL-->>U: Confirm your subscription 📬\r\n\r\n    U->>EMAIL: Click confirm link\r\n    EMAIL->>API: GET /newsletter/confirm/{token}\r\n    API->>DB: Update subscriber status\r\n    DB-->>API: Confirmed\r\n    API->>EMAIL: Send welcome + free toolkit\r\n    EMAIL-->>U: Your Creator Toolkit is ready! 🎁\r\n\r\n    Note over U: Week 1: Nurture emails...\r\n\r\n    EMAIL->>U: Day 3: \"How I Created 10 Songs in a Day\"\r\n    U->>UI: Click article link\r\n    UI->>U: Show case study + CTA\r\n\r\n    EMAIL->>U: Day 5: \"The Vibe OS Method\"\r\n    U->>UI: Click to learn more\r\n    UI->>U: Show Vibe OS landing page\r\n\r\n    EMAIL->>U: Day 7: \"Special Offer: First Session $27\"\r\n    U->>UI: Click \"Get My Session\"\r\n\r\n    Note over U: (Purchase flow continues as Flow 2...)\r\n\r\n    Note over U: Conversion complete! 💰\r\n\r\n    %% Styling\r\n    autonumber\r\n\r\n    box rgb(75, 144, 226) Frontend Layer\r\n    participant U\r\n    participant UI\r\n    end\r\n\r\n    box rgb(226, 74, 144) Backend Layer\r\n    participant API\r\n    participant AUTH\r\n    end\r\n\r\n    box rgb(144, 226, 74) Data Layer\r\n    participant DB\r\n    end\r\n\r\n    box rgb(155, 74, 226) AI Layer\r\n    participant AI\r\n    end\r\n\r\n    box rgb(74, 226, 226) External Services\r\n    participant EMAIL\r\n    participant STRIPE\r\n    end",
+  "content_size": 6342,
+  "collected_at": "2026-02-06T11:05:20.462491",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，👤 User的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "U"
+      ],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将🎨 Web UI分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "UI"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "关于⚙️ API、🔐 Auth Service，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，⚙️ API、🔐 Auth Service是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "API",
+        "AUTH",
+        "DB"
+      ],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将🤖 AI Service、📧 Email Service分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下🤖 AI Service、📧 Email Service吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "AI",
+        "EMAIL",
+        "STRIPE"
+      ],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Visit signup page分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Visit signup page的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，Visit signup page有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "Visit signup page主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "msg_0"
+      ],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有Show signup form、Submit email & password。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Show signup form、Submit email & password应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下Show signup form、Submit email & password吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "在Show signup form、Submit email & password中，我们需要定义核心逻辑。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_1",
+        "msg_2",
+        "msg_3"
+      ],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含Create user account、Insert user record这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_4",
+        "msg_5",
+        "msg_6"
+      ],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Show Guardian selection、Choose \"Lumina\" guardian分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_7",
+        "msg_8"
+      ],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理POST /guardians/select、Initialize Lumina personality？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_9",
+        "msg_10"
+      ],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下Create guardian record吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，Create guardian record有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_11"
+      ],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Show personalized dashboard分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_12"
+      ],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下Create first post、POST /posts/create吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 495
+    },
+    {
+      "turn_id": 34,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Create first post、POST /posts/create应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 510
+    },
+    {
+      "turn_id": 35,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Create first post、POST /posts/create分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 525
+    },
+    {
+      "turn_id": 36,
+      "speaker": "Speaker_A",
+      "utterance": "首先，我们需要定义流程的起点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_13",
+        "msg_14"
+      ],
+      "timestamp_offset": 540
+    },
+    {
+      "turn_id": 37,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理Insert post、Guardian response？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 555
+    },
+    {
+      "turn_id": 38,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 570
+    },
+    {
+      "turn_id": 39,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 585
+    },
+    {
+      "turn_id": 40,
+      "speaker": "Speaker_A",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_15",
+        "msg_16"
+      ],
+      "timestamp_offset": 600
+    },
+    {
+      "turn_id": 41,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理Display feed with Guardian interaction？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 615
+    },
+    {
+      "turn_id": 42,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_17"
+      ],
+      "timestamp_offset": 630
+    },
+    {
+      "turn_id": 43,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由Browse Vibe OS sessions、GET /vibe-os/sessions组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 645
+    },
+    {
+      "turn_id": 44,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，Browse Vibe OS sessions、GET /vibe-os/sessions是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_18",
+        "msg_19"
+      ],
+      "timestamp_offset": 660
+    },
+    {
+      "turn_id": 45,
+      "speaker": "Speaker_B",
+      "utterance": "关于Query sessions、Click \"Courage Frequency\" session，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 675
+    },
+    {
+      "turn_id": 46,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Query sessions、Click \"Courage Frequency\" session的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 690
+    },
+    {
+      "turn_id": 47,
+      "speaker": "Speaker_B",
+      "utterance": "Query sessions、Click \"Courage Frequency\" session和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 705
+    },
+    {
+      "turn_id": 48,
+      "speaker": "Speaker_A",
+      "utterance": "首先，我们需要定义流程的起点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_20",
+        "msg_21"
+      ],
+      "timestamp_offset": 720
+    },
+    {
+      "turn_id": 49,
+      "speaker": "Speaker_B",
+      "utterance": "GET /vibe-os/sessions/courage-frequency、Get session details主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 735
+    },
+    {
+      "turn_id": 50,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 750
+    },
+    {
+      "turn_id": 51,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 765
+    },
+    {
+      "turn_id": 52,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下GET /vibe-os/sessions/courage-frequency、Get session details吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "msg_22",
+        "msg_23"
+      ],
+      "timestamp_offset": 780
+    },
+    {
+      "turn_id": 53,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有Display: $47, includes music + guide。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 795
+    },
+    {
+      "turn_id": 54,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Display: $47, includes music + guide就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 810
+    },
+    {
+      "turn_id": 55,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，Display: $47, includes music + guide有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_24"
+      ],
+      "timestamp_offset": 825
+    },
+    {
+      "turn_id": 56,
+      "speaker": "Speaker_A",
+      "utterance": "Click \"Purchase\"、POST /checkout/create主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 840
+    },
+    {
+      "turn_id": 57,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，Click \"Purchase\"、POST /checkout/create是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 855
+    },
+    {
+      "turn_id": 58,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 870
+    },
+    {
+      "turn_id": 59,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，Click \"Purchase\"、POST /checkout/create是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_25",
+        "msg_26",
+        "msg_27"
+      ],
+      "timestamp_offset": 885
+    },
+    {
+      "turn_id": 60,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下Stripe payment form、Enter card & complete payment吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 900
+    },
+    {
+      "turn_id": 61,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_28",
+        "msg_29",
+        "msg_30"
+      ],
+      "timestamp_offset": 915
+    },
+    {
+      "turn_id": 62,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Update purchase record、Send download link分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 930
+    },
+    {
+      "turn_id": 63,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Update purchase record、Send download link的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 945
+    },
+    {
+      "turn_id": 64,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Update purchase record、Send download link组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_31",
+        "msg_32",
+        "msg_33"
+      ],
+      "timestamp_offset": 960
+    },
+    {
+      "turn_id": 65,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含GET /vibe-os/download/courage-frequency这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 975
+    },
+    {
+      "turn_id": 66,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 990
+    },
+    {
+      "turn_id": 67,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_34"
+      ],
+      "timestamp_offset": 1005
+    },
+    {
+      "turn_id": 68,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Verify purchase、Download music + guide分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1020
+    },
+    {
+      "turn_id": 69,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_35",
+        "msg_36"
+      ],
+      "timestamp_offset": 1035
+    },
+    {
+      "turn_id": 70,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由View course sales page、GET /courses/ai-music-academy组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1050
+    },
+    {
+      "turn_id": 71,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是View course sales page、GET /courses/ai-music-academy应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1065
+    },
+    {
+      "turn_id": 72,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1080
+    },
+    {
+      "turn_id": 73,
+      "speaker": "Speaker_B",
+      "utterance": "View course sales page、GET /courses/ai-music-academy和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_37",
+        "msg_38"
+      ],
+      "timestamp_offset": 1095
+    },
+    {
+      "turn_id": 74,
+      "speaker": "Speaker_A",
+      "utterance": "Get course info、Click \"Enroll Now - $297\"主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1110
+    },
+    {
+      "turn_id": 75,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Get course info、Click \"Enroll Now - $297\"就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1125
+    },
+    {
+      "turn_id": 76,
+      "speaker": "Speaker_A",
+      "utterance": "Get course info、Click \"Enroll Now - $297\"和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1140
+    },
+    {
+      "turn_id": 77,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Get course info、Click \"Enroll Now - $297\"分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "msg_39",
+        "msg_40"
+      ],
+      "timestamp_offset": 1155
+    },
+    {
+      "turn_id": 78,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含POST /checkout/course这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1170
+    },
+    {
+      "turn_id": 79,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，POST /checkout/course的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1185
+    },
+    {
+      "turn_id": 80,
+      "speaker": "Speaker_A",
+      "utterance": "最后，流程到达POST /checkout/course结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_41"
+      ],
+      "timestamp_offset": 1200
+    },
+    {
+      "turn_id": 81,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下Create checkout吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1215
+    },
+    {
+      "turn_id": 82,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1230
+    },
+    {
+      "turn_id": 83,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Create checkout应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_42"
+      ],
+      "timestamp_offset": 1245
+    },
+    {
+      "turn_id": 84,
+      "speaker": "Speaker_A",
+      "utterance": "Complete payment、Webhook: payment.succeeded主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1260
+    },
+    {
+      "turn_id": 85,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Complete payment、Webhook: payment.succeeded的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_43",
+        "msg_44"
+      ],
+      "timestamp_offset": 1275
+    },
+    {
+      "turn_id": 86,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理Create enrollment record？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1290
+    },
+    {
+      "turn_id": 87,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Create enrollment record的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1305
+    },
+    {
+      "turn_id": 88,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Create enrollment record分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1320
+    },
+    {
+      "turn_id": 89,
+      "speaker": "Speaker_B",
+      "utterance": "在Create enrollment record中，我们需要定义核心逻辑。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_45"
+      ],
+      "timestamp_offset": 1335
+    },
+    {
+      "turn_id": 90,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含Grant course access、Send onboarding sequence这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1350
+    },
+    {
+      "turn_id": 91,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1365
+    },
+    {
+      "turn_id": 92,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理Grant course access、Send onboarding sequence？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "msg_46",
+        "msg_47"
+      ],
+      "timestamp_offset": 1380
+    },
+    {
+      "turn_id": 93,
+      "speaker": "Speaker_B",
+      "utterance": "关于Click email link → course dashboard，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1395
+    },
+    {
+      "turn_id": 94,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Click email link → course dashboard就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1410
+    },
+    {
+      "turn_id": 95,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有Click email link → course dashboard。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1425
+    },
+    {
+      "turn_id": 96,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_48"
+      ],
+      "timestamp_offset": 1440
+    },
+    {
+      "turn_id": 97,
+      "speaker": "Speaker_B",
+      "utterance": "GET /courses/dashboard、Verify enrollment主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1455
+    },
+    {
+      "turn_id": 98,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_49",
+        "msg_50"
+      ],
+      "timestamp_offset": 1470
+    },
+    {
+      "turn_id": 99,
+      "speaker": "Speaker_B",
+      "utterance": "Get progress、Click \"Module 1: Foundations\"主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1485
+    },
+    {
+      "turn_id": 100,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Get progress、Click \"Module 1: Foundations\"就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_51",
+        "msg_52",
+        "msg_53"
+      ],
+      "timestamp_offset": 1500
+    },
+    {
+      "turn_id": 101,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理Get module content、Watch video lesson？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1515
+    },
+    {
+      "turn_id": 102,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，Get module content、Watch video lesson是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1530
+    },
+    {
+      "turn_id": 103,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达Get module content、Watch video lesson结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1545
+    },
+    {
+      "turn_id": 104,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，Get module content、Watch video lesson是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_54",
+        "msg_55"
+      ],
+      "timestamp_offset": 1560
+    },
+    {
+      "turn_id": 105,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由Download workbook组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1575
+    },
+    {
+      "turn_id": 106,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Download workbook就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1590
+    },
+    {
+      "turn_id": 107,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Download workbook就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_56"
+      ],
+      "timestamp_offset": 1605
+    },
+    {
+      "turn_id": 108,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下Mark lesson complete、POST /progress/lesson-complete吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1620
+    },
+    {
+      "turn_id": 109,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1635
+    },
+    {
+      "turn_id": 110,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理Mark lesson complete、POST /progress/lesson-complete？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "msg_57",
+        "msg_58"
+      ],
+      "timestamp_offset": 1650
+    },
+    {
+      "turn_id": 111,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含Update progress、Visit blog post这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1665
+    },
+    {
+      "turn_id": 112,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Update progress、Visit blog post就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1680
+    },
+    {
+      "turn_id": 113,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1695
+    },
+    {
+      "turn_id": 114,
+      "speaker": "Speaker_A",
+      "utterance": "Update progress、Visit blog post负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_59",
+        "msg_60"
+      ],
+      "timestamp_offset": 1710
+    },
+    {
+      "turn_id": 115,
+      "speaker": "Speaker_B",
+      "utterance": "Show popup: \"Get Weekly AI Insights\"主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1725
+    },
+    {
+      "turn_id": 116,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Show popup: \"Get Weekly AI Insights\"应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1740
+    },
+    {
+      "turn_id": 117,
+      "speaker": "Speaker_B",
+      "utterance": "Show popup: \"Get Weekly AI Insights\"和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_61"
+      ],
+      "timestamp_offset": 1755
+    },
+    {
+      "turn_id": 118,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下Enter email、POST /newsletter/subscribe吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1770
+    },
+    {
+      "turn_id": 119,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1785
+    },
+    {
+      "turn_id": 120,
+      "speaker": "Speaker_A",
+      "utterance": "最后，流程到达Enter email、POST /newsletter/subscribe结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1800
+    },
+    {
+      "turn_id": 121,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Enter email、POST /newsletter/subscribe的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_62",
+        "msg_63"
+      ],
+      "timestamp_offset": 1815
+    },
+    {
+      "turn_id": 122,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有Insert subscriber、Send confirmation。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1830
+    },
+    {
+      "turn_id": 123,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1845
+    },
+    {
+      "turn_id": 124,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1860
+    },
+    {
+      "turn_id": 125,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_64",
+        "msg_65"
+      ],
+      "timestamp_offset": 1875
+    },
+    {
+      "turn_id": 126,
+      "speaker": "Speaker_A",
+      "utterance": "Click confirm link主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1890
+    },
+    {
+      "turn_id": 127,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Click confirm link应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1905
+    },
+    {
+      "turn_id": 128,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Click confirm link的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_66"
+      ],
+      "timestamp_offset": 1920
+    },
+    {
+      "turn_id": 129,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含GET /newsletter/confirm/{token}这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1935
+    },
+    {
+      "turn_id": 130,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，GET /newsletter/confirm/{token}的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_67"
+      ],
+      "timestamp_offset": 1950
+    },
+    {
+      "turn_id": 131,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Update subscriber status、Send welcome + free toolkit分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1965
+    },
+    {
+      "turn_id": 132,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1980
+    },
+    {
+      "turn_id": 133,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，Update subscriber status、Send welcome + free toolkit有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1995
+    },
+    {
+      "turn_id": 134,
+      "speaker": "Speaker_A",
+      "utterance": "Update subscriber status、Send welcome + free toolkit负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_68",
+        "msg_69"
+      ],
+      "timestamp_offset": 2010
+    },
+    {
+      "turn_id": 135,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有Day 3: \"How I Created 10 Songs in a Day\"、Click article link。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2025
+    },
+    {
+      "turn_id": 136,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Day 3: \"How I Created 10 Songs in a Day\"、Click article link的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2040
+    },
+    {
+      "turn_id": 137,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_70",
+        "msg_71"
+      ],
+      "timestamp_offset": 2055
+    },
+    {
+      "turn_id": 138,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理Show case study + CTA、Day 5: \"The Vibe OS Method\"？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2070
+    },
+    {
+      "turn_id": 139,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Show case study + CTA、Day 5: \"The Vibe OS Method\"就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2085
+    },
+    {
+      "turn_id": 140,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Show case study + CTA、Day 5: \"The Vibe OS Method\"就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_72",
+        "msg_73"
+      ],
+      "timestamp_offset": 2100
+    },
+    {
+      "turn_id": 141,
+      "speaker": "Speaker_B",
+      "utterance": "关于Click to learn more，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2115
+    },
+    {
+      "turn_id": 142,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Click to learn more的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2130
+    },
+    {
+      "turn_id": 143,
+      "speaker": "Speaker_B",
+      "utterance": "Click to learn more和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2145
+    },
+    {
+      "turn_id": 144,
+      "speaker": "Speaker_A",
+      "utterance": "在Click to learn more中，我们需要定义核心逻辑。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_74"
+      ],
+      "timestamp_offset": 2160
+    },
+    {
+      "turn_id": 145,
+      "speaker": "Speaker_B",
+      "utterance": "关于Show Vibe OS landing page、Day 7: \"Special Offer: First Session $27\"，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2175
+    },
+    {
+      "turn_id": 146,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Show Vibe OS landing page、Day 7: \"Special Offer: First Session $27\"的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2190
+    },
+    {
+      "turn_id": 147,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Show Vibe OS landing page、Day 7: \"Special Offer: First Session $27\"的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2205
+    },
+    {
+      "turn_id": 148,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Show Vibe OS landing page、Day 7: \"Special Offer: First Session $27\"应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_75",
+        "msg_76"
+      ],
+      "timestamp_offset": 2220
+    },
+    {
+      "turn_id": 149,
+      "speaker": "Speaker_B",
+      "utterance": "关于Click \"Get My Session\"，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2235
+    },
+    {
+      "turn_id": 150,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在Click \"Get My Session\"完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_77"
+      ],
+      "timestamp_offset": 2250
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 150,
+    "speaker_distribution": {
+      "Speaker_B": 75,
+      "Speaker_A": 75
+    },
+    "speech_act_distribution": {
+      "sequential": 9,
+      "clarify": 21,
+      "classification": 20,
+      "confirm": 29,
+      "inform": 19,
+      "request": 23,
+      "contrastive": 9,
+      "structural": 20
+    },
+    "avg_turn_length": 38.45333333333333,
+    "dialogue_duration": 2250
+  }
+}

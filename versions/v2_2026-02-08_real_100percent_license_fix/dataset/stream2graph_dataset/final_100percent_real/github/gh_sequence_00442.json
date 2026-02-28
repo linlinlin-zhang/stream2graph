@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00442",
+  "source": "github",
+  "source_url": "https://github.com/Ksschkw/LPnP/blob/07916e4415cca9bb5744f161460538e86965a819/1_des/Real-time%20Dispatch%20Sequence.mmd",
+  "github_repo": "Ksschkw/LPnP",
+  "github_file_path": "1_des/Real-time Dispatch Sequence.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant B as Buyer\n    participant API as FastAPI Backend\n    participant Redis as Redis Cache\n    participant DB as PostgreSQL\n    participant S as Seller\n\n    title Real-time Dispatch Sequence Diagram\n\n    B->>API: POST /jobs/dispatch {category, location}\n    API->>Redis: GEORADIUS available_providers\n    Redis-->>API: Nearby provider IDs\n    API->>DB: SELECT services WHERE id IN (...)\n    DB-->>API: Service details with trust scores\n    API->>API: Filter & rank by proximity/trust\n    API->>S: WebSocket: Job Offer (60s expiry)\n    S->>API: POST /accept_offer (first to respond)\n    API->>DB: INSERT Job (pending_payment)\n    API->>B: WebSocket: Provider Accepted\n    API->>S: WebSocket: Awaiting Payment\n    B->>API: Initiate Payment\n    API->>API: Process Escrow Hold\n    API->>S: WebSocket: Payment Confirmed",
+  "content_size": 842,
+  "collected_at": "2026-02-06T01:32:21.015128",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

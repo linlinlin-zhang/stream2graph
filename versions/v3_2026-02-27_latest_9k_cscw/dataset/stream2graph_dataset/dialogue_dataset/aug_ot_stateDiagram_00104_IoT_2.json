@@ -1,0 +1,67 @@
+{
+  "id": "aug_ot_stateDiagram_00104_IoT_2",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/musel25/lab_software_eng/blob/abe7b632a47ca8035f732e0dc34d75fc4b0d8b1b/code/diagram7_2.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "musel25/lab_software_eng",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    %% ───────── Top-level flow ─────────\n    [IoT_Industrial_EdgeNode] --> WaitForEntryRequest\n\n    WaitForEntryRequest --> ProcSecCard : reqReadSecurityCard\n    ProcSecCard --> WaitForEntryRequest : flagSecurityCardFailure\n    ProcSecCard --> ProcBioData        : CardStatus==Valid\n    ProcBioData  --> UnlockLockAP      : Authenticated\n    UnlockLockAP --> WaitForEntryRequest : evAccessPointLocked\n\n    %% ───────── Composite ① ─────────\n    state \"ProcessingSecurityCardData\" as ProcSecCard {IoT_Industrial_TelemetryStream] --> ValidatingCard\n        ValidatingCard --> WaitForEntryRequest : SecCardFailure / ScFailCount&lt;3\n        ValidatingCard --> Fail3Card           : SecCardFailure / ScFailCount&gt;=3\n        ValidatingCard --> exit                : CardStatus==Valid\n\n        state Fail3Card {IoT_Industrial_ActuatorController] --> DisableAccount\n            DisableAccount --> exit : done\n        }\n        exit --> [IoT_Industrial_ActuatorController]\n    }\n\n    %% ───────── Composite ② ─────────\n    state \"ProcessingBiometricData\" as ProcBioData {IoT_Industrial_MQTT_Broker] --> AuthenticatingBio\n        AuthenticatingBio --> WaitForEntryRequest : BsTimeout\n        AuthenticatingBio --> Fail3Bio           : BioScanFailure / BFailCount&gt;=3\n        AuthenticatingBio --> exit               : Authenticated\n\n        state Fail3Bio {IoT_Industrial_MQTT_Broker] --> DisableAccountB\n            DisableAccountB --> exit : done\n        }\n        exit --> [IoT_Industrial_PLC_Logic]\n    }\n\n    %% ───────── Composite ③ ─────────\n    state \"UnlockingAndLockingAccessPoint\" as UnlockLockAP {IoT_Industrial_MQTT_Broker] --> Locked\n        Locked --> Unlocking : reqUnlockAccessPoint\n        Unlocking --> Unlocked : evAccessPointUnlocked\n        Unlocked --> Locked : reqLockAccessPoint\n    }",
+  "content_size": 1667,
+  "collected_at": "2026-02-06T10:37:56.625984",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "IoT_Industrial",
+  "seed_id": "ot_stateDiagram_00104",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "首先，我们需要定义流程的起点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Generic Diagram应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "Generic Diagram主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在Generic Diagram完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "root"
+      ],
+      "timestamp_offset": 60
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 4,
+    "speaker_distribution": {
+      "Speaker_B": 2,
+      "Speaker_A": 2
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "clarify": 1,
+      "classification": 1
+    },
+    "avg_turn_length": 24.0,
+    "dialogue_duration": 60
+  }
+}

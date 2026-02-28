@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00349",
+  "source": "github",
+  "source_url": "https://github.com/Nick0oo/pyllren/blob/2beb9fefad97fa3143d2274717b63caf8fbd8898/diagrams/sequences/recepcion-distribuida.mmd",
+  "github_repo": "Nick0oo/pyllren",
+  "github_file_path": "diagrams/sequences/recepcion-distribuida.mmd",
+  "diagram_type": "sequence",
+  "code": "\n%% Mermaid sequence diagram - Very detailed\n%% File: diagrams/sequences/recepcion-distribuida.mmd\nsequenceDiagram\n  participant FE as Frontend (SPA)\n  participant Proxy as Traefik/Nginx\n  participant API as FastAPI (Auth middleware + LotesController)\n  participant Auth as Auth Dependency (`get_current_user`)\n  participant Scope as Scope Helper (`get_user_scope`)\n  participant DB as Postgres\n  participant Cache as Redis Cache\n  participant Auditoria as Auditoria Table\n\n  Note over FE,Proxy: User submits recepción distribuida (payload with lote_base + distribuciones[])\n  FE->>Proxy: POST /api/v1/lotes/recepcion-distribuida (Authorization: Bearer <token>)\n  Proxy->>API: Forward request\n\n  API->>Auth: Decode token, return current_user\n  API->>Scope: get_user_scope(current_user)\n  Scope-->>API: scope\n\n  API->>API: Validate all target bodegas exist and belong to same sucursal\n  loop for each distribucion in distribuciones\n    API->>DB: SELECT * FROM bodegas WHERE id = distrib.id FOR UPDATE  -- lock each bodega row\n    DB-->>API: bodega record\n    API->>DB: SUM existing occupation for that bodega\n    DB-->>API: current_occupacion\n    API->>API: verify requested items fit in capacity\n    alt any bodega exceeds capacity\n      API-->>FE: 409 Conflict + { error: capacidad_insuficiente_al_distribuir, detalle: bodega_id }\n      break\n    end\n  end\n\n  alt all bodegas ok\n    API->>DB: BEGIN TRANSACTION\n    loop create sub-lotes per bodega\n      API->>DB: INSERT lote_sub, INSERT productos, INSERT movimientos\n      DB-->>API: insert confirmations\n    end\n    API->>Auditoria: write audit entries for each created sub-lote\n    API->>Cache: invalidate relevant keys\n    API->>DB: COMMIT\n    API-->>FE: 200 OK + detalles sub-lotes\n  end\n\n  Note over FE,API: End\n",
+  "content_size": 1769,
+  "collected_at": "2026-02-06T01:31:04.139213",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 1,
+  "repo_forks": 1
+}

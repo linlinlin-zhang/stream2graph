@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01585",
+  "source": "github",
+  "source_url": "https://github.com/Dabaghi-Anass/entropot-medicale/blob/b17665e0309b183b4cb0c0e09e2e169b485afb27/etl_scripts/steps_mermaid.mmd",
+  "github_repo": "Dabaghi-Anass/entropot-medicale",
+  "github_file_path": "etl_scripts/steps_mermaid.mmd",
+  "diagram_type": "architecture",
+  "code": "flowchart TD\n    %% SOURCE DATA\n    S1[hopital.csv] --> ST1[hopital table]\n    S2[hopital_service.csv] --> ST2[hopital_services table]\n    S3[medecins.csv] --> ST3[medecins table]\n    \n    %% STAGING DATABASE\n    subgraph \"Staging Database<br/>chargement_des_donnees\"\n        ST1\n        ST2\n        ST3\n    end\n    \n    %% ETL PROCESS\n    ST1 -->|ETL| DW1[dim_hopital]\n    ST2 -->|ETL| DW3[dim_services<br/>fact_hospital_services]\n    ST3 -->|ETL| DW2[dim_medecin<br/>fact_doctor_assignments]\n    \n    %% DATA WAREHOUSE\n    subgraph \"Data Warehouse<br/>hopital_data_warehouse\"\n        subgraph \"Dimension Tables\"\n            DW1\n            DW2\n            DW3\n        end\n        \n        subgraph \"Fact Tables\"\n            FT1[fact_doctor_assignments]\n            FT2[fact_hospital_services]\n        end\n    end\n    \n    %% ANALYTICAL VIEWS\n    FT1 --> V1[vw_assignments]\n    FT2 --> V2[vw_services]\n    DW1 --> V3[vw_hospital_summary]\n    \n    subgraph \"Analytical Layer\"\n        V1\n        V2\n        V3\n    end\n    \n    %% BUSINESS USERS\n    V1 --> BU1[Business Analysts]\n    V2 --> BU2[Hospital Administrators]\n    V3 --> BU3[Health Officials]\n    \n    %% STYLING\n    classDef source fill:#bbdefb,stroke:#0d47a1\n    classDef staging fill:#c8e6c9,stroke:#1b5e20\n    classDef dimension fill:#fff9c4,stroke:#f57f17\n    classDef fact fill:#ffccbc,stroke:#bf360c\n    classDef view fill:#d1c4e9,stroke:#311b92\n    classDef user fill:#f8bbd0,stroke:#880e4f\n    \n    class S1,S2,S3 source\n    class ST1,ST2,ST3 staging\n    class DW1,DW2,DW3 dimension\n    class FT1,FT2 fact\n    class V1,V2,V3 view\n    class BU1,BU2,BU3 user",
+  "content_size": 1623,
+  "collected_at": "2026-02-06T01:48:13.193165",
+  "license": "none",
+  "license_name": "No License",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

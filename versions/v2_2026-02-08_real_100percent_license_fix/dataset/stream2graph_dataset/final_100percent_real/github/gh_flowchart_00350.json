@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00350",
+  "source": "github",
+  "source_url": "https://github.com/Romofish/DataSocket/blob/819967aa9f18ef79071659e63dbe5564d63999bc/docs/architecture.mmd",
+  "github_repo": "Romofish/DataSocket",
+  "github_file_path": "docs/architecture.mmd",
+  "diagram_type": "flowchart",
+  "code": "%% ==========================================================\n%% AI-Driven Clinical Trial Tool — Architecture Diagram\n%% Author: AI Assistant\n%% ==========================================================\n\n%% === System Overview ===\nflowchart LR\n  subgraph Client[\"Frontend (Vue 3 SPA)\"]\n    UI[\"Home / ALS Reader / QC Console\"]\n  end\n\n  subgraph Node[\"Node.js API Gateway\"]\n    API[\"API Layer: /api/v1/*\"]\n    AUTH[\"Auth / Validation\"]\n  end\n\n  subgraph Python[\"Python AI Microservices\"]\n    FAST[\"FastAPI: Matrix Extractor / QC Engine\"]\n    WORKER[\"Async Worker (Celery/RQ)\"]\n  end\n\n  subgraph Data[\"Data Layer\"]\n    DB[\"PostgreSQL (Jobs/Users)\"]\n    S3[\"Object Storage (MinIO/S3)\"]\n    MQ[\"Message Queue (Redis/RabbitMQ)\"]\n  end\n\n  UI -->|HTTP| API\n  API -->|Forward| FAST\n  FAST -->|Read/Write| S3\n  API -->|Read/Write| DB\n  API -.-> MQ\n  MQ -.-> WORKER\n  WORKER --> S3\n\n%% === Frontend Structure ===\n---\nflowchart TB\n  subgraph FE[\"Frontend / src\"]\n    A[\"views/Home.vue\nTools Grid\"]\n    B[\"apps/registry.ts\nSingle Source of Truth\"]\n    C[\"views/AlsReaderView.vue\nFields/Matrix\"]\n    D[\"views/ComingSoon.vue\nPlaceholder\"]\n    E[\"stores/alsStore.ts\nPinia Store\"]\n    F[\"router/index.ts\nAggregate Router\"]\n    F1[\"router/modules/*.ts\nModule-based Routes\"]\n    G[\"services/api.ts\nHTTP Client\"]\n    H[\"components/*.vue\nMatrixView / ToolCard\"]\n  end\n  B --> F\n  F --> F1\n  B --> A\n  F1 --> C\n  F1 --> D\n  A --> C\n  A --> D\n  C --> E\n  C --> H\n  A --> G\n  C --> G\n\n%% === Backend Structure ===\n---\nflowchart LR\n  subgraph BE_NODE[\"Backend - Node.js API Gateway\"]\n    N1[\"server/index.ts\nEntry/Middlewares\"]\n    N2[\"routes/jobs.ts\nPOST /jobs, GET /jobs/:id\"]\n    N3[\"routes/matrix.ts\nPOST /parse-matrix (sync)\"]\n    N4[\"services/fastapi.ts\nCall FastAPI\"]\n    N5[\"services/storage.ts\nS3/MinIO\"]\n    N6[\"services/db.ts\nPostgreSQL\"]\n    N7[\"services/cache.ts\nRedis (optional)\"]\n  end\n\n  subgraph BE_PY[\"Backend - Python FastAPI\"]\n    P1[\"main.py\n/matrix/extract (upload)\"]\n    P2[\"/matrix/extract-by-url (object storage)\"]\n    P3[\"core/parser.py\nmatrix parsing\"]\n    P4[\"workers/* (Celery/RQ)\nlong jobs\"]\n  end\n\n  subgraph DATA[\"Data Layer\"]\n    D1[(\"(PostgreSQL)\")]\n    D2[(\"(S3/MinIO)\")]\n    D3[[\"(Redis/RabbitMQ)\"]]\n  end\n\n  N1 --> N2\n  N1 --> N3\n  N3 --> N4\n  N2 --> N6\n  N1 --> N5\n  N4 --> P1\n  N4 --> P2\n  P1 --> D2\n  P2 --> D2\n  N6 --- D1\n  N5 --- D2\n  N7 --- D3\n  P4 --- D3\n",
+  "content_size": 2376,
+  "collected_at": "2026-02-06T01:43:34.497318",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

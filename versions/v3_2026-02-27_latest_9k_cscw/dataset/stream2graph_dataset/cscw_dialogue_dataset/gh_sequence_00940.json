@@ -1,0 +1,61 @@
+{
+  "id": "gh_sequence_00940",
+  "source": "github",
+  "source_url": "https://github.com/milanfusco/mcFramework/blob/688c1e422c0afb54ea9a0e4b840cc37c49deceb9/docs/source/diagrams/sequence_simulation.mmd",
+  "github_repo": "milanfusco/mcFramework",
+  "github_file_path": "docs/source/diagrams/sequence_simulation.mmd",
+  "diagram_type": "sequence",
+  "code": "---\nname: sequence_simulation\nconfig:\n    layout: elk\n    look: neo\n---\nsequenceDiagram\n    participant User\n    participant Sim as MonteCarloSimulation\n    participant Pool as ThreadPool/ProcessPool\n    participant Engine as StatsEngine\n    participant Result as SimulationResult\n\n    User->>Sim: run(n=10000, parallel=True)\n    activate Sim\n\n    Sim->>Sim: _validate_run_params()\n    Sim->>Sim: spawn SeedSequences\n\n    Note over Sim,Pool: Parallel Execution\n    Sim->>Pool: submit chunks to workers\n    activate Pool\n\n    par Worker 1\n        Pool->>Pool: single_simulation() × chunk_size\n    and Worker 2\n        Pool->>Pool: single_simulation() × chunk_size\n    and Worker 3\n        Pool->>Pool: single_simulation() × chunk_size\n    end\n\n    Pool-->>Sim: collected results[]\n    deactivate Pool\n\n    Sim->>Engine: compute(results, StatsContext)\n    activate Engine\n    Engine->>Engine: mean(), std(), ci_mean(), ...\n    Engine-->>Sim: ComputeResult\n    deactivate Engine\n\n    Sim->>Result: _create_result()\n    Result-->>Sim: SimulationResult\n    Sim-->>User: SimulationResult\n    deactivate Sim\n\n",
+  "content_size": 1102,
+  "collected_at": "2026-02-06T01:51:02.260518",
+  "compilation_status": "failed",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 n=10000, parallel=True 和 results, StatsContext 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'n=10000, parallel=True 和 results, StatsContext'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "run",
+        "compute"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

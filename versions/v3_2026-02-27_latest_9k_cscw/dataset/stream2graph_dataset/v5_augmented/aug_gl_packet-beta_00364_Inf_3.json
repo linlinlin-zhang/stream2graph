@@ -1,0 +1,18 @@
+{
+  "id": "aug_gl_packet-beta_00364_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/chris-arsenault/the-glass-frontier/blob/c0f4b7e7c333793aa3c28dc25e3bac325a56605c/docs/design/diagrams/DES-EDGE-01-contested-move-flow.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "chris-arsenault/the-glass-frontier",
+  "diagram_type": "packet-beta",
+  "code": "sequenceDiagram\n    participant PlayerA as Player A\n    participant PlayerB as Player B / Rival\n    participant NarrativeEngine as Narrative Engine (Infra_IngressController)\n    participant ContestCoordinator as Contest Coordinator\n    participant Temporal as Temporal Check Runner\n    participant CompQueue as Shared Complication Queue\n    participant NarrativeWeaver as Narrative Weaver\n    participant WebUI as Web UI Shell\n    participant Admin as Admin Console\n\n    PlayerA->>NarrativeEngine: Utterance + context (Infra_IngressController)\n    PlayerB->>NarrativeEngine: Utterance + context (Infra_WorkerNode)\n    NarrativeEngine->>NarrativeEngine: Detect collision hints (Infra_IngressController)\n    NarrativeEngine->>ContestCoordinator: intent.checkRequest (Infra_WorkerNode)\n    NarrativeEngine->>ContestCoordinator: intent.checkRequest (Infra_IngressController)\n    ContestCoordinator->>ContestCoordinator: Wait 8s/2 turns for matching hints\n    ContestCoordinator->>ContestCoordinator: Create contestId + contestSeed\n    ContestCoordinator->>Temporal: contest.bundle (Infra_WorkerNode)\n\n    loop For each participant\n        Temporal->>Temporal: Spawn contest.check child workflow\n        Temporal->>Temporal: Derive dice seed hash(Infra_EtcdCluster)\n        Temporal->>Temporal: Resolve roll + modifiers\n        Temporal-->>ContestCoordinator: contest.checkResult (Infra_EtcdCluster)\n    end\n\n    ContestCoordinator->>ContestCoordinator: Rank results (Infra_EtcdCluster)\n    ContestCoordinator->>CompQueue: Upsert shared complications\n    ContestCoordinator->>NarrativeWeaver: contest.resolution (Infra_RedisCache)\n    ContestCoordinator->>Admin: telemetry.contest.start/resolved (Infra_RedisCache)\n\n    NarrativeWeaver->>WebUI: Contested turn packet (Infra_RedisCache)\n    NarrativeWeaver->>Admin: contest.override hooks + safety flags\n    WebUI->>PlayerA: Display contested badge + breakdown\n    WebUI->>PlayerB: Display contested badge + breakdown\n\n    Admin-->>NarrativeWeaver: moderation.decision (Infra_LoadBalancer)\n    NarrativeWeaver-->>WebUI: Updated contest narration (Infra_RedisCache)\n",
+  "content_size": 2140,
+  "collected_at": "2026-02-06T14:08:18.772733",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "gl_packet-beta_00364"
+}

@@ -1,0 +1,652 @@
+{
+  "id": "aug_gl_timeline_00130_IoT_2",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/suprachakra/AtlasMesh-Fleet-OS/blob/de69e6cd300f1e29301b16e68db67ac7874e847b/docs/diagrams/sequence/business-flows/security_incident_response_v1.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "suprachakra/AtlasMesh-Fleet-OS",
+  "diagram_type": "timeline",
+  "code": "---\r\ntitle: Security Incident Response - AtlasMesh Fleet OS\r\n---\r\nsequenceDiagram\r\n    participant VA as Vehicle Agent\r\n    participant ZT as Zero-Trust IAM\r\n    participant SM as Security Monitor\r\n    participant IR as Incident Response\r\n    participant PE as Policy Engine\r\n    participant KS as Key/Secret Management\r\n    participant AL as Audit Log\r\n    participant OC as On-Call Team\r\n    \r\n    Note over VA,OC: Security Incident Detection & Response\r\n    \r\n    %% Anomaly Detection\r\n    VA->>+ZT: AuthenticateRequest(IoT_Industrial_PLC_Logic)\r\n    ZT->>ZT: Validate certificate and permissions\r\n    ZT->>+SM: LogAuthenticationAttempt(IoT_Industrial_PLC_Logic)\r\n    SM->>SM: Analyze authentication patterns\r\n    \r\n    alt Suspicious Activity Detected\r\n        SM->>SM: Correlate with threat intelligence\r\n        SM->>+IR: TriggerSecurityAlert(IoT_Industrial_MQTT_Broker)\r\n        IR->>IR: Classify incident severity\r\n        IR->>AL: Log security incident\r\n        \r\n        %% Immediate Response\r\n        alt High Severity Incident\r\n            IR->>+PE: EvaluatePolicy(IoT_Industrial_PLC_Logic)\r\n            PE->>PE: Execute emergency security policies\r\n            PE->>AL: Log emergency policy activation\r\n            PE->>-IR: PolicyResult(IoT_Industrial_EdgeNode)\r\n            \r\n            IR->>+ZT: RevokeVehicleAccess(IoT_Industrial_ActuatorController)\r\n            ZT->>ZT: Revoke all active tokens\r\n            ZT->>AL: Log access revocation\r\n            ZT->>-IR: AccessRevoked(IoT_Industrial_TelemetryStream)\r\n            \r\n            IR->>+KS: RotateVehicleSecrets(IoT_Industrial_TelemetryStream)\r\n            KS->>KS: Generate new certificates immediately\r\n            KS->>AL: Log emergency secret rotation\r\n            KS->>-IR: SecretsRotated(IoT_Industrial_ActuatorController)\r\n            \r\n            IR->>+OC: PageOnCallTeam(IoT_Industrial_ActuatorController)\r\n            OC->>-IR: IncidentAcknowledged(IoT_Industrial_ActuatorController)\r\n            \r\n        else Medium/Low Severity\r\n            IR->>+PE: EvaluatePolicy(IoT_Industrial_EdgeNode)\r\n            PE->>-IR: PolicyResult(IoT_Industrial_TelemetryStream)\r\n            \r\n            IR->>+SM: EnhanceMonitoring(IoT_Industrial_PLC_Logic)\r\n            SM->>-IR: MonitoringEnhanced(IoT_Industrial_MQTT_Broker)\r\n            \r\n            IR->>+OC: NotifySecurityTeam(IoT_Industrial_EdgeNode)\r\n            OC->>-IR: NotificationReceived(IoT_Industrial_TelemetryStream)\r\n        end\r\n        \r\n        %% Investigation & Remediation\r\n        IR->>IR: Begin incident investigation\r\n        IR->>+AL: CollectForensicEvidence(IoT_Industrial_MQTT_Broker)\r\n        AL->>AL: Generate forensic timeline\r\n        AL->>-IR: ForensicEvidence(IoT_Industrial_MQTT_Broker)\r\n        \r\n        IR->>+VA: RequestDiagnosticData(IoT_Industrial_MQTT_Broker)\r\n        VA->>VA: Collect detailed system state\r\n        VA->>-IR: DiagnosticData(IoT_Industrial_TelemetryStream)\r\n        \r\n        %% Recovery Process\r\n        alt Incident Contained\r\n            IR->>+ZT: RestoreVehicleAccess(IoT_Industrial_MQTT_Broker)\r\n            ZT->>ZT: Validate new identity\r\n            ZT->>AL: Log access restoration\r\n            ZT->>-IR: AccessRestored(IoT_Industrial_EdgeNode)\r\n            \r\n            IR->>+VA: NotifySecurityClearance(IoT_Industrial_EdgeNode)\r\n            VA->>VA: Resume normal operations\r\n            VA->>AL: Log security clearance\r\n            VA->>-IR: OperationsResumed(IoT_Industrial_TelemetryStream)\r\n            \r\n        else Incident Escalated\r\n            IR->>+OC: EscalateIncident(IoT_Industrial_TelemetryStream)\r\n            OC->>OC: Engage security experts\r\n            OC->>-IR: IncidentEscalated(IoT_Industrial_ActuatorController)\r\n        end\r\n        \r\n        %% Post-Incident Activities\r\n        IR->>IR: Generate incident report\r\n        IR->>+AL: ArchiveIncidentEvidence(IoT_Industrial_MQTT_Broker)\r\n        AL->>-IR: EvidenceArchived(IoT_Industrial_PLC_Logic)\r\n        \r\n        IR->>+PE: UpdateSecurityPolicies(IoT_Industrial_MQTT_Broker)\r\n        PE->>PE: Incorporate security improvements\r\n        PE->>AL: Log policy updates\r\n        PE->>-IR: PoliciesUpdated(IoT_Industrial_ActuatorController)\r\n        \r\n    else Normal Activity\r\n        ZT->>-VA: AuthenticationSuccess(IoT_Industrial_TelemetryStream)\r\n        SM->>-ZT: ActivityLogged(IoT_Industrial_MQTT_Broker)\r\n    end\r\n",
+  "content_size": 4153,
+  "collected_at": "2026-02-06T14:03:20.321720",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "IoT_Industrial",
+  "seed_id": "gl_timeline_00130",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 IoT_Industrial_PLC_Logic 和 IoT_Industrial_PLC_Logic 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 IoT_Industrial_PLC_Logic处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'IoT_Industrial_PLC_Logic处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AuthenticateRequest",
+        "LogAuthenticationAttempt"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 IoT_Industrial_MQTT_Broker 和 IoT_Industrial_PLC_Logic 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'IoT_Industrial_MQTT_Broker 和 IoT_Industrial_PLC_Logic'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TriggerSecurityAlert",
+        "EvaluatePolicy"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 IoT_Industrial_EdgeNode 和 IoT_Industrial_ActuatorController 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'IoT_Industrial_EdgeNode 和 IoT_Industrial_ActuatorController'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PolicyResult",
+        "RevokeVehicleAccess"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 IoT_Industrial_TelemetryStream 和 IoT_Industrial_TelemetryStream 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'IoT_Industrial_TelemetryStream 和 IoT_Industrial_TelemetryStream'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AccessRevoked",
+        "RotateVehicleSecrets"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 IoT_Industrial_ActuatorController 和 IoT_Industrial_ActuatorController 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'IoT_Industrial_ActuatorController 和 IoT_Industrial_ActuatorController'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SecretsRotated",
+        "PageOnCallTeam"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 IoT_Industrial_ActuatorController 和 IoT_Industrial_EdgeNode。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'IoT_Industrial_ActuatorController 和 IoT_Industrial_EdgeNode'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "IncidentAcknowledged",
+        "EvaluatePolicy"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 IoT_Industrial_TelemetryStream 和 IoT_Industrial_PLC_Logic 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'IoT_Industrial_TelemetryStream 和 IoT_Industrial_PLC_Logic'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PolicyResult",
+        "EnhanceMonitoring"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 IoT_Industrial_MQTT_Broker 和 IoT_Industrial_EdgeNode 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'IoT_Industrial_MQTT_Broker 和 IoT_Industrial_EdgeNode'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MonitoringEnhanced",
+        "NotifySecurityTeam"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 IoT_Industrial_TelemetryStream 和 IoT_Industrial_MQTT_Broker。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 IoT_Industrial_TelemetryStream处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'IoT_Industrial_TelemetryStream处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "NotificationReceived",
+        "CollectForensicEvidence"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 IoT_Industrial_MQTT_Broker 和 IoT_Industrial_MQTT_Broker 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'IoT_Industrial_MQTT_Broker 和 IoT_Industrial_MQTT_Broker'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ForensicEvidence",
+        "RequestDiagnosticData"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 IoT_Industrial_TelemetryStream 和 IoT_Industrial_MQTT_Broker 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'IoT_Industrial_TelemetryStream 和 IoT_Industrial_MQTT_Broker'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DiagnosticData",
+        "RestoreVehicleAccess"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 IoT_Industrial_EdgeNode 和 IoT_Industrial_EdgeNode。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 IoT_Industrial_EdgeNode处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'IoT_Industrial_EdgeNode处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AccessRestored",
+        "NotifySecurityClearance"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 IoT_Industrial_TelemetryStream 和 IoT_Industrial_TelemetryStream 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 IoT_Industrial_TelemetryStream处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'IoT_Industrial_TelemetryStream处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OperationsResumed",
+        "EscalateIncident"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 IoT_Industrial_ActuatorController 和 IoT_Industrial_MQTT_Broker 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'IoT_Industrial_ActuatorController 和 IoT_Industrial_MQTT_Broker'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "IncidentEscalated",
+        "ArchiveIncidentEvidence"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 IoT_Industrial_PLC_Logic 和 IoT_Industrial_MQTT_Broker 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'IoT_Industrial_PLC_Logic 和 IoT_Industrial_MQTT_Broker'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EvidenceArchived",
+        "UpdateSecurityPolicies"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 IoT_Industrial_ActuatorController 和 IoT_Industrial_TelemetryStream。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'IoT_Industrial_ActuatorController 和 IoT_Industrial_TelemetryStream'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PoliciesUpdated",
+        "AuthenticationSuccess"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 IoT_Industrial_MQTT_Broker 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'IoT_Industrial_MQTT_Broker'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ActivityLogged"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 72,
+    "repair_count": 4,
+    "grounding_acts_count": 34,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

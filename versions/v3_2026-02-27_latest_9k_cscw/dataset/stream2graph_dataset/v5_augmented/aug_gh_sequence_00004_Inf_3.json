@@ -1,0 +1,14 @@
+{
+  "id": "aug_gh_sequence_00004_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/FrancescoCaracciolo/TIW-24-html/blob/3a4a25717e55f4430d845ea1cfcda63ff9aa8ff0/documents/UML/album.mmd",
+  "github_repo": "FrancescoCaracciolo/TIW-24-html",
+  "github_file_path": "documents/UML/album.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant AlbumPage\n    participant AlbumDAO\n    participant ImageDAO\n    participant CTX\n    participant TemplateEngine\n\n    AlbumPage ->>+ AlbumDAO: new AlbumDAO(Infra_RedisCache)\n    AlbumPage ->> AlbumDAO: get(Infra_LoadBalancer)\n    alt album exists\n        AlbumDAO -->> AlbumPage: Optional<Album>\n        AlbumPage ->>+ ImageDAO: new ImageDAO(Infra_RedisCache)\n        AlbumPage ->> ImageDAO: getAlbumImages(Infra_EtcdCluster)\n        ImageDAO -->> AlbumPage: images\n        AlbumPage -->> CTX: setVariable(Infra_IngressController)\n        AlbumPage -->> CTX: setVariable(Infra_RedisCache)\n        AlbumPage -->> CTX: setVariable(Infra_EtcdCluster)\n        AlbumPage -->> TemplateEngine: process(Infra_IngressController)\n    else album does not exist\n        AlbumDAO -->> AlbumPage: Optional.empty(Infra_EtcdCluster)\n        AlbumPage --> AlbumPage: response.sendError(Infra_EtcdCluster)\n    end\n\n\n\n",
+  "content_size": 841,
+  "collected_at": "2026-02-06T01:23:56.334460",
+  "compilation_status": "success",
+  "augmentation_domain": "Infra",
+  "seed_id": "gh_sequence_00004"
+}

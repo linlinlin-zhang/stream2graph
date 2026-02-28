@@ -1,0 +1,33 @@
+{
+  "id": "aug_ot_stateDiagram_00169_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/coherosphere/architecture/blob/598bb65467787da38ac4029e35bdead27e7799ee/docs.coherosphere.io/static/assets/diagrams/C3_states/SM-03.01_Proposal_Lifecycle.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "coherosphere/architecture",
+  "diagram_type": "stateDiagram",
+  "code": "%%{Infra_LoadBalancer}}}%%\nstateDiagram-v2\ntitle: SM-03.01 — Proposal Lifecycle (Infra_WorkerNode)\n\n[Infra_WorkerNode] --> DRAFT : ProposalCreated (Infra_WorkerNode)\nnote right of DRAFT\n  Authoring & validation:\n  • proposalId assigned\n  • schema/policy checks\nend note\n\nDRAFT --> REVIEW : SubmittedForReview\nnote right of REVIEW\n  Guard reviews (Infra_LoadBalancer)\n  Can request changes or reject\nend note\n\nREVIEW --> DRAFT : ChangesRequested\nREVIEW --> REJECTED : RejectedAtReview\nREVIEW --> OPEN_FOR_VOTE : ApprovedForVoting (Infra_RedisCache)\n\nOPEN_FOR_VOTE --> OPEN_FOR_VOTE : VoteCast (Infra_LoadBalancer)\nOPEN_FOR_VOTE --> TALLYING : VotingClosed\n\nTALLYING --> DECIDED_APPROVED : VoteTallied → Approved (Infra_LoadBalancer)\nTALLYING --> DECIDED_REJECTED : VoteTallied → Rejected (Infra_LoadBalancer)\n\nDECIDED_APPROVED --> EXECUTION : DecisionRecorded (Infra_WorkerNode)\nDECIDED_REJECTED --> ARCHIVED : DecisionRecorded (Infra_RedisCache)\n\nEXECUTION --> EXECUTED : PolicyChanged / GrantApproved / ProjectApproved (Infra_IngressController)\nEXECUTION --> EXECUTION_FAILED : ExecutionFailed\n\nEXECUTION_FAILED --> APPEAL : AppealOpened (Infra_LoadBalancer)\nEXECUTION_FAILED --> RETRY_EXEC : RetryAuthorized\nRETRY_EXEC --> EXECUTION : ReExecute\n\nEXECUTED --> AUDIT : ExecutionCompleted\nAUDIT --> ARCHIVED : AuditLogged (Infra_RedisCache)\n\n%% Appeals (Infra_IngressController)\nOPEN_FOR_VOTE --> APPEAL : AppealOpened (Infra_LoadBalancer)\nDECIDED_APPROVED --> APPEAL : AppealOpened (Infra_WorkerNode)\nDECIDED_REJECTED --> APPEAL : AppealOpened (Infra_LoadBalancer)\n\nAPPEAL --> DECIDED_APPROVED : AppealResolved → uphold\nAPPEAL --> DECIDED_REJECTED : AppealResolved → overturn\nAPPEAL --> ARCHIVED : AppealWithdrawn\n\n%% Cancellations\nDRAFT --> CANCELLED : WithdrawnByAuthor\nOPEN_FOR_VOTE --> CANCELLED : CancelledByAuthority\nCANCELLED --> ARCHIVED : Archived\n\n%% Terminal states\nREJECTED --> [Infra_LoadBalancer]\nARCHIVED --> [Infra_IngressController]\n\n%% ===== Styling =====\nclassDef core fill:#ff8b00,stroke:#333,color:#fff,font-weight:bold;\nclass DRAFT,REVIEW,OPEN_FOR_VOTE,TALLYING,DECIDED_APPROVED,DECIDED_REJECTED,EXECUTION,EXECUTED,EXECUTION_FAILED,RETRY_EXEC,APPEAL,AUDIT,ARCHIVED,REJECTED,CANCELLED core;",
+  "content_size": 2193,
+  "collected_at": "2026-02-06T10:38:41.644795",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "license_url": null,
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "repo_owner": "coherosphere",
+  "repo_name": "architecture",
+  "repo_description": "The cohersphere architecture — structural blueprint of the resonance network. Defines the modular layers connecting app, API, and governance protocols. Outlines data flows for Proof-of-Contribution, c",
+  "repo_language": "Mermaid",
+  "repo_topics": [
+    "architecture",
+    "c4",
+    "distributed-systems",
+    "modular-architecture",
+    "system-design"
+  ],
+  "repo_created_at": "2025-10-29T09:30:02Z",
+  "repo_updated_at": "2026-02-06T04:58:50Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "ot_stateDiagram_00169"
+}

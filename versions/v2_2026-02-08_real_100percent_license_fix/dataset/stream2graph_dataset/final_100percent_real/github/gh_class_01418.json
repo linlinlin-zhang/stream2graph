@@ -1,0 +1,20 @@
+{
+  "id": "gh_class_01418",
+  "source": "github",
+  "source_url": "https://github.com/davis-boudreau/PROG1400/blob/f06c7d043c1c490a915f76e1e36926f8f57529f2/UML/pacman_UML_Class_Diagram_from_CRC.mmd",
+  "github_repo": "davis-boudreau/PROG1400",
+  "github_file_path": "UML/pacman_UML_Class_Diagram_from_CRC.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\ndirection LR\n\n%%========================\n%% Core game coordination\n%%========================\nclass Game {\n  +GameState state\n  +start()\n  +pause()\n  +resume()\n  +gameOver()\n  +updateTick()\n  +advanceLevel()\n}\n\nclass GameLoop {\n  +tickRate\n  +start()\n  +stop()\n  +tick()\n}\n\nclass Level {\n  +levelNumber\n  +init()\n  +isComplete() bool\n  +increaseDifficulty()\n}\n\nclass LifeManager {\n  +livesRemaining\n  +loseLife()\n  +resetPositions()\n  +isGameOver() bool\n}\n\nclass Score {\n  +currentScore\n  +addPoints(points)\n  +reset()\n}\n\nclass CollisionDetector {\n  +checkCollisions()\n  +resolvePacmanGhost(p: PacMan, g: Ghost)\n}\n\nGame --> GameLoop : controls\nGame --> Level : manages\nGame --> LifeManager : uses\nGame --> Score : owns\nGame --> CollisionDetector : uses\n\n%%========================\n%% Maze and tiles\n%%========================\nclass Maze {\n  +width\n  +height\n  +isWall(pos) bool\n  +canMove(from,to) bool\n  +getTile(pos) Tile\n}\n\nclass Tile {\n  +position\n  +passable : bool\n  +hasItem() bool\n  +removeItem()\n}\n\nMaze \"1\" o-- \"*\" Tile : contains\nLevel --> Maze : loads\n\n%%========================\n%% Entities\n%%========================\nclass Entity {\n  <<abstract>>\n  +position\n  +direction\n  +move()\n}\n\nclass PacMan {\n  +lives\n  +changeDirection(dir)\n  +consume(item: Item)\n}\n\nclass Ghost {\n  <<abstract>>\n  +speed\n  +state : GhostState\n  +setState(s: GhostState)\n  +updateAI()\n}\n\nEntity <|-- PacMan\nEntity <|-- Ghost\n\nPacMan --> Maze : navigates\nGhost --> Maze : navigates\nCollisionDetector --> PacMan : checks\nCollisionDetector --> Ghost : checks\n\n%%========================\n%% Specific ghosts\n%%========================\nclass Blinky\nclass Pinky\nclass Inky\nclass Clyde\n\nGhost <|-- Blinky\nGhost <|-- Pinky\nGhost <|-- Inky\nGhost <|-- Clyde\n\n%%========================\n%% Ghost state pattern\n%%========================\nclass GhostState {\n  <<interface>>\n  +onEnter(g: Ghost)\n  +onExit(g: Ghost)\n  +nextMove(g: Ghost, m: Maze) \n  +handleCollision(g: Ghost, p: PacMan)\n}\n\nclass ChaseState\nclass ScatterState\nclass FrightenedState {\n  +duration\n}\nclass EatenState\n\nGhostState <|.. ChaseState\nGhostState <|.. ScatterState\nGhostState <|.. FrightenedState\nGhostState <|.. EatenState\n\nGhost --> GhostState : has\n\nGameLoop --> PacMan : updates\nGameLoop --> Ghost : updates\nGameLoop --> GhostState : timers/updates\n\n%%========================\n%% Items and scoring\n%%========================\nclass Item {\n  <<abstract>>\n  +pointValue\n  +consume(p: PacMan)\n}\n\nclass Pellet\nclass PowerPellet {\n  +frightenDuration\n}\nclass Fruit {\n  +spawnTime\n  +despawnTime\n}\n\nItem <|-- Pellet\nItem <|-- PowerPellet\nItem <|-- Fruit\n\nTile \"0..1\" o-- \"0..1\" Item : holds\n\nPacMan --> Item : consumes\nPellet --> Score : adds points\nPowerPellet --> Score : adds points\nFruit --> Score : adds points\n\nPowerPellet --> Ghost : triggers frightened\nFrightenedState --> Ghost : applied to\n\n%%========================\n%% Game state enum (optional)\n%%========================\nclass GameState {\n  <<enumeration>>\n  Start\n  Playing\n  Paused\n  LevelComplete\n  GameOver\n}\n\nGame --> GameState : current\nLevel --> Score : awards\nLifeManager --> PacMan : tracks\nLifeManager --> Ghost : resets",
+  "content_size": 3152,
+  "collected_at": "2026-02-06T01:57:31.832314",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "repo_owner": "davis-boudreau",
+  "repo_name": "PROG1400",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

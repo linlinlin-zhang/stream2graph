@@ -1,0 +1,27 @@
+{
+  "id": "ot_journey_01012",
+  "source": "other",
+  "source_url": "https://github.com/NeonGamerBot-QK/slack-zeon/blob/d5472dce8259ffdd1cd6b516affc974683e5a474/docs/architecture.mmd",
+  "source_type": "github_search",
+  "github_repo": "NeonGamerBot-QK/slack-zeon",
+  "diagram_type": "journey",
+  "code": "flowchart TB\n    subgraph Entry[\"🚀 Bootstrap (index.ts)\"]\n        Init[index.ts<br/>Composition Root]\n    end\n\n    subgraph SlackLayer[\"📡 Slack Layer\"]\n        BoltApp[Bolt App<br/>HTTP Server :3000]\n        SlackAPI[Slack Platform<br/>Events + Web API]\n    end\n\n    subgraph CommandSystem[\"⚡ Command System\"]\n        CmdLoader[CommandLoader<br/>Dynamic Loader]\n        subgraph Commands[\"Commands (37 files)\"]\n            SlashCmds[\"/ping, /join, /tag<br/>/zpurge, /bday...\"]\n            EventCmds[\"message, team_join<br/>app_home_opened...\"]\n            ActionCmds[\"send_mail, vote_poll<br/>approve_join...\"]\n        end\n    end\n\n    subgraph Modules[\"🔧 Modules\"]\n        subgraph Core[\"Core\"]\n            BaseCmd[BaseCommand]\n            Utils[utils/index.ts]\n        end\n        subgraph Features[\"Features\"]\n            Leveling[leveling.ts<br/>XP/Levels]\n            Status[status.ts<br/>Now Playing]\n            Random[randomResponse.ts]\n            Hangman[hangman.ts]\n        end\n        subgraph Trackers[\"Trackers\"]\n            School[school.ts<br/>Grades]\n            Hacktime[hacktime.ts<br/>Coding]\n            Flightly[flightly.ts<br/>Flights]\n            Journey[journey.ts<br/>Ships]\n        end\n    end\n\n    subgraph Background[\"⏰ Background Jobs\"]\n        Cron[cron.ts<br/>Master Scheduler]\n        MemWatch[memwatch.ts]\n        AlertCPU[alertcpu.ts]\n        GitWatch[watch-git.ts]\n        Uptime[Uptime Ping<br/>60s interval]\n    end\n\n    subgraph Storage[\"💾 Persistence\"]\n        subgraph Postgres[\"PostgreSQL\"]\n            KeyvMain[(Keyv: data)]\n            KeyvTables[(channelhoister, tags<br/>stickymessages...)]\n            LevelDB[(levelsystem)]\n        end\n        subgraph LocalFiles[\"Local Files\"]\n            JSONStore[JSONdb<br/>discord-datamining.json]\n            EncryptedDB[EncryptedJsonDb<br/>anondm.json]\n        end\n    end\n\n    subgraph External[\"🌐 External Services\"]\n        Sentry[Sentry<br/>Error Monitoring]\n        LogSnag[LogSnag<br/>Analytics]\n        NocoDB[NocoDB<br/>Birthdays]\n        Spotify[Spotify<br/>Now Playing]\n        Jellyfin[Jellyfin<br/>Media Status]\n        HCMail[HC Mail<br/>Notifications]\n        HCAI[HC AI<br/>Chat API]\n        Steam[Steam API]\n        UptimeSvc[Uptime Service]\n    end\n\n    subgraph ErrorHandling[\"🚨 Error Handling\"]\n        GlobalErr[Global Handler<br/>unhandledRejection]\n    end\n\n    Init --> BoltApp\n    Init --> KeyvMain\n    Init --> KeyvTables\n    Init --> JSONStore\n    Init --> EncryptedDB\n    Init --> Cron\n    Init --> CmdLoader\n\n    BoltApp <--> SlackAPI\n    CmdLoader --> Commands\n    Commands --> BoltApp\n\n    Cron --> Status\n    Cron --> School\n    Cron --> Hacktime\n    Cron --> Flightly\n    Cron --> Random\n\n    BoltApp --> Leveling\n    Leveling --> LevelDB\n    Leveling --> LogSnag\n\n    Status --> Spotify\n    Status --> Jellyfin\n\n    Init -.->|deferred| Sentry\n    Init -.->|deferred| NocoDB\n    Init --> LogSnag\n\n    GlobalErr --> Sentry\n    GlobalErr --> SlackAPI\n\n    MemWatch --> SlackAPI\n    AlertCPU --> SlackAPI\n    Uptime --> UptimeSvc\n\n    School -.-> KeyvTables\n    Hacktime -.-> SlackAPI\n    Journey -.-> SlackAPI\n",
+  "content_size": 3129,
+  "collected_at": "2026-02-06T11:01:58.808333",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 13,
+  "repo_forks": 1,
+  "repo_owner": "NeonGamerBot-QK",
+  "repo_name": "slack-zeon",
+  "repo_description": "Zeon but on da hackclub slack",
+  "repo_language": "TypeScript",
+  "repo_topics": [
+    "slack",
+    "zeon"
+  ],
+  "repo_created_at": "2024-09-08T21:57:07Z",
+  "repo_updated_at": "2026-01-20T02:03:18Z"
+}

@@ -1,0 +1,169 @@
+{
+  "id": "aug_gl_packet-beta_00386_Edu_4",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/coherosphere/architecture/blob/2535c2c60723b48d688d65fc3a8581d2f4bc9bba/assets/.mermaid_clean/C4_sequences/C4-16_Peer_to_Peer_Hub_Signaling.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "coherosphere/architecture",
+  "diagram_type": "packet-beta",
+  "code": "%%{Education_ContentCDN}}}%%\n\nsequenceDiagram\nautonumber\n\nbox #8b5cf6 UI\n  participant UIA as C2-12 Resonance Board UI Hub A\n  participant UIB as C2-12 Resonance Board UI Hub B\nend\n\nbox #ff8b00 Core Services\n  participant HUBA as C2-06 Local Hub and Federation A\n  participant HUBB as C2-06 Local Hub and Federation B\n  participant META as C2-07 Metrics and Analytics\n  participant SECA as C2-10 Security and Audit A\n  participant SECB as C2-10 Security and Audit B\nend\n\nbox #e5e7eb Transport\n  participant BUS as Federation Transport P2P channel\nend\n\n%% -------- Establish link and capabilities --------\nUIA ->> HUBA: open federation console\nHUBA ->> BUS: initiatePeerLink offer caps versions\nBUS ->> HUBB: deliverPeerOffer\nHUBB ->> HUBB: validate caps and versions\nHUBB ->> BUS: acceptPeerLink and session keys\nBUS ->> HUBA: linkEstablished\nHUBA -->> SECA: audit link established\nHUBB -->> SECB: audit link established\n\n%% -------- Periodic health and resonance signals --------\nloop heartbeat interval\n  HUBA ->> BUS: send HubSignal metrics latency sri window\n  BUS ->> HUBB: forward HubSignal\n  HUBB -->> META: event HubSignal DDD EVT 14\n  META -->> META: event KPIUpdated DDD EVT 26\n\n  HUBB ->> BUS: send HubSignal metrics latency sri window\n  BUS ->> HUBA: forward HubSignal\n  HUBA -->> META: event HubSignal DDD EVT 14\n  META -->> META: event KPIUpdated DDD EVT 26\nend\n\n%% -------- Degradation detection and peer alert --------\nalt degradation detected at Hub B\n  HUBB ->> HUBB: detect packet loss or coherence drop\n  HUBB ->> BUS: send PeerAlert status degraded\n  BUS ->> HUBA: deliver PeerAlert\n  HUBA -->> META: event PeerAlert DDD EVT 44\n  HUBA -->> SECA: record peer alert and context\nelse normal\n  HUBA ->> HUBA: update peer health registry\nend\n\n%% -------- Optional rate and backpressure control --------\nalt high load on Hub A\n  HUBA ->> BUS: throttle request new interval\n  BUS ->> HUBB: apply throttle\n  HUBB ->> HUBB: adjust heartbeat interval\nelse balanced\n  HUBA ->> HUBA: keep current interval\nend\n\n%% -------- Optional failover path --------\nalt peer unresponsive\n  HUBA ->> BUS: ping and retry\n  BUS ->> HUBA: timeout\n  HUBA -->> SECA: open incident and timer\n  SECA ->> SECA: correlate with local anomalies\n  SECA -->> META: publish incident kpi update\n  META -->> META: event KPIUpdated DDD EVT 26\nelse responsive\n  HUBA ->> HUBA: clear incident timers\nend\n\n%% -------- UI updates --------\nMETA -->> UIA: stream health and sri charts\nMETA -->> UIB: stream health and sri charts\n\n%% -------- Close or rotate session --------\nopt rotate session keys\n  HUBA ->> BUS: rotateKeys request\n  BUS ->> HUBB: rotateKeys execute\n  HUBB -->> SECB: audit key rotation\n  HUBA -->> SECA: audit key rotation\nend\n\n%% -------- Completion --------\nHUBA ->> BUS: closePeerLink\nBUS ->> HUBB: notify link closed\nHUBA -->> SECA: audit link closed\nHUBB -->> SECB: audit link closed\n\n%% Notes\nNote over HUBA,HUBB: HubSignal DDD EVT 14 carries health resonance and latency fields\nNote over HUBA,META: KPIUpdated DDD EVT 26 emitted on each processed signal batch\nNote over HUBA: PeerAlert DDD EVT 44 indicates degradation or policy breach on peer",
+  "content_size": 3196,
+  "collected_at": "2026-02-06T14:08:42.021650",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "repo_owner": "coherosphere",
+  "repo_name": "architecture",
+  "repo_description": "The cohersphere architecture — structural blueprint of the resonance network. Defines the modular layers connecting app, API, and governance protocols. Outlines data flows for Proof-of-Contribution, c",
+  "repo_language": "Mermaid",
+  "repo_topics": [
+    "architecture",
+    "c4",
+    "distributed-systems",
+    "modular-architecture",
+    "system-design"
+  ],
+  "repo_created_at": "2025-10-29T09:30:02Z",
+  "repo_updated_at": "2026-02-06T04:58:50Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Education",
+  "seed_id": "gl_packet-beta_00386",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "首先，我们需要定义流程的起点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，C2-12 Resonance Board UI Hub A、C2-12 Resonance Board UI Hub B是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，C2-12 Resonance Board UI Hub A、C2-12 Resonance Board UI Hub B有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "在C2-12 Resonance Board UI Hub A、C2-12 Resonance Board UI Hub B中，我们需要定义核心逻辑。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "UIA",
+        "UIB"
+      ],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下C2-06 Local Hub and Federation A、C2-06 Local Hub and Federation B吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，C2-06 Local Hub and Federation A、C2-06 Local Hub and Federation B是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "HUBA",
+        "HUBB"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由C2-07 Metrics and Analytics、C2-10 Security and Audit A组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "META",
+        "SECA"
+      ],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理C2-10 Security and Audit B、Federation Transport P2P channel？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，C2-10 Security and Audit B、Federation Transport P2P channel的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "C2-10 Security and Audit B、Federation Transport P2P channel和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在C2-10 Security and Audit B、Federation Transport P2P channel完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "SECB",
+        "BUS"
+      ],
+      "timestamp_offset": 195
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 13,
+    "speaker_distribution": {
+      "Speaker_B": 7,
+      "Speaker_A": 6
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "confirm": 3,
+      "contrastive": 2,
+      "structural": 2,
+      "request": 2,
+      "inform": 1,
+      "clarify": 1
+    },
+    "avg_turn_length": 58.53846153846154,
+    "dialogue_duration": 195
+  }
+}

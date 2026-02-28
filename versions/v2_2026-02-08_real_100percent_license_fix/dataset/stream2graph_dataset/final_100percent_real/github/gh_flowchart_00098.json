@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00098",
+  "source": "github",
+  "source_url": "https://github.com/irahulsawhney/crypto-concepts/blob/421b34506119fb1ef623014ff5ccda6016d46210/diagrams/02-API-token-signing-verification.mmd",
+  "github_repo": "irahulsawhney/crypto-concepts",
+  "github_file_path": "diagrams/02-API-token-signing-verification.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TB\n    %% Title\n    Title[\"🧩 API Token Signing and Verification using Asymmetric Cryptography\"]\n\n    %% Entities\n    subgraph Issuer[\"Token Issuer / Authentication Server<br/>(e.g., AWS Cognito, STS)\"]\n        direction TB\n        P[\"Private Key 🔐 Kpriv\"]\n        T1[\"Create Token Payload<br/>(client_id, permissions, expiry)\"]\n        T1 --> S1[\"Sign Token with Kpriv\"]\n        P -.->|Used for signing| S1\n        S1 --> J[\"JWT / Token (Header.Payload.Signature)\"]\n        INote[\"• Issuer holds PRIVATE key (Kpriv) — never shared<br/>• Used only for signing tokens<br/>• Examples: AWS Cognito, STS\"]\n    end\n\n    subgraph Consumer[\"API Client\"]\n        direction TB\n        C1[\"Receives Signed Token (JWT)\"]\n        CNote[\"• Token may be stored temporarily<br/>• Sent in API requests as 'Authorization: Bearer ...'\"]\n    end\n\n    subgraph Verifier[\"Backend Service / Resource Server<br/>(e.g., API Gateway)\"]\n        direction TB\n        PU[\"Public Key 🔓 Kpub\"]\n        PU -.->|Used for verification| V1[\"Verify Signature with Kpub\"]\n        V1 --> V2[\"Check Claims<br/>(expiry, scope, audience)\"]\n        V2 --> A1[\"Access Granted ✅ or Denied ❌\"]\n        VNote[\"• Verifier holds PUBLIC key (Kpub) — shared widely<br/>• Used only for verifying signature<br/>• Examples: API Gateway, Lambda Authorizer\"]\n    end\n\n    Analogy[\"💡 Analogy:<br/>The issuer is like a notary with a unique stamp (private key) that only they possess.<br/>Anyone can verify the stamp's authenticity using publicly available information (public key),<br/>but only the notary can create new stamps.<br/>The token is like a notarized document — it proves who issued it and that it hasn't been tampered with.\"]\n\n    %% Data Flow\n    J --> C1\n    C1 ~~~ separator1[ ]\n    separator1 ~~~ Verifier\n    C1 -->|Sends Token in Request| V1\n\n    %% Styling\n    style Issuer stroke:#7a42f4,stroke-width:1px\n    style Consumer stroke:#0099cc,stroke-width:1px\n    style Verifier stroke:#00b386,stroke-width:1px\n    style Title fill:none,stroke:none\n    style separator1 fill:none,stroke:none\n",
+  "content_size": 2062,
+  "collected_at": "2026-02-06T01:41:56.216701",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

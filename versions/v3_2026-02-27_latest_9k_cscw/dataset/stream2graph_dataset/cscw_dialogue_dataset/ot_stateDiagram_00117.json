@@ -1,0 +1,362 @@
+{
+  "id": "ot_stateDiagram_00117",
+  "source": "other",
+  "source_url": "https://github.com/ballsun1003/Project_SE_TheTuringTest/blob/185a70825cf0376ce35265345b5b8e58dbbdf67f/doc/SDS/diagrams/SMD.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "ballsun1003/Project_SE_TheTuringTest",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    direction TB\n\n    %% ============================================================\n    %% 1. 초기화 및 게스트 세션 (Guest Session)\n    %% ============================================================\n    state \"Guest Session (Unauthenticated)\" as Guest {\n        direction LR\n        [*] --> AppInit : URL Access\n        \n        state \"App Initialization\" as AppInit\n        note right of AppInit\n            AuthProvider checks localStorage\n            Sets 'isLoggedIn = false'\n            Sets BG color (Slate)\n        end note\n\n        state \"Landing Page\" as Landing\n        state \"Login Screen\" as Login\n        state \"Sign Up Screen\" as SignUp\n\n        AppInit --> Landing : Render Home\n        Landing --> Login : Click 'Login'\n        Landing --> SignUp : Click 'Sign Up'\n        \n        state \"Registration Processing\" as RegProcess\n        note right of RegProcess\n            Verify Turnstile\n            Check Duplicate\n            Hash Password\n        end note\n        \n        SignUp --> RegProcess : Submit Form\n        RegProcess --> Login : Success (Redirect)\n        RegProcess --> SignUp : Fail (Show Error)\n\n        state \"Auth Processing\" as AuthProcess\n        note right of AuthProcess\n            Verify Turnstile\n            Verify Password\n            Get AccessToken\n        end note\n\n        Login --> AuthProcess : Submit Credentials\n        AuthProcess --> Login : Fail (Show Error)\n    }\n\n    %% ============================================================\n    %% 2. 유저 세션 (Authenticated Session)\n    %% ============================================================\n    state \"User Session (Authenticated)\" as User {\n        direction TB\n        \n        state \"Auth Success\" as AuthSuccess\n        note right of AuthSuccess\n            Set 'isLoggedIn = true'\n            Set BG color (Amber)\n            Save Token to LocalStorage\n        end note\n\n        state \"Main Dashboard\" as Dashboard\n        state \"Board View (Category)\" as BoardList\n        state \"User Profile View\" as Profile\n\n        %% --- Post Creation Flow ---\n        state \"Post Creation View\" as PostCreate\n        state \"AI Generating Content\" as AI_Gen_Post\n        note right of AI_Gen_Post\n            Call OpenAI API\n            Generate Text\n        end note\n\n        state \"Saving Post\" as DB_Save_Post\n\n        %% --- Post Detail & Interaction Flow ---\n        state \"Post Detail View\" as PostDetail\n        state \"Reaction Processing\" as Reacting\n        note right of Reacting\n            RPC Call (Toggle)\n            Create Notification\n        end note\n\n        state \"Comment Processing\" as Commenting\n        note right of Commenting\n            AI Generate Comment\n            Insert DB\n        end note\n\n        %% --- Post Edit Flow ---\n        state \"Post Edit View\" as PostEdit\n        state \"AI Rewriting Content\" as AI_Edit_Post\n        note right of AI_Edit_Post\n            Call OpenAI API\n            Rewrite Text\n        end note\n\n        state \"Updating Post\" as DB_Update_Post\n\n        %% --- Account Management ---\n        state \"Profile Updating\" as ProfileUpdate\n        state \"Account Deleting\" as AccDelete\n        note right of AccDelete\n            Cascade Delete All Data\n            (Posts, Comments, Noti, etc.)\n        end note\n\n        %% Transitions inside User Session\n        AuthSuccess --> Dashboard : Redirect\n        Dashboard --> BoardList : Click Category\n        Dashboard --> PostCreate : Click Write\n        Dashboard --> PostDetail : Click Post Title\n        Dashboard --> Profile : Click My Page\n\n        %% Create Post\n        PostCreate --> AI_Gen_Post : Submit Prompt\n        AI_Gen_Post --> DB_Save_Post : Success\n        DB_Save_Post --> PostDetail : Redirect\n\n        %% View & Interact\n        PostDetail --> Reacting : Click Like/Dislike\n        Reacting --> PostDetail : Update Counts\n        PostDetail --> Commenting : Write Comment\n        Commenting --> PostDetail : Update List\n        PostDetail --> PostEdit : Click Edit (Author Only)\n        PostDetail --> Dashboard : Click Delete (Soft Delete)\n\n        %% Edit Post\n        PostEdit --> AI_Edit_Post : Submit New Prompt\n        AI_Edit_Post --> DB_Update_Post : Success\n        DB_Update_Post --> PostDetail : Redirect\n\n        %% Profile\n        Profile --> ProfileUpdate : Update Info\n        ProfileUpdate --> Profile : Success\n        Profile --> AccDelete : Click Withdrawal\n    }\n\n    %% ============================================================\n    %% 3. Global Transitions (세션 간 전환)\n    %% ============================================================\n    \n    AuthProcess --> AuthSuccess : Success\n    \n    %% Logout\n    Dashboard --> Guest : Click Logout (Clear Storage)\n    Profile --> Guest : Click Logout\n    \n    %% Account Withdrawal\n    AccDelete --> Guest : Success (Clear Storage)\n\n    %% Protected Route Redirect\n    Guest --> Login : Try Accessing Protected Route",
+  "content_size": 4923,
+  "collected_at": "2026-02-06T10:38:05.419610",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Guest Session 和 Unauthenticated 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Guest Session 和 Unauthenticated'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "세션",
+        "Session"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 direction LR\n        [* 和 Slate 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'direction LR\n        [* 和 Slate'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Guest",
+        "color"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Redirect 和 Show Error 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 Redirect处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Redirect处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Success",
+        "Fail"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Show Error 和 Authenticated Session 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 Show Error处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Show Error处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Fail",
+        "세션"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Authenticated 和 direction TB\n        \n        state \"Auth Success\" as AuthSuccess\n        note right of AuthSuccess\n            Set 'isLoggedIn = true'\n            Set BG color (Amber 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Authenticated 和 direction TB\n        \n        state \"Auth Success\" as AuthSuccess\n        note right of AuthSuccess\n            Set 'isLoggedIn = true'\n            Set BG color (Amber'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Session",
+        "User"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Category 和 Toggle 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Category 和 Toggle'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "View",
+        "Call"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Posts, Comments, Noti, etc. 和 Author Only 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Posts, Comments, Noti, etc. 和 Author Only'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Data",
+        "Edit"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Soft Delete 和 세션 간 전환 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Soft Delete 和 세션 간 전환'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Delete",
+        "Transitions"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Clear Storage 和 Clear Storage 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 Clear Storage处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Clear Storage处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Logout",
+        "Success"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 39,
+    "repair_count": 3,
+    "grounding_acts_count": 18,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

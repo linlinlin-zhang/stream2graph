@@ -1,0 +1,9 @@
+{
+  "id": "gh_ind_6883a66e8a",
+  "source": "github_industrial",
+  "repo": "TotallyInformation/node-red-contrib-uibuilder",
+  "license": "apache-2.0",
+  "code": "sequenceDiagram\n    %% https://mermaid-js.github.io/mermaid-live-editor/edit\n    %% https://mermaid-js.github.io/mermaid/#/sequenceDiagram?id=syntax\n\n    title: uibuilder client connection sequence\n\n    participant client as Client <br> Browser\n    participant NR as Node-RED <br> uibuilder node\n    participant u as uib <br> Internals\n\n    autonumber\n\n    client->>+NR: HTTPS GET endpoint \n    NR-)-client: 200: index.html\n    client->>+NR: HTTPS GET other resources\n    NR-)-client: 200: other resources\n\n    client->>+NR: HTTPS Websocket connection request\n    NR-)-client: 200: OK\n\n    client->>+NR: WSS Websocket UPGRADE request\n    Note right of client: Headers/cookies no longer available\n    NR-)-client: 101: Switching Protocols\n\n    Note over client,NR: Begin websocket comms\n    Note over NR,u: Socket.IO 'connection'<br>event\n\n    NR-->>client: uibuilderCtrl: \"client connect\"\n    \n    rect rgba(0, 255, 0, 0.1)\n        client--)NR: uibuilderCtrl: \"ready for content\"<br> cacheControl: \"REPLAY\"\n        Note over NR,u: Send Cached content <br> if available\n    end\n",
+  "diagram_type": "node size:900..1500",
+  "collected_at": "2026-02-27T05:30:39.452732"
+}

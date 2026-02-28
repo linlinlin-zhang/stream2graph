@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00492",
+  "source": "github",
+  "source_url": "https://github.com/pagopa/p4pa-doc/blob/7e7885cceb7021d36015482fc7455c44951d6b3f/design/auth_mypayOperatore/TOBE_implicitFlow.mmd",
+  "github_repo": "pagopa/p4pa-doc",
+  "github_file_path": "design/auth_mypayOperatore/TOBE_implicitFlow.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    actor Operatore\n    participant UserAgent\n    participant FE as FE_MyOperatore\n    participant BFF as BFF_MyOperatore\n    participant AUTH as Authorization Server\n\n    Operatore ->> UserAgent: Accede al portale MyPay Operatore\n\n    activate UserAgent\n        note over Operatore, UserAgent: Privo di sessione valida\n        UserAgent ->> FE: #\n        activate FE\n            FE -->> UserAgent: Redirect verso pagina di login\n        deactivate FE\n\n        note over AUTH: Dal punto di vista di MyPay Operatore,<BR />si tratta di una sola entità.<BR />In realtà è qui che avverrà l'integrazione<BR />tra p4pa-auth e SelfCare\n        UserAgent ->> AUTH: Pagina di login\n        activate AUTH\n            note right of AUTH: L'utente si autentica\n            AUTH -->> UserAgent: Redirect verso pagina di accettazione ID Token\n        deactivate AUTH\n\n        UserAgent ->> FE: Consegna ID Token\n        activate FE\n            FE ->> BFF: Consegna ID Token\n            activate BFF\n                BFF ->> AUTH: POST /token\n                activate AUTH\n                    note right of AUTH: Valida ID Token\n                    note right of AUTH: Genera access Token\n                    AUTH ->> BFF: Consegna access Token\n                deactivate AUTH\n\n                BFF ->> AUTH: GET /userinfo\n                activate AUTH\n                    AUTH -->> BFF: Dati utente\n                deactivate AUTH\n\n                BFF ->> BFF: upsert mygov_utente\n                BFF ->> BFF: upsert mygov_operatore\n                BFF -->> FE: access token JWT\n            deactivate BFF\n            FE -->> UserAgent: #\n            alt L'operatore ha spuntato la casella \"Ricordami\"\n                note right of UserAgent: token di sessione persistito nel local storage\n            else\n                note right of UserAgent: token di sessione mantenuto in RAM\n            end\n        deactivate FE\n\n        UserAgent -->> Operatore: #\n    deactivate UserAgent\n    \n    note over Operatore, UserAgent: Da adesso l'operatore potrà navigare le pagine del FE",
+  "content_size": 2077,
+  "collected_at": "2026-02-06T01:33:02.533261",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

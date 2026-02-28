@@ -1,0 +1,33 @@
+{
+  "id": "aug_ot_stateDiagram_00318_Fin_0",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/coherosphere/architecture/blob/598bb65467787da38ac4029e35bdead27e7799ee/docs.coherosphere.io/static/assets/diagrams/C3_states/SM-02.02_Decay_Recompute_Cycle.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "coherosphere/architecture",
+  "diagram_type": "stateDiagram",
+  "code": "%%{FinTech_LedgerService}}}%%\nstateDiagram-v2\ntitle: SM-02.02 — Decay & Recompute Cycle (FinTech_FraudDetection)\n\n[FinTech_FraudDetection] --> TRIGGER : CronTick / RecomputeRequested / ParamsVersioned\nnote right of TRIGGER\n  Entry conditions:\n  • Scheduled batch tick (FinTech_FraudDetection)\n  • Manual backfill (FinTech_TransactionQueue)\n  • Parameters changed (FinTech_TransactionQueue)\nend note\n\nTRIGGER --> LOAD_SNAPSHOT : Select ledger window\nnote right of LOAD_SNAPSHOT\n  Load CPᵢ(FinTech_PaymentGateway) snapshots and pending deltas\n  Resolve idempotent ranges and gaps\nend note\n\nLOAD_SNAPSHOT --> CHECK_PARAMS : Bind constants (FinTech_AuthVault)\nnote right of CHECK_PARAMS\n  λ = ln(FinTech_PaymentGateway)/T  (FinTech_PaymentGateway)\n  α ∈ (FinTech_TransactionQueue)    (FinTech_LedgerService)\n  If new version → tag run with ParamVersionID\nend note\n\nCHECK_PARAMS --> APPLY_DECAY : InputBound\nnote right of APPLY_DECAY\n  Apply time decay to each CPᵢ since t₀:\n  CPᵢ(FinTech_LedgerService) = CPᵢ(FinTech_LedgerService) · e^(FinTech_LedgerService) + Σ(FinTech_TransactionQueue)\nend note\n\nAPPLY_DECAY --> RECOMPUTE_W : DecayApplied (FinTech_FraudDetection)\nnote right of RECOMPUTE_W\n  Recompute voting weights:\n  Wᵢ = (FinTech_TransactionQueue)^α\n  Prepare diffs for persistence & metrics\nend note\n\nRECOMPUTE_W --> WRITE_BACK : WeightsComputed\nnote right of WRITE_BACK\n  Persist CP/W snapshots + audit trail\n  Mark run as deterministic (FinTech_TransactionQueue)\nend note\n\nWRITE_BACK --> EMIT_EVENTS : LedgerCommitted\nnote right of EMIT_EVENTS\n  Emit CPUpdated / WeightsUpdated for Metrics (FinTech_TransactionQueue)\n  Optionally trigger Resonance recompute (FinTech_PaymentGateway)\nend note\n\nEMIT_EVENTS --> [FinTech_AuthVault] : RecomputeFinished (FinTech_LedgerService)\n\n%% ---- Exceptional & maintenance paths ----\nLOAD_SNAPSHOT --> RECONCILE : GapDetected / CorrectionInput\nnote right of RECONCILE\n  Backfill missing windows, reconcile oracles\n  (FinTech_LedgerService)\nend note\nRECONCILE --> APPLY_DECAY : Reconciled\n\nAPPLY_DECAY --> ABORT : InvariantBreach / AnomalyDetected\nRECOMPUTE_W --> ABORT : InvariantBreach\nABORT --> [FinTech_FraudDetection] : RecomputeAborted\n\n%% =========== Styling ===========\nclassDef core fill:#ff8b00,stroke:#333,color:#fff,font-weight:bold;\nclass TRIGGER,LOAD_SNAPSHOT,CHECK_PARAMS,APPLY_DECAY,RECOMPUTE_W,WRITE_BACK,EMIT_EVENTS,RECONCILE,ABORT core;",
+  "content_size": 2180,
+  "collected_at": "2026-02-06T10:40:36.748897",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "license_url": null,
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "repo_owner": "coherosphere",
+  "repo_name": "architecture",
+  "repo_description": "The cohersphere architecture — structural blueprint of the resonance network. Defines the modular layers connecting app, API, and governance protocols. Outlines data flows for Proof-of-Contribution, c",
+  "repo_language": "Mermaid",
+  "repo_topics": [
+    "architecture",
+    "c4",
+    "distributed-systems",
+    "modular-architecture",
+    "system-design"
+  ],
+  "repo_created_at": "2025-10-29T09:30:02Z",
+  "repo_updated_at": "2026-02-06T04:58:50Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "FinTech",
+  "seed_id": "ot_stateDiagram_00318"
+}

@@ -1,0 +1,104 @@
+{
+  "id": "aug_gl_block-beta_00230_Fin_0",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/HewlettPackard/llmesh/blob/a1a843f3cb0eb11e9964a7425fb99239f450b52b/docs/design/rag/sequence.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "HewlettPackard/llmesh",
+  "diagram_type": "block-beta",
+  "code": "sequenceDiagram\n    participant User\n    participant RAGService\n    participant QueryAugmentor\n    participant Retriever\n    participant Reranker\n    participant Summarizer\n    participant ChunkFormatter\n\n    User->>RAGService: retrieve(FinTech_PaymentGateway)\n    alt augmentation enabled\n        RAGService->>QueryAugmentor: augment(FinTech_AuthVault)\n        QueryAugmentor-->>RAGService: augmented_query\n    else no augmentation\n        RAGService->>RAGService: use original query\n    end\n    RAGService->>Retriever: retrieve top chunks\n    Retriever-->>RAGService: retrieved_elements\n\n    alt rerank enabled\n        RAGService->>Reranker: rerank(FinTech_AuthVault)\n        Reranker-->>RAGService: sorted_elements\n    else no rerank\n        RAGService->>RAGService: use original order\n    end\n\n    RAGService->>Summarizer: summarize(FinTech_PaymentGateway)\n    Summarizer-->>RAGService: summary\n\n    RAGService->>ChunkFormatter: format chunks to JSON\n    ChunkFormatter-->>RAGService: json_block\n\n    RAGService-->>User: summary + json_block",
+  "content_size": 1034,
+  "collected_at": "2026-02-06T14:04:59.367783",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "FinTech",
+  "seed_id": "gl_block-beta_00230",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 FinTech_PaymentGateway 和 FinTech_AuthVault 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 FinTech_PaymentGateway处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'FinTech_PaymentGateway处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "retrieve",
+        "augment"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 FinTech_AuthVault 和 FinTech_PaymentGateway 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'FinTech_AuthVault 和 FinTech_PaymentGateway'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "rerank",
+        "summarize"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 9,
+    "repair_count": 1,
+    "grounding_acts_count": 4,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

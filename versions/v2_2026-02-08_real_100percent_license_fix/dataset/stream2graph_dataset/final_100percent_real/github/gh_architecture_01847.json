@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01847",
+  "source": "github",
+  "source_url": "https://github.com/AlmatJuvashev/phd-students-portal/blob/b88b252ccf22627eafd166ab2c48dbd64fab7deb/docs/diagrams/08_auth_rbac.mmd",
+  "github_repo": "AlmatJuvashev/phd-students-portal",
+  "github_file_path": "docs/diagrams/08_auth_rbac.mmd",
+  "diagram_type": "architecture",
+  "code": "flowchart TD\n    Login[User Login Request] --> Lookup{Find User by Email}\n    Lookup -- Not Found --> 401[401 Unauthorized]\n    Lookup -- Found --> HashCheck{Verify Password Hash}\n    HashCheck -- Invalid --> 401\n    HashCheck -- Valid --> JWT[Generate JWT Access Token]\n    \n    subgraph Token Content\n    Claims[Claims: <br/>- sub: UserID<br/>- role: student/admin<br/>- tenant_id: UUID]\n    end\n    \n    JWT -->|Embeds| Claims\n    JWT --> Response[Return Token to Client]\n    \n    Request[Authenticated API Request] --> Middleware[Auth Middleware]\n    Middleware --> Parse[Parse & Validate JWT]\n    Parse -- Invalid/Expired --> 401\n    Parse -- Valid --> Context[Set Context Variables]\n    \n    Context --> RBAC{Check Permission}\n    subgraph \"RBAC Policy\"\n    Admin[Admin Role] --> AllAccess\n    Advisor[Advisor Role] --> AssignedStudentsOnly\n    Student[Student Role] --> OwnDataOnly\n    end\n    \n    Context --> Policy[Apply Policy]\n    Policy -- Allowed --> Handler[Execute Handler]\n    Policy -- Denied --> 403[403 Forbidden]\n",
+  "content_size": 1034,
+  "collected_at": "2026-02-06T02:04:04.756422",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

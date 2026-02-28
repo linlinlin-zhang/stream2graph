@@ -1,0 +1,129 @@
+{
+  "id": "gh_class_01235",
+  "source": "github",
+  "source_url": "https://github.com/CMPUT301F25rocket/rocket-radar/blob/65f6037820e80d56572facc2a17751b625e026be/doc/uml/profile.mmd",
+  "github_repo": "CMPUT301F25rocket/rocket-radar",
+  "github_file_path": "doc/uml/profile.mmd",
+  "diagram_type": "class",
+  "code": "---\ntitle: profile package\nconfig:\n  htmlLabels: false\numlink:\n  select:\n    - field: package\n      pattern: com.rocket.radar.profile\n---\n\nclassDiagram\ndirection LR\n\n%% =========================\n%% MODEL — User Profile\n%% =========================\n\nclass ProfileModel {\n    - String uid\n    - String name\n    - String phoneNumber\n    - String email\n    - Timestamp lastLogin\n    - Boolean notificationsEnabled\n    - Boolean geolocationEnabled\n    - ArrayList<String> onWaitlistEventIds\n    - ArrayList<String> onMyEventIds\n    - ArrayList<String> onInvitedEventIds\n    - ArrayList<String> attendingEventIds\n    - ArrayList<String> cancelledEventIds\n    - String role\n    - GeoPoint lastKnownLocation\n\n    + getUid() : String\n    + setUid(String)\n    + getName() : String\n    + setName(String)\n    + getEmail() : String\n    + setEmail(String)\n    + getPhoneNumber() : String\n    + setPhoneNumber(String)\n    + getRole() : UserRole\n    + setRole(UserRole)\n    + isNotificationsEnabled() : Boolean\n    + setNotificationsEnabled(Boolean)\n    + isGeolocationEnabled() : Boolean\n    + setGeolocationEnabled(Boolean)\n    + getOnWaitlistEventIds() : ArrayList<String>\n    + addOnWaitlistEventId(String)\n    + removeOnWaitlistEventId(String)\n    + getOnMyEventIds() : ArrayList<String>\n    + addOnMyEventId(String)\n    + removeOnMyEventId(String)\n    + getOnInvitedEventIds() : ArrayList<String>\n    + addOnInvitedEventId(String)\n    + removeInvitedEventId(String)\n    + getAttendingEventIds() : ArrayList<String>\n    + addAttendingEventId(String)\n    + getCancelledEventIds() : ArrayList<String>\n    + addCancelledEventId(String)\n}\n\nclass UserRole {\n    <<enum>>\n    ENTRANT\n    ORGANIZER\n    ADMIN\n}\n\n%% =========================\n%% VALIDATION UTILITY\n%% =========================\n\nclass InputValidator {\n    <<utility>>\n    + isValidEmail(String) : boolean\n    + isValidPhone(String) : boolean\n    + cleanText(TextInputEditText) : String\n}\n\n%% =========================\n%% REPOSITORY\n%% =========================\n\nclass ProfileRepository {\n    - FirebaseFirestore db\n\n    + readProfile(String, ReadCallback)\n    + writeProfile(ProfileModel, WriteCallback)\n    + deleteAccount(FirebaseUser, ProfileModel, WriteCallback)\n    + addEventIdToWaitlist(String,String,WriteCallback)\n    + addEventIdToMyEvent(String,String,WriteCallback)\n    + updateLastLogin(String)\n    + updateUserProfileLocation(String,GeoPoint)\n    + updateUserInvitedList(String,String)\n}\n\nclass ReadCallback {\n    <<interface>>\n    + onProfileLoaded(ProfileModel)\n    + onError(Exception)\n}\n\nclass WriteCallback {\n    <<interface>>\n    + onSuccess()\n    + onError(Exception)\n}\n\nProfileRepository \"1\" ..> \"*\" ProfileModel : creates/manages\nProfileRepository \"1\" *-- \"2\" ProfileRepository_ReadCallback : defines\nProfileRepository \"1\" *-- \"2\" ProfileRepository_WriteCallback : defines\n\n%% =========================\n%% VIEWMODEL\n%% =========================\n\nclass ProfileViewModel {\n    - FirebaseFirestore db\n    - FirebaseAuth auth\n    - ProfileRepository profileRepository\n    - ListenerRegistration profileListenerRegistration\n    - MutableLiveData<ProfileModel> profileLiveData\n    - MutableLiveData<Boolean> deleteSuccess\n\n    + getProfileLiveData() : LiveData<ProfileModel>\n    + getDeleteSuccess() : LiveData<Boolean>\n    + setUserIdForProfileListener(String)\n    + deleteProfile(ProfileModel)\n    + updateProfile(ProfileModel)\n    + getProfile(String)\n    + updateLastLogin(String)\n}\nProfileViewModel \"1\" --> \"1\" ProfileRepository : uses\nProfileViewModel \"1\" *-- \"0..1\" ProfileModel : observes/manages as live data\n\n%% =========================\n%% ACCOUNT SETTINGS UI\n%% =========================\n\nclass AccountSettingsFragment {\n    - MaterialButton backButton\n    - MaterialButton saveButton\n    - MaterialButton deleteButton\n    - MaterialButton adminButton\n    - TextInputEditText usernameField\n    - TextInputEditText emailField\n    - TextInputEditText phoneNumberField\n    - MaterialSwitch notificationsEnabled\n    - MaterialSwitch geolocationEnabled\n    - ProfileViewModel profileViewModel\n    - AdminModeManager adminModeManager\n    - String uid\n\n    + onCreateView()\n    + confirmAccountDelete()\n}\n\n\nAccountSettingsFragment \"1\" *-- \"1\" ProfileViewModel : uses\nAccountSettingsFragment \"1\" ..> \"1\" InputValidator : validates with\nAccountSettingsFragment \"1\" --> \"1\" AdminModeManager : toggles admin mode\n\n%% =========================\n%% PROFILE UI\n%% =========================\n\nclass ProfileFragment {\n    - ImageButton accountSettingsButton\n    - MaterialButton criteriaButton\n    - TextView profileName\n    - ProfileViewModel profileViewModel\n    - ProfileModel currentUserProfile\n    - RecyclerView myEventRecyclerView\n    - EventAdapter adapter\n    - EventHistoryAdapter historyAdapter\n    - MaterialButtonToggleGroup toggleGroup\n    - List<Event> allEvents\n    - List<Event> displayedEvents\n    - EventRepository eventRepository\n\n    + onCreateView()\n    + onViewCreated()\n    - setupToggleListener()\n    - observeUserProfile()\n    - observeEvents()\n    - filterAndDisplayEvents()\n    + onEventClick(int,View)\n    + onResume()\n}\n\nProfileFragment \"1\" *-- \"1\" ProfileViewModel : observes\nProfileFragment \"1\" *-- \"0..1\" ProfileModel : displays\nProfileFragment \"1\" --> \"1\" EventRepository : fetches events\nProfileFragment \"1\" --> \"1\" EventAdapter : displays events\nProfileFragment \"1\" --> \"1\" EventHistoryAdapter : displays history\n\nProfileRepository \"1\" --> \"1\" FirebaseFirestore : reads/writes\nProfileViewModel \"1\" --> \"1\" ProfileRepository : business logic\n",
+  "content_size": 5534,
+  "collected_at": "2026-02-06T01:54:55.504720",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "gpl-3.0",
+  "license_name": "GNU General Public License v3.0",
+  "license_url": "https://api.github.com/licenses/gpl-3.0",
+  "repo_stars": 2,
+  "repo_forks": 0,
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "首先，我们需要定义流程的起点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，ProfileModel、UserRole的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "ProfileModel",
+        "UserRole",
+        "InputValidator"
+      ],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有ProfileRepository、ReadCallback。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，ProfileRepository、ReadCallback的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "ProfileRepository、ReadCallback和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，ProfileRepository、ReadCallback的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "ProfileRepository",
+        "ReadCallback"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由WriteCallback、ProfileViewModel组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "WriteCallback",
+        "ProfileViewModel"
+      ],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有AccountSettingsFragment、ProfileFragment。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在AccountSettingsFragment、ProfileFragment完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "AccountSettingsFragment",
+        "ProfileFragment"
+      ],
+      "timestamp_offset": 150
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 10,
+    "speaker_distribution": {
+      "Speaker_B": 5,
+      "Speaker_A": 5
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "clarify": 3,
+      "structural": 3,
+      "contrastive": 1,
+      "inform": 1
+    },
+    "avg_turn_length": 37.5,
+    "dialogue_duration": 150
+  }
+}

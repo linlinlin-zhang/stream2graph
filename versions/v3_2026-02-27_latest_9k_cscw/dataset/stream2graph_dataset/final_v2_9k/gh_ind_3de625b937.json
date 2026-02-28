@@ -1,0 +1,9 @@
+{
+  "id": "gh_ind_3de625b937",
+  "source": "github_industrial",
+  "repo": "FabioHAraujo/ShardBox",
+  "license": "gpl-3.0",
+  "code": "stateDiagram-v2\n    [*] --> Inicializando: Nodo inicia\n    \n    Inicializando --> AguardandoSync: Servidor TCP pronto\n    AguardandoSync --> Ativo: Aguarda 10s<br/>Servidor HTTP pronto\n    \n    note right of AguardandoSync\n        Período de graça de 10s\n        para sincronização inicial\n    end note\n    \n    Ativo --> Monitorando: Inicia heartbeat\n    \n    Monitorando --> Monitorando: Heartbeat OK<br/>Todos vivos\n    Monitorando --> DetectandoFalha: Sem resposta\n    \n    DetectandoFalha --> Monitorando: Timeout < 30s<br/>Aguarda\n    DetectandoFalha --> ConfirmandoMorte: Timeout > 30s\n    \n    ConfirmandoMorte --> AguardandoCooldown: Em período de<br/>inicialização (<15s)\n    ConfirmandoMorte --> AguardandoCooldown: Cooldown ativo<br/>(última tentativa <60s)\n    ConfirmandoMorte --> Recuperando: Condições OK<br/>para recuperação\n    \n    note right of ConfirmandoMorte\n        Proteções contra\n        recuperação prematura\n    end note\n    \n    AguardandoCooldown --> Monitorando: Volta ao monitoramento\n    \n    Recuperando --> IniciaProcesso: subprocess.Popen<br/>python node.py N\n    IniciaProcesso --> RegistraTentativa: Armazena timestamp\n    RegistraTentativa --> Monitorando: Continua monitorando\n    \n    IniciaProcesso --> [*]: Novo processo<br/>do nodo\n    \n    note left of Recuperando\n        Inicia novo processo\n        em background, desacoplado\n        do processo pai\n    end note\n",
+  "diagram_type": "node size:900..1500",
+  "collected_at": "2026-02-27T05:29:52.167147"
+}

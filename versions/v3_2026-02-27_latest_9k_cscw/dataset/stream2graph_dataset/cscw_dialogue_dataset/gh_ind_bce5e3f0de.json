@@ -1,0 +1,216 @@
+{
+  "id": "gh_ind_bce5e3f0de",
+  "source": "github_industrial",
+  "repo": "OnceApp/Analytics",
+  "license": "mit",
+  "code": "sequenceDiagram\nparticipant M as Some module\nparticipant E as MyEvent(record)\nparticipant R as RecordsSupervisor\nparticipant PS as ProducerSupervisor\nparticipant P as Producer\nparticipant CD as ConsumerDynamicSupervisor\nparticipant CS as ConsumerSupervisor\nparticipant C as Consumer\nparticipant T as Task\nparticipant K as Kinesis\nM->>+E: record(event)\n\nopt MyEvent server not running\nE->>+R: start_child\nR->>+E: init\nE->>E: New ets table\nE->>E: create_or_get_queue\n\nE->>+PS: start_child(MyEvent)\nPS->>+P: init(MyEvent)\nP->>+CD: start_child(MyEvent, pid)\nCD->>+CS: init({MyEvent, pid})\nCS-->>-CD: {:ok, pid}\nCD-->>-P: {:ok, pid}\nP->>+E: create_or_get_queue\nE-->>-P: queue\nP-->>-PS: {:producer, {{queue, 0}, MyEvent}}\nPS-->>-E: {:ok, pid}\nE-->>-R: {:ok, nil}\nR-->>-E: {:ok pid}\nend\n\nE->>E: add(event)\n\nE-->>-M: :ok\n\nloop Every tick\nC->>+E: create_batches_and_flush\nE-->>-C: batch of events\nC->>C: Append batches to the current batches queue\n\nopt When there is enough batches to dispatch\nC->>C: dispatch batches\nend\nend\n\nopt When a new batch is dispatched\nCS->>+C: start_link(MyEvent, events)\nC->>+T: start_link\nT->>E: handle_event(events)\nE->>K: send_data(events)\nT->>-C: :ok\nC-->>-CS: {:ok, pid}\nend\n",
+  "diagram_type": "size:1000..1500",
+  "collected_at": "2026-02-27T03:26:12.409371",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 record 和 event。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 record处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'record处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MyEvent",
+        "record"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 MyEvent 和 MyEvent 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 MyEvent处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'MyEvent处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "start_child",
+        "init"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 MyEvent, pid 和 {MyEvent, pid。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 MyEvent, pid处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'MyEvent, pid处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "start_child",
+        "init"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 event 和 MyEvent, events。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'event 和 MyEvent, events'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "add",
+        "start_link"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 events 和 events。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'events 和 events'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "handle_event",
+        "send_data"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 23,
+    "repair_count": 3,
+    "grounding_acts_count": 10,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "gh_class_01106",
+  "source": "github",
+  "source_url": "https://github.com/Dera301/projet_stage/blob/3ff0a1769dda7d9425e28b8bee7835e0dc5879b4/diagramme/DC07_PlanifierVisite_ClasseConception.mmd",
+  "github_repo": "Dera301/projet_stage",
+  "github_file_path": "diagramme/DC07_PlanifierVisite_ClasseConception.mmd",
+  "diagram_type": "class",
+  "code": "---\nconfig:\n  layout: elk\n  theme: base\n---\nclassDiagram\n    %% Diagramme de Classe de Conception - Planifier Visite\n    \n    class Appointment {\n        <<entity>>\n        -id: Int\n        -propertyId: Int\n        -studentId: Int\n        -ownerId: Int\n        -appointmentDate: DateTime\n        -status: AppointmentStatus\n        -message: String?\n        -cancellationReason: String?\n        -createdAt: DateTime\n        -updatedAt: DateTime\n        --\n        +create(propertyId: Int, studentId: Int, ownerId: Int, appointmentDate: DateTime, message: String?): Appointment\n        +getById(id: Int): Appointment\n        +getByProperty(propertyId: Int): Appointment[]\n        +getByStudent(studentId: Int): Appointment[]\n        +getByOwner(ownerId: Int): Appointment[]\n        +validateDate(date: DateTime): Boolean\n        +checkConflict(ownerId: Int, date: DateTime): Boolean\n    }\n    \n    class Property {\n        <<entity>>\n        -id: Int\n        -title: String\n        -address: String\n        -ownerId: Int\n        -isAvailable: Boolean\n        --\n        +getAppointments(): Appointment[]\n        +isAvailableForVisit(date: DateTime): Boolean\n    }\n    \n    class User {\n        <<entity>>\n        -id: Int\n        -email: String\n        -firstName: String\n        -lastName: String\n        -userType: UserType\n        --\n        +getMyAppointments(): Appointment[]\n    }\n    \n    class Student {\n        <<entity>>\n        --\n        +planVisit(propertyId: Int, appointmentDate: DateTime, message: String?): Appointment\n        +getMyAppointments(): Appointment[]\n        +cancelAppointment(appointmentId: Int, reason: String?): void\n    }\n    \n    class Owner {\n        <<entity>>\n        --\n        +getAppointmentsForProperty(propertyId: Int): Appointment[]\n        +getAllAppointments(): Appointment[]\n    }\n    \n    class AppointmentStatus {\n        <<enumeration>>\n        PENDING\n        CONFIRMED\n        CANCELLED\n        COMPLETED\n    }\n    \n    %% Relations\n    User \"1\" --> \"0..*\" Appointment : créer comme student\n    User \"1\" --> \"0..*\" Appointment : recevoir comme owner\n    Property \"1\" --> \"0..*\" Appointment : avoir\n    Appointment \"1\" --> \"1\" AppointmentStatus : posséder\n    Student --|> User : hériter\n    Owner --|> User : hériter\n    \n    Student ..> Appointment : créer\n    Student ..> Property : consulter\n\n",
+  "content_size": 2346,
+  "collected_at": "2026-02-06T01:53:01.969434",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 0
+}

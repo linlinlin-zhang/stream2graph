@@ -1,0 +1,20 @@
+{
+  "id": "gh_class_01393",
+  "source": "github",
+  "source_url": "https://github.com/jennxsierra/event-workshop-manager-system/blob/b9b0226c1afa776677cb7254b376a4476101d9bb/docs/uml.mmd",
+  "github_repo": "jennxsierra/event-workshop-manager-system",
+  "github_file_path": "docs/uml.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n    %% Enumeration Classes\n    class Role {\n        <<enumeration>>\n        PARTICIPANT\n        STAFF\n        ADMIN\n    }\n    class EventCategory {\n        <<enumeration>>\n        WORKSHOP\n        TRAINING\n        PUBLIC_OUTREACH\n        PRESS\n        LAUNCH\n    }\n\n    %% User Hierarchy\n    class User {\n        <<abstract>>\n        - username: string\n        - password: string\n        - firstName: string\n        - lastName: string\n        - email: string\n        - phone: string\n        - organization: string\n        - role: Role\n        + getters/setters()\n        + User(username, password, firstName, lastName, email, phone, organization, role)\n        + login(): bool\n        + logout(): void\n    }\n    class Participant {\n        + Participant(username, password, firstName, lastName, email, phone, organization)\n        + registerForEvent(e: Event): bool\n        + cancelRegistration(e: Event): bool\n        + viewRegisteredEvents(em: EventManager): Event[]\n    }\n    class Staff {\n        + Staff(username, password, firstName, lastName, email, phone, organization)\n        + updateEvent(e: Event): void\n    }\n    class Administrator {\n        + Administrator(username, password, firstName, lastName, email, phone, organization)\n        + updateUser(): void\n        + generateReports(): void\n    }\n\n    %% Core Domain Classes\n    class Event {\n        - name: string\n        - date: Date\n        - time: Time\n        - location: string\n        - category: EventCategory\n        - capacity: int\n        - registrations: Registration[]\n        + getters/setters()\n        + Event(name, date, time, location, category, capacity)\n        + addRegistration(r: Registration): void\n        + removeRegistration(r: Registration): void\n    }\n    class Registration {\n        - timestamp: DateTime\n        - cancelled: bool\n        + Registration(timestamp: DateTime)\n        + cancel(): void\n        + isCancelled(): bool\n    }\n\n    %% Manager Classes\n    class EventManager {\n        - events: Event[]\n        + EventManager()\n        + createEvent(e: Event, currentUser: User): bool\n        + updateEvent(e: Event, currentUser: User): bool\n        + deleteEvent(e: Event, currentUser: User): bool\n        + getEvents(): Event[]\n    }\n    class ReportManager {\n        - eventManager: EventManager\n        + ReportManager(eventManager: EventManager)\n        + generateSummaryReport(): Report\n        + generateDetailedReport(): Report\n        + generateHistoricalReport(): Report\n    }\n\n    %% Relationships\n    User <|-- Participant\n    Participant <|-- Staff\n    Staff <|-- Administrator\n\n    Event *-- Registration : composes\n    EventManager o-- Event : aggregates\n    ReportManager o-- EventManager : uses\n\n    Participant --> Registration : makes\n",
+  "content_size": 2770,
+  "collected_at": "2026-02-06T01:57:13.361870",
+  "compilation_status": "failed",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "repo_owner": "jennxsierra",
+  "repo_name": "event-workshop-manager-system",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

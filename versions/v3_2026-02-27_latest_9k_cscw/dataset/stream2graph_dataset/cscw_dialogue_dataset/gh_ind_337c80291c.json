@@ -1,0 +1,51 @@
+{
+  "id": "gh_ind_337c80291c",
+  "source": "github_industrial",
+  "repo": "ropfuscator/ropfuscator",
+  "license": "other",
+  "code": "%% Mermaid UML diagram\nsequenceDiagram\n\nparticipant LLVM as (LLVM backend)\nparticipant Pass as : X86ROPfuscator\nparticipant Core as : ROPfuscatorCore\nparticipant ROP  as : ROPEngine\nparticipant RCB  as : ROPChainBuilder\nparticipant BA   as : BinaryAutopsy\nparticipant ELF  as : ELFParser\nLLVM ->>  + Pass : runOnMachineFunction()\nPass ->>  + Core : obfuscateFunction()\nopt if BinaryAutopsy is not initialized\nCore -->> + BA   : getInstance()\nBA   -->> + ELF  : <<create>>\nELF  -->> - BA   : ELFParser\nBA   ->>    BA   : dissect()\nactivate    BA\nBA   -->    BA   : dumpSegments()\nBA   -->    BA   : dumpGadgets()\nBA   -->    BA   : buildXchgGraph()\ndeactivate  BA\nBA   -->> - Core : BinaryAutopsy\nend %% opt\nloop for each MachineBasicBlock\nloop for each MachineInstr\nCore -->> + ROP  : <<create>>\nCore ->>    ROP  : ropify()\nROP  ->>    ROP  : handleXXX()\nactivate    ROP\nROP  -->> + RCB  : <<create>>\nROP  ->>    RCB  : append()\nROP  ->>    RCB  : build()\nRCB  ->>  + BA   : findGadgetPrimitive()\nBA   -->> - RCB  : ROPChain\nRCB  ->>  + BA   : undoXchgs()\nBA   -->> - RCB  : ROPChain\nRCB  -->> - ROP  : ROPChain\ndeactivate  ROP\nROP  -->> - Core : ROPChain\nend %% for each MachineInstr\nCore ->>    Core : insertROPChain()\nactivate    Core\ndeactivate  Core\nend %% for each MachineBasicBlock\nCore -->> - Pass : .\nPass -->> - LLVM : .\n",
+  "diagram_type": "participant size:900..1500",
+  "collected_at": "2026-02-27T03:38:49.302493",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 LLVM backend 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'LLVM backend'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "as"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

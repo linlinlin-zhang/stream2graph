@@ -1,0 +1,60 @@
+{
+  "id": "gh_sequence_00679",
+  "source": "github",
+  "source_url": "https://github.com/Youknow2509/cio_verify_face/blob/64dd1b1eb75e62b25244067fb046f81672585bbe/doc/sequence_diagrams/websocket/device_status.mmd",
+  "github_repo": "Youknow2509/cio_verify_face",
+  "github_file_path": "doc/sequence_diagrams/websocket/device_status.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Admin as Admin Dashboard\n    participant WSGateway as WebSocket Gateway\n    participant WS as WebSocket Service\n    participant Monitor as Device Monitor\n    participant Cache as Redis Cache\n    participant DB as PostgreSQL\n    participant Queue as Kafka Consumer\n\n    Admin->>+WSGateway: WebSocket Connection\n    Note over Admin,WSGateway: ws://api.example.com/ws/admin?company_id=123&token=xyz\n    \n    WSGateway->>WSGateway: Validate admin token\n    WSGateway->>+Cache: Register admin connection\n    Note over WSGateway,Cache: admin_ws_connection:{company_id}:{admin_id}\n    Cache-->>-WSGateway: Connection registered\n    \n    WSGateway->>+WS: Register WebSocket client\n    Note over WSGateway,WS: Map admin to company device notifications\n    WS-->>-WSGateway: Admin client registered\n    \n    WSGateway-->>-Admin: WebSocket connection established\n    \n    Note over Admin,Queue: Device status monitoring begins...\n    \n    Monitor->>+DB: Query device status for company\n    Note over Monitor,DB: Check device heartbeats, connectivity\n    DB-->>-Monitor: Device status data\n    \n    Monitor->>Monitor: Analyze device health\n    Note over Monitor: Detect offline devices, connection issues\n    \n    alt Device status changed\n        Monitor->>+Queue: Publish device_status event\n        Note over Monitor,Queue: {company_id, device_id, status, details}\n        Queue-->>-Monitor: Event published\n        \n        Queue->>+WS: Consume device_status event\n        WS->>+Cache: Get admin connections for company\n        Note over WS,Cache: admin_ws_connection:{company_id}:*\n        Cache-->>-WS: Admin connection list\n        \n        loop For each connected admin\n            WS->>WSGateway: Send device status update\n            Note over WS,WSGateway: {type: \"device_status\", payload: {...}}\n            \n            WSGateway->>Admin: WebSocket message\n            Note over WSGateway,Admin: Real-time device status update\n            \n            Admin->>Admin: Update dashboard UI\n            Note over Admin: Show device online/offline status\n            Note over Admin: Display connection quality, last seen\n        end\n        \n        WS-->>-Queue: Event processed\n    end\n    \n    Note over Admin,Queue: Admin alert generation...\n    \n    Monitor->>Monitor: Check alert conditions\n    Note over Monitor: Multiple offline devices, security alerts\n    \n    alt Alert condition met\n        Monitor->>+Queue: Publish admin_alert event\n        Note over Monitor,Queue: {company_id, alert_type, severity, message}\n        Queue-->>-Monitor: Alert published\n        \n        Queue->>+WS: Consume admin_alert event\n        WS->>WSGateway: Send alert to admins\n        \n        WSGateway->>Admin: Critical alert notification\n        Note over WSGateway,Admin: High priority alert message\n        \n        Admin->>Admin: Display alert notification\n        Note over Admin: Show alert badge, sound notification\n        \n        WS-->>-Queue: Alert processed\n    end\n    \n    Note over Admin,Cache: WebSocket optimizations for admin dashboards:\n    Note over Admin,Cache: 1. Company-scoped device status broadcasting\n    Note over Admin,Cache: 2. Real-time alert prioritization\n    Note over Admin,Cache: 3. Dashboard state synchronization\n    Note over Admin,Cache: 4. Bandwidth-efficient status updates\n    Note over Admin,Cache: 5. Alert acknowledgment tracking",
+  "content_size": 3397,
+  "collected_at": "2026-02-06T01:35:34.728090",
+  "compilation_status": "failed",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 1,
+  "repo_forks": 2,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 主架构。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '主架构'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "root"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

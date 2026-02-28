@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00354",
+  "source": "github",
+  "source_url": "https://github.com/gonzalopatino/IoT_thermoStat_ecosystem/blob/8789216c66b2d4b1f9922287dd186e8f8f8d11f6/src/assets/diagrams/telemetry-pipeline.mmd",
+  "github_repo": "gonzalopatino/IoT_thermoStat_ecosystem",
+  "github_file_path": "src/assets/diagrams/telemetry-pipeline.mmd",
+  "diagram_type": "flowchart",
+  "code": "%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#2d4a6f', 'primaryTextColor': '#fff', 'primaryBorderColor': '#1a1a2e', 'lineColor': '#333'}}}%%\nflowchart TB\n    subgraph ESP32[\"ESP32 Thermostat\"]\n        SENSOR_TASK[\"Sensor Task<br/>Collects readings\"]\n        CONTROL_TASK[\"Control Task<br/>FSM decisions\"]\n        TELEMETRY_TASK[\"Telemetry Task<br/>Builds JSON payload\"]\n        WIFI_STACK[\"Wi-Fi Stack<br/>HTTPS POST\"]\n    end\n    \n    subgraph Network[\"Network Layer\"]\n        TLS[\"TLS 1.2/1.3<br/>Encrypted channel\"]\n    end\n    \n    subgraph Django[\"Django Backend\"]\n        direction TB\n        API_ENDPOINT[\"/api/telemetry/<br/>POST endpoint\"]\n        \n        AUTH[\"Authentication<br/>─────────<br/>Validate API key hash<br/>Check device registration\"]\n        \n        VALIDATE[\"Validation<br/>─────────<br/>Check required fields<br/>Validate value ranges<br/>Normalize timestamps\"]\n        \n        RATE_LIMIT[\"Rate Limiting<br/>─────────<br/>Per-device throttle<br/>Quota enforcement\"]\n        \n        ORM[\"Django ORM<br/>─────────<br/>Create snapshot<br/>Update last_seen\"]\n    end\n    \n    subgraph PostgreSQL[\"PostgreSQL Database\"]\n        SNAPSHOTS[(\"telemetry_snapshot<br/>─────────<br/>Indexed by device_id<br/>Indexed by recorded_at\")]\n        DEVICES[(\"device<br/>─────────<br/>last_seen updated\")]\n    end\n    \n    subgraph Response[\"API Response\"]\n        SUCCESS[\"200 OK<br/>Snapshot stored\"]\n        REJECT[\"4xx Error<br/>Auth/Validation failed\"]\n    end\n    \n    SENSOR_TASK --> CONTROL_TASK\n    CONTROL_TASK --> TELEMETRY_TASK\n    TELEMETRY_TASK --> WIFI_STACK\n    WIFI_STACK --> TLS\n    TLS --> API_ENDPOINT\n    \n    API_ENDPOINT --> AUTH\n    AUTH -->|\"Valid\"| VALIDATE\n    AUTH -->|\"Invalid\"| REJECT\n    VALIDATE -->|\"Valid\"| RATE_LIMIT\n    VALIDATE -->|\"Invalid\"| REJECT\n    RATE_LIMIT -->|\"Allowed\"| ORM\n    RATE_LIMIT -->|\"Exceeded\"| REJECT\n    \n    ORM --> SNAPSHOTS\n    ORM --> DEVICES\n    ORM --> SUCCESS\n",
+  "content_size": 1956,
+  "collected_at": "2026-02-06T01:43:35.781696",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

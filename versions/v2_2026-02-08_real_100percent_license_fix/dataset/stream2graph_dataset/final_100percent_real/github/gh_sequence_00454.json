@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00454",
+  "source": "github",
+  "source_url": "https://github.com/cimpa2004/financeTracker/blob/738564d496ab1b59c3e7beb2903adab04e6d8fe5/docs/sequence-diagrams/email.mmd",
+  "github_repo": "cimpa2004/financeTracker",
+  "github_file_path": "docs/sequence-diagrams/email.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Caller\n    participant EmailService\n    participant Db as FinancetrackerContext\n    participant Logger\n    participant User\n    participant Notification\n\n    Caller->>EmailService: NotifyBudgetsForTransactionAsync(tx, db, logger)\n    EmailService->>Logger: Log start\n    EmailService->>Db: Load budgets for user (global or matching tx.CategoryId)\n    Db-->>EmailService: Budgets list\n    loop For each budget\n        EmailService->>Db: Load relevant transactions for budget period\n        Db-->>EmailService: Transactions list\n        EmailService->>EmailService: Calculate spent and spentBefore\n        alt Budget amount > 0\n            EmailService->>Db: Remove stale notifications if period changed\n            Db-->>EmailService: Confirmation\n            alt percent >= 90 and percentBefore < 90\n                EmailService->>Db: Check for existing 90% notification\n                Db-->>EmailService: Exists?\n                alt Not exists\n                    EmailService->>Db: Load user\n                    Db-->>EmailService: User info\n                    EmailService->>EmailService: Prepare email (90%)\n                    EmailService->>EmailService: SendTemplatedEmailAsync\n                    EmailService->>Db: Add 90% notification\n                    Db-->>EmailService: Confirmation\n                    EmailService->>Logger: Log sent 90% email\n                else Exists\n                    EmailService->>Logger: Log skip 90% email\n                end\n            end\n            alt percent >= 100 and percentBefore < 100\n                EmailService->>Db: Check for existing 100% notification\n                Db-->>EmailService: Exists?\n                alt Not exists\n                    EmailService->>Db: Load user\n                    Db-->>EmailService: User info\n                    EmailService->>EmailService: Prepare email (100%)\n                    EmailService->>EmailService: SendTemplatedEmailAsync\n                    EmailService->>Db: Add 100% notification\n                    Db-->>EmailService: Confirmation\n                    EmailService->>Logger: Log sent 100% email\n                else Exists\n                    EmailService->>Logger: Log skip 100% email\n                end\n            end\n        end\n    end\n    EmailService->>Logger: Log errors if any",
+  "content_size": 2332,
+  "collected_at": "2026-02-06T01:32:29.069599",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

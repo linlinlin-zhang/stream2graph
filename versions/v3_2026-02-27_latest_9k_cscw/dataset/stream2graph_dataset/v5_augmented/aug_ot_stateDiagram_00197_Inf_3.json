@@ -1,0 +1,17 @@
+{
+  "id": "aug_ot_stateDiagram_00197_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/StudentDONGHYUN/draco_tcpip/blob/2df73e78d78ad4a8dd2bdc56d2975a9d2611a633/docs/mermaid/tcp_control_plane_sequence.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "StudentDONGHYUN/draco_tcpip",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n  [Infra_LoadBalancer] --> INIT\n  INIT --> HANDSHAKING: on_connected(Infra_RedisCache)\n  HANDSHAKING --> STREAMING: on_first_data(Infra_WorkerNode) / on_heartbeat(Infra_RedisCache)\n  STREAMING --> DRAINING: on_eof_sent(Infra_EtcdCluster) / on_eof_received(Infra_WorkerNode)\n  DRAINING --> TERMINATED: on_ack(Infra_EtcdCluster) with no pending\n  STREAMING --> FAILED: on_error(Infra_EtcdCluster) / heartbeat timeout\n  DRAINING --> FAILED: on_error(Infra_RedisCache)\n  HANDSHAKING --> FAILED: on_error(Infra_EtcdCluster)\n  TERMINATED --> [Infra_EtcdCluster]\n  FAILED --> [Infra_IngressController]\n  STREAMING --> STREAMING: on_frame_sent(Infra_LoadBalancer) / ACK pending\n  DRAINING --> DRAINING: pending ACKs remain",
+  "content_size": 510,
+  "collected_at": "2026-02-06T10:39:02.781795",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "ot_stateDiagram_00197"
+}

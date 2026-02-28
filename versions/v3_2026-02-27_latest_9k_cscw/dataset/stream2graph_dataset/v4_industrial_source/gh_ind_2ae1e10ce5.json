@@ -1,0 +1,9 @@
+{
+  "id": "gh_ind_2ae1e10ce5",
+  "source": "github_industrial",
+  "repo": "kubernetes-sigs/security-profiles-operator",
+  "license": "apache-2.0",
+  "code": "flowchart LR\n    U(User)\n    subgraph Node\n        FS1[(FileSystem)]\n        P1[Pod]\n        D1[Daemon]\n        R1[eBpfRecorder]\n        E1[LogEnricher]\n        M1[Metrics]\n\n        D1 -.->|install profile|FS1\n        P1 -.-> |use profile|FS1\n        D1 --> |gRPC: record profile| R1\n        D1 --> |gRPC: record profile| E1\n        D1 --> |gRPC: update metric| M1\n        R1 --> |record profile| P1\n        E1 --> |record profile| P1\n        D1 -->|get/watch| P1\n    end\n    \n    Recording[/ProfileRecording<br> CR/]\n    Config[/SPOD CR/]\n    Profile[/SeccompProfile CR<br>SelinuxProfile CR <br> ApparmorProfile CR/]\n    Binding[ProfileBinding CR]\n    W[Webhook]\n    M[Manager]\n    D[Daemonset]\n\n    U -->|deploy|M\n    U -->|deploy|W\n    U -->|update|Config\n    U -->|create|Recording\n    U -->|create/update/get/delete|Profile\n\n    W -.->|watch| Recording\n    W -->|add annotations| P1\n\n    M -.->|watch|Config\n    M -->|create/update|D\n    M -->|create<br>when not preset|W\n\n    D -.->|start|D1\n    D1 -.->|watch|Config\n    D1-.->|get/update|Recording\n    D1 -->|create/update/watch|Profile\n\n    W-->|get|Binding\n    W-->|get|Profile\n    W-->|add SecurityContext<br>when profile binding is defined|P1\n\n  classDef green fill:#9f6,stroke:#333,stroke-width:2px;\n  classDef orange fill:#f96,stroke:#333,stroke-width:4px;\n  classDef purple fill:#f9f,stroke:#333,stroke-width:4px\n  class W,M,D,D1,D2,R1,R2,E1,M1 green\n  class U orange\n  class P1,P2 purple",
+  "diagram_type": "node size:900..1500",
+  "collected_at": "2026-02-27T05:30:18.074488"
+}

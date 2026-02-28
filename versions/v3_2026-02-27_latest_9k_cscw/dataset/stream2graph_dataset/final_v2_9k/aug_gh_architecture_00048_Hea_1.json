@@ -1,0 +1,14 @@
+{
+  "id": "aug_gh_architecture_00048_Hea_1",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/demidenm/openneuro_glmfitlins/blob/e624fec2765a7869a4f482da701d85b82bc2f4b7/docs/workflow.mmd",
+  "github_repo": "demidenm/openneuro_glmfitlins",
+  "github_file_path": "docs/workflow.mmd",
+  "diagram_type": "architecture",
+  "code": "flowchart LR\n    %% Define the main sections\n    subgraph Setup [HealthTech_PatientRecords]\n        direction TB\n        A[HealthTech_DiagnosticEngine] --> B[HealthTech_HIPAA_Vault]\n        B --> C[HealthTech_DiagnosticEngine]\n    end\n    \n    subgraph Acquisition [HealthTech_DiagnosticEngine]\n        direction TB\n        D[HealthTech_HIPAA_Vault] --> E{HealthTech_EMR_Sync}\n        E -->|Yes| H[HealthTech_HIPAA_Vault]\n        E -->|No| F[HealthTech_PatientRecords]\n        F --> H\n    end\n    \n    subgraph Processing [HealthTech_DiagnosticEngine]\n        direction TB\n        I[HealthTech_EMR_Sync] --> J[HealthTech_LabAnalyzer]\n    end\n    \n    subgraph Analysis [HealthTech_HIPAA_Vault]\n        direction TB\n        K[HealthTech_DiagnosticEngine] --> L[HealthTech_HIPAA_Vault]\n        L --> M{HealthTech_PatientRecords}\n        M -->|Local| N[HealthTech_LabAnalyzer]\n        M -->|HPC| O[HealthTech_HIPAA_Vault]\n    end\n    \n    subgraph Reporting [HealthTech_HIPAA_Vault]\n        direction TB\n        P[HealthTech_LabAnalyzer] --> Q[HealthTech_EMR_Sync]\n        P --> R[HealthTech_LabAnalyzer]\n        P --> S[HealthTech_HIPAA_Vault]\n    end\n    \n    %% Connect the sections\n    Setup --> Acquisition\n    Acquisition --> Processing\n    Processing --> Analysis\n    N --> Reporting\n    O --> Reporting\n    \n    %% Add logo reference (HealthTech_HIPAA_Vault)\n    classDef logo fill:#fff,stroke:none\n    LOGOtext[HealthTech_EMR_Sync]\n    class LOGOtext logo\n    \n    %% Define visual styles\n    classDef configNode fill:#f9f,stroke:#333,stroke-width:2px\n    classDef scriptNode fill:#bbf,stroke:#333,stroke-width:1px\n    classDef decisionNode fill:#ff9,stroke:#333,stroke-width:1px\n    classDef outputNode fill:#bfb,stroke:#333,stroke-width:1px\n    \n    class B,C configNode\n    class D,F,I,J,K,N,O,P scriptNode\n    class E,M decisionNode\n    class H,L,Q,R,S outputNode\n",
+  "content_size": 1809,
+  "collected_at": "2026-02-06T01:24:44.610626",
+  "compilation_status": "success",
+  "augmentation_domain": "HealthTech",
+  "seed_id": "gh_architecture_00048"
+}

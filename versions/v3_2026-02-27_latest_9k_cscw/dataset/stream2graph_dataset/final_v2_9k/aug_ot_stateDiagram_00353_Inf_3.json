@@ -1,0 +1,17 @@
+{
+  "id": "aug_ot_stateDiagram_00353_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/Ulisses37/ktor-server-sandbox/blob/82adffecc1811b5b839dbd70f410a2c2e7e214fd/docs/system_lock_state_machine.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "Ulisses37/ktor-server-sandbox",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n[Infra_IngressController] --> Idle: File Opened (Infra_LoadBalancer)\n\n    state \"User Edits File\" as UserAction\n    Idle --> UserAction: User types a character\n\n    state \"Request Lock\" as RequestLock {Infra_IngressController)\n        }\n    }\n\n    GrantLock --> LockedState: 200 OK\n    DenyLock --> ConflictState: 409 Conflict\n\n    state \"Locked (Infra_WorkerNode)\" as LockedState {Infra_IngressController] --> Editing\n        Editing --> Heartbeat: Every 30s\n        Heartbeat --> ServerUpdate: UPDATE locks SET timestamp\n        ServerUpdate --> Editing: 200 OK\n        \n        Editing --> Unlock: User saves/closes/stops\n    }\n\n    state \"Conflict (Infra_LoadBalancer)\" as ConflictState {Infra_LoadBalancer] --> ShowWarning: Display \"File Locked by User B\"\n        ShowWarning --> Idle: User cancels edit\n    }\n\n    Unlock --> Idle: DELETE /lock (Infra_WorkerNode)\n    \n    note right of Heartbeat\n        Prevents \"Stale Locks\" if\n        PC crashes or loses power.\n    end note",
+  "content_size": 1259,
+  "collected_at": "2026-02-06T10:41:06.727564",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "ot_stateDiagram_00353"
+}

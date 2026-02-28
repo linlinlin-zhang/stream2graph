@@ -1,0 +1,321 @@
+{
+  "id": "gh_class_01048",
+  "source": "github",
+  "source_url": "https://github.com/AshGreyG/Robox/blob/f65a993e28aab6417dd4d4708a23be972e9781b1/docs/uml/core_ref.mmd",
+  "github_repo": "AshGreyG/Robox",
+  "github_file_path": "docs/uml/core_ref.mmd",
+  "diagram_type": "class",
+  "code": "---\r\ntitle: Robox Class Diagram\r\n---\r\n\r\nclassDiagram\r\n    class Input[\"Core::Input\"] {\r\n        + seq_ : queue~int~\r\n    }\r\n    class Output[\"Core::Output\"] {\r\n        + seq_ : queue~int~\r\n    }\r\n    class Vacant[\"Core::Vacant\"] {\r\n        + seq_ : queue~int~\r\n    }\r\n    class Robot[\"Core::Robot\"] {\r\n        - handbox_ : int\r\n        - cmd_ : Command\r\n        - handbox_state_ : bool\r\n        $+ kEmptyHandbox : int\r\n        + Robot(in, out, hs) : [[constructor]]\r\n        + getValue() : int\r\n        + setValue(v) : void\r\n        + isEmpty() : bool\r\n        + setState(s) : void\r\n        + initCommandList(name, index) : void\r\n    }\r\n    class Command[\"Core::Command\"] {\r\n        $- kCmdCount : unsigned int\r\n        - list_ : vector~SingleCommand~\r\n        - ref_ : unsigned int\r\n        - owner_ : Robot _ptr_\r\n        - input_ : Input _ptr_\r\n        - output_ : Output _ptr_\r\n        $+ kAllCmd : vector~string~\r\n        + Command(o, in, out) : [[constructor]]\r\n        + runRefCommand() : void\r\n        + appendToList(name, index) : void\r\n    }\r\n    class SingleCommand[\"Core::Command::SingleCommand\"] {\r\n        $+ kNullVacant : int\r\n        + cmd_name_ : string\r\n        + vacant_index_ : int\r\n        + id_ : unsigned int\r\n        + SingleCommand(cn, id, vi) : [[constructor]]\r\n    }\r\n\r\n    class Game[\"Core::Game\"] {\r\n        + available_cmd_ : vector~string~\r\n        + game_input_ : Input\r\n        + game_output_ : Output\r\n        + game_vacant_ : Vacant\r\n        + game_robot_ : Robot\r\n        + Game() : [[constructor]]\r\n        + initialize(a, ps, ns, cmd) : void\r\n    }\r\n    SingleCommand --o \"*\" Command : inline struct / member\r\n    Command --o \"1\" Robot : member\r\n    Robot --o \"1\" Command : member / used in function\r\n    Robot --o \"*\" Game : member\r\n    Input --o \"1\" Game : member\r\n    Output --o \"1\" Game : member\r\n    Vacant --o \"1\" Game : member\r\n    Input --o \"1\" Command : transport by Game -> Robot -> Command\r\n    Output --o \"1\" Command\r\n    Vacant --o \"1\" Command\r\n    Command --o \"1\" Game : influence the game state\r\n\r\n    note for SingleCommand \"Use id to specify different commands\"",
+  "content_size": 2116,
+  "collected_at": "2026-02-06T01:52:15.753758",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Core::Input\" 和 \"Core::Output\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Core::Input\" 和 \"Core::Output\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Input",
+        "Output"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Core::Vacant\" 和 \"Core::Robot\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 \"Core::Vacant\"处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Core::Vacant\"处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Vacant",
+        "Robot"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 in, out, hs 和 v 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'in, out, hs 和 v'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Robot",
+        "setValue"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 s 和 name, index。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 's 和 name, index'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "setState",
+        "initCommandList"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Core::Command\" 和 o, in, out 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"Core::Command\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Core::Command\"处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Command",
+        "Command"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 name, index 和 \"Core::Command::SingleCommand\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'name, index 和 \"Core::Command::SingleCommand\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "appendToList",
+        "SingleCommand"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 cn, id, vi 和 \"Core::Game\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'cn, id, vi 和 \"Core::Game\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SingleCommand",
+        "Game"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 a, ps, ns, cmd 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'a, ps, ns, cmd'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "initialize"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 34,
+    "repair_count": 2,
+    "grounding_acts_count": 16,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

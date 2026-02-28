@@ -1,0 +1,994 @@
+{
+  "id": "gh_flowchart_00085",
+  "source": "github",
+  "source_url": "https://github.com/Ribesh19/redis-azure-vecsim-app/blob/cb01576497f24c7feb2d897c6b9ccf8a3b8e2934/flowchart_system_deisgn.mmd",
+  "github_repo": "Ribesh19/redis-azure-vecsim-app",
+  "github_file_path": "flowchart_system_deisgn.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TB\n    %% Main Components\n    subgraph \"Frontend\"\n        UI[\"User Interface\"]\n        SemanticSearch[\"Semantic Search Button\"]\n        ImageSearch[\"Image Search Button\"]\n        ProductCard[\"Product Card Component\"]\n        ProductGrid[\"Product Grid\"]\n    end\n    \n    subgraph \"Backend\"\n        API[\"FastAPI Server\"]\n        Routes[\"API Routes\"]\n        Models[\"Data Models\"]\n        QueryBuilder[\"Query Builder\"]\n        ResultProcessor[\"Result Processor\"]\n    end\n    \n    subgraph \"Azure Cloud\"\n        subgraph \"Azure SQL Database\"\n            SQLdb[(Product Database)]\n            ChangeTracking[\"Change Tracking\"]\n        end\n        \n        subgraph \"Azure Function\"\n            SQLTrigger[\"SQL Trigger Function\"]\n            EmbeddingGenerator[\"Embedding Generator\"]\n            TextVectorCreator[\"Text Vector Creator\"]\n            ImageVectorCreator[\"Image Vector Creator\"]\n            RedisUpdater[\"Redis Updater\"]\n        end\n        \n        subgraph \"Azure Cache for Redis\"\n            RedisCache[(Redis Cache)]\n            VectorIndex[\"HNSW Vector Index\"]\n            ProductMetadata[\"Product Metadata\"]\n        end\n    end\n    \n    subgraph \"Initial Load\"\n        JupyterNb[\"Jupyter Notebook\"]\n        SentenceTransformer[\"Sentence Transformer\"]\n        Img2Vec[\"Img2Vec ResNet-18\"]\n        VectorFiles[\"Vector JSON Files\"]\n    end\n    \n    %% Connections\n    UI --> ProductGrid\n    ProductGrid --> ProductCard\n    ProductCard --> SemanticSearch\n    ProductCard --> ImageSearch\n    \n    SemanticSearch -- \"API Call\" --> Routes\n    ImageSearch -- \"API Call\" --> Routes\n    \n    Routes --> QueryBuilder\n    QueryBuilder --> VectorIndex\n    VectorIndex -- \"Search Results\" --> ResultProcessor\n    ResultProcessor --> ProductMetadata\n    ResultProcessor -- \"Similar Products\" --> UI\n    \n    %% Initial Data Loading Flow\n    JupyterNb -- \"Extract Data\" --> SQLdb\n    JupyterNb -- \"Process Text\" --> SentenceTransformer\n    JupyterNb -- \"Process Images\" --> Img2Vec\n    SentenceTransformer -- \"768-dim vectors\" --> VectorFiles\n    Img2Vec -- \"512-dim vectors\" --> VectorFiles\n    VectorFiles -- \"Load\" --> RedisCache\n    \n    %% Prefetch Caching Flow\n    SQLdb -- \"Product Update\" --> ChangeTracking\n    ChangeTracking -- \"Trigger\" --> SQLTrigger\n    SQLTrigger -- \"Get Changed Products\" --> EmbeddingGenerator\n    EmbeddingGenerator -- \"Process Text\" --> TextVectorCreator\n    EmbeddingGenerator -- \"Process Images\" --> ImageVectorCreator\n    TextVectorCreator -- \"New Text Vectors\" --> RedisUpdater\n    ImageVectorCreator -- \"New Image Vectors\" --> RedisUpdater\n    RedisUpdater -- \"Update Vectors\" --> RedisCache\n    RedisUpdater -- \"Update Metadata\" --> ProductMetadata\n    \n    %% Search Flow Process\n    subgraph \"Semantic Search Flow\"\n        S1[\"User clicks 'By Text' button\"]\n        S2[\"Frontend calls API with product_id\"]\n        S3[\"Backend retrieves product's text vector\"]\n        S4[\"Query Builder creates HNSW search with filters\"]\n        S5[\"Redis executes vector similarity search\"]\n        S6[\"Backend processes results\"]\n        S7[\"Frontend displays similar products\"]\n        \n        S1 --> S2 --> S3 --> S4 --> S5 --> S6 --> S7\n    end\n    \n    subgraph \"Image Search Flow\"\n        I1[\"User clicks 'By Image' button\"]\n        I2[\"Frontend calls API with product_id\"]\n        I3[\"Backend retrieves product's image vector\"]\n        I4[\"Query Builder creates HNSW search with filters\"]\n        I5[\"Redis executes vector similarity search\"]\n        I6[\"Backend processes results\"]\n        I7[\"Frontend displays similar products\"]\n        \n        I1 --> I2 --> I3 --> I4 --> I5 --> I6 --> I7\n    end\n    \n    subgraph \"Prefetch Caching Process\"\n        P1[\"Admin updates product in SQL Database\"]\n        P2[\"SQL Change Tracking detects update\"]\n        P3[\"Azure Function triggered with changed data\"]\n        P4[\"Function extracts product information\"]\n        P5[\"Function generates new text embedding\"]\n        P6[\"Function generates new image embedding\"]\n        P7[\"Function combines embeddings\"]\n        P8[\"Function updates Redis vector data\"]\n        P9[\"Function updates Redis product metadata\"]\n        P10[\"Vector index automatically updated\"]\n        \n        P1 --> P2 --> P3 --> P4 --> P5 & P6\n        P5 & P6 --> P7 --> P8 --> P9 --> P10\n    end\n    \n    subgraph \"HNSW Indexing Process\"\n        H1[\"Define image vector field (512-dim)\"]\n        H2[\"Define text vector field (768-dim)\"]\n        H3[\"Add tag fields (gender, category)\"]\n        H4[\"Create index with COSINE distance metric\"]\n        H5[\"Apply index to product_vector: keys\"]\n        \n        H1 & H2 --> H3 --> H4 --> H5\n    end\n    \n    %% Styling\n    classDef azure fill:#0072C6,color:white,stroke:#0072C6,stroke-width:2px\n    classDef redis fill:#DC382D,color:white,stroke:#DC382D,stroke-width:2px\n    classDef react fill:#61DAFB,color:black,stroke:#61DAFB,stroke-width:2px\n    classDef python fill:#3776AB,color:white,stroke:#3776AB,stroke-width:2px\n    classDef process fill:#FFF,color:black,stroke:#333,stroke-width:1px,stroke-dasharray: 5 5\n    \n    class SQLdb,ChangeTracking,SQLTrigger,EmbeddingGenerator,TextVectorCreator,ImageVectorCreator,RedisUpdater azure\n    class RedisCache,VectorIndex,ProductMetadata redis\n    class UI,SemanticSearch,ImageSearch,ProductCard,ProductGrid react\n    class API,Routes,Models,QueryBuilder,ResultProcessor,JupyterNb,SentenceTransformer,Img2Vec python\n    class S1,S2,S3,S4,S5,S6,S7,I1,I2,I3,I4,I5,I6,I7,P1,P2,P3,P4,P5,P6,P7,P8,P9,P10,H1,H2,H3,H4,H5 process",
+  "content_size": 5528,
+  "collected_at": "2026-02-06T01:41:51.711053",
+  "compilation_status": "failed",
+  "license": "bsd-3-clause",
+  "license_name": "BSD 3-Clause \"New\" or \"Revised\" License",
+  "license_url": "https://api.github.com/licenses/bsd-3-clause",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"User Interface\" 和 \"Semantic Search Button\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"User Interface\" 和 \"Semantic Search Button\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "UI",
+        "SemanticSearch"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Image Search Button\" 和 \"Product Card Component\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Image Search Button\" 和 \"Product Card Component\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ImageSearch",
+        "ProductCard"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Product Grid\" 和 \"FastAPI Server\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Product Grid\" 和 \"FastAPI Server\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ProductGrid",
+        "API"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"API Routes\" 和 \"Data Models\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"API Routes\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"API Routes\"处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Routes",
+        "Models"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Query Builder\" 和 \"Result Processor\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Query Builder\" 和 \"Result Processor\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "QueryBuilder",
+        "ResultProcessor"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 (Product Database 和 \"Change Tracking\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '(Product Database 和 \"Change Tracking\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SQLdb",
+        "ChangeTracking"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"SQL Trigger Function\" 和 \"Embedding Generator\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"SQL Trigger Function\" 和 \"Embedding Generator\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SQLTrigger",
+        "EmbeddingGenerator"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Text Vector Creator\" 和 \"Image Vector Creator\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Text Vector Creator\" 和 \"Image Vector Creator\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TextVectorCreator",
+        "ImageVectorCreator"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Redis Updater\" 和 (Redis Cache 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 \"Redis Updater\"处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Redis Updater\"处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "RedisUpdater",
+        "RedisCache"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"HNSW Vector Index\" 和 \"Product Metadata\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"HNSW Vector Index\" 和 \"Product Metadata\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "VectorIndex",
+        "ProductMetadata"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Jupyter Notebook\" 和 \"Sentence Transformer\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Jupyter Notebook\" 和 \"Sentence Transformer\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "JupyterNb",
+        "SentenceTransformer"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Img2Vec ResNet-18\" 和 \"Vector JSON Files\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Img2Vec ResNet-18\" 和 \"Vector JSON Files\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Img2Vec",
+        "VectorFiles"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"User clicks 'By Text' button\" 和 \"Frontend calls API with product_id\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"User clicks 'By Text' button\" 和 \"Frontend calls API with product_id\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "S1",
+        "S2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Backend retrieves product's text vector\" 和 \"Query Builder creates HNSW search with filters\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Backend retrieves product's text vector\" 和 \"Query Builder creates HNSW search with filters\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "S3",
+        "S4"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Redis executes vector similarity search\" 和 \"Backend processes results\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Redis executes vector similarity search\" 和 \"Backend processes results\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "S5",
+        "S6"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Frontend displays similar products\" 和 \"User clicks 'By Image' button\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Frontend displays similar products\" 和 \"User clicks 'By Image' button\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "S7",
+        "I1"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Frontend calls API with product_id\" 和 \"Backend retrieves product's image vector\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Frontend calls API with product_id\" 和 \"Backend retrieves product's image vector\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "I2",
+        "I3"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Query Builder creates HNSW search with filters\" 和 \"Redis executes vector similarity search\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Query Builder creates HNSW search with filters\" 和 \"Redis executes vector similarity search\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 73,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 74,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "I4",
+        "I5"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 75,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Backend processes results\" 和 \"Frontend displays similar products\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 76,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Backend processes results\" 和 \"Frontend displays similar products\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 77,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 78,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "I6",
+        "I7"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 79,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Admin updates product in SQL Database\" 和 \"SQL Change Tracking detects update\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 80,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Admin updates product in SQL Database\" 和 \"SQL Change Tracking detects update\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 81,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 82,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "P1",
+        "P2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 83,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Azure Function triggered with changed data\" 和 \"Function extracts product information\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 84,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Azure Function triggered with changed data\" 和 \"Function extracts product information\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 85,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 86,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "P3",
+        "P4"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 87,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Function generates new text embedding\" 和 \"Function generates new image embedding\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 88,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"Function generates new text embedding\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 89,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Function generates new text embedding\"处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 90,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 91,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "P5",
+        "P6"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 92,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Function combines embeddings\" 和 \"Function updates Redis vector data\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 93,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Function combines embeddings\" 和 \"Function updates Redis vector data\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 94,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 95,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "P7",
+        "P8"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 96,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Function updates Redis product metadata\" 和 \"Vector index automatically updated\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 97,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Function updates Redis product metadata\" 和 \"Vector index automatically updated\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 98,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 99,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "P9",
+        "P10"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 100,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Define image vector field (512-dim 和 \"Define text vector field (768-dim 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 101,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Define image vector field (512-dim 和 \"Define text vector field (768-dim'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 102,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 103,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "H1",
+        "H2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 104,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Add tag fields (gender, category 和 \"Create index with COSINE distance metric\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 105,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Add tag fields (gender, category 和 \"Create index with COSINE distance metric\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 106,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 107,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "H3",
+        "H4"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 108,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Apply index to product_vector: keys\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 109,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Apply index to product_vector: keys\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 110,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 111,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "H5"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 111,
+    "repair_count": 3,
+    "grounding_acts_count": 54,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

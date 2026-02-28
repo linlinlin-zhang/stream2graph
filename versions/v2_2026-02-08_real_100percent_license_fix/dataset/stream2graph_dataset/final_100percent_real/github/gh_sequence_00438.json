@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00438",
+  "source": "github",
+  "source_url": "https://github.com/ChicoFigueiredo/puc.pr-trabalho.pos/blob/4cb85bafed22061955cabfb1295e348fcb5ab89f/estudo/mermaid/v_006_01_criacao_parametro_critico.mmd",
+  "github_repo": "ChicoFigueiredo/puc.pr-trabalho.pos",
+  "github_file_path": "estudo/mermaid/v_006_01_criacao_parametro_critico.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Admin as Administrador\n    participant UI as Interface Web\n    participant Auth as Azure AD\n    participant ParamSvc as Parameter Service\n    participant EventStore as Event Store\n    participant AuditSvc as Audit Service\n    participant NotifSvc as Notification Service\n    participant BCB as Sistema BCB\n    \n    Note over Admin, BCB: Workflow Segurança Cibernética (Art. 3º, § 2º, Resolução CMN 4.893/2021)\n    \n    Admin->>UI: Solicita criação parâmetro crítico\n    UI->>Auth: Valida credenciais + MFA\n    Auth-->>UI: Token JWT + Roles\n    \n    Note over UI, ParamSvc: Controles de Acesso (Resolução CMN 4.893/2021)\n    UI->>ParamSvc: CreateCriticalParameter(data, token)\n    ParamSvc->>ParamSvc: Valida permissões RBAC\n    \n    Note over ParamSvc, EventStore: Rastreabilidade (Art. 3º, III)\n    ParamSvc->>EventStore: Store(ParameterCreationRequested)\n    EventStore-->>ParamSvc: EventId + Timestamp\n    \n    Note over ParamSvc, AuditSvc: Auditoria Automática Compliance\n    ParamSvc->>AuditSvc: LogSecurityEvent(eventId, userId, action)\n    AuditSvc->>EventStore: Store(SecurityAuditEvent)\n    \n    Note over ParamSvc, NotifSvc: Comunicação Obrigatória (Art. 15)\n    ParamSvc->>NotifSvc: NotifyRegulatory(paramChange, bcbRequired)\n    NotifSvc->>BCB: SendComplianceNotification(changeDetails)\n    BCB-->>NotifSvc: AckReceived + RefNumber\n    \n    Note over NotifSvc, EventStore: Registro Imutável para Auditoria\n    NotifSvc->>EventStore: Store(RegulatoryNotificationSent)\n    \n    ParamSvc-->>UI: ParameterCreated + AuditTrail\n    UI-->>Admin: Confirmação com rastreabilidade completa\n",
+  "content_size": 1624,
+  "collected_at": "2026-02-06T01:32:17.948359",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

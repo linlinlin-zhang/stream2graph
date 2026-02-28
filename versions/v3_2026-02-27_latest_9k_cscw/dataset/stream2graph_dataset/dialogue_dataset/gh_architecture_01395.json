@@ -1,0 +1,1162 @@
+{
+  "id": "gh_architecture_01395",
+  "source": "github",
+  "source_url": "https://github.com/hmaach/01Blog/blob/17f0db5bf794f79c27c496894ff8e5bd4028d5c0/docs/security_flow.mmd",
+  "github_repo": "hmaach/01Blog",
+  "github_file_path": "docs/security_flow.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TD\n    A[HTTP Request] --> B{RateLimitFilter<br/>OncePerRequestFilter}\n    \n    B -->|Rate Limit Exceeded| C[Return 429<br/>TOO_MANY_REQUESTS]\n    B -->|Within Limit| D{JwtFilter<br/>OncePerRequestFilter}\n    \n    D --> D1[Extract Authorization Header]\n    D1 --> D2{Bearer Token<br/>Present?}\n    \n    D2 -->|No| E[Continue Filter Chain]\n    D2 -->|Yes| D3[Extract JWT Token]\n    \n    D3 --> D4{Parse Token<br/>Valid Format?}\n    D4 -->|Invalid/Malformed| D5[Return 401<br/>UNAUTHORIZED]\n    D4 -->|Valid| D6[Extract User ID from Token]\n    \n    D6 --> D7{User ID Present &<br/>No Auth in Context?}\n    D7 -->|No| E\n    D7 -->|Yes| D8[Fetch User from Database]\n    \n    D8 --> D9{User Banned?}\n    D9 -->|Yes| D10[Return 401<br/>User Banned]\n    D9 -->|No| D11[Load UserDetails via<br/>CustomUserDetailsService]\n    \n    D11 --> D12{Validate Token<br/>Against UserDetails?}\n    D12 -->|Invalid| E\n    D12 -->|Valid| D13[Create Authentication Token<br/>UsernamePasswordAuthenticationToken]\n    \n    D13 --> D14[Set Authentication in<br/>SecurityContext]\n    D14 --> E\n    \n    E --> F{UsernamePasswordAuthenticationFilter<br/>Default Spring Security Filter}\n    \n    F --> G{Authorization Rules<br/>HttpSecurity Config}\n    \n    G --> G1{Endpoint Check}\n    G1 -->|/api/auth/**| H[Permit All]\n    G1 -->|GET /| H\n    G1 -->|GET /api/posts| H\n    G1 -->|/api/admin/**| I{Has ROLE_ADMIN?}\n    G1 -->|Other Endpoints| J{Authenticated?}\n    \n    I -->|No| K[JwtAuthenticationEntryPoint<br/>Return 401 UNAUTHORIZED]\n    I -->|Yes| L[Process Request]\n    \n    J -->|No| K\n    J -->|Yes| L\n    \n    H --> L\n    L --> M[Controller/Endpoint]\n    \n    style A fill:#e1f5ff\n    style B fill:#fff3cd\n    style D fill:#fff3cd\n    style F fill:#d4edda\n    style G fill:#d4edda\n    style M fill:#d1ecf1\n    style C fill:#f8d7da\n    style D5 fill:#f8d7da\n    style D10 fill:#f8d7da\n    style K fill:#f8d7da\n    \n    subgraph \"Custom Filters\"\n    B\n    D\n    end\n    \n    subgraph \"Spring Security Default Filters\"\n    F\n    end\n    \n    subgraph \"Security Configuration\"\n    G\n    end\n    \n    subgraph \"Authentication Components\"\n    N[DaoAuthenticationProvider]\n    O[CustomUserDetailsService]\n    P[BCryptPasswordEncoder]\n    Q[UserPrincipal]\n    end\n    \n    subgraph \"JWT Components\"\n    R[JwtService]\n    R1[Generate Token]\n    R2[Validate Token]\n    R3[Extract Claims]\n    R --> R1\n    R --> R2\n    R --> R3\n    end\n    \n    subgraph \"Session Management\"\n    S[SessionCreationPolicy.STATELESS]\n    end",
+  "content_size": 2498,
+  "collected_at": "2026-02-06T01:45:41.839669",
+  "license": "none",
+  "license_name": "No License",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "",
+  "repo_stars": 12,
+  "repo_forks": 0,
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在HTTP Request完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，HTTP Request的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "A"
+      ],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "RateLimitFilter<br/>OncePerRequestFilter主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是RateLimitFilter<br/>OncePerRequestFilter应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "B"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有Return 429<br/>TOO_MANY_REQUESTS。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "C"
+      ],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由JwtFilter<br/>OncePerRequestFilter、Extract Authorization Header组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "D",
+        "D1",
+        "D2"
+      ],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下Continue Filter Chain、Extract JWT Token吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理Continue Filter Chain、Extract JWT Token？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "E",
+        "D3",
+        "D4"
+      ],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "Return 401<br/>UNAUTHORIZED、Extract User ID from Token主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "D5",
+        "D6",
+        "D7"
+      ],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由Fetch User from Database、User Banned?组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下Fetch User from Database、User Banned?吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "Fetch User from Database、User Banned?主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "D8",
+        "D9"
+      ],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下Return 401<br/>User Banned吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Return 401<br/>User Banned应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在Return 401<br/>User Banned完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理Return 401<br/>User Banned？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "D10"
+      ],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有Load UserDetails via<br/>CustomUserDetailsService。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Load UserDetails via<br/>CustomUserDetailsService的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达Load UserDetails via<br/>CustomUserDetailsService结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "D11"
+      ],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有Validate Token<br/>Against UserDetails?、Create Authentication Token<br/>UsernamePasswordAuthenticationToken。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "D12",
+        "D13"
+      ],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Set Authentication in<br/>SecurityContext、UsernamePasswordAuthenticationFilter<br/>Default Spring Security Filter组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Set Authentication in<br/>SecurityContext、UsernamePasswordAuthenticationFilter<br/>Default Spring Security Filter应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "D14",
+        "F",
+        "G"
+      ],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有Endpoint Check、Permit All。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 495
+    },
+    {
+      "turn_id": 34,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Endpoint Check、Permit All组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 510
+    },
+    {
+      "turn_id": 35,
+      "speaker": "Speaker_B",
+      "utterance": "在Endpoint Check、Permit All中，我们需要定义核心逻辑。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "G1",
+        "H"
+      ],
+      "timestamp_offset": 525
+    },
+    {
+      "turn_id": 36,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Has ROLE_ADMIN?、Authenticated?组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 540
+    },
+    {
+      "turn_id": 37,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，Has ROLE_ADMIN?、Authenticated?是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 555
+    },
+    {
+      "turn_id": 38,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Has ROLE_ADMIN?、Authenticated?的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "I",
+        "J"
+      ],
+      "timestamp_offset": 570
+    },
+    {
+      "turn_id": 39,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有JwtAuthenticationEntryPoint<br/>Return 401 UNAUTHORIZED。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 585
+    },
+    {
+      "turn_id": 40,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是JwtAuthenticationEntryPoint<br/>Return 401 UNAUTHORIZED应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 600
+    },
+    {
+      "turn_id": 41,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，JwtAuthenticationEntryPoint<br/>Return 401 UNAUTHORIZED是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 615
+    },
+    {
+      "turn_id": 42,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "K"
+      ],
+      "timestamp_offset": 630
+    },
+    {
+      "turn_id": 43,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含Process Request、Controller/Endpoint这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 645
+    },
+    {
+      "turn_id": 44,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 660
+    },
+    {
+      "turn_id": 45,
+      "speaker": "Speaker_B",
+      "utterance": "关于Process Request、Controller/Endpoint，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "L",
+        "M"
+      ],
+      "timestamp_offset": 675
+    },
+    {
+      "turn_id": 46,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将DaoAuthenticationProvider、CustomUserDetailsService分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 690
+    },
+    {
+      "turn_id": 47,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，DaoAuthenticationProvider、CustomUserDetailsService的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 705
+    },
+    {
+      "turn_id": 48,
+      "speaker": "Speaker_A",
+      "utterance": "最后，流程到达DaoAuthenticationProvider、CustomUserDetailsService结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "N",
+        "O"
+      ],
+      "timestamp_offset": 720
+    },
+    {
+      "turn_id": 49,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含BCryptPasswordEncoder这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 735
+    },
+    {
+      "turn_id": 50,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 750
+    },
+    {
+      "turn_id": 51,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，BCryptPasswordEncoder有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "P"
+      ],
+      "timestamp_offset": 765
+    },
+    {
+      "turn_id": 52,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理UserPrincipal、JwtService？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 780
+    },
+    {
+      "turn_id": 53,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，UserPrincipal、JwtService的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 795
+    },
+    {
+      "turn_id": 54,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含UserPrincipal、JwtService这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 810
+    },
+    {
+      "turn_id": 55,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，UserPrincipal、JwtService有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "Q",
+        "R"
+      ],
+      "timestamp_offset": 825
+    },
+    {
+      "turn_id": 56,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Generate Token、Validate Token分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 840
+    },
+    {
+      "turn_id": 57,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Generate Token、Validate Token的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "R1",
+        "R2"
+      ],
+      "timestamp_offset": 855
+    },
+    {
+      "turn_id": 58,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Extract Claims、SessionCreationPolicy.STATELESS组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 870
+    },
+    {
+      "turn_id": 59,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 885
+    },
+    {
+      "turn_id": 60,
+      "speaker": "Speaker_A",
+      "utterance": "Extract Claims、SessionCreationPolicy.STATELESS和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 900
+    },
+    {
+      "turn_id": 61,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "R3",
+        "S"
+      ],
+      "timestamp_offset": 915
+    },
+    {
+      "turn_id": 62,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含Rate Limit Exceeded这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 930
+    },
+    {
+      "turn_id": 63,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Rate Limit Exceeded就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_0"
+      ],
+      "timestamp_offset": 945
+    },
+    {
+      "turn_id": 64,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Within Limit、分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 960
+    },
+    {
+      "turn_id": 65,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Within Limit、应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 975
+    },
+    {
+      "turn_id": 66,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在Within Limit、完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 990
+    },
+    {
+      "turn_id": 67,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_1",
+        "edge_2"
+      ],
+      "timestamp_offset": 1005
+    },
+    {
+      "turn_id": 68,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1020
+    },
+    {
+      "turn_id": 69,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1035
+    },
+    {
+      "turn_id": 70,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_3"
+      ],
+      "timestamp_offset": 1050
+    },
+    {
+      "turn_id": 71,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下No、Yes吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1065
+    },
+    {
+      "turn_id": 72,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_4",
+        "edge_5"
+      ],
+      "timestamp_offset": 1080
+    },
+    {
+      "turn_id": 73,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下、Invalid/Malformed吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1095
+    },
+    {
+      "turn_id": 74,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，、Invalid/Malformed的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1110
+    },
+    {
+      "turn_id": 75,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_6",
+        "edge_7"
+      ],
+      "timestamp_offset": 1125
+    },
+    {
+      "turn_id": 76,
+      "speaker": "Speaker_A",
+      "utterance": "Valid、主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1140
+    },
+    {
+      "turn_id": 77,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1155
+    },
+    {
+      "turn_id": 78,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Valid、就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1170
+    },
+    {
+      "turn_id": 79,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下Valid、吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "edge_8",
+        "edge_9"
+      ],
+      "timestamp_offset": 1185
+    },
+    {
+      "turn_id": 80,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含No、Yes这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1200
+    },
+    {
+      "turn_id": 81,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1215
+    },
+    {
+      "turn_id": 82,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将No、Yes分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1230
+    },
+    {
+      "turn_id": 83,
+      "speaker": "Speaker_B",
+      "utterance": "No、Yes负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "edge_10",
+        "edge_11"
+      ],
+      "timestamp_offset": 1245
+    },
+    {
+      "turn_id": 84,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理、Yes？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1260
+    },
+    {
+      "turn_id": 85,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是、Yes应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_12",
+        "edge_13"
+      ],
+      "timestamp_offset": 1275
+    },
+    {
+      "turn_id": 86,
+      "speaker": "Speaker_A",
+      "utterance": "关于No，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1290
+    },
+    {
+      "turn_id": 87,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，No的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_14"
+      ],
+      "timestamp_offset": 1305
+    },
+    {
+      "turn_id": 88,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有、Invalid。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1320
+    },
+    {
+      "turn_id": 89,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，、Invalid的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1335
+    },
+    {
+      "turn_id": 90,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，、Invalid的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_15",
+        "edge_16",
+        "edge_17"
+      ],
+      "timestamp_offset": 1350
+    },
+    {
+      "turn_id": 91,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将、分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1365
+    },
+    {
+      "turn_id": 92,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，、的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1380
+    },
+    {
+      "turn_id": 93,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_18",
+        "edge_19"
+      ],
+      "timestamp_offset": 1395
+    },
+    {
+      "turn_id": 94,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1410
+    },
+    {
+      "turn_id": 95,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1425
+    },
+    {
+      "turn_id": 96,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "edge_20"
+      ],
+      "timestamp_offset": 1440
+    },
+    {
+      "turn_id": 97,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1455
+    },
+    {
+      "turn_id": 98,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1470
+    },
+    {
+      "turn_id": 99,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1485
+    },
+    {
+      "turn_id": 100,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_21"
+      ],
+      "timestamp_offset": 1500
+    },
+    {
+      "turn_id": 101,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含、/api/auth/**这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1515
+    },
+    {
+      "turn_id": 102,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1530
+    },
+    {
+      "turn_id": 103,
+      "speaker": "Speaker_B",
+      "utterance": "关于、/api/auth/**，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1545
+    },
+    {
+      "turn_id": 104,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，、/api/auth/**就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_22",
+        "edge_23"
+      ],
+      "timestamp_offset": 1560
+    },
+    {
+      "turn_id": 105,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含GET /这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1575
+    },
+    {
+      "turn_id": 106,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是GET /应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1590
+    },
+    {
+      "turn_id": 107,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_24"
+      ],
+      "timestamp_offset": 1605
+    },
+    {
+      "turn_id": 108,
+      "speaker": "Speaker_A",
+      "utterance": "GET /api/posts、/api/admin/**主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1620
+    },
+    {
+      "turn_id": 109,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1635
+    },
+    {
+      "turn_id": 110,
+      "speaker": "Speaker_A",
+      "utterance": "关于GET /api/posts、/api/admin/**，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "edge_25",
+        "edge_26",
+        "edge_27"
+      ],
+      "timestamp_offset": 1650
+    },
+    {
+      "turn_id": 111,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由No组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1665
+    },
+    {
+      "turn_id": 112,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1680
+    },
+    {
+      "turn_id": 113,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，No有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1695
+    },
+    {
+      "turn_id": 114,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将No分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "edge_28"
+      ],
+      "timestamp_offset": 1710
+    },
+    {
+      "turn_id": 115,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Yes、No分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1725
+    },
+    {
+      "turn_id": 116,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Yes、No应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1740
+    },
+    {
+      "turn_id": 117,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由Yes、No组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "edge_29",
+        "edge_30",
+        "edge_31"
+      ],
+      "timestamp_offset": 1755
+    },
+    {
+      "turn_id": 118,
+      "speaker": "Speaker_A",
+      "utterance": "主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1770
+    },
+    {
+      "turn_id": 119,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1785
+    },
+    {
+      "turn_id": 120,
+      "speaker": "Speaker_A",
+      "utterance": "关于，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "edge_32"
+      ],
+      "timestamp_offset": 1800
+    },
+    {
+      "turn_id": 121,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下、吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1815
+    },
+    {
+      "turn_id": 122,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，、的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1830
+    },
+    {
+      "turn_id": 123,
+      "speaker": "Speaker_B",
+      "utterance": "、和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "edge_33",
+        "edge_34",
+        "edge_35"
+      ],
+      "timestamp_offset": 1845
+    },
+    {
+      "turn_id": 124,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1860
+    },
+    {
+      "turn_id": 125,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1875
+    },
+    {
+      "turn_id": 126,
+      "speaker": "Speaker_A",
+      "utterance": "最后，流程到达结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "edge_36"
+      ],
+      "timestamp_offset": 1890
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 126,
+    "speaker_distribution": {
+      "Speaker_B": 63,
+      "Speaker_A": 63
+    },
+    "speech_act_distribution": {
+      "sequential": 8,
+      "inform": 21,
+      "clarify": 20,
+      "classification": 15,
+      "structural": 24,
+      "request": 18,
+      "confirm": 15,
+      "contrastive": 5
+    },
+    "avg_turn_length": 28.928571428571427,
+    "dialogue_duration": 1890
+  }
+}

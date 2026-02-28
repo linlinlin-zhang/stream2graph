@@ -1,0 +1,729 @@
+{
+  "id": "gh_flowchart_00193",
+  "source": "github",
+  "source_url": "https://github.com/bcb-unl/dbcan-nf/blob/c7a800b49d8dee290ff98f149604efe16250cd55/docs/pipeline_shortreads.mmd",
+  "github_repo": "bcb-unl/dbcan-nf",
+  "github_file_path": "docs/pipeline_shortreads.mmd",
+  "diagram_type": "flowchart",
+  "code": "%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#1ba1e2', 'primaryTextColor':'#fff', 'primaryBorderColor':'#006EAF', 'lineColor':'#1ba1e2', 'secondaryColor':'#6c8ebf', 'tertiaryColor':'#d5e8d4'}}}%%\nflowchart LR\n    subgraph Input[\"Input Data\"]\n        DNA[DNA Reads<br/>Short-read Data]\n        RNA[RNA Transcriptomes<br/>Optional]\n    end\n\n    subgraph QC[\"Quality Control & Trimming\"]\n        FastQC_DNA[FastQC<br/>DNA]\n        TrimGalore_DNA[TrimGalore<br/>DNA]\n        FastQC_RNA[FastQC<br/>RNA]\n        TrimGalore_RNA[TrimGalore<br/>RNA]\n    end\n\n    subgraph Kraken[\"Contamination Removal (Optional)\"]\n        Kraken2[Kraken2<br/>Classification]\n        KrakenTools[KrakenTools<br/>Extraction]\n    end\n\n    subgraph Assembly[\"Assembly\"]\n        MEGAHIT[MEGAHIT<br/>Metagenome Assembly]\n    end\n\n    subgraph GenePred[\"Gene Prediction\"]\n        Pyrodigal[Pyrodigal<br/>Gene Prediction]\n        Gunzip_FAA[GUNZIP<br/>Decompress FAA]\n        Gunzip_GFF[GUNZIP<br/>Decompress GFF]\n    end\n\n    subgraph Annotation[\"CAZyme Annotation\"]\n        RunDBCAN[run_dbCAN<br/>CAZyme Annotation]\n    end\n\n    subgraph Mapping[\"Read Mapping\"]\n        BWA_Index[BWA Index<br/>Index Building]\n        BWA_MEM_DNA[BWA-MEM<br/>DNA Mapping]\n        BWA_MEM_RNA[BWA-MEM<br/>RNA Mapping]\n        Samtools_Index[SAMtools Index<br/>BAM Indexing]\n    end\n\n    subgraph Coverage[\"Coverage Calculation\"]\n        CalcCoverage_DNA[dbcan_utils<br/>Calculate Coverage DNA]\n        CalcCoverage_RNA[dbcan_utils<br/>Calculate Coverage RNA]\n        CGC_Depth_DNA[CGC Depth Plot<br/>CGC Depth Plot DNA]\n        CGC_Depth_RNA[CGC Depth Plot<br/>CGC Depth Plot RNA]\n    end\n\n    subgraph Abundance[\"Abundance Calculation\"]\n        CalcAbund_DNA[dbcan_utils<br/>Calculate Abundance DNA]\n        CalcAbund_RNA[dbcan_utils<br/>Calculate Abundance RNA]\n    end\n\n    subgraph Visualization[\"Visualization\"]\n        Plot_DNA[dbcan_plot<br/>Plotting DNA]\n        Plot_RNA[dbcan_plot<br/>Plotting RNA]\n    end\n\n    subgraph Report[\"Report\"]\n        MultiQC[MultiQC<br/>Summary Report]\n    end\n\n    %% Input connections\n    DNA --> FastQC_DNA\n    DNA --> TrimGalore_DNA\n    RNA --> FastQC_RNA\n    RNA --> TrimGalore_RNA\n\n    %% QC connections\n    FastQC_DNA --> TrimGalore_DNA\n    FastQC_RNA --> TrimGalore_RNA\n\n    %% Kraken connections (optional)\n    TrimGalore_DNA -.->|optional| Kraken2\n    TrimGalore_RNA -.->|optional| Kraken2\n    Kraken2 --> KrakenTools\n\n    %% Assembly connections\n    TrimGalore_DNA -->|or skip Kraken| MEGAHIT\n    KrakenTools -->|extracted reads| MEGAHIT\n\n    %% Gene prediction connections\n    MEGAHIT --> Pyrodigal\n    Pyrodigal --> Gunzip_FAA\n    Pyrodigal --> Gunzip_GFF\n\n    %% Annotation connections\n    Gunzip_FAA --> RunDBCAN\n    Gunzip_GFF --> RunDBCAN\n\n    %% Mapping connections\n    MEGAHIT --> BWA_Index\n    BWA_Index --> BWA_MEM_DNA\n    TrimGalore_DNA -->|or extracted reads| BWA_MEM_DNA\n    TrimGalore_RNA -->|or extracted reads| BWA_MEM_RNA\n    BWA_Index --> BWA_MEM_RNA\n    BWA_MEM_DNA --> Samtools_Index\n    BWA_MEM_RNA --> Samtools_Index\n\n    %% Coverage connections\n    Gunzip_GFF --> CalcCoverage_DNA\n    Samtools_Index --> CalcCoverage_DNA\n    Gunzip_GFF --> CalcCoverage_RNA\n    Samtools_Index --> CalcCoverage_RNA\n    RunDBCAN --> CGC_Depth_DNA\n    Samtools_Index --> CGC_Depth_DNA\n    RunDBCAN --> CGC_Depth_RNA\n    Samtools_Index --> CGC_Depth_RNA\n\n    %% Abundance connections\n    CalcCoverage_DNA --> CalcAbund_DNA\n    RunDBCAN --> CalcAbund_DNA\n    CalcCoverage_RNA --> CalcAbund_RNA\n    RunDBCAN --> CalcAbund_RNA\n\n    %% Visualization connections\n    CalcAbund_DNA --> Plot_DNA\n    CalcAbund_RNA --> Plot_RNA\n\n    %% Report connections\n    FastQC_DNA --> MultiQC\n    FastQC_RNA --> MultiQC\n    Plot_DNA --> MultiQC\n    Plot_RNA --> MultiQC\n\n    %% Styling\n    classDef inputStyle fill:#d5e8d4,stroke:#82b366,stroke-width:2px\n    classDef processStyle fill:#dae8fc,stroke:#6c8ebf,stroke-width:2px\n    classDef outputStyle fill:#fff2cc,stroke:#d6b656,stroke-width:2px\n\n    class DNA,RNA inputStyle\n    class FastQC_DNA,TrimGalore_DNA,FastQC_RNA,TrimGalore_RNA,Kraken2,KrakenTools,MEGAHIT,Pyrodigal,Gunzip_FAA,Gunzip_GFF,RunDBCAN,BWA_Index,BWA_MEM_DNA,BWA_MEM_RNA,Samtools_Index,CalcCoverage_DNA,CalcCoverage_RNA,CGC_Depth_DNA,CGC_Depth_RNA,CalcAbund_DNA,CalcAbund_RNA,Plot_DNA,Plot_RNA processStyle\n    class MultiQC outputStyle\n",
+  "content_size": 4358,
+  "collected_at": "2026-02-06T01:42:32.628371",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 2,
+  "repo_forks": 0,
+  "repo_owner": "bcb-unl",
+  "repo_name": "dbcan-nf",
+  "repo_description": "Nextflow of run_dbcan protocol",
+  "repo_language": "Nextflow",
+  "repo_topics": [],
+  "repo_created_at": "2025-05-22T03:30:28Z",
+  "repo_updated_at": "2026-01-26T04:30:19Z",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Input Data\" 和 DNA Reads<br/>Short-read Data 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Input Data\" 和 DNA Reads<br/>Short-read Data'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Input",
+        "DNA"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 RNA Transcriptomes<br/>Optional 和 \"Quality Control & Trimming\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'RNA Transcriptomes<br/>Optional 和 \"Quality Control & Trimming\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "RNA",
+        "QC"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 FastQC<br/>DNA 和 TrimGalore<br/>DNA 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 FastQC<br/>DNA处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'FastQC<br/>DNA处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "FastQC_DNA",
+        "TrimGalore_DNA"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 FastQC<br/>RNA 和 TrimGalore<br/>RNA 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'FastQC<br/>RNA 和 TrimGalore<br/>RNA'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "FastQC_RNA",
+        "TrimGalore_RNA"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Contamination Removal (Optional 和 Kraken2<br/>Classification 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 \"Contamination Removal (Optional处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Contamination Removal (Optional处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Kraken",
+        "Kraken2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 KrakenTools<br/>Extraction 和 \"Assembly\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'KrakenTools<br/>Extraction 和 \"Assembly\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "KrakenTools",
+        "Assembly"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 MEGAHIT<br/>Metagenome Assembly 和 \"Gene Prediction\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'MEGAHIT<br/>Metagenome Assembly 和 \"Gene Prediction\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MEGAHIT",
+        "GenePred"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Pyrodigal<br/>Gene Prediction 和 GUNZIP<br/>Decompress FAA 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 Pyrodigal<br/>Gene Prediction处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Pyrodigal<br/>Gene Prediction处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Pyrodigal",
+        "Gunzip_FAA"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 GUNZIP<br/>Decompress GFF 和 \"CAZyme Annotation\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'GUNZIP<br/>Decompress GFF 和 \"CAZyme Annotation\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Gunzip_GFF",
+        "Annotation"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 run_dbCAN<br/>CAZyme Annotation 和 \"Read Mapping\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'run_dbCAN<br/>CAZyme Annotation 和 \"Read Mapping\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "RunDBCAN",
+        "Mapping"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 BWA Index<br/>Index Building 和 BWA-MEM<br/>DNA Mapping 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'BWA Index<br/>Index Building 和 BWA-MEM<br/>DNA Mapping'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BWA_Index",
+        "BWA_MEM_DNA"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 BWA-MEM<br/>RNA Mapping 和 SAMtools Index<br/>BAM Indexing。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'BWA-MEM<br/>RNA Mapping 和 SAMtools Index<br/>BAM Indexing'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BWA_MEM_RNA",
+        "Samtools_Index"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Coverage Calculation\" 和 dbcan_utils<br/>Calculate Coverage DNA 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Coverage Calculation\" 和 dbcan_utils<br/>Calculate Coverage DNA'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Coverage",
+        "CalcCoverage_DNA"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 dbcan_utils<br/>Calculate Coverage RNA 和 CGC Depth Plot<br/>CGC Depth Plot DNA。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'dbcan_utils<br/>Calculate Coverage RNA 和 CGC Depth Plot<br/>CGC Depth Plot DNA'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CalcCoverage_RNA",
+        "CGC_Depth_DNA"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 CGC Depth Plot<br/>CGC Depth Plot RNA 和 \"Abundance Calculation\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'CGC Depth Plot<br/>CGC Depth Plot RNA 和 \"Abundance Calculation\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CGC_Depth_RNA",
+        "Abundance"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 dbcan_utils<br/>Calculate Abundance DNA 和 dbcan_utils<br/>Calculate Abundance RNA 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'dbcan_utils<br/>Calculate Abundance DNA 和 dbcan_utils<br/>Calculate Abundance RNA'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CalcAbund_DNA",
+        "CalcAbund_RNA"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Visualization\" 和 dbcan_plot<br/>Plotting DNA。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Visualization\" 和 dbcan_plot<br/>Plotting DNA'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Visualization",
+        "Plot_DNA"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 dbcan_plot<br/>Plotting RNA 和 \"Report\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 73,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'dbcan_plot<br/>Plotting RNA 和 \"Report\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 74,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 75,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Plot_RNA",
+        "Report"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 76,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 MultiQC<br/>Summary Report 和 optional 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 77,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 MultiQC<br/>Summary Report处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 78,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'MultiQC<br/>Summary Report处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 79,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 80,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MultiQC",
+        "connections"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 80,
+    "repair_count": 4,
+    "grounding_acts_count": 38,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

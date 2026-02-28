@@ -1,0 +1,30 @@
+{
+  "id": "gl_timeline_00105",
+  "source": "gitlab",
+  "source_url": "https://github.com/aaronlifton/orchestrated-codex/blob/6d2077253d96831dd42ccd30c3c50faec022c936/docs/architecture.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "aaronlifton/orchestrated-codex",
+  "diagram_type": "timeline",
+  "code": "%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4a90d9', 'secondaryColor': '#f0f4f8', 'tertiaryColor': '#e8f4e8'}}}%%\nflowchart TB\n    subgraph Entry[\"Entry Points\"]\n        LAUNCHER[\"launch_codex_orchestrator_session.ts<br/><i>CLI launcher</i>\"]\n        ORCHESTRATOR[\"index.ts<br/><i>Main orchestrator</i>\"]\n        TIMELINE[\"dynamic_timeline.ts<br/><i>Status display</i>\"]\n    end\n\n    subgraph Config[\"Configuration Layer\"]\n        AGENTS_LARK[\"agents.lark<br/><i>DSL config file</i>\"]\n        AGENTLARK_COMPILER[\"agentlark (Rust)<br/><i>Compiles .lark to JSON</i>\"]\n        AGENTS_JSON[\"agents.out.json<br/><i>Compiled config</i>\"]\n        AGENTS_TS[\"agents.ts<br/><i>Config loader & types</i>\"]\n        CLI_ARGS[\"orchestrator_cli.ts<br/><i>CLI argument parser</i>\"]\n    end\n\n    subgraph AIBackends[\"AI Backend Layer\"]\n        AI_INDEX[\"ai/index.ts<br/><i>Backend factory</i>\"]\n        CODEX_CLIENT[\"ai/openai/<br/><i>Codex/OpenAI SDK</i>\"]\n        MINIMAX_CLIENT[\"ai/anthropic/<br/><i>MiniMax backend</i>\"]\n        AI_TOOLS[\"ai/tools/<br/><i>Tool definitions</i>\"]\n    end\n\n    subgraph Zellij[\"Zellij Integration\"]\n        ZELLIJ_CLIENT[\"zellij_client.ts<br/><i>Session management</i>\"]\n        ZELLIJ_CLI[\"zellij/cli.ts<br/><i>CLI wrapper</i>\"]\n        ZELLIJ_SESSIONS[\"zellij/sessions.ts<br/><i>Layout & KDL generation</i>\"]\n        ZELLIJ_TABS[\"zellij/tabs.ts<br/><i>Tab management</i>\"]\n        ZELLIJ_LAYOUTS[\"zellij/layouts.ts<br/><i>Layout builders</i>\"]\n    end\n\n    subgraph Persistence[\"Persistence & Logging\"]\n        MEMORY_STORE[\"memory_store.ts<br/><i>Artifact storage</i>\"]\n        PROGRESS_TRACKER[\"progress_tracker.ts<br/><i>Agent progress</i>\"]\n        AGENTFS[\"agentfs/<br/><i>FS logging system</i>\"]\n        LOG_FILES[\"logs/*.log<br/><i>Agent log files</i>\"]\n        MEMORY_DIR[\"memory/<br/><i>Memory artifacts</i>\"]\n    end\n\n    subgraph Orchestration[\"Orchestration Patterns\"]\n        direction TB\n        WORKFLOW[\"Workflow<br/><i>Sequential agents</i>\"]\n        PARALLEL[\"Parallel<br/><i>Concurrent execution</i>\"]\n        RELAY[\"Relay<br/><i>Graph-based routing</i>\"]\n        ROUTER[\"Router<br/><i>Dynamic routing</i>\"]\n        EVAL_OPT[\"Evaluator-Optimizer<br/><i>Iterative refinement</i>\"]\n    end\n\n    %% Entry flow\n    LAUNCHER -->|\"1. Parse args\"| CLI_ARGS\n    LAUNCHER -->|\"2. Compile config\"| AGENTLARK_COMPILER\n    AGENTLARK_COMPILER -->|\"Generates\"| AGENTS_JSON\n    LAUNCHER -->|\"3. Build layout\"| ZELLIJ_SESSIONS\n    LAUNCHER -->|\"4. Spawn\"| ORCHESTRATOR\n    LAUNCHER -->|\"5. Launch\"| ZELLIJ_CLIENT\n\n    %% Config loading\n    AGENTS_LARK -->|\"Input\"| AGENTLARK_COMPILER\n    AGENTS_JSON -->|\"Loaded by\"| AGENTS_TS\n    AGENTS_TS -->|\"Provides agents\"| ORCHESTRATOR\n    CLI_ARGS -->|\"Options\"| ORCHESTRATOR\n\n    %% Orchestrator main flow\n    ORCHESTRATOR -->|\"Creates client\"| AI_INDEX\n    AI_INDEX -->|\"Codex backend\"| CODEX_CLIENT\n    AI_INDEX -->|\"MiniMax backend\"| MINIMAX_CLIENT\n    ORCHESTRATOR -->|\"Uses tools\"| AI_TOOLS\n\n    %% Orchestration patterns\n    ORCHESTRATOR -->|\"Executes\"| WORKFLOW\n    ORCHESTRATOR -->|\"Executes\"| PARALLEL\n    ORCHESTRATOR -->|\"Executes\"| RELAY\n    ORCHESTRATOR -->|\"Executes\"| ROUTER\n    ORCHESTRATOR -->|\"Executes\"| EVAL_OPT\n\n    %% Persistence\n    ORCHESTRATOR -->|\"Records progress\"| PROGRESS_TRACKER\n    ORCHESTRATOR -->|\"Stores artifacts\"| MEMORY_STORE\n    ORCHESTRATOR -->|\"Logs actions\"| AGENTFS\n    ORCHESTRATOR -->|\"Writes\"| LOG_FILES\n    MEMORY_STORE -->|\"Persists to\"| MEMORY_DIR\n    PROGRESS_TRACKER -->|\"Writes to\"| MEMORY_DIR\n\n    %% Timeline\n    TIMELINE -->|\"Reads\"| LOG_FILES\n    TIMELINE -->|\"Reads\"| PROGRESS_TRACKER\n    TIMELINE -->|\"Reads\"| MEMORY_STORE\n\n    %% Zellij internals\n    ZELLIJ_CLIENT --> ZELLIJ_CLI\n    ZELLIJ_CLIENT --> ZELLIJ_TABS\n    ZELLIJ_SESSIONS --> ZELLIJ_LAYOUTS\n\n    classDef entry fill:#4a90d9,stroke:#2e5d8a,color:#fff\n    classDef config fill:#f4a460,stroke:#cd853f,color:#000\n    classDef ai fill:#9370db,stroke:#6a5acd,color:#fff\n    classDef zellij fill:#20b2aa,stroke:#008b8b,color:#fff\n    classDef persist fill:#3cb371,stroke:#2e8b57,color:#fff\n    classDef pattern fill:#ff69b4,stroke:#c71585,color:#fff\n\n    class LAUNCHER,ORCHESTRATOR,TIMELINE entry\n    class AGENTS_LARK,AGENTLARK_COMPILER,AGENTS_JSON,AGENTS_TS,CLI_ARGS config\n    class AI_INDEX,CODEX_CLIENT,MINIMAX_CLIENT,AI_TOOLS ai\n    class ZELLIJ_CLIENT,ZELLIJ_CLI,ZELLIJ_SESSIONS,ZELLIJ_TABS,ZELLIJ_LAYOUTS zellij\n    class MEMORY_STORE,PROGRESS_TRACKER,AGENTFS,LOG_FILES,MEMORY_DIR persist\n    class WORKFLOW,PARALLEL,RELAY,ROUTER,EVAL_OPT pattern\n",
+  "content_size": 4558,
+  "collected_at": "2026-02-06T14:02:46.514707",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "repo_owner": "aaronlifton",
+  "repo_name": "orchestrated-codex",
+  "repo_description": "a multi-agent orchestration framework that autonomously decomposes complex prompts into actionable tasks through a specialized hierarchy of user-definable agents, orchestrating them across Zellij term",
+  "repo_language": "TypeScript",
+  "repo_topics": [
+    "agent-configuration",
+    "agent-orchestration",
+    "agentic-workflow",
+    "codex",
+    "zellij"
+  ],
+  "repo_created_at": "2025-11-30T02:10:44Z",
+  "repo_updated_at": "2026-01-18T04:47:43Z"
+}

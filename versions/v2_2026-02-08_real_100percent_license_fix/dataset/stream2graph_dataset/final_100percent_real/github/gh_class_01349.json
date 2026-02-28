@@ -1,0 +1,18 @@
+{
+  "id": "gh_class_01349",
+  "source": "github",
+  "source_url": "https://github.com/FitSense-Emergentes-14653/Project-Report/blob/0c1c960fe18f487d8bcd175159fe54d9b7419ffc/img/chapter-5/Security%20classDiagram.mmd",
+  "github_repo": "FitSense-Emergentes-14653/Project-Report",
+  "github_file_path": "img/chapter-5/Security classDiagram.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\ndirection LR\n\n%% ===== Value Objects =====\nclass AccountId { +value: UUID }\nclass RoleName { +value: string }\nclass TokenType { +value: string }\nclass HashedPassword { +value: string }\n\n%% ===== Entities / Aggregates =====\nclass Account {\n  +id: AccountId\n  +email: string\n  +password: HashedPassword\n  +mfaEnabled: bool\n  +status: string\n  +enableMFA()\n  +disableMFA()\n  +changePassword(newHash: HashedPassword)\n}\n\nclass Role {\n  +id: UUID\n  +name: RoleName\n}\n\nclass Permission {\n  +id: UUID\n  +code: string\n  +scope: string\n}\n\nclass Token {\n  +id: UUID\n  +accountId: AccountId\n  +type: TokenType\n  +valueHash: string\n  +expiresAt: Date\n  +revoked: bool\n}\n\nclass AuditLog {\n  +id: UUID\n  +accountId: AccountId\n  +action: string\n  +details: string\n  +ip: string\n  +occurredAt: Date\n}\n\n%% ===== Domain Services / Policy =====\nclass AuthPolicy {\n  +accessTtl(): number\n  +refreshTtl(): number\n  +shouldRotate(now: Date, lastUsed: Date): bool\n}\n\nclass AuthService {\n  +issueTokens(account: Account): Token\n  +validateCredentials(email: string, password: string): Account\n  +refreshTokens(refreshToken: string): Token\n}\n\nclass PasswordHasher {\n  +hash(plain: string): HashedPassword\n  +verify(plain: string, hashed: HashedPassword): bool\n}\n\n%% ===== Repository Interfaces (Ports) =====\nclass AccountRepository {\n  +findByEmail(email: string): Account\n  +save(account: Account): void\n}\n\nclass RoleRepository {\n  +findRolesByAccount(id: AccountId): Role\n  +assignRole(accountId: AccountId, roleId: UUID): void\n}\n\nclass TokenRepository {\n  +store(token: Token): void\n  +revoke(tokenId: UUID): void\n  +findValidRefresh(accountId: AccountId): Token\n}\n\nclass AuditLogRepository {\n  +append(entry: AuditLog): void\n}\n\n%% ===== Associations =====\nAccount --> Role\nRole --> Permission\n\nToken --> AccountId\nAuditLog --> AccountId\nAccount --> AccountId\nAccount --> HashedPassword\n\nAuthService ..> AccountRepository\nAuthService ..> RoleRepository\nAuthService ..> TokenRepository\nAuthService ..> PasswordHasher\nAccountRepository <.. Account\nRole *-- RoleName\nToken *-- TokenType\n\n",
+  "content_size": 2075,
+  "collected_at": "2026-02-06T01:56:36.069273",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License (Assumed)",
+  "license_url": null,
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

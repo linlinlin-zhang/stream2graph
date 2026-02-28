@@ -1,0 +1,216 @@
+{
+  "id": "aug_ot_stateDiagram_00133_Ret_8",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/verysys-pal/DCM_CCV2/blob/9bb087e210674f73be7e568d5d9e538ad9f2a59e/docs/mermaid/SystemState.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "verysys-pal/DCM_CCV2",
+  "diagram_type": "stateDiagram",
+  "code": "%%{Retail_Inventory}}}%%\n\nstateDiagram-v2\n  [Retail_PointOfSale] --> OFF\n  %% 시작 경로\n  OFF --> WARMUP: START(Retail_OrderManagement) + MODE=WARM_UP\n  OFF --> INIT: START(Retail_Inventory)\n  INIT --> PRECOOL: init_seconds elapsed\n  PRECOOL --> RUN: T5 <= TSP - precool_band\n  %% READY 표출 (Retail_CouponSystem)\n  INIT --> READY: ready flag true\n  PRECOOL --> READY: ready flag true\n  RUN --> READY: ready flag true\n  READY --> RUN: ready flag cleared\n  %% 보류/재개\n  RUN --> HOLD: HOLD(Retail_CouponSystem)\n  READY --> HOLD: HOLD(Retail_CustomerLoyalty)\n  HOLD --> RUN: RESUME(Retail_OrderManagement)\n  %% 정지/전원 OFF\n  any --> OFF: STOP(Retail_Inventory) or OFF(Retail_CouponSystem)\n  WARMUP --> OFF: warm reached\n  %% 안전 전이\n  state SAFE_SHUTDOWN\n  INIT --> SAFE_SHUTDOWN: Safety\n  PRECOOL --> SAFE_SHUTDOWN: Safety\n  RUN --> SAFE_SHUTDOWN: Safety\n  READY --> SAFE_SHUTDOWN: Safety\n  HOLD --> SAFE_SHUTDOWN: Safety\n  WARMUP --> SAFE_SHUTDOWN: Safety\n  SAFE_SHUTDOWN --> OFF: RESET(Retail_OrderManagement)=ACK_ALARM\n",
+  "content_size": 915,
+  "collected_at": "2026-02-06T10:38:17.122867",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Retail",
+  "seed_id": "ot_stateDiagram_00133",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Retail_PointOfSale 和 Retail_OrderManagement 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Retail_PointOfSale 和 Retail_OrderManagement'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2",
+        "START"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Retail_Inventory 和 Retail_CouponSystem 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Retail_Inventory 和 Retail_CouponSystem'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "START",
+        "표출"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Retail_CouponSystem 和 Retail_CustomerLoyalty 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 Retail_CouponSystem处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Retail_CouponSystem处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "HOLD",
+        "HOLD"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Retail_OrderManagement 和 Retail_Inventory 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 Retail_OrderManagement处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Retail_OrderManagement处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "RESUME",
+        "STOP"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Retail_CouponSystem 和 Retail_OrderManagement 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Retail_CouponSystem 和 Retail_OrderManagement'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OFF",
+        "RESET"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 22,
+    "repair_count": 2,
+    "grounding_acts_count": 10,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

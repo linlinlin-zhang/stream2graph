@@ -1,0 +1,18 @@
+{
+  "id": "gh_class_01130",
+  "source": "github",
+  "source_url": "https://github.com/tuliodeladio/CofreDigitalMcPato/blob/aee9c22342c546ce0fdee14c6cfb89bbf1838f23/Documenta%C3%A7%C3%A3o/DiagramaDeClasses(www.mermaidchart.com).mmd",
+  "github_repo": "tuliodeladio/CofreDigitalMcPato",
+  "github_file_path": "Documentação/DiagramaDeClasses(www.mermaidchart.com).mmd",
+  "diagram_type": "class",
+  "code": "---\nconfig:\n  theme: dark\n  layout: elk\n---\nclassDiagram\ndirection TB\nclass Account {\n  - accountNumber: String\n  - name: String\n  - email: String\n  - passwordHash: String\n  - balance: double\n  - wallet: Map<String,Double>\n  + deposit(double)\n  + withdraw(double): boolean\n  + addAsset(String,double)\n  + removeAsset(String,double)\n}\nclass Asset {\n  - symbol: String\n  - name: String\n  - currentValue: double\n  - description: String\n}\nclass Operation {\n  - accountNumber: String\n  - assetSymbol: String\n  - amount: double\n  - price: double\n  - date: LocalDateTime\n  - type: Type\n}\nclass Transfer {\n  - fromAccount: String\n  - toAccount: String\n  - assetSymbol: String\n  - amount: double\n  - date: LocalDateTime\n}\nclass AuthService {\n  - accounts: Map<String,Account>\n  + register(Account)\n  + login(String,String): Account\n  + getAccounts(): Map<String,Account>\n}\nclass TwoFactorService {\n  + generateAndSendCode(String)\n  + validateCode(String): boolean\n}\nclass AssetService {\n  - assets: Map<String,Asset>\n  + getAssets(): Map<String,Asset>\n  + updateAssetValue(Asset)\n}\nclass OperationService {\n  - operations: List<Operation>\n  + buyAsset(Account,Asset,double): boolean\n  + sellAsset(Account,Asset,double): boolean\n  + listByAccount(String): List<Operation>\n}\nclass TransferService {\n  - allTransfers: List<Transfer>\n  + transfer(Account,Account,String,double): boolean\n  + deposit(Account,double): boolean\n  + withdraw(Account,double): boolean\n  + listByUser(String): List<Transfer>\n}\nclass ReportService {\n  + printReport(String,List<Operation>,double,Map<String,Double>,List<Transfer>)\n}\nAuthService \"1\" o-- \"many\" Account : cadastro\nAuthService --> TwoFactorService : 2FA\nAccount \"1\" -- \"many\" Operation : registra\nAccount \"1\" -- \"many\" Transfer : envia/recebe\nAssetService \"1\" o-- \"many\" Asset : catálogo\nOperationService \"1\" o-- \"many\" Operation : histórico\nTransferService \"1\" o-- \"many\" Transfer : histórico\nOperationService --> Account : movimentação\nOperationService --> Asset : cotação\nTransferService --> Account : movimentação\nReportService --> Account\nReportService --> Operation\nReportService --> Transfer\nnote for Account \"Conta acumula saldo, múltiplos ativos e registra histórico.\"\nnote for OperationService \"Centraliza regra de negócio de compra e venda.\"\nnote for TransferService \"Toda transação entre contas (saque, depósito, transferência) via TransferService.\"\n",
+  "content_size": 2388,
+  "collected_at": "2026-02-06T01:53:22.786080",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

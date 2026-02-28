@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01909",
+  "source": "github",
+  "source_url": "https://github.com/fatihdurgut/Azure-App-Service-Access-Restrictions-Demo/blob/9eb35ad48842cfb14014f23b2ff31f10f40b79eb/docs/diagrams/network-architecture.mmd",
+  "github_repo": "fatihdurgut/Azure-App-Service-Access-Restrictions-Demo",
+  "github_file_path": "docs/diagrams/network-architecture.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TB\n    subgraph \"Azure Subscription\"\n        subgraph \"Resource Group: azdevops-servicetag-demo-dev-rg\"\n            subgraph \"Virtual Network: 10.1.0.0/16\"\n                subgraph \"Bastion Subnet: 10.1.0.0/24\"\n                    B[Azure Bastion<br/>Standard SKU]\n                    PIP[Public IP<br/>Static]\n                end\n                \n                subgraph \"Web App Subnet: 10.1.1.0/24\"\n                    WA[Linux Web App<br/>Node.js 18-lts]\n                    PE[Private Endpoint]\n                    NSG1[NSG: webapp-nsg<br/>Manual Azure DevOps Tag Demo]\n                end\n                \n                subgraph \"App Gateway Subnet: 10.1.2.0/24\"\n                    RESERVED[Reserved for<br/>Application Gateway]\n                end\n            end\n            \n            DNS[Private DNS Zone<br/>privatelink.azurewebsites.net]\n            ASP[App Service Plan<br/>Linux B1 SKU]\n        end\n    end\n    \n    subgraph \"Azure DevOps\"\n        Pipeline[Azure Pipelines]\n        Agent[Build Agents]\n        Repo[Git Repository]\n    end\n    \n    subgraph \"External Access\"\n        Admin[Administrator]\n        Internet[Internet]\n    end\n    \n    Internet --> PIP\n    PIP --> B\n    B -.-> WA\n    PE --> WA\n    DNS --> PE\n    WA --> ASP\n    \n    Pipeline --> Agent\n    Agent --> WA\n    \n    Admin --> B\n    Repo --> Pipeline\n    \n    classDef private fill:#ffeeee,stroke:#d63384\n    classDef public fill:#eeffee,stroke:#198754\n    classDef security fill:#fff3cd,stroke:#664d03\n    class WA,PE,NSG1,ASP private\n    class PIP,B public\n    class DNS,RESERVED security\n    class Pipeline,Agent,Repo devops",
+  "content_size": 1627,
+  "collected_at": "2026-02-06T02:04:51.244960",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

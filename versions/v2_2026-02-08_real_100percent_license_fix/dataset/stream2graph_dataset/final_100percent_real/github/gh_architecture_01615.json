@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01615",
+  "source": "github",
+  "source_url": "https://github.com/andresvisco/ing-datos-migracion-gcp/blob/77728134e33ee49d75767962f5006198ad222ba6/Artefactos/MEDICUS_RAW_ARQ_DRAFT___Mermaid_Chart-2025-09-27-050921.mmd",
+  "github_repo": "andresvisco/ing-datos-migracion-gcp",
+  "github_file_path": "Artefactos/MEDICUS_RAW_ARQ_DRAFT___Mermaid_Chart-2025-09-27-050921.mmd",
+  "diagram_type": "architecture",
+  "code": "---\nconfig:\n  layout: fixed\n  theme: neo\n---\nflowchart TD\n subgraph ORCHESTRATION[\"Composer Airflow\"]\n        O1([\"Composer<br>Orquestador\"])\n  end\n subgraph BRONZE[\"BRONZE Raw Landing Zone\"]\n        B1([\"Dataflow<br>Ingesta RAW\"])\n        B2([\"GCS<br>Parquet/Avro\"])\n        QA1([\"Data Quality<br>Great Expectations\"])\n        LOG1([\"Logging & Monitoring\"])\n  end\n subgraph SILVER[\"SILVER Procesado Curado\"]\n        S1([\"Dataflow<br>Transformación\"])\n        S2([\"BigQuery<br>Tablas Silver\"])\n        QA2([\"Data Quality<br>Curado\"])\n        LOG2([\"Logging & Monitoring\"])\n  end\n subgraph GOLD[\"GOLD Analítica y Reporting\"]\n        G1([\"BigQuery<br>Tablas Gold\"])\n        QA3([\"Data Quality<br>Gold\"])\n        LOG3([\"Logging & Monitoring\"])\n  end\n subgraph CONTROL[\"Gobernanza y Control\"]\n        MET([\"Metadatos &amp; Lineage<br>Data Catalog\"])\n        SEC([\"Seguridad &amp; Auditoría<br>IAM, KMS\"])\n        VER([\"Versionado de Datos\"])\n  end\n subgraph s1[\"Conectores\"]\n        n2[\"Communication Link\"]\n  end\n    O1 -- Orquesta --> B1 & S1 & QA1 & QA2 & G1 & QA3\n    B1 -- Escribe RAW data --> B2\n    B2 -- Valida Calidad --> QA1\n    QA1 -- Logs --> LOG1\n    B2 -- Alimenta transformación --> S1\n    S1 -- Escribe datos curados --> S2\n    S1 -- Calidad Curado --> QA2\n    QA2 -- Logs --> LOG2\n    S2 -- Transformación GOLD --> G1\n    G1 -- Calidad Gold --> QA3\n    QA3 -- Logs --> LOG3\n    B2 -- Catalog --> MET\n    S2 -- Catalog --> MET\n    G1 -- Catalog --> MET\n    MET -- Policies --> SEC\n    B2 -- Versiona --> VER\n    S2 -- Versiona --> VER\n    G1 -- Versiona --> VER\n    n2 --> n1[\"MEDICUS<br>Source\"] & B1\n    n1 L_n1_B1_0@-- Ingesta --> B1\n    n2@{ shape: com-link}\n    n1@{ shape: db}\n     O1:::orchestration\n     B1:::bronze\n     B2:::bronze\n     QA1:::bronze\n     LOG1:::bronze\n     S1:::silver\n     S2:::silver\n     QA2:::silver\n     LOG2:::silver\n     G1:::gold\n     QA3:::gold\n     LOG3:::gold\n     MET:::control\n     SEC:::control\n     VER:::control\n    classDef silver fill:#e2f4ea,stroke:#008c4a,stroke-width:2px\n    classDef gold fill:#fff8dc,stroke:#d4af37,stroke-width:2px\n    classDef control fill:#ede7f6,stroke:#7c43bd,stroke-width:2px\n    classDef bronze fill:#f4e2d8, stroke:#b36b00, stroke-width:2px\n    classDef orchestration fill:#def3fc, stroke:#176aa6, stroke-width:2px\n    classDef Conectores fill:#C8E6C9, color:#000000, stroke-width:2px, stroke-dasharray: 2, stroke:#000000\n    L_n1_B1_0@{ animation: slow }\n",
+  "content_size": 2442,
+  "collected_at": "2026-02-06T01:48:36.437612",
+  "license": "none",
+  "license_name": "No License",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

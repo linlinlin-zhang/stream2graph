@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00474",
+  "source": "github",
+  "source_url": "https://github.com/mustaphakd/tickerQ/blob/28d51d8a51f1f39ce057c0f3d4a8fa1577dd0264/docs/diagrams/04-job-list-dag-execution-flow.mmd",
+  "github_repo": "mustaphakd/tickerQ",
+  "github_file_path": "docs/diagrams/04-job-list-dag-execution-flow.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant TQ as TickerQ Engine\n    participant EX as Job Executor\n    participant DR as Dependency Resolver\n    participant DB as Database\n    participant CA as Client App\n\n    TQ->>EX: JobList Triggered\n    EX->>DB: Get JobList with Jobs\n    EX->>DR: Validate DAG (Cycle Check)\n    DR-->>EX: Valid DAG\n\n    EX->>DB: Create JobListExecution Record\n    EX->>DR: Get Topological Sort Order\n    DR-->>EX: Execution Order [J1, J2, J3, J4]\n\n    Note over EX: Execute in Waves (Parallel where possible)\n\n    rect rgb(200, 230, 201)\n        Note over EX,CA: Wave 1: Jobs with no dependencies\n        par Execute J1\n            EX->>CA: Execute J1\n            CA-->>EX: Success\n        and Execute J2\n            EX->>CA: Execute J2\n            CA-->>EX: Success\n        end\n        EX->>DB: Log J1, J2 Results\n    end\n\n    rect rgb(187, 222, 251)\n        Note over EX,CA: Wave 2: Jobs depending on Wave 1\n        EX->>CA: Execute J3 (depends on J1, J2)\n        CA-->>EX: Success\n        EX->>DB: Log J3 Result\n    end\n\n    rect rgb(255, 249, 196)\n        Note over EX,CA: Wave 3: Jobs depending on Wave 2\n        EX->>CA: Execute J4 (depends on J3)\n        CA-->>EX: Success\n        EX->>DB: Log J4 Result\n    end\n\n    EX->>DB: Complete JobListExecution\n    EX-->>TQ: JobList Execution Complete\n\n",
+  "content_size": 1311,
+  "collected_at": "2026-02-06T01:32:49.479482",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

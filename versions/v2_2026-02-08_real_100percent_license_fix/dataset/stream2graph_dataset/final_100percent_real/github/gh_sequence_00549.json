@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00549",
+  "source": "github",
+  "source_url": "https://github.com/Coaxus-ux/Event-Driven-Contact-Form-Modern-Architecture-Demo/blob/6cf7569a73c03c1a9bee45a301a24a0ed88e2945/docs/event-flow.mmd",
+  "github_repo": "Coaxus-ux/Event-Driven-Contact-Form-Modern-Architecture-Demo",
+  "github_file_path": "docs/event-flow.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant User\n    participant Frontend as React Frontend\n    participant API as Flask API\n    participant Kafka as Event Store\n    participant Mailer as Mailer Service\n    participant Agent as Workflow Agent\n    participant CRM as CRM Mock API\n    participant SMTP as Email Server\n    \n    Note over User, SMTP: Contact Form Submission Flow\n    \n    User->>Frontend: Fill and submit contact form\n    Frontend->>Frontend: Client-side validation\n    Frontend->>API: POST /api/contact (form data)\n    \n    Note over API: Input validation & sanitization\n    API->>API: Validate request payload\n    API->>API: Generate UUIDv7 event ID\n    \n    Note over API, Kafka: Event Publishing\n    API->>Kafka: Publish ContactFormSubmitted event\n    API->>Frontend: Return 202 Accepted + event ID\n    Frontend->>User: Show success message\n    \n    Note over Kafka, SMTP: Parallel Event Processing\n    \n    par Email Processing\n        Kafka->>Mailer: Consume ContactFormSubmitted\n        Mailer->>Mailer: Load Mustache templates\n        Mailer->>Mailer: Generate HTML & text emails\n        Mailer->>SMTP: Send email\n        SMTP-->>Mailer: Delivery confirmation\n        Mailer->>Kafka: Publish EmailDispatched event\n    and Workflow Processing\n        Kafka->>Agent: Consume ContactFormSubmitted\n        Agent->>Agent: Evaluate business rules\n        Agent->>Agent: Plan 3-step workflow\n        Note over Agent: Step 1: Tag lead\n        Agent->>Agent: Execute tag assignment\n        Note over Agent: Step 2: Assign responsible\n        Agent->>Agent: Execute assignment logic\n        Note over Agent: Step 3: Schedule follow-up\n        Agent->>Agent: Execute scheduling\n        Agent->>CRM: POST /internal/leads (create lead)\n        CRM-->>Agent: Return lead ID + status NUEVO\n        Agent->>Kafka: Publish WorkflowCompleted event\n    end\n    \n    Note over User, SMTP: End-to-End Trace Complete\n    Note over Kafka: All events persisted with UUIDv7 + ISO-8601 timestamps\n\n",
+  "content_size": 1981,
+  "collected_at": "2026-02-06T01:33:48.108012",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

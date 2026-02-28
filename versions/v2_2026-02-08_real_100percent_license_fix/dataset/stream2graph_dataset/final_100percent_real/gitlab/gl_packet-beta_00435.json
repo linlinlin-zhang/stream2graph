@@ -1,0 +1,16 @@
+{
+  "id": "gl_packet-beta_00435",
+  "source": "gitlab",
+  "source_url": "https://github.com/sean-galloway/RTLDesignSherpa/blob/47f8a16641658f570a69c3af3c9724b29ea39187/projects/components/stream/docs/stream_mas/assets/mermaid/11_scheduler_group_block.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "sean-galloway/RTLDesignSherpa",
+  "diagram_type": "packet-beta",
+  "code": "graph TB\n    APB[APB Interface<br/>apb_valid/addr] --> DESC_ENG[Descriptor Engine]\n    CFG[Configuration] --> DESC_ENG\n    CFG --> SCHED\n\n    subgraph \"Scheduler Group\"\n        subgraph \"Descriptor Engine\"\n            DESC_ENG --> |desc_ar_*| DESC_AXI[AXI AR/R]\n            DESC_AXI --> |desc_r_data| DESC_PARSE[Parse Descriptor]\n            DESC_PARSE --> |descriptor_packet 256-bit| DESC_OUT[Descriptor Output]\n            DESC_ENG --> |mon_valid/packet| DESC_MON[MonBus Events<br/>Agent ID 0x10]\n        end\n\n        DESC_OUT --> |descriptor_valid/ready| SCHED[Scheduler FSM]\n\n        subgraph \"Scheduler\"\n            SCHED --> |datard_valid/addr/beats| RD_IF[Read Interface]\n            SCHED --> |datawr_valid/addr/beats| WR_IF[Write Interface]\n            RD_IF --> |datard_done_strobe| SCHED\n            WR_IF --> |datawr_done_strobe| SCHED\n            SCHED --> |mon_valid/packet| SCHED_MON[MonBus Events<br/>Agent ID 0x30]\n        end\n\n        DESC_MON --> ARB[MonBus Arbiter<br/>2 Clients]\n        SCHED_MON --> ARB\n        ARB --> |mon_valid/ready/packet| MON_OUT[MonBus Output]\n    end\n\n    RD_IF --> RD_ENG[AXI Read Engine]\n    WR_IF --> WR_ENG[AXI Write Engine]\n    RD_ENG --> |datard_done| RD_IF\n    WR_ENG --> |datawr_done| WR_IF\n    MON_OUT --> SYS_MON[System MonBus]\n\n    style DESC_ENG fill:#bbf,stroke:#333,stroke-width:2px\n    style SCHED fill:#f9f,stroke:#333,stroke-width:3px\n    style ARB fill:#bfb,stroke:#333,stroke-width:2px",
+  "content_size": 1451,
+  "collected_at": "2026-02-06T14:09:38.844299",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

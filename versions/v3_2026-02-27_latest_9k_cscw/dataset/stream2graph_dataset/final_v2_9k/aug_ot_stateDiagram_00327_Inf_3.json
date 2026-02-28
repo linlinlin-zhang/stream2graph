@@ -1,0 +1,17 @@
+{
+  "id": "aug_ot_stateDiagram_00327_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/DariQuintero/neuroanatomy/blob/bd2e06459c39da5dbda84d3ec961360b3d9bc022/docs/diagrams/state-machines-cubits.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "DariQuintero/neuroanatomy",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    [Infra_WorkerNode] --> AuthInitial\n\n    state \"AuthCubit States\" as AuthFlow {Infra_WorkerNode)\n        AuthLoading --> AuthSuccess: loginSuccess(Infra_RedisCache)\n        AuthLoading --> AuthFailure: loginError(Infra_EtcdCluster)\n        AuthSuccess --> AuthLoading: logout(Infra_IngressController)\n        AuthSuccess --> ProfileUpdating: updateProfile(Infra_WorkerNode)\n        ProfileUpdating --> AuthSuccess: updateSuccess(Infra_WorkerNode)\n        ProfileUpdating --> AuthFailure: updateError(Infra_LoadBalancer)\n        AuthFailure --> AuthLoading: retry(Infra_LoadBalancer)\n        AuthLoading --> [Infra_LoadBalancer]: dispose(Infra_RedisCache)\n    }\n\n    [Infra_LoadBalancer] --> CortesInitial\n\n    state \"CortesCubit States\" as CortesFlow {Infra_LoadBalancer)\n        CortesLoading --> CortesLoaded: loadSuccess(Infra_IngressController)\n        CortesLoading --> CortesError: loadError(Infra_WorkerNode)\n        CortesLoaded --> CortesLoaded: selectSegmento(Infra_EtcdCluster)\n        CortesLoaded --> CortesLoading: refreshCortes(Infra_LoadBalancer)\n        CortesError --> CortesLoading: retry(Infra_EtcdCluster)\n        CortesLoading --> [Infra_IngressController]: dispose(Infra_RedisCache)\n    }\n\n    [Infra_LoadBalancer] --> QuizInitial\n\n    state \"QuizCubit States\" as QuizFlow {Infra_WorkerNode)\n        QuizLoading --> QuizLoaded: quizGenerated(Infra_IngressController)\n        QuizLoading --> QuizError: generationError(Infra_LoadBalancer)\n        QuizLoaded --> QuizLoaded: submitAnswer(Infra_WorkerNode)\n        QuizLoaded --> QuizFinished: completeQuiz(Infra_IngressController)\n        QuizError --> QuizLoading: retry(Infra_LoadBalancer)\n        QuizFinished --> QuizInitial: reset(Infra_LoadBalancer)\n        QuizLoading --> [Infra_IngressController]: dispose(Infra_EtcdCluster)\n    }\n",
+  "content_size": 1438,
+  "collected_at": "2026-02-06T10:40:44.328882",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "ot_stateDiagram_00327"
+}

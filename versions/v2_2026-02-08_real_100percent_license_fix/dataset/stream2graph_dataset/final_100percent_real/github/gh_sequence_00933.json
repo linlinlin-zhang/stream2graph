@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00933",
+  "source": "github",
+  "source_url": "https://github.com/MikhailPalagashvili/RepCheck/blob/819d56ef2b366060e5e992f0a58a86d0558c0fd6/Video%20Processing%20Pipeline%20.mmd",
+  "github_repo": "MikhailPalagashvili/RepCheck",
+  "github_file_path": "Video Processing Pipeline .mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Mobile as 📱 Mobile App (KMM)\n    participant API as 🌐 API Gateway (Ktor)\n    participant Auth as 🔐 Auth Service\n    participant VideoSvc as 🎥 Video Service\n    participant Queue as 🔄 Queue\n    participant Worker as 👷 Worker\n    participant S3 as 💾 S3 Storage\n    participant AI as 🧠 AI Analysis\n    participant DB as 📊 PostgreSQL\n    participant Email as 📧 Email Service\n\n%% Authentication Flow\n    Mobile->>+API: 1. Login/Register\n    API->>+Auth: 2. Authenticate\n    Auth-->>-API: 3. JWT Token\n    API-->>-Mobile: 4. Return Token\n\n%% Video Upload Flow\n    Mobile->>+API: 5. Request Upload URL\n    API->>+Auth: 6. Validate Token\n    Auth-->>-API: 7. User ID\n    API->>+VideoSvc: 8. Create Upload Session\n    VideoSvc->>+S3: 9. Generate Pre-signed URL\n    S3-->>-VideoSvc: 10. Pre-signed URL\n    VideoSvc->>+DB: 11. Create Video Record (UPLOADING)\n    DB-->>-VideoSvc: 12. Record Created\n    VideoSvc-->>-API: 13. Upload URL & Video ID\n    API-->>-Mobile: 14. Return Upload URL\n\n%% Direct Upload & Processing\n    Mobile->>+S3: 15. Upload Video (Direct)\n    S3-->>-Mobile: 16. Upload Complete\n    S3->>+VideoSvc: 17. S3 Event (s3:ObjectCreated:*)\n    VideoSvc->>+Queue: 18. Add Process Job\n    Queue-->>-VideoSvc: 19. Job Queued\n    VideoSvc->>+DB: 20. Update Status (QUEUED)\n    DB-->>-VideoSvc: 21. Status Updated\n\n%% Background Processing\n    Worker->>+Queue: 22. Poll for Jobs\n    Queue-->>-Worker: 23. Next Job\n    Worker->>+DB: 24. Get Video Details\n    DB-->>-Worker: 25. Video Metadata\n    Worker->>+S3: 26. Download Video\n    S3-->>-Worker: 27. Video File\n    Worker->>+DB: 28. Update Status (PROCESSING)\n    DB-->>-Worker: 29. Status Updated\n    Worker->>+AI: 30. Analyze Video\n    AI-->>-Worker: 31. Analysis Results\n    Worker->>+DB: 32. Save Analysis\n    DB-->>-Worker: 33. Analysis Saved\n    Worker->>+DB: 34. Update Status (COMPLETED)\n    DB-->>-Worker: 35. Status Updated\n\n%% Notifications\n    Worker->>+Email: 36. Send Completion Email\n    Email-->>-Worker: 37. Email Sent\n    Worker->>+API: 38. Push Notification\n    API-->>-Mobile: 39. Show Notification\n\n%% Status Check\n    Mobile->>+API: 40. Get Video Status\n    API->>+DB: 41. Query Video\n    DB-->>-API: 42. Video Status & Results\n    API-->>-Mobile: 43. Return Status & Analysis",
+  "content_size": 2283,
+  "collected_at": "2026-02-06T01:50:55.997694",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

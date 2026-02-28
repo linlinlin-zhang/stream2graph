@@ -1,0 +1,65 @@
+{
+  "id": "ot_stateDiagram_00163",
+  "source": "other",
+  "source_url": "https://github.com/shangrongliat/consul/blob/fac59b748caf139158dc993e4d73df5dc56ab687/docs/service-mesh/ca/state-machine.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "shangrongliat/consul",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n\n    [*] --> Uninitialized\n    Uninitialized --> Initializing : InitializeCA\n    Uninitialized --> Reconfig : UpdateConfiguration\n    Reconfig --> Uninitialized : return\n\n    # Initialized can transition to any state\n    Initialized --> Renew : RenewIntermediate\n    Initialized --> Uninitialized : Stop\n    Initialized --> Reconfig  : UpdateConfiguration\n    Initialized --> Initializing : INVALID\n\n    # Initialized is set using validate=false\n    Uninitialized --> Initialized : INVALID\n    Reconfig --> Initialized : return\n    Initializing --> Initialized : InitializeCA complete\n    Renew --> Initialized : return\n\n    # Uninitialized is set using validate=false\n    Renew --> Uninitialized : Stop\n    Reconfig --> Uninitialized : Stop\n    Initializing --> Uninitialized : Stop\n",
+  "content_size": 800,
+  "collected_at": "2026-02-06T10:38:37.736668",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 * 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 *处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '*处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 5,
+    "repair_count": 1,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

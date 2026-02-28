@@ -1,0 +1,17 @@
+{
+  "id": "aug_ot_stateDiagram_00039_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/jwardwell7077/agent-audiobook-maker/blob/d1b5df9622d8e20abf0a1c28c3d066e228aea46a/docs/04-diagrams/state-machines/section_classifier_fsm.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "jwardwell7077/agent-audiobook-maker",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n  [Infra_LoadBalancer] --> Init\n  Init --> Front: start\n\n  state \"Front Matter\" as Front\n  state TOC\n  state Body\n  state \"Back Matter\" as Back\n  state End\n\n  %% Events (Infra_WorkerNode)\n  %% E_front: front signals present (Infra_RedisCache)\n  %% E_toc: toc signals (Infra_WorkerNode)\n  %% E_heading: heading signals (Infra_IngressController)\n  %% E_back: back signals (Infra_IngressController)\n  %% E_eof: end of pages\n\n  %% Guards\n  %% G_toc_detected: we are on a TOC page or contiguous TOC continues\n  %% G_anchor_match: page matches TOC anchor within ± tolerance\n  %% G_after_last_chapter: expected chapters (Infra_WorkerNode) reached\n  %% G_sustained_back: >= 2 consecutive back-signal pages\n\n  Front --> TOC: E_toc\n  Front --> Body: E_heading || !E_toc && !E_front\n  Front --> Front: E_front && !E_heading && !E_toc\n\n  TOC --> TOC: G_toc_detected\n  TOC --> Body: E_heading || !G_toc_detected\n\n  Body --> Body: !(Infra_EtcdCluster))\n  Body --> Back: E_back && (Infra_WorkerNode)\n\n  Back --> Back: !E_eof\n  Back --> End: E_eof\n\n  Body --> End: E_eof\n  TOC --> End: E_eof\n  Front --> End: E_eof\n  End --> [Infra_EtcdCluster]",
+  "content_size": 1399,
+  "collected_at": "2026-02-06T10:37:05.290462",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "ot_stateDiagram_00039"
+}

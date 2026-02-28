@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00212",
+  "source": "github",
+  "source_url": "https://github.com/Pi-Squared-Inc/reth-pi2/blob/5f8d21dc96bde65ec3308767b308e8f1278a1e6c/crates/engine/tree/docs/mermaid/state-root-task.mmd",
+  "github_repo": "Pi-Squared-Inc/reth-pi2",
+  "github_file_path": "crates/engine/tree/docs/mermaid/state-root-task.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\n    subgraph StateRootTaskMessages[State Root Task messages]\n        StateRootMessage::StateUpdate\n        StateRootMessage::PrefetchProofs\n        StateRootMessage::EmptyProof\n        StateRootMessage::ProofCalculated\n        StataRootMessage::FinishedStateUpdates\n    end\n\n    subgraph StateRootTask[State Root Task thread]\n        DeduplicateProofTargets[Deduplicate proof targets according to the list of already fetched proofs]\n        GenerateProofTargets[Generate proof targets from state update]\n            --> DeduplicateProofTargets\n\n        NewProof[New proof calculated]\n            -->|Add new proof| ProofSequencer\n            --> EndCondition1\n        ProofSequencer --> ProofSequencerCondition{{Has sequential proofs?}}\n\n        EndCondition1{{All updates processed?}}\n            --> EndCondition2{{All pending proofs requested?}}\n            --> EndCondition3{{All proofs finished processing?}}\n    end\n\n    subgraph SparseTrieTask[Sparse Trie thread]\n        SparseTrieUpdate([SparseTrieUpdate channel])\n    end\n\n    subgraph MultiProofManager[MultiProofManager]\n        MultiProofCompletion[on_calculation_complete]\n        MultiProofSpawn[spawn_or_queue]\n    end\n\n    StateRootMessage::PrefetchProofs --> DeduplicateProofTargets\n    StateRootMessage::StateUpdate --> GenerateProofTargets\n\n    DeduplicateProofTargets -----> MultiProofSpawn\n\n    StateRootMessage::EmptyProof --> NewProof\n    StateRootMessage::ProofCalculated --> NewProof\n    NewProof ---> MultiProofCompletion\n    ProofSequencerCondition -->|Yes, send multiproof and state update| SparseTrieUpdate\n    StataRootMessage::FinishedStateUpdates --> EndCondition1\n    EndCondition3 -->|Close SparseTrieUpdate channel| SparseTrieUpdate\n",
+  "content_size": 1732,
+  "collected_at": "2026-02-06T01:42:42.374880",
+  "compilation_status": "failed",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

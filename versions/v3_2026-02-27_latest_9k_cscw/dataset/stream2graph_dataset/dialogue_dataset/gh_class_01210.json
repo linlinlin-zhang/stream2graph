@@ -1,0 +1,251 @@
+{
+  "id": "gh_class_01210",
+  "source": "github",
+  "source_url": "https://github.com/mlaurel/openai-cookbook/blob/86145b3f530889860dba904d61fb95b8c9cd466c/examples/object_oriented_agentic_approach/resources/diagrams/src/uml.mmd",
+  "github_repo": "mlaurel/openai-cookbook",
+  "github_file_path": "examples/object_oriented_agentic_approach/resources/diagrams/src/uml.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n\n    %% ==========================\n    %% Abstract Classes\n    %% ==========================\n    class BaseAgent {\n        - model_name: str\n        - messages: ChatMessages\n        - tool_manager: ToolManager\n        - logger: Logger\n        - language_model_interface: LanguageModelInterface\n\n        + __init__(developer_prompt: str, model_name: str)\n        + setup_tools(): void  %% abstract\n        + add_context(content: str): void\n        + add_message(content: str): void\n        + task(user_task: str, tool_call_enabled: bool, return_tool_response_as_is: bool): str\n    }\n\n    class ToolInterface {\n        + get_definition(): Dict[str, Any]\n        + run(arguments: Dict[str, Any]): str\n    }\n\n    class LanguageModelInterface {\n        + generate_completion(\n            model: str, \n            messages: List<Dict[str, str]], \n            tools: List[Dict[str, Any]]\n        ): Dict[str, Any]\n    }\n\n\n    %% ==========================\n    %% Concrete Classes\n    %% ==========================\n    class ChatMessages {\n        - messages: List<Dict[str, str]>\n\n        + __init__(developer_prompt: str)\n        + add_developer_message(content: str): void\n        + add_user_message(content: str): void\n        + add_assistant_message(content: str): void\n        + get_messages(): List<Dict[str, str]>\n    }\n\n    class ToolManager {\n        - tools: Dict[str, ToolInterface]\n        - logger: Logger\n        - language_model_interface: LanguageModelInterface\n\n        + __init__()\n        + register_tool(tool: ToolInterface): void\n        + get_tool_definitions(): List<Dict[str, Any]>\n        + handle_tool_call_sequence(\n            response: str, \n            return_tool_response_as_is: bool, \n            messages: ChatMessages\n        ): str\n    }\n\n    class OpenAILanguageModel {\n        - openai_client: OpenAI\n        - logger: Logger\n\n        + __init__()\n        + generate_completion(\n            model: str, \n            messages: List<Dict[str, str]], \n            tools: List<Dict[str, Any]]\n        ): Dict[str, Any]\n    }\n\n    class OpenAIClientFactory {\n        + create_client(api_key: str): OpenAI\n        - _resolve_api_key(api_key: str): str\n    }\n\n\n    %% ==========================\n    %% Relationships\n    %% ==========================\n    BaseAgent --> ChatMessages : uses\n    BaseAgent --> LanguageModelInterface : uses\n    BaseAgent --> ToolManager : optionally uses\n\n    ToolManager \"0..*\" --> \"1\" ToolInterface : manages\n    ToolManager --> ChatMessages : uses\n    ToolManager --> LanguageModelInterface : uses\n\n    LanguageModelInterface <|-- OpenAILanguageModel\n    OpenAILanguageModel --> OpenAIClientFactory : uses",
+  "content_size": 2674,
+  "collected_at": "2026-02-06T01:54:36.454348",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "首先，我们需要定义流程的起点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，BaseAgent的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "BaseAgent和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "关于BaseAgent，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "BaseAgent"
+      ],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下ToolInterface吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，ToolInterface就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是ToolInterface应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "在ToolInterface中，我们需要定义核心逻辑。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "ToolInterface"
+      ],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "LanguageModelInterface、ChatMessages主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，LanguageModelInterface、ChatMessages的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "LanguageModelInterface",
+        "ChatMessages"
+      ],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "关于ToolManager、OpenAILanguageModel，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是ToolManager、OpenAILanguageModel应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是ToolManager、OpenAILanguageModel应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理ToolManager、OpenAILanguageModel？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "ToolManager",
+        "OpenAILanguageModel"
+      ],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "OpenAIClientFactory、-->主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，OpenAIClientFactory、-->的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "OpenAIClientFactory",
+        "rel_0"
+      ],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有-->、-->。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，-->、-->是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有-->、-->。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "rel_1",
+        "rel_2",
+        "rel_3"
+      ],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理-->、<|--？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，-->、<|--的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有-->、<|--。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在-->、<|--完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "rel_4",
+        "rel_5",
+        "rel_6"
+      ],
+      "timestamp_offset": 360
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 24,
+    "speaker_distribution": {
+      "Speaker_B": 12,
+      "Speaker_A": 12
+    },
+    "speech_act_distribution": {
+      "sequential": 3,
+      "clarify": 7,
+      "contrastive": 1,
+      "request": 5,
+      "confirm": 2,
+      "structural": 4,
+      "classification": 2
+    },
+    "avg_turn_length": 27.833333333333332,
+    "dialogue_duration": 360
+  }
+}

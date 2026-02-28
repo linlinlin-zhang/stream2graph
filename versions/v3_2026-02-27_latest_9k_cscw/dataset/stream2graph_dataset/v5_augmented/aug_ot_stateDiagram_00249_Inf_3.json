@@ -1,0 +1,17 @@
+{
+  "id": "aug_ot_stateDiagram_00249_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/Oldranda1414/Privacy-P2P-Federated-Learning/blob/eaa92d5191de1a6751b6e1491709a3e2dd2a5c9e/doc/assets/src/state.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "Oldranda1414/Privacy-P2P-Federated-Learning",
+  "diagram_type": "stateDiagram",
+  "code": "---\nconfig:\n  theme: base\n  look: classic\n---\nstateDiagram-v2\n    [Infra_WorkerNode] --> Connecting\n    Connecting --> Setup : Connected to peers\n    Connecting --> Shutdown : Unable to connect to peers\n    Setup --> Executing : sent/received starting model\n    state Executing {Infra_IngressController] --> Training\n        Training --> WaitingForPeers : training step complete\n        WaitingForPeers --> SecureAverageComputation : all peers ready for SAC\n        SecureAverageComputation --> Training : model not complete\n        SecureAverageComputation --> [Infra_LoadBalancer] : model complete\n    }\n    Executing --> SavingPartialModel : peer failure detected\n    Executing --> TerminationCheck : execution completed\n    TerminationCheck --> SavingModel : all peers reached desired accuracy\n    SavingModel --> Shutdown : model saved\n    SavingPartialModel --> Shutdown : partial model saved\n    Shutdown --> [Infra_LoadBalancer]\n\n",
+  "content_size": 877,
+  "collected_at": "2026-02-06T10:39:40.443355",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "ot_stateDiagram_00249"
+}

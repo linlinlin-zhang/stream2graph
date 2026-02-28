@@ -1,0 +1,15 @@
+{
+  "id": "ot_stateDiagram_00353",
+  "source": "other",
+  "source_url": "https://github.com/Ulisses37/ktor-server-sandbox/blob/82adffecc1811b5b839dbd70f410a2c2e7e214fd/docs/system_lock_state_machine.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "Ulisses37/ktor-server-sandbox",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n[*] --> Idle: File Opened (Read-Only/Unlocked)\n\n    state \"User Edits File\" as UserAction\n    Idle --> UserAction: User types a character\n\n    state \"Request Lock\" as RequestLock {\n        UserAction --> CheckLocal: Plugin checks local state\n        CheckLocal --> ServerRequest: POST /lock\n        \n        state \"Server Logic\" as ServerLogic {\n            ServerRequest --> CheckDB: SELECT * FROM locks\n            CheckDB --> GrantLock: No active lock found\n            CheckDB --> DenyLock: Active lock exists (User B)\n        }\n    }\n\n    GrantLock --> LockedState: 200 OK\n    DenyLock --> ConflictState: 409 Conflict\n\n    state \"Locked (Editing Allowed)\" as LockedState {\n        [*] --> Editing\n        Editing --> Heartbeat: Every 30s\n        Heartbeat --> ServerUpdate: UPDATE locks SET timestamp\n        ServerUpdate --> Editing: 200 OK\n        \n        Editing --> Unlock: User saves/closes/stops\n    }\n\n    state \"Conflict (Read-Only)\" as ConflictState {\n        [*] --> ShowWarning: Display \"File Locked by User B\"\n        ShowWarning --> Idle: User cancels edit\n    }\n\n    Unlock --> Idle: DELETE /lock (or expiry)\n    \n    note right of Heartbeat\n        Prevents \"Stale Locks\" if\n        PC crashes or loses power.\n    end note",
+  "content_size": 1259,
+  "collected_at": "2026-02-06T10:41:06.727564",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

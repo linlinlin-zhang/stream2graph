@@ -1,0 +1,208 @@
+{
+  "id": "gh_sequence_00852",
+  "source": "github",
+  "source_url": "https://github.com/stephenbessey/CardFlow/blob/d110a2ae251de114598be30d3420d9fea0ad519c/SequenceDiagram.mmd",
+  "github_repo": "stephenbessey/CardFlow",
+  "github_file_path": "SequenceDiagram.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Merchant\n    participant Processor as Payment Processor\n    participant MerchantDB as Merchant DB\n    participant Bank as Bank API\n    participant TransactionDB as Transaction Log\n    \n    Merchant->>Processor: send_payment_request(merchant_data)\n    activate Processor\n    Processor->>Processor: validate_request_parameters()\n    \n    alt Invalid Request Parameters\n        Processor-->>Merchant: return 400 Bad Request\n    else Valid Request Parameters\n        Processor->>MerchantDB: get_merchant_authorization(merchant_name, token)\n        activate MerchantDB\n        MerchantDB-->>Processor: return merchant_data\n        deactivate MerchantDB\n        \n        alt Merchant Not Authorized\n            Processor->>TransactionDB: log_transaction(unauthorized)\n            Processor-->>Merchant: return 401 Unauthorized\n        else Merchant Authorized\n            alt Bank Not Supported\n                Processor->>TransactionDB: log_transaction(unsupported_bank)\n                Processor-->>Merchant: return 400 Bank Not Supported\n            else Bank Supported\n                Processor->>Bank: process_bank_transaction(cc_number, amount)\n                activate Bank\n                \n                alt Transaction Succeeds\n                    Bank-->>Processor: return success\n                    Processor->>TransactionDB: log_transaction(success)\n                    Processor-->>Merchant: return 200 Success\n                else Transaction Fails\n                    Bank-->>Processor: return error\n                    Processor->>TransactionDB: log_transaction(error)\n                    Processor-->>Merchant: return appropriate error code\n                end\n                deactivate Bank\n            end\n        end\n    end\n    \n    deactivate Processor\n",
+  "content_size": 1805,
+  "collected_at": "2026-02-06T01:49:58.009634",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "首先，我们需要定义流程的起点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "Processor",
+        "MerchantDB"
+      ],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下Bank API吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Bank API的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "Bank"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "Transaction Log、send_payment_request(merchant_data)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Transaction Log、send_payment_request(merchant_data)应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "TransactionDB",
+        "msg_0",
+        "msg_1"
+      ],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "get_merchant_authorization(merchant_name, token)、log_transaction(unauthorized)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，get_merchant_authorization(merchant_name, token)、log_transaction(unauthorized)就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有get_merchant_authorization(merchant_name, token)、log_transaction(unauthorized)。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是get_merchant_authorization(merchant_name, token)、log_transaction(unauthorized)应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_2",
+        "msg_3"
+      ],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将log_transaction(unsupported_bank)、process_bank_transaction(cc_number, amount)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，log_transaction(unsupported_bank)、process_bank_transaction(cc_number, amount)就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是log_transaction(unsupported_bank)、process_bank_transaction(cc_number, amount)应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_4",
+        "msg_5"
+      ],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有log_transaction(success)、log_transaction(error)。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，log_transaction(success)、log_transaction(error)的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在log_transaction(success)、log_transaction(error)完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_6",
+        "msg_7"
+      ],
+      "timestamp_offset": 285
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 19,
+    "speaker_distribution": {
+      "Speaker_B": 10,
+      "Speaker_A": 9
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "inform": 3,
+      "confirm": 3,
+      "request": 1,
+      "clarify": 5,
+      "classification": 3,
+      "structural": 2
+    },
+    "avg_turn_length": 54.26315789473684,
+    "dialogue_duration": 285
+  }
+}

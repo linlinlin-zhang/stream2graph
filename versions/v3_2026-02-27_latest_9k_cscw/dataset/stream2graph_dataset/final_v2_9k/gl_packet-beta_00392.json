@@ -1,0 +1,16 @@
+{
+  "id": "gl_packet-beta_00392",
+  "source": "gitlab",
+  "source_url": "https://github.com/71suodrazaH/SattOnTable/blob/217f26cebe14e577ac7b72300076696dc5601a90/Software/Satbus_Commons_lib/docs/fault_injection_integration_flow.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "71suodrazaH/SattOnTable",
+  "diagram_type": "packet-beta",
+  "code": "%%{init: {'theme':'default', 'themeVariables': {'fontSize':'31px', 'actorBkg':'#f5f5f5', 'actorBorder':'#666', 'actorTextColor':'#000'}}}%%\nsequenceDiagram\n    participant GS as Local Machine\n    participant ESP as ESP32 Controller\n    participant TS as Target Subsystem\n    participant FM as FaultManager\n    participant TD as TransportDecorator\n    participant HAL as Platform HAL\n    \n    GS->>ESP: Design Fault Injection Campaign\n    ESP->>TS: SPI Fault Frame (26 bytes)\n    TS->>FM: Process SPI Frame\n    FM->>FM: Validate State Mask\n    FM->>FM: Configure Fault Parameters\n    \n    rect rgb(255, 255, 200)\n        Note over TS,FM: Normal Operation Continues\n    end\n    \n    TS->>FM: send(packet)\n    FM->>TD: isFaultActive(current_state)\n    \n    alt [Layer 1 (Transport) Fault]\n        rect rgb(255, 255, 200)\n            Note over TD: Active + Parameters\n        end\n        FM->>TD: Active + Parameters\n        TD->>TD: Apply Fault (drop/corrupt/delay)\n        TD-->>FM: TIMEOUT/CRC_ERROR\n    else [Layer 2 (HAL) Fault]\n        rect rgb(255, 255, 200)\n            Note over HAL: Active + Parameters\n        end\n        FM->>HAL: Active + Parameters\n        HAL->>HAL: injectFault(parameters)\n        HAL->>HAL: Hardware Manipulation\n        HAL-->>TD: Hardware Response\n        TD-->>FM: Modified Hardware Behavior\n    else [No Active Fault]\n        rect rgb(255, 255, 200)\n            Note over TD: Inactive\n        end\n        FM->>TD: Inactive\n        TD-->>TS: Normal Operation\n    end\n\n",
+  "content_size": 1501,
+  "collected_at": "2026-02-06T14:08:49.118743",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

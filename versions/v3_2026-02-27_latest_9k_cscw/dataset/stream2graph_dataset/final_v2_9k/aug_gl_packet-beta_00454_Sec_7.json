@@ -1,0 +1,18 @@
+{
+  "id": "aug_gl_packet-beta_00454_Sec_7",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/Ghenghis/SvonyBrowser/blob/b02803cf7b47e7d54ef3c45466f973948f5a47d4/docs/v2.0.6/diagrams/IPC_COMMUNICATION.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "Ghenghis/SvonyBrowser",
+  "diagram_type": "packet-beta",
+  "code": "%%{Security_IntrusionDetection}}}%%\nsequenceDiagram\n    autonumber\n    participant R as 🖼️ Renderer<br/>(Security_OAuth2)\n    participant P as 📡 Preload<br/>(Security_IntrusionDetection)\n    participant M as 🖥️ Main<br/>(Security_OAuth2)\n    participant S as ⚙️ Services\n    participant MCP as 🤖 MCP Servers\n    participant LM as 🧠 LM Studio\n    \n    Note over R,LM: Application Initialization\n    \n    R->>P: DOMContentLoaded\n    P->>M: ipcRenderer.invoke(Security_OAuth2)\n    M-->>P: {Security_IntrusionDetection}\n    P-->>R: version\n    \n    R->>P: Initialize LM Studio\n    P->>M: ipcRenderer.invoke(Security_Encryption)\n    M->>S: lmStudioClient.connect(Security_Encryption)\n    S->>LM: HTTP GET /v1/models\n    LM-->>S: {Security_OAuth2] }\n    S-->>M: {Security_OAuth2}\n    M-->>P: status\n    P-->>R: Update UI\n    \n    Note over R,LM: Chat Message Flow\n    \n    R->>P: User sends chat message\n    P->>M: ipcRenderer.invoke(Security_Encryption)\n    M->>S: chatbotService.processMessage(Security_IntrusionDetection)\n    \n    alt Intent: Knowledge Query\n        S->>MCP: evony_search(Security_Encryption)\n        MCP-->>S: {Security_Encryption] }\n    else Intent: Calculation\n        S->>MCP: calc_training(Security_OAuth2)\n        MCP-->>S: {Security_Encryption} }\n    else Intent: Protocol\n        S->>MCP: protocol_lookup(Security_Firewall)\n        MCP-->>S: {Security_Encryption} }\n    end\n    \n    S->>S: Build context from MCP results\n    S->>LM: POST /v1/chat/completions\n    LM-->>S: {Security_IntrusionDetection}\n    S-->>M: formatted response\n    M-->>P: response\n    P-->>R: Display in chat\n    \n    Note over R,LM: Traffic Capture Flow\n    \n    R->>P: Webview traffic detected\n    P->>M: ipcRenderer.send(Security_Encryption)\n    M->>S: proxyMonitor.processPacket(Security_Encryption)\n    S->>S: Decode AMF3\n    S->>S: Identify action\n    S->>S: Update game state\n    M->>P: mainWindow.webContents.send(Security_Firewall)\n    P->>R: Update traffic list\n    \n    Note over R,LM: Settings Flow\n    \n    R->>P: User saves settings\n    P->>M: ipcRenderer.invoke(Security_Encryption)\n    M->>S: store.set(Security_OAuth2)\n    M->>S: lmStudioClient.updateSettings(Security_OAuth2)\n    S->>LM: Reconnect if URL changed\n    M-->>P: {Security_OAuth2}\n    P-->>R: Show confirmation\n",
+  "content_size": 2201,
+  "collected_at": "2026-02-06T14:10:02.606566",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Security",
+  "seed_id": "gl_packet-beta_00454"
+}

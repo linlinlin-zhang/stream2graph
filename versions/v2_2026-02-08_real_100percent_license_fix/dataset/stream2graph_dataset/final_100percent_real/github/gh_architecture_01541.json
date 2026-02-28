@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01541",
+  "source": "github",
+  "source_url": "https://github.com/sean-galloway/RTLDesignSherpa/blob/ea4a63af832786f67859f3a6fd4b6a955f49bf96/docs/markdown/assets/RTLCommon/cam_tag.mmd",
+  "github_repo": "sean-galloway/RTLDesignSherpa",
+  "github_file_path": "docs/markdown/assets/RTLCommon/cam_tag.mmd",
+  "diagram_type": "architecture",
+  "code": "%%{init: {'theme': 'neutral', 'themeVariables': { 'fontSize': '14px'}}}%%\nflowchart TB\n    subgraph Inputs\n        CLK[clk]\n        RST[rst_n]\n        TAG[\"tag[N-1:0]\"]\n        MV[mark_valid]\n        MI[mark_invalid]\n    end\n\n    subgraph cam_tag[\"cam_tag\"]\n        subgraph Storage[\"Tag Storage\"]\n            TAGS[\"tags[DEPTH-1:0][N-1:0]\"]\n            VALID[\"valid[DEPTH-1:0]\"]\n        end\n\n        subgraph Lookup[\"Associative Lookup\"]\n            MATCH[\"Parallel Compare\\nall entries\"]\n        end\n\n        subgraph Alloc[\"Allocation Logic\"]\n            FIRST[\"Priority Encoder\\nfind first free slot\"]\n        end\n\n        subgraph Status[\"Status Generation\"]\n            FULL[\"tags_full:\\nall entries valid\"]\n            EMPTY[\"tags_empty:\\nno entries valid\"]\n        end\n    end\n\n    subgraph Outputs\n        STAT[tag_status]\n        TF[tags_full]\n        TE[tags_empty]\n    end\n\n    CLK --> Storage\n    RST --> Storage\n    TAG --> Lookup\n    TAG --> Alloc\n    MV --> Alloc\n    MI --> Lookup\n    Storage --> Lookup\n    Lookup --> STAT\n    Storage --> Status\n    Status --> TF\n    Status --> TE\n    Alloc --> Storage\n",
+  "content_size": 1121,
+  "collected_at": "2026-02-06T01:47:38.899786",
+  "license": "mit",
+  "license_name": "MIT License",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 8,
+  "repo_forks": 1
+}

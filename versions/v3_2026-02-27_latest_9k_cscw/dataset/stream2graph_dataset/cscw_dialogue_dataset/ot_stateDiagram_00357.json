@@ -1,0 +1,127 @@
+{
+  "id": "ot_stateDiagram_00357",
+  "source": "other",
+  "source_url": "https://github.com/CPU-JIA/Flotilla/blob/002b7757d8792695a487c8d016779cb04a1d06bb/UML/diagrams/Mermaid/31-%E7%94%A8%E6%88%B7%E4%BC%9A%E8%AF%9D%E7%AE%A1%E7%90%86%E7%8A%B6%E6%80%81%E5%9B%BE.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "CPU-JIA/Flotilla",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    [*] --> Anonymous : 访问网站\n\n    state Anonymous {\n        [*] --> Browsing\n        Browsing --> LoginPage : 点击登录\n        Browsing --> RegisterPage : 点击注册\n    }\n\n    Anonymous --> Authenticating : 提交凭据\n\n    state Authenticating {\n        [*] --> ValidatingCredentials\n        ValidatingCredentials --> CheckingMFA : 凭据正确\n        ValidatingCredentials --> AuthFailed : 凭据错误\n\n        CheckingMFA --> MFARequired : 启用了2FA\n        CheckingMFA --> AuthSuccess : 未启用2FA\n\n        MFARequired --> ValidatingTOTP\n        ValidatingTOTP --> AuthSuccess : TOTP正确\n        ValidatingTOTP --> AuthFailed : TOTP错误\n    }\n\n    AuthFailed --> Anonymous : 返回登录\n\n    AuthSuccess --> Authenticated : 创建Session\n\n    state Authenticated {\n        [*] --> Active\n\n        Active --> Active : API请求<br/>刷新lastActivity\n        Active --> TokenRefresh : Access Token过期\n        Active --> Idle : 15分钟无活动\n\n        TokenRefresh --> Active : 刷新成功\n        TokenRefresh --> SessionExpired : Refresh Token过期\n\n        Idle --> Active : 恢复活动\n        Idle --> SessionExpired : 30分钟无活动\n\n        Active --> DeviceLogout : 从其他设备登出\n        Active --> PasswordChanged : 密码被修改\n        Active --> ManualLogout : 主动登出\n    }\n\n    SessionExpired --> Anonymous : 重定向登录\n    DeviceLogout --> Anonymous : Token版本失效\n    PasswordChanged --> Anonymous : Token版本递增\n    ManualLogout --> Anonymous : 清除Session\n\n    state SessionStorage {\n        Redis : Redis存储\n        --\n        SessionID : 会话ID\n        UserID : 用户ID\n        TokenVersion : Token版本\n        DeviceInfo : 设备信息\n        IPAddress : IP地址\n        ExpiresAt : 过期时间\n    }\n\n    Authenticated --> SessionStorage : 存储会话\n",
+  "content_size": 1638,
+  "collected_at": "2026-02-06T10:41:09.310422",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 * 和 [* 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '* 和 [*'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2",
+        "Anonymous"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 [* 和 [* 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '[* 和 [*'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Authenticating",
+        "Authenticated"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Redis : Redis存储\n        --\n        SessionID : 会话ID\n        UserID : 用户ID\n        TokenVersion : Token版本\n        DeviceInfo : 设备信息\n        IPAddress : IP地址\n        ExpiresAt : 过期时间\n     这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Redis : Redis存储\n        --\n        SessionID : 会话ID\n        UserID : 用户ID\n        TokenVersion : Token版本\n        DeviceInfo : 设备信息\n        IPAddress : IP地址\n        ExpiresAt : 过期时间\n    '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SessionStorage"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 12,
+    "repair_count": 0,
+    "grounding_acts_count": 6,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "id": "gl_block-beta_00290",
+  "source": "gitlab",
+  "source_url": "https://github.com/pagopa/p4pa-doc/blob/7e7885cceb7021d36015482fc7455c44951d6b3f/design/workflow/classificazioneIncassi/04.tesoreriaXLS-ingestion.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "pagopa/p4pa-doc",
+  "diagram_type": "block-beta",
+  "code": "---\ntitle: WF caricamento giornale di cassa XLS\n---\nflowchart TD\n    DESCRIPTION@{ shape: braces, label: \"Input: ingestionFlowFileId\" }\n    START@{shape: start} -->\n    UPDATE_STATUS_INELAB:::activity@{label: \"Aggiorna stato ingestionFlowFile in 'PROCESSING'\"} -->\n    INGESTION:::activity@{label: \"Leggi file e persisti righe\"}\n\n    subgraph INGESTION_NOTE_BLOCK\n        INGESTION\n        INGESTION_NOTE@{shape: braces, label: \"Restituisce List&lt;IUF,treasuryId&gt;, <span style=\\\"color:red\\\">List&lt;IUV&gt;</span>\"}\n    end\n    class INGESTION_NOTE_BLOCK note_block\n\n    INGESTION -->\n    UPDATE_STATUS_COMPLETE:::activity@{label: \"Finalizza stato entità ingestionFlowId\"} -->\n    SEND_EMAIL:::activity@{label: \"Notifica stato import tramite email\"} -->\n    LOOP_IUVs\n\n    subgraph LOOP_IUVs[\"Per ogni IUV restituito dall'activity di ingestion\"]\n\n        %% dummy block added to have an empty line\n        DUMMY1:::hidden-->SIGNAL_IUV\n        linkStyle 5 display:none;\n\n        SIGNAL_IUV:::send-signal@{shape: delay, label: \"Invia evento 'Classifica Transfer' al workflow 'Classificazione Transfer'\"}\n        NOTE_SIGNAL_IUV@{ shape: braces, label: \"signalWithStart con workflowID=organizationId+IUV\" }\n    end\n    class LOOP_IUVs loop\n    style LOOP_IUVs color:red;\n\n    LOOP_IUVs --> LOOP_IUFs\n\n    subgraph LOOP_IUFs[\"Per ogni IUF/treasuryId restituito dall'activity di ingestion\"]\n\n        %% dummy block added to have an empty line\n        DUMMY2:::hidden-->SIGNAL_IUF\n        linkStyle 7 display:none;\n\n        SIGNAL_IUF:::send-signal@{shape: delay, label: \"Invia evento 'Tesoreria IUF' con treasuryId al workflow 'Classificazione IUF'\"}\n        NOTE_SIGNAL_IUF@{ shape: braces, label: \"signalWithStart con workflowID=organizationId+IUF\" }\n    end\n    class LOOP_IUFs loop\n\n    LOOP_IUFs --> END@{shape: stop}\n\n\n    classDef hidden display:none;\n    classDef note_block display:none;\n    classDef activity fill:#FFFFE0, stroke:#ffc300, stroke-width:2px;\n    classDef loop fill:#CCFFCC, stroke:#7FBF7F, stroke-width:2px, padding-bottom: 5px;\n    classDef send-signal fill:#ade8f4, stroke:#48cae4, stroke-width:2px",
+  "content_size": 2124,
+  "collected_at": "2026-02-06T14:06:19.099970",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Per ogni IUV restituito dall'activity di ingestion\" 和 \"Per ogni IUF/treasuryId restituito dall'activity di ingestion\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Per ogni IUV restituito dall'activity di ingestion\" 和 \"Per ogni IUF/treasuryId restituito dall'activity di ingestion\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "LOOP_IUVs",
+        "LOOP_IUFs"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01423",
+  "source": "github",
+  "source_url": "https://github.com/MeeMarc/SmartQ/blob/998db90331f69ce902d5708ed7017fb56aec5b4a/docs/flowchart.mmd",
+  "github_repo": "MeeMarc/SmartQ",
+  "github_file_path": "docs/flowchart.mmd",
+  "diagram_type": "architecture",
+  "code": "flowchart TD\n  Start([User hits site /]) --> RootRedirect[/redirect to /admin/]\n  RootRedirect --> AdminPage[\"/admin\\n(Admin/admin.html)\"]\n\n  AdminPage --> Signup[\"/signup\\n(Admin/SignUp.html)\"]\n  AdminPage --> Login[\"/login\\n(Admin/login.html)\"]\n  Login -->|success| Homepage[\"/homepage\\n(Admin2/Homepage.html)\"]\n  Login -->|fail| Signup\n\n  Homepage --> CreateQ[\"/createq\\n(Admin2/CreateQ.html)\"]\n  Homepage --> AddCandidate[\"/addcandidate\\n(Admin2/AddCandidate.html)\"]\n  Homepage --> ScanTracking[\"/scantracking\\n(Admin2/Scantracking.html)\"]\n  Homepage --> AdminSettings[\"/admin_settings\\n(Admin2/AdminSettings.html)\"]\n  AdminSettings --> Logout[\"/logout\"]\n\n  CreateQ -->|POST /generate_qr_db| QRCreated[\"QR saved (qr_history / temp_qr)\"]\n  QRCreated --> QRImage[\"QR image (base64) returned to UI\"]\n  CreateQ --> QRHistory[\"/qr_history_data\\n(list of historical QRs)\"]\n  CreateQ --> TempQR[\"/temp_qr_data\\n(active QRs)\"]\n\n  %% User-facing area\n  subgraph User_Area [User-facing pages]\n    UserPage[\"/user\\n(User/User.html)\"]\n    QueuePage[\"/queue/:slug/:number\\n(User/User.html)\"]\n    QueueSubmit[[POST form -> create queue entry]]\n    WaitingPage[\"/queue/:slug/:num/waiting/:entry_id\\n(User/Waiting.html)\"]\n    Download[\"/download_ticket/:slug/:num/:entry_id\"]\n\n    QueuePage -->|POST form| QueueSubmit\n    QueueSubmit --> WaitingPage\n    WaitingPage --> Download\n  end\n\n  %% Admin tools interacting with user queues\n  Homepage -->|manage| QRCreated\n  Homepage -->|view scans| QRScans[\"/get_qr_scans/:qr_id\"]\n  QRScans --> UpdateStatus[\"/update_queue_status (POST)\"]\n\n  %% Misc utilities\n  AdminPage --> GenerateSiteQR[\"/generate_site_qr\"]\n  AdminPage --> GenerateQR[\"/generate_qr (quick)\\n/ generate_qr_db (save)\"]\n\n  %% Entry links\n  AdminPage --> UserPage[\"link: /user or direct queue links\"]\n\n  classDef admin fill:#f9f,stroke:#333,stroke-width:1px;\n  class AdminPage,Homepage,CreateQ,AddCandidate,ScanTracking,AdminSettings admin;\n",
+  "content_size": 1939,
+  "collected_at": "2026-02-06T01:46:02.575467",
+  "license": "none",
+  "license_name": "No License",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 1
+}

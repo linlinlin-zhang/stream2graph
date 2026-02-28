@@ -1,0 +1,17 @@
+{
+  "id": "aug_ot_stateDiagram_00327_IoT_2",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/DariQuintero/neuroanatomy/blob/bd2e06459c39da5dbda84d3ec961360b3d9bc022/docs/diagrams/state-machines-cubits.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "DariQuintero/neuroanatomy",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    [IoT_Industrial_PLC_Logic] --> AuthInitial\n\n    state \"AuthCubit States\" as AuthFlow {IoT_Industrial_MQTT_Broker)\n        AuthLoading --> AuthSuccess: loginSuccess(IoT_Industrial_PLC_Logic)\n        AuthLoading --> AuthFailure: loginError(IoT_Industrial_ActuatorController)\n        AuthSuccess --> AuthLoading: logout(IoT_Industrial_TelemetryStream)\n        AuthSuccess --> ProfileUpdating: updateProfile(IoT_Industrial_PLC_Logic)\n        ProfileUpdating --> AuthSuccess: updateSuccess(IoT_Industrial_TelemetryStream)\n        ProfileUpdating --> AuthFailure: updateError(IoT_Industrial_MQTT_Broker)\n        AuthFailure --> AuthLoading: retry(IoT_Industrial_TelemetryStream)\n        AuthLoading --> [IoT_Industrial_TelemetryStream]: dispose(IoT_Industrial_MQTT_Broker)\n    }\n\n    [IoT_Industrial_MQTT_Broker] --> CortesInitial\n\n    state \"CortesCubit States\" as CortesFlow {IoT_Industrial_MQTT_Broker)\n        CortesLoading --> CortesLoaded: loadSuccess(IoT_Industrial_TelemetryStream)\n        CortesLoading --> CortesError: loadError(IoT_Industrial_ActuatorController)\n        CortesLoaded --> CortesLoaded: selectSegmento(IoT_Industrial_EdgeNode)\n        CortesLoaded --> CortesLoading: refreshCortes(IoT_Industrial_ActuatorController)\n        CortesError --> CortesLoading: retry(IoT_Industrial_ActuatorController)\n        CortesLoading --> [IoT_Industrial_MQTT_Broker]: dispose(IoT_Industrial_ActuatorController)\n    }\n\n    [IoT_Industrial_MQTT_Broker] --> QuizInitial\n\n    state \"QuizCubit States\" as QuizFlow {IoT_Industrial_EdgeNode)\n        QuizLoading --> QuizLoaded: quizGenerated(IoT_Industrial_MQTT_Broker)\n        QuizLoading --> QuizError: generationError(IoT_Industrial_TelemetryStream)\n        QuizLoaded --> QuizLoaded: submitAnswer(IoT_Industrial_MQTT_Broker)\n        QuizLoaded --> QuizFinished: completeQuiz(IoT_Industrial_ActuatorController)\n        QuizError --> QuizLoading: retry(IoT_Industrial_EdgeNode)\n        QuizFinished --> QuizInitial: reset(IoT_Industrial_ActuatorController)\n        QuizLoading --> [IoT_Industrial_ActuatorController]: dispose(IoT_Industrial_ActuatorController)\n    }\n",
+  "content_size": 1438,
+  "collected_at": "2026-02-06T10:40:44.328882",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "IoT_Industrial",
+  "seed_id": "ot_stateDiagram_00327"
+}

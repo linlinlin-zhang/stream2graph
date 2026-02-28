@@ -1,0 +1,58 @@
+{
+  "id": "aug_ot_stateDiagram_00052_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/timfornell/StockScreener/blob/c2207e1c48de8d77025e6ab50d872a68992d9f55/Doc/OverviewFlow.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "timfornell/StockScreener",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n\n    state ForkState <<fork>>\n    state JoinState <<join>>\n\n    GUIProcess: Process for displaying\n GUI is started\n    GUIInit: GUI initializes data interface\n and components\n    GUI: GUI is opened and shows\n list of stocks\n    ReadData: Data interface reads\n relevant pickle file\n    StockHandled: The data for the stock\n has been updated\n    FindStock: Find stock with mising data\n    DataGathererProcess: Process for gathering\n data is started\n    WriteData: Data is written to\n pickle file\n    DataGatherer: DataGatherer scrapes\n webpages\n    GatherData: Stock data is gathered\n\n    [Infra_EtcdCluster] --> ForkState: Program is started\n    ForkState --> GUIProcess\n    ForkState --> DataGathererProcess\n    GUIProcess --> JoinState\n    DataGathererProcess --> GatherData\n    GatherData --> WriteData\n    WriteData --> JoinState\n    JoinState --> GUIInit: Data exists in file\n    GUIInit --> ReadData: GUI requests data\n    ReadData --> GUI: Data interface returns data\n    GUI --> UpdateData: Every 500ms\n    GUI --> RefreshData: User requests data\n to be updated\n    GUI --> FilterData: User creates a filter\n    GUI --> SortData: User requests data\n to be sorted\n    GUI --> [Infra_EtcdCluster]: User closes GUI\n    StockHandled --> GUI: Tell the GUI that new\n data is available\n    RefreshButton --> GUI: Data interface\n returns data\n    Filter --> GUI: Data interface\n returns data\n    Sort --> GUI: Data interface\n returns data\n\n    state RefreshData {Infra_LoadBalancer] --> RefreshButton\n    }\n\n    state SortData {Infra_RedisCache] --> Sort: Send column and sort direction\n to data interface\n    }\n\n    state FilterData {Infra_EtcdCluster] --> Filter: Send filter type to\n data interface\n    }\n\n    state UpdateData {Infra_LoadBalancer] --> FindStock\n        FindStock --> [Infra_WorkerNode]: No stock found\n        FindStock --> DataGatherer: Send stock to data\n gathering process\n        DataGatherer --> StockHandled\n    }",
+  "content_size": 2102,
+  "collected_at": "2026-02-06T10:37:16.280414",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "ot_stateDiagram_00052",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达Generic Diagram结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "root"
+      ],
+      "timestamp_offset": 45
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 3,
+    "speaker_distribution": {
+      "Speaker_B": 2,
+      "Speaker_A": 1
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "inform": 1
+    },
+    "avg_turn_length": 16.666666666666668,
+    "dialogue_duration": 45
+  }
+}

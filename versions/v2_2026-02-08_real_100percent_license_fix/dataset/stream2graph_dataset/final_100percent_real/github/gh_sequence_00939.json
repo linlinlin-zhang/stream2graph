@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00939",
+  "source": "github",
+  "source_url": "https://github.com/albertomeleleo/agiemme-editor/blob/6c33adcff66ce9c360ccab15c5e325c9474e7d2a/doc/file-management/sequence.mmd",
+  "github_repo": "albertomeleleo/agiemme-editor",
+  "github_file_path": "doc/file-management/sequence.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    actor User\n    participant App as App Component\n    participant IPC as Electron API\n    participant Main as Main Process\n    participant FS as File System\n\n    %% Open File Flow\n    User->>App: Click File in Explorer\n    App->>App: Check hasUnsavedChanges\n    alt Unsaved Changes\n        App->>User: Confirm Discard?\n        User-->>App: Yes\n    end\n    App->>IPC: readFile(path)\n    IPC->>Main: invoke('read-file', path)\n    Main->>FS: fs.readFile(path)\n    FS-->>Main: content\n    Main-->>IPC: content\n    IPC-->>App: content\n    App->>App: setContent(content), setCurrentFile(path)\n\n    %% Save Flow\n    User->>App: Click Save (Ctrl+S)\n    alt New File (No Path)\n        App->>IPC: saveFileAs(content)\n        IPC->>Main: invoke('save-file-as')\n        Main->>User: Show Save Dialog\n        User-->>Main: Select Path\n        Main->>FS: fs.writeFile(path, content)\n        Main-->>IPC: newPath\n        IPC-->>App: newPath\n        App->>App: setCurrentFile(newPath)\n    else Existing File\n        App->>IPC: saveFile(path, content)\n        IPC->>Main: invoke('save-file', path, content)\n        Main->>FS: fs.writeFile(path, content)\n        Main-->>IPC: success\n    end\n    App->>App: setHasUnsavedChanges(false)\n    App->>User: Show Success Message\n",
+  "content_size": 1272,
+  "collected_at": "2026-02-06T01:51:01.622958",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

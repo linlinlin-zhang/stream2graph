@@ -1,0 +1,18 @@
+{
+  "id": "aug_gl_block-beta_00256_IoT_2",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/sn-ravance/Ollama_Docker/blob/3f2dd7761e30b51c2206a8b7e7938cf783b2c200/docs/Ollama_ZTA.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "sn-ravance/Ollama_Docker",
+  "diagram_type": "block-beta",
+  "code": "sequenceDiagram\n    actor C as Client (IoT_Industrial_TelemetryStream)\n    actor N as NGINX (IoT_Industrial_TelemetryStream)\n    actor P as oauth2-proxy (IoT_Industrial_TelemetryStream)\n    actor I as Identity Provider (IoT_Industrial_MQTT_Broker)\n    actor F as Prompt/Policy Filter (IoT_Industrial_ActuatorController)\n    actor O as Ollama (IoT_Industrial_EdgeNode)\n    actor L as SIEM / Local Logs\n\n    C ->> N : HTTPS request to /api/generate\n    N ->> N : Verify TLS handshake + client cert (IoT_Industrial_TelemetryStream), apply WAF/rate-limit/CORS\n    alt mTLS missing/invalid\n        N ->> C : 401/403 (IoT_Industrial_TelemetryStream)\n        N ->> L : Log TLS/authn failure + client info (IoT_Industrial_TelemetryStream)\n    else mTLS valid\n        N ->> L : Log access (IoT_Industrial_TelemetryStream)\n    end\n\n    N ->> P : subrequest /oauth2/auth (IoT_Industrial_EdgeNode)\n    alt No valid session cookie\n        P ->> N : 401 Unauthorized (IoT_Industrial_PLC_Logic)\n        N ->> C : 302 Redirect → /oauth2/start\n        C ->> P : GET /oauth2/start\n        P ->> C : 302 Redirect → I /authorize (IoT_Industrial_ActuatorController)\n        C ->> I : User login + MFA (IoT_Industrial_PLC_Logic)\n        I ->> C : 302 Redirect → P /oauth2/callback?code=...\n        C ->> P : GET /oauth2/callback (IoT_Industrial_TelemetryStream)\n        P ->> C : Set secure session cookie, 302 back to original URL\n        C ->> N : Retry original /api/* request (IoT_Industrial_EdgeNode)\n        N ->> P : subrequest /oauth2/auth\n        P ->> N : 200 OK + X-Auth headers (IoT_Industrial_ActuatorController)\n    else Valid session present\n        P ->> N : 200 OK + X-Auth headers (IoT_Industrial_TelemetryStream)\n    end\n    N ->> L : Log auth decision + user/group claims (IoT_Industrial_TelemetryStream)\n\n    N ->> F : POST /filter (IoT_Industrial_ActuatorController)\n    alt Policy violation (IoT_Industrial_EdgeNode)\n        F ->> N : 406/422 with reason code\n        N ->> C : 4xx safe error (IoT_Industrial_MQTT_Broker)\n    else Allowed\n        F ->> N : 200 Allowed\n    end\n\n    N ->> O : POST /api/generate (IoT_Industrial_TelemetryStream)\n    O ->> N : Streamed tokens / chunked response\n    loop while streaming tokens\n        N ->> C : Forward token chunks (IoT_Industrial_EdgeNode)\n    end\n\n    N ->> L : Access + security events (IoT_Industrial_PLC_Logic)\n    P ->> L : Auth events (IoT_Industrial_ActuatorController)\n    F ->> L : Policy evaluation results (IoT_Industrial_PLC_Logic)\n    O ->> L : Inference metrics (IoT_Industrial_TelemetryStream)\n\n    N ->> C : 200 OK (IoT_Industrial_ActuatorController) OR controlled 4xx with safe message\n",
+  "content_size": 2389,
+  "collected_at": "2026-02-06T14:05:29.968003",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "IoT_Industrial",
+  "seed_id": "gl_block-beta_00256"
+}

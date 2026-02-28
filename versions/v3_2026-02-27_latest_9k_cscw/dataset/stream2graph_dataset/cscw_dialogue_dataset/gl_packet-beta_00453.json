@@ -1,0 +1,409 @@
+{
+  "id": "gl_packet-beta_00453",
+  "source": "gitlab",
+  "source_url": "https://github.com/asmund20/in4230-mip/blob/791c34e926d22caef6c6cf7103c7265f86db82cc/design/tp.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "asmund20/in4230-mip",
+  "diagram_type": "packet-beta",
+  "code": "---\ntitle: MIP TP daemon\n---\nflowchart TB\n    Start((Start))\n    Init[Setup sockets, structures and accept connections]\n    Timeouts[Check timeouts and disconnects]\n    ReadyFd{Which fd?}\n    RecvLower{Ack?}\n    ReceiveData{Expected?}\n    RecvUpper{Is in-flight full \\nor first packet\\n not yet acked?}\n    ReceiveAck{NACK?}\n    HandleNack{In-flight?}\n    HandleAck{In-flight?}\n    Retransmit1[Retransmit non-acked in-flight packets\\n if holddown timer is expired]\n    Retransmit2[Retransmit non-acked in-flight packets\\n if holddown timer is expired]\n    SendPacket[Send packet and send\\n ready to upper]\n    Enque[Add packet to queue]\n    SendQueue1[Send packets from queue until in-flight is\\n full, sending request for each send]\n    SendQueue2[Send packets from queue until in-flight is\\n full, sending request for each send]\n    CummulativeAck[Remove all packets with seqno before\\nNACK-no from in-flight]\n    RemoveFirst[Remove first packet from in-flight]\n    CorrectData[Send up, ACK]\n    Store[Store in buffer, send ACK and NACK]\n    SendAck[Send ack, ignore content]\n    MarkAcked[Mark in-flight packet as acked]\n\n    Start --> Init --> Poll --> Timeouts --> ReadyFd\n    ReadyFd-- Mip daemon -->RecvLower\n        RecvLower-- Yes --> ReceiveAck\n            ReceiveAck-- Yes -->HandleNack\n                HandleNack-- First in-flight --> Retransmit1 --> Poll\n                HandleNack-- Other in-flight --> CummulativeAck --> Retransmit2 --> SendQueue1 --> Poll\n                HandleNack-- Not in-flight --> Poll\n            ReceiveAck-- No -->HandleAck\n                HandleAck-- First --> RemoveFirst --> SendQueue2 --> Poll\n                HandleAck-- In-flight --> MarkAcked --> Poll\n                HandleAck-- Not in-flight --> Poll\n        RecvLower-- No --> ReceiveData\n            ReceiveData-- Yes -->CorrectData -->Poll\n            ReceiveData-- In-window --> Store -->Poll\n            ReceiveData-- Recent seqno -->SendAck -->Poll\n    ReadyFd-- Upper -->RecvUpper\n        RecvUpper-- Yes -->Enque --> Poll\n        RecvUpper-- NO -->SendPacket --> Poll\n\n",
+  "content_size": 2077,
+  "collected_at": "2026-02-06T14:10:01.974436",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 (Start 和 Setup sockets, structures and accept connections 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '(Start 和 Setup sockets, structures and accept connections'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Start",
+        "Init"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Check timeouts and disconnects 和 Which fd? 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Check timeouts and disconnects 和 Which fd?'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Timeouts",
+        "ReadyFd"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Ack? 和 Expected? 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Ack? 和 Expected?'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "RecvLower",
+        "ReceiveData"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Is in-flight full \\nor first packet\\n not yet acked? 和 NACK? 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Is in-flight full \\nor first packet\\n not yet acked? 和 NACK?'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "RecvUpper",
+        "ReceiveAck"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 In-flight? 和 In-flight? 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'In-flight? 和 In-flight?'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "HandleNack",
+        "HandleAck"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Retransmit non-acked in-flight packets\\n if holddown timer is expired 和 Retransmit non-acked in-flight packets\\n if holddown timer is expired 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Retransmit non-acked in-flight packets\\n if holddown timer is expired 和 Retransmit non-acked in-flight packets\\n if holddown timer is expired'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Retransmit1",
+        "Retransmit2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Send packet and send\\n ready to upper 和 Add packet to queue 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Send packet and send\\n ready to upper 和 Add packet to queue'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SendPacket",
+        "Enque"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Send packets from queue until in-flight is\\n full, sending request for each send 和 Send packets from queue until in-flight is\\n full, sending request for each send 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Send packets from queue until in-flight is\\n full, sending request for each send 和 Send packets from queue until in-flight is\\n full, sending request for each send'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SendQueue1",
+        "SendQueue2"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Remove all packets with seqno before\\nNACK-no from in-flight 和 Remove first packet from in-flight 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Remove all packets with seqno before\\nNACK-no from in-flight 和 Remove first packet from in-flight'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CummulativeAck",
+        "RemoveFirst"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Send up, ACK 和 Store in buffer, send ACK and NACK 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Send up, ACK 和 Store in buffer, send ACK and NACK'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CorrectData",
+        "Store"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Send ack, ignore content 和 Mark in-flight packet as acked。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Send ack, ignore content 和 Mark in-flight packet as acked'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SendAck",
+        "MarkAcked"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 44,
+    "repair_count": 0,
+    "grounding_acts_count": 22,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

@@ -1,0 +1,279 @@
+{
+  "id": "gh_class_01144",
+  "source": "github",
+  "source_url": "https://github.com/a38062an/hft-orderbook-benchmark/blob/f7a8e5e2727109298209aea57e9a3d570b77d417/docs/mapOrderBookStructure.mmd",
+  "github_repo": "a38062an/hft-orderbook-benchmark",
+  "github_file_path": "docs/mapOrderBookStructure.mmd",
+  "diagram_type": "class",
+  "code": "---\ntitle: MapOrderBook Data Structure Design\n---\nclassDiagram\n    %% Core Types and Enums\n    class Side {\n        <<enumeration>>\n        Buy\n        Sell\n    }\n    \n    class OrderType {\n        <<enumeration>>\n        Limit\n        Market\n    }\n    \n    %% Basic Types (type aliases)\n    class Types {\n        <<typedefs>>\n        OrderId: uint64_t\n        Price: uint64_t\n        Quantity: uint64_t\n        Timestamp: uint64_t\n    }\n    \n    %% Order Structure\n    class Order {\n        +OrderId id\n        +Price price\n        +Quantity quantity\n        +Side side\n        +OrderType type\n        +Timestamp timestamp\n    }\n    \n    %% Trade Structure\n    class Trade {\n        +OrderId buyOrderId\n        +OrderId sellOrderId\n        +Price price\n        +Quantity quantity\n        +Timestamp timestamp\n    }\n    \n    %% Order Location for Fast Lookup\n    class OrderLocation {\n        +bool isBuy\n        +Price price\n        +OrderList::iterator iterator\n    }\n    \n    %% STL Container Types\n    class OrderList {\n        <<std::list~Order~>>\n        +push_back(order)\n        +pop_front()\n        +erase(iterator)\n        +front() Order\n        +empty() bool\n    }\n    \n    class BidsMap {\n        <<std::map~Price, OrderList, greater~Price~~~>>\n        +operator[](price) OrderList\n        +begin() iterator\n        +erase(price)\n        +empty() bool\n    }\n    \n    class AsksMap {\n        <<std::map~Price, OrderList, less~Price~~~>>\n        +operator[](price) OrderList\n        +begin() iterator\n        +erase(price)\n        +empty() bool\n    }\n    \n    class OrderLookup {\n        <<std::unordered_map~OrderId, OrderLocation~>>\n        +operator[](orderId) OrderLocation\n        +find(orderId) iterator\n        +erase(orderId)\n    }\n    \n    %% Main Class\n    class MapOrderBook {\n        -BidsMap bids_\n        -AsksMap asks_\n        -OrderLookup orderLookup_\n        +addOrder(order) void\n        +cancelOrder(orderId) void\n        +modifyOrder(orderId, qty) void\n        +match() vector~Trade~\n        +getOrderCount() size_t\n        +getBestBid() Price\n        +getBestAsk() Price\n    }\n    \n    %% Relationships\n    Order --> Side : has\n    Order --> OrderType : has\n    Order --> Types : uses types\n    Trade --> Types : uses types\n    \n    OrderList \"1\" *-- \"*\" Order : contains FIFO\n    \n    BidsMap \"1\" *-- \"*\" OrderList : Price to List\n    AsksMap \"1\" *-- \"*\" OrderList : Price to List\n    \n    OrderLocation --> OrderList : points into\n    OrderLookup \"1\" *-- \"*\" OrderLocation : OrderId to Location\n    \n    MapOrderBook \"1\" *-- \"1\" BidsMap : owns\n    MapOrderBook \"1\" *-- \"1\" AsksMap : owns\n    MapOrderBook \"1\" *-- \"1\" OrderLookup : owns\n    MapOrderBook ..> Trade : creates\n    MapOrderBook ..> Order : processes\n    \n    %% Notes on Design Decisions\n    note for BidsMap \"std::map greater\nHighest bid first\nO(log n) insert/delete\"\n    \n    note for AsksMap \"std::map less\nLowest ask first\nO(log n) insert/delete\"\n    \n    note for OrderList \"std::list doubly-linked\nFIFO at each price\nO(1) push/pop/erase\"\n    \n    note for OrderLookup \"std::unordered_map\nO(1) lookup by OrderId\nEnables fast cancel/modify\"\n    \n    note for Order \"Price-time priority\nEach order tracked by ID\"\n    \n    note for MapOrderBook \"Add: O(log n)\nCancel: O(1) avg\nMatch: O(m)\nBest price: O(1) map.begin()\ngetBestBid/Ask: O(1)\"\n\n    %% Styling\n    classDef container fill:#e1f5ff,stroke:#0288d1,stroke-width:2px\n    classDef struct fill:#fff3e0,stroke:#f57c00,stroke-width:2px\n    classDef enum fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px\n    classDef core fill:#e8f5e9,stroke:#388e3c,stroke-width:3px\n    \n    class OrderList container\n    class BidsMap container\n    class AsksMap container\n    class OrderLookup container\n    class Order struct\n    class Trade struct\n    class OrderLocation struct\n    class Side enum\n    class OrderType enum\n    class MapOrderBook core\n",
+  "content_size": 3885,
+  "collected_at": "2026-02-06T01:53:36.096132",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Side、OrderType就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Side、OrderType的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "Side",
+        "OrderType"
+      ],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下Types、Order吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Types、Order分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "Types",
+        "Order"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由Trade、OrderLocation组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Trade、OrderLocation的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "Trade",
+        "OrderLocation"
+      ],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将OrderList、BidsMap分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，OrderList、BidsMap的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，OrderList、BidsMap的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "OrderList",
+        "BidsMap"
+      ],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有AsksMap、OrderLookup。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是AsksMap、OrderLookup应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "AsksMap、OrderLookup主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "AsksMap",
+        "OrderLookup"
+      ],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将MapOrderBook、-->分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "MapOrderBook",
+        "rel_0"
+      ],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将-->、-->分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，-->、-->是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "rel_1",
+        "rel_2"
+      ],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由-->组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "关于-->，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "首先，我们需要定义流程的起点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "rel_3"
+      ],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将-->分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，-->就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由-->组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达-->结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "rel_4"
+      ],
+      "timestamp_offset": 405
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 27,
+    "speaker_distribution": {
+      "Speaker_B": 14,
+      "Speaker_A": 13
+    },
+    "speech_act_distribution": {
+      "sequential": 3,
+      "confirm": 5,
+      "clarify": 5,
+      "request": 2,
+      "classification": 6,
+      "structural": 4,
+      "inform": 2
+    },
+    "avg_turn_length": 20.88888888888889,
+    "dialogue_duration": 405
+  }
+}

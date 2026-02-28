@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00124",
+  "source": "github",
+  "source_url": "https://github.com/mpro775/tagdod-project/blob/559959d1da7616a664535f2d108100d8e7bbd888/docs/requirements/flows/notifications/notification-system.mmd",
+  "github_repo": "mpro775/tagdod-project",
+  "github_file_path": "docs/requirements/flows/notifications/notification-system.mmd",
+  "diagram_type": "flowchart",
+  "code": "%% Unified Notification System Flow\n%% View at https://mermaid.live\nflowchart TD\n  A[طلب إرسال إشعار] --> B{نوع الطلب?}\n  B -->|إشعار واحد| C[CreateNotificationDto]\n  B -->|إشعارات جماعية| D[BulkSendNotificationDto]\n  B -->|باستخدام قالب| E[SendTemplateNotificationDto]\n\n  %% Single Notification Flow\n  C --> C1[استلام البيانات]\n  C1 --> C2[إنشاء UnifiedNotification]\n  C2 --> C3[تحديد الفئة تلقائياً حسب النوع]\n  C3 --> C4[إنشاء trackingId فريد]\n  C4 --> C5{مجدول؟}\n  C5 -->|نعم| C6[حفظ كـ SCHEDULED]\n  C5 -->|لا| C7[إرسال فوري]\n\n  %% Bulk Notifications Flow\n  D --> D1[استلام مصفوفة الإشعارات]\n  D1 --> D2[معالجة كل إشعار على حدة]\n  D2 --> D3[إنشاء UnifiedNotification لكل واحد]\n\n  %% Template Notifications Flow\n  E --> E1[استلام templateKey وبيانات المتغيرات]\n  E1 --> E2[البحث عن القالب في TEMPLATES]\n  E2 --> E3[استبدال المتغيرات في العنوان والرسالة]\n  E3 --> E4[إنشاء UnifiedNotification]\n\n  %% Sending Process\n  C7 --> F[إرسال الإشعار]\n  D3 --> F\n  E4 --> F\n  C6 --> G[انتظار الموعد المجدول]\n\n  F --> F1{القناة?}\n  F1 -->|IN_APP| F2[حفظ في قاعدة البيانات فقط]\n  F1 -->|PUSH| F3[PushNotificationAdapter]\n  F1 -->|SMS| F4[SmsNotificationAdapter]\n  F1 -->|EMAIL| F5[EmailNotificationAdapter]\n  F1 -->|DASHBOARD| F6[حفظ في لوحة التحكم]\n\n  %% Push Notifications Flow\n  F3 --> F3A{FCM مهيأ?}\n  F3A -->|نعم| F3B[FCMAdapter.sendToDevice]\n  F3A -->|لا| F3C[Mock Implementation]\n  F3B --> F3D[Firebase Cloud Messaging]\n  F3D --> F3E{نجح الإرسال?}\n  F3E -->|نعم| F8\n  F3E -->|لا| F11\n  F3C --> F8\n\n  %% Email Flow\n  F5 --> F5A{SMTP مهيأ?}\n  F5A -->|نعم| F5B[EmailAdapter.sendEmail]\n  F5A -->|لا| F5C[Mock Implementation]\n  F5B --> F5D[SMTP Server]\n  F5D --> F5E{نجح الإرسال?}\n  F5E -->|نعم| F8\n  F5E -->|لا| F11\n  F5C --> F8\n\n  %% SMS Flow\n  F4 --> F4A{Twilio مهيأ?}\n  F4A -->|نعم| F4B[SMSAdapter.sendSMS]\n  F4A -->|لا| F4C[Mock Implementation]\n  F4B --> F4D[Twilio API]\n  F4D --> F4E{نجح الإرسال?}\n  F4E -->|نعم| F8\n  F4E -->|لا| F11\n  F4C --> F8\n\n  F2 --> F7[تحديث الحالة إلى SENT]\n  F6 --> F7\n  F8 --> F10[تحديث الحالة إلى DELIVERED]\n  F11 --> F12[زيادة retryCount]\n  F12 --> F13{retryCount < 5?}\n  F13 -->|نعم| F14[جدولة إعادة المحاولة]\n  F13 -->|لا| F15[إيقاف إعادة المحاولة]\n\n  %% Status Tracking\n  H[المستخدم يتفاعل] --> I{نوع التفاعل?}\n  I -->|قراءة| J[تحديث readAt و status إلى READ]\n  I -->|نقر| K[تحديث clickedAt و status إلى CLICKED]\n  I -->|توصيل| L[تحديث deliveredAt و status إلى DELIVERED]\n\n  %% Scheduled Notifications\n  G --> M[استيقاظ الجدولة]\n  M --> N[فحص الإشعارات المجدولة]\n  N --> O[إرسال الإشعارات المستحقة]\n  O --> F\n  F14 --> F\n\n  %% Error Handling\n  P[خطأ في الإرسال] --> Q[حفظ errorMessage و errorCode]\n  Q --> R[تحديث status إلى FAILED]\n  R --> S[زيادة retryCount]\n\n  %% End points\n  F10 --> Z[نهاية - نجاح]\n  F15 --> Z\n  J --> Z\n  K --> Z\n  L --> Z\n  F14 --> F\n",
+  "content_size": 2788,
+  "collected_at": "2026-02-06T01:42:05.857405",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

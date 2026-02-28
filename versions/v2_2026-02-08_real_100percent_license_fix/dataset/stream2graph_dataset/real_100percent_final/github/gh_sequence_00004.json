@@ -1,0 +1,11 @@
+{
+  "id": "gh_sequence_00004",
+  "source": "github",
+  "source_url": "https://github.com/FrancescoCaracciolo/TIW-24-html/blob/3a4a25717e55f4430d845ea1cfcda63ff9aa8ff0/documents/UML/album.mmd",
+  "github_repo": "FrancescoCaracciolo/TIW-24-html",
+  "github_file_path": "documents/UML/album.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant AlbumPage\n    participant AlbumDAO\n    participant ImageDAO\n    participant CTX\n    participant TemplateEngine\n\n    AlbumPage ->>+ AlbumDAO: new AlbumDAO()\n    AlbumPage ->> AlbumDAO: get(albumId)\n    alt album exists\n        AlbumDAO -->> AlbumPage: Optional<Album>\n        AlbumPage ->>+ ImageDAO: new ImageDAO()\n        AlbumPage ->> ImageDAO: getAlbumImages(album)\n        ImageDAO -->> AlbumPage: images\n        AlbumPage -->> CTX: setVariable(\"images\". imageArray)\n        AlbumPage -->> CTX: setVariable(\"album\". album)\n        AlbumPage -->> CTX: setVariable(\"albumAuthor\". albumAuthor)\n        AlbumPage -->> TemplateEngine: process(ctx, \"album.html\")\n    else album does not exist\n        AlbumDAO -->> AlbumPage: Optional.empty()\n        AlbumPage --> AlbumPage: response.sendError(404)\n    end\n\n\n\n",
+  "content_size": 841,
+  "collected_at": "2026-02-06T01:23:56.334460"
+}

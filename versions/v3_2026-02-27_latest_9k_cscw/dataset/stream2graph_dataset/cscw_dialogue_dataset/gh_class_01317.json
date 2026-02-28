@@ -1,0 +1,489 @@
+{
+  "id": "gh_class_01317",
+  "source": "github",
+  "source_url": "https://github.com/shabaraba/PooCode/blob/4e9402785a40bbbb3e1bde2bd084384e13392ea9/docs/class_diagram.mmd",
+  "github_repo": "shabaraba/PooCode",
+  "github_file_path": "docs/class_diagram.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n    %% インターフェース定義\n    class Node {\n        <<interface>>\n        +TokenLiteral() string\n        +String() string\n    }\n    \n    class Statement {\n        <<interface>>\n        +statementNode()\n    }\n    \n    class Expression {\n        <<interface>>\n        +expressionNode()\n    }\n    \n    class Object {\n        <<interface>>\n        +Type() ObjectType\n        +Inspect() string\n        +GetPooValue() Object\n        +SetPooValue(Object)\n    }\n    \n    class Hashable {\n        <<interface>>\n        +HashKey() HashKey\n    }\n    \n    %% AST関連のクラス\n    class Program {\n        +Statements Statement[]\n        +TokenLiteral() string\n        +String() string\n    }\n    \n    class BlockStatement {\n        +Token token.Token\n        +Statements Statement[]\n        +statementNode()\n        +TokenLiteral() string\n        +String() string\n    }\n    \n    class ExpressionStatement {\n        +Token token.Token\n        +Expression Expression\n        +statementNode()\n        +TokenLiteral() string\n        +String() string\n    }\n    \n    class AssignStatement {\n        +Token token.Token\n        +Left Expression\n        +Value Expression\n        +statementNode()\n        +TokenLiteral() string\n        +String() string\n    }\n    \n    class PipeStatement {\n        +Token token.Token\n        +Left Expression\n        +Right Expression\n        +IsParallel bool\n        +statementNode()\n        +TokenLiteral() string\n        +String() string\n    }\n    \n    class CaseStatement {\n        +Token token.Token\n        +Condition Expression\n        +Consequence BlockStatement\n        +Body BlockStatement\n        +statementNode()\n        +expressionNode()\n        +TokenLiteral() string\n        +String() string\n    }\n    \n    class DefaultCaseStatement {\n        +Token token.Token\n        +Body BlockStatement\n        +statementNode()\n        +expressionNode()\n        +TokenLiteral() string\n        +String() string\n    }\n    \n    class BlockExpression {\n        +Token token.Token\n        +Block BlockStatement\n        +expressionNode()\n        +TokenLiteral() string\n        +String() string\n    }\n    \n    class FunctionLiteral {\n        +Token token.Token\n        +Name Identifier\n        +Parameters Identifier[]\n        +Body BlockStatement\n        +ReturnType string\n        +InputType string\n        +Condition Expression\n        +Cases CaseStatement[]\n        +expressionNode()\n        +TokenLiteral() string\n        +String() string\n    }\n    \n    %% 式関連のクラス\n    class Identifier {\n        +Token token.Token\n        +Value string\n        +expressionNode()\n        +TokenLiteral() string\n        +String() string\n    }\n    \n    class IntegerLiteral {\n        +Token token.Token\n        +Value int64\n        +expressionNode()\n        +TokenLiteral() string\n        +String() string\n    }\n    \n    class StringLiteral {\n        +Token token.Token\n        +Value string\n        +expressionNode()\n        +TokenLiteral() string\n        +String() string\n    }\n    \n    class BooleanLiteral {\n        +Token token.Token\n        +Value bool\n        +expressionNode()\n        +TokenLiteral() string\n        +String() string\n    }\n    \n    class ArrayLiteral {\n        +Token token.Token\n        +Elements Expression[]\n        +expressionNode()\n        +TokenLiteral() string\n        +String() string\n    }\n    \n    class PizzaLiteral {\n        +Token token.Token\n        +expressionNode()\n        +TokenLiteral() string\n        +String() string\n    }\n    \n    class PooLiteral {\n        +Token token.Token\n        +expressionNode()\n        +TokenLiteral() string\n        +String() string\n    }\n    \n    %% 関連性\n    Node <|-- Statement\n    Node <|-- Expression\n    \n    Statement <|.. BlockStatement\n    Statement <|.. ExpressionStatement\n    Statement <|.. AssignStatement\n    Statement <|.. PipeStatement\n    Statement <|.. CaseStatement\n    Statement <|.. DefaultCaseStatement\n    \n    Expression <|.. BlockExpression\n    Expression <|.. FunctionLiteral\n    Expression <|.. Identifier\n    Expression <|.. IntegerLiteral\n    Expression <|.. StringLiteral\n    Expression <|.. BooleanLiteral\n    Expression <|.. ArrayLiteral\n    Expression <|.. PizzaLiteral\n    Expression <|.. PooLiteral\n    \n    Program o-- Statement\n    \n    BlockExpression o-- BlockStatement\n    FunctionLiteral o-- BlockStatement\n    FunctionLiteral o-- CaseStatement\n    CaseStatement o-- BlockStatement\n    DefaultCaseStatement o-- BlockStatement\n    \n    Hashable <|.. IntegerLiteral\n    Hashable <|.. StringLiteral\n    Hashable <|.. BooleanLiteral\n    \n    class Parser {\n        -lexer Lexer\n        -curToken token.Token\n        -peekToken token.Token\n        -errors string[]\n        +ParseProgram() Program\n    }\n    \n    class Evaluator {\n        +Eval(node, env) Object\n    }\n    \n    class Environment {\n        +store map\n        +outer Environment\n        +Get(name) (Object, bool)\n        +Set(name, val) Object\n    }\n",
+  "content_size": 4910,
+  "collected_at": "2026-02-06T01:56:08.664206",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 <<interface>>\n        +TokenLiteral( 和 <<interface>>\n        +statementNode( 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '<<interface>>\n        +TokenLiteral( 和 <<interface>>\n        +statementNode('。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Node",
+        "Statement"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 <<interface>>\n        +expressionNode( 和 <<interface>>\n        +Type( 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '<<interface>>\n        +expressionNode( 和 <<interface>>\n        +Type('，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Expression",
+        "Object"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Object 和 <<interface>>\n        +HashKey( 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Object 和 <<interface>>\n        +HashKey('，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SetPooValue",
+        "Hashable"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 +Statements Statement[ 和 +Token token.Token\n        +Statements Statement[。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '+Statements Statement[ 和 +Token token.Token\n        +Statements Statement['。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Program",
+        "BlockStatement"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 +Token token.Token\n        +Expression Expression\n        +statementNode( 和 +Token token.Token\n        +Left Expression\n        +Value Expression\n        +statementNode( 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '+Token token.Token\n        +Expression Expression\n        +statementNode( 和 +Token token.Token\n        +Left Expression\n        +Value Expression\n        +statementNode('，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ExpressionStatement",
+        "AssignStatement"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 +Token token.Token\n        +Left Expression\n        +Right Expression\n        +IsParallel bool\n        +statementNode( 和 +Token token.Token\n        +Condition Expression\n        +Consequence BlockStatement\n        +Body BlockStatement\n        +statementNode(。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '+Token token.Token\n        +Left Expression\n        +Right Expression\n        +IsParallel bool\n        +statementNode( 和 +Token token.Token\n        +Condition Expression\n        +Consequence BlockStatement\n        +Body BlockStatement\n        +statementNode('。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PipeStatement",
+        "CaseStatement"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 +Token token.Token\n        +Body BlockStatement\n        +statementNode( 和 +Token token.Token\n        +Block BlockStatement\n        +expressionNode( 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '+Token token.Token\n        +Body BlockStatement\n        +statementNode( 和 +Token token.Token\n        +Block BlockStatement\n        +expressionNode('，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DefaultCaseStatement",
+        "BlockExpression"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 +Token token.Token\n        +Name Identifier\n        +Parameters Identifier[ 和 +Token token.Token\n        +Value string\n        +expressionNode( 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '+Token token.Token\n        +Name Identifier\n        +Parameters Identifier[ 和 +Token token.Token\n        +Value string\n        +expressionNode('，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "FunctionLiteral",
+        "Identifier"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 +Token token.Token\n        +Value int64\n        +expressionNode( 和 +Token token.Token\n        +Value string\n        +expressionNode( 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '+Token token.Token\n        +Value int64\n        +expressionNode( 和 +Token token.Token\n        +Value string\n        +expressionNode('？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "IntegerLiteral",
+        "StringLiteral"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 +Token token.Token\n        +Value bool\n        +expressionNode( 和 +Token token.Token\n        +Elements Expression[。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 +Token token.Token\n        +Value bool\n        +expressionNode(处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '+Token token.Token\n        +Value bool\n        +expressionNode(处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BooleanLiteral",
+        "ArrayLiteral"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 +Token token.Token\n        +expressionNode( 和 +Token token.Token\n        +expressionNode( 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '+Token token.Token\n        +expressionNode( 和 +Token token.Token\n        +expressionNode('，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PizzaLiteral",
+        "PooLiteral"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 -lexer Lexer\n        -curToken token.Token\n        -peekToken token.Token\n        -errors string[ 和 +Eval(node, env 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '-lexer Lexer\n        -curToken token.Token\n        -peekToken token.Token\n        -errors string[ 和 +Eval(node, env'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Parser",
+        "Evaluator"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 +store map\n        +outer Environment\n        +Get(name 和 name, val 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '+store map\n        +outer Environment\n        +Get(name 和 name, val'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Environment",
+        "Set"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 53,
+    "repair_count": 1,
+    "grounding_acts_count": 26,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

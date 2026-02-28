@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00600",
+  "source": "github",
+  "source_url": "https://github.com/naykel76/nbw_siteX/blob/75575d004308ab84fac2fa1f26a97ed13e31828b/resources/views/diagrams/route-builder-sequence-diagram.mmd",
+  "github_repo": "naykel76/nbw_siteX",
+  "github_file_path": "resources/views/diagrams/route-builder-sequence-diagram.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant User as web.php\n    participant RB as RouteBuilder\n    participant FS as File System\n    participant DTO as RouteDTO\n    participant Route as Laravel Route\n\n    User->>RB: new RouteBuilder(filename, layout?)\n    RB->>FS: getMenusFromJson(filename)\n    FS-->>RB: JSON menu object\n    RB->>RB: Store menus & data['filename']\n    \n    User->>RB: create()\n    \n    loop For each menu in menus\n        RB->>RB: getMenuKeys(menus)\n        RB->>RB: data['menus'] = menu keys\n        RB->>RB: processLinks(menu.links)\n        \n        loop For each routeItem in links\n            RB->>DTO: new RouteDTO(routeItem)\n            DTO-->>RB: item\n            \n            alt excludeRoute is false\n                RB->>RB: make(item)\n                RB->>RB: Extract url, routeName, viewPath\n                RB->>RB: Set data['type']\n                \n                alt type is 'md'\n                    RB->>RB: data['path'] = viewPath\n                    RB->>RB: viewPath = 'components.layouts.markdown'\n                end\n                \n                alt layout is set\n                    RB->>RB: data['path'] = viewPath\n                    RB->>RB: viewPath = layout\n                end\n                \n                RB->>RB: createRoute(url, viewPath, routeName)\n                RB->>Route: Route::get(url, closure)->name(routeName)\n                Route-->>RB: Route created\n            end\n            \n            alt isParent && !exclude_child_routes\n                RB->>RB: processLinks(routeItem.children)\n                Note over RB: Recursive call for nested routes\n            end\n        end\n    end\n    \n    RB-->>User: Routes created",
+  "content_size": 1681,
+  "collected_at": "2026-02-06T01:34:31.784441",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

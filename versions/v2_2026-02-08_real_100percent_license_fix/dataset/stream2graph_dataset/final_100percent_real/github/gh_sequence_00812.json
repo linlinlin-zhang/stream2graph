@@ -1,0 +1,31 @@
+{
+  "id": "gh_sequence_00812",
+  "source": "github",
+  "source_url": "https://github.com/coherosphere/architecture/blob/598bb65467787da38ac4029e35bdead27e7799ee/assets/.mermaid_clean/C4_sequences/C4-04_Member_Onboarding_Identity_Verification_Reputation_Creation.mmd",
+  "github_repo": "coherosphere/architecture",
+  "github_file_path": "assets/.mermaid_clean/C4_sequences/C4-04_Member_Onboarding_Identity_Verification_Reputation_Creation.mmd",
+  "diagram_type": "sequence",
+  "code": "%%{init: {'theme':'base','themeVariables':{ 'sequenceNumberColor':'#334155'}}}%%\n\nsequenceDiagram\nautonumber\n\nactor M as C1-02 Member / Contributor\n\nbox #8b5cf6 UI (🟪)\n  participant UI as C2-12 Resonance Board / UI\nend\n\nbox #fde68a Control / API (🟨)\n  participant API as C2-11 Public API Gateway\nend\n\nbox #ff8b00 Core Services (🟧)\n  participant ID as C2-05 Identity (PoCI)\n  participant ETH as C2-08 Manifesto & Ethics Guard\n  participant GOV as C2-03 Governance & DAO\n  participant MET as C2-07 Metrics / Analytics\nend\n\n%% -------- Onboarding start --------\nM ->> UI: Start onboarding (profile, consent)\nUI ->> API: registerMember(profile, consent)\n\n%% -------- DID creation & credentials --------\nAPI ->> ID: createDID(memberProfile)\nID -->> API: didCreated(DID)\nAPI ->> ID: issueCredentials(DID, baseVCs)\nID -->> UI: deliverWalletCreds(VC pack)\nID -->> MET: event ReputationUpdated (baseline)\n\n%% -------- Ethics preflight --------\nAPI ->> ETH: preflightAlignment(profile, intents)\nETH -->> API: AlignmentChecked / Guidance\n\n%% -------- Identity verification (path based) --------\nalt Evidence required (eKYC / attestations)\n  API ->> ID: verifyEvidence(DID, refs)\n  ID -->> API: IdentityVerified (strong)\nelse Minimal verification\n  ID -->> API: IdentityVerified (light)\nend\n\n%% -------- Governance registration (optional) --------\nAPI ->> GOV: registerMemberForVoting(DID)\nGOV -->> MET: event ProposalEligibilityUpdated\n\n%% -------- Completion --------\nAPI -->> UI: onboardingStatus=Completed\nUI -->> M: Show welcome & reputation baseline\n\nnote over UI,MET: Outcome → DID created, credentials issued, identity verified, ethics preflight passed, metrics updated (baseline reputation).",
+  "content_size": 1688,
+  "collected_at": "2026-02-06T01:37:23.939515",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License (Assumed)",
+  "license_url": null,
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "repo_owner": "coherosphere",
+  "repo_name": "architecture",
+  "repo_description": "The cohersphere architecture — structural blueprint of the resonance network. Defines the modular layers connecting app, API, and governance protocols. Outlines data flows for Proof-of-Contribution, c",
+  "repo_language": "Mermaid",
+  "repo_topics": [
+    "architecture",
+    "c4",
+    "distributed-systems",
+    "modular-architecture",
+    "system-design"
+  ],
+  "repo_created_at": "2025-10-29T09:30:02Z",
+  "repo_updated_at": "2026-02-06T04:58:50Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

@@ -1,0 +1,84 @@
+{
+  "id": "aug_ot_stateDi_Inf_14",
+  "seed": "ot_stateDiagram_00110",
+  "domain": "Infra",
+  "code": "stateDiagram-v2\n    [Infra_Ingress] --> CLOSED\n\n    state CLOSED {Infra_Ingress] --> Normal\n        Normal --> IncrementFailures: execute_trade fails\n        IncrementFailures --> CheckThreshold: failure_count++\n        CheckThreshold --> Normal: count < 3\n        CheckThreshold --> [Infra_Worker]: count >= 3\n\n        Normal --> ResetCount: execute_trade succeeds\n        ResetCount --> Normal: failure_count = 0\n    }\n\n    CLOSED --> OPEN: Threshold Reached 3 failures\n\n    state OPEN {Infra_Worker] --> BlockCalls\n        BlockCalls --> CheckTimeout: All calls raise CircuitBreakerError\n        CheckTimeout --> BlockCalls: elapsed < 60s\n        CheckTimeout --> [Infra_Cache]: elapsed >= 60s\n    }\n\n    OPEN --> HALF_OPEN: Recovery Timeout Expired\n\n    state HALF_OPEN {Infra_Ingress] --> TestRecovery\n        TestRecovery --> EvaluateResult: Allow ONE test call\n        EvaluateResult --> [Infra_Ingress]: Success\n        EvaluateResult --> ReOpen: Failure\n\n        ReOpen --> [Infra_Cache]\n    }\n\n    HALF_OPEN --> CLOSED: Test Call Succeeds\n    HALF_OPEN --> OPEN: Test Call Fails\n\n    style CLOSED fill:#4CAF50,stroke:#2E7D32,color:#fff\n    style OPEN fill:#F44336,stroke:#C62828,color:#fff\n    style HALF_OPEN fill:#FFC107,stroke:#F57C00,color:#333",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Infra_Ingress 和 Infra_Ingress 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Infra_Ingress 和 Infra_Ingress'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2",
+        "CLOSED"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Infra_Worker 和 Infra_Ingress 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Infra_Worker 和 Infra_Ingress'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OPEN",
+        "HALF_OPEN"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 8,
+    "repair_count": 0,
+    "grounding_acts_count": 4,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

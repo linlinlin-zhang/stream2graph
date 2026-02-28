@@ -1,0 +1,59 @@
+{
+  "id": "aug_gl_block-beta_00289_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/zone17/sovren/blob/d3da3358e52da6ae6b2365e89401eca50f337a0c/docs/architecture/diagrams/patterns/circuit-breaker-pattern.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "zone17/sovren",
+  "diagram_type": "block-beta",
+  "code": "%% Circuit Breaker Pattern - Fault Tolerance\n%% Version: 1.0.0\n%% Date: 2025-10-27\n%% Description: Circuit breaker pattern for webhook delivery and external service calls\n\nstateDiagram-v2\n    [Infra_LoadBalancer] --> Closed: Initial State\n\n    Closed --> Open: Failure Threshold Exceeded<br/>(Infra_RedisCache)\n    Closed --> Closed: Successful Request<br/>(Infra_IngressController)\n    Closed --> Closed: Failed Request<br/>(Infra_IngressController)\n\n    Open --> HalfOpen: Timeout Elapsed<br/>(Infra_LoadBalancer)\n    Open --> Open: Request Attempted<br/>(Infra_EtcdCluster)\n\n    HalfOpen --> Closed: Test Request Successful<br/>(Infra_EtcdCluster)\n    HalfOpen --> Open: Test Request Failed<br/>(Infra_WorkerNode)\n    HalfOpen --> HalfOpen: Waiting for Test<br/>(Infra_RedisCache)\n\n    note right of Closed\n        CLOSED STATE\n        - All requests flow through\n        - Monitor failure rate\n        - Track response times\n        - Increment error counter\n    end note\n\n    note right of Open\n        OPEN STATE\n        - Block all requests\n        - Return cached response\n        - Or return error immediately\n        - Wait for timeout period\n        - Log all blocked attempts\n    end note\n\n    note right of HalfOpen\n        HALF-OPEN STATE\n        - Allow test requests\n        - Limited throughput\n        - Monitor success rate\n        - Quick transition decision\n    end note\n",
+  "content_size": 1387,
+  "collected_at": "2026-02-06T14:06:18.048847",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "gl_block-beta_00289",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达Generic Diagram结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "root"
+      ],
+      "timestamp_offset": 45
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 3,
+    "speaker_distribution": {
+      "Speaker_B": 2,
+      "Speaker_A": 1
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "inform": 1
+    },
+    "avg_turn_length": 18.333333333333332,
+    "dialogue_duration": 45
+  }
+}

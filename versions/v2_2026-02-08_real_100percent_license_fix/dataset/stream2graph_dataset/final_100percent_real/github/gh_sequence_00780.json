@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00780",
+  "source": "github",
+  "source_url": "https://github.com/nathanvale/capture-bridge/blob/302d805dbf628cd84323ab45a120db3adf8a4a30/packages/capture/src/gmail/email-poller.mmd",
+  "github_repo": "nathanvale/capture-bridge",
+  "github_file_path": "packages/capture/src/gmail/email-poller.mmd",
+  "diagram_type": "sequence",
+  "code": "---\nid: d9f9aad1-5d14-4733-b6f7-3ddf92d5f6e3\n---\nsequenceDiagram\n  autonumber\n  actor App\n  participant Poller as EmailPoller\n  participant CB as CircuitBreaker\n  participant Backoff\n  participant Repo as SyncStateRepository\n  participant Gmail as Gmail API\n  participant Stager as stageCapture()\n\n  App->>Poller: pollOnce()\n  Poller->>CB: execute(pollWithRetry)\n  alt Circuit CLOSED or HALF_OPEN\n    loop attempts (until success or max)\n      Poller->>Repo: get(\"gmail_history_id\")\n      alt No cursor\n        Poller->>Gmail: users.history.list(bootstrap)\n        Gmail-->>Poller: historyId₀\n        Poller->>Repo: set(\"gmail_history_id\", historyId₀)\n        Note right of Poller: bootstrapped=true\n      else Has cursor\n        Poller->>Gmail: history.list(startHistoryId, [pageToken])\n        Gmail-->>Poller: {history, nextPageToken, historyIdᵢ}\n        Poller->>Stager: stageCapture(messageIds from history)\n        Stager-->>Poller: ok\n        Poller->>Repo: set(\"gmail_history_id\", historyIdᵢ)\n        opt next page\n          Poller->>Poller: maybeRateLimitDelay()\n          Poller->>Gmail: history.list(..., nextPageToken)\n        end\n      end\n      CB-->>Poller: onSuccess()\n      Poller-->>App: EmailPollResult\n    end\n  else Circuit OPEN\n    Note over CB,Poller: Reject until resetTimeout elapses\n  end\n  opt Retries on 429/5xx\n    Poller->>Backoff: calculateDelay(attempt)\n    Backoff-->>Poller: delay ms\n    Poller->>Poller: sleep(delay)\n    CB-->>Poller: onFailure(err)\n  end",
+  "content_size": 1490,
+  "collected_at": "2026-02-06T01:36:58.683286",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

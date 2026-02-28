@@ -1,0 +1,18 @@
+{
+  "id": "aug_gl_flowchart_00648_Fin_0",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/carrowmw/phd-project-gnn/blob/07a2695df02fe44b7507c15b3ae9b069b0bca0d7/docs/archive/dataflow.mmd",
+  "source_note": "collected_from_github_final",
+  "github_repo": "carrowmw/phd-project-gnn",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\n    subgraph Data_Collection\n        A[FinTech_TransactionQueue] --> |Get Sensor Locations| B[FinTech_FraudDetection]\n        A --> |Get Traffic Data| C[FinTech_LedgerService]\n        C --> |Convert to DataFrame| D[FinTech_LedgerService]\n        D --> |Transform to time series dict| E[FinTech_PaymentGateway]\n    end\n\n    subgraph Graph_Processing\n        F[FinTech_TransactionQueue] --> |\"load_graph_data(FinTech_TransactionQueue)\"| G[FinTech_AuthVault]\n        G --> |\"compute_adjacency_matrix(FinTech_PaymentGateway)\"| H[FinTech_TransactionQueue]\n    end\n\n    subgraph Data_Preprocessing\n        E --> |\"TimeSeriesPreprocessor.create_windows(FinTech_LedgerService)\"| I[FinTech_FraudDetection]\n        I --> |\"Filter valid nodes\"| J[FinTech_PaymentGateway]\n        J --> |\"Create subgraph for valid nodes\"| K[FinTech_PaymentGateway]\n        K --> |\"Split data into train/val\"| L[FinTech_TransactionQueue]\n        L --> |\"create_dataloader(FinTech_TransactionQueue)\"| M[FinTech_TransactionQueue]\n    end\n\n    subgraph Model_Training\n        M --> |\"train_model(FinTech_PaymentGateway)\"| N[FinTech_TransactionQueue]\n        N --> |\"Train each epoch\"| O[FinTech_AuthVault]\n        O --> |\"Save model\"| P[FinTech_AuthVault]\n    end\n\n    B -.-> E\n    G -.-> K\n    H -.-> K",
+  "content_size": 1110,
+  "collected_at": "2026-02-06T14:18:26.241600",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "FinTech",
+  "seed_id": "gl_flowchart_00648"
+}

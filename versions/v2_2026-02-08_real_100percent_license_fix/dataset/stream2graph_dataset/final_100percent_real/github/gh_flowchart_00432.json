@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00432",
+  "source": "github",
+  "source_url": "https://github.com/KatanaQuant/rag-kb/blob/62bef08509649f80fc0c0902e3200227a65245fc/docs/diagrams/flow-diagram.mmd",
+  "github_repo": "KatanaQuant/rag-kb",
+  "github_file_path": "docs/diagrams/flow-diagram.mmd",
+  "diagram_type": "flowchart",
+  "code": "%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#e8f5e9', 'secondaryColor': '#fff3e0', 'tertiaryColor': '#e3f2fd'}}}%%\nflowchart TB\n    subgraph Ingestion[\"INGESTION PIPELINE\"]\n        direction TB\n        Doc[/\"Document<br/>.pdf, .md, .py, .epub\"/]\n\n        subgraph Extract[\"1. EXTRACTION\"]\n            Router{Extension<br/>Router}\n            DocE[DoclingExtractor<br/>.pdf, .docx]\n            CodeE[CodeExtractor<br/>.py, .java, .ts]\n            MdE[MarkdownExtractor<br/>.md]\n            EpubE[EpubExtractor<br/>.epub]\n            JupyE[JupyterExtractor<br/>.ipynb]\n        end\n\n        Raw[/\"Raw Text +<br/>Metadata\"/]\n\n        subgraph Chunk[\"2. CHUNKING\"]\n            ChunkS{Strategy}\n            Hybrid[HybridChunker<br/>semantic + structural]\n            Semantic[SemanticChunker<br/>sentence-aware]\n            Fixed[FixedChunker<br/>token-based]\n        end\n\n        Chunks[/\"Text Chunks<br/>~512 tokens each\"/]\n\n        subgraph Embed[\"3. EMBEDDING\"]\n            STEmbed[SentenceTransformer<br/>Embedder]\n        end\n\n        Vectors[/\"Vectors<br/>1024 dimensions\"/]\n\n        Store[(PostgreSQL<br/>+ pgvector)]\n    end\n\n    subgraph Query[\"QUERY PIPELINE\"]\n        direction TB\n        Q[/\"User Query\"/]\n        QEmbed[Embed Query]\n        Search[Vector Search<br/>top_n candidates]\n\n        subgraph Rerank[\"4. RERANKING\"]\n            RankS{Enabled?}\n            BGE[BGEReranker<br/>cross-encoder]\n            Noop[NoopReranker<br/>pass-through]\n        end\n\n        Results[/\"Top-k Results\"/]\n    end\n\n    %% Ingestion Flow\n    Doc --> Router\n    Router -->|.pdf, .docx| DocE\n    Router -->|.py, .java, .ts| CodeE\n    Router -->|.md| MdE\n    Router -->|.epub| EpubE\n    Router -->|.ipynb| JupyE\n\n    DocE --> Raw\n    CodeE --> Raw\n    MdE --> Raw\n    EpubE --> Raw\n    JupyE --> Raw\n\n    Raw --> ChunkS\n    ChunkS -->|hybrid| Hybrid\n    ChunkS -->|semantic| Semantic\n    ChunkS -->|fixed| Fixed\n\n    Hybrid --> Chunks\n    Semantic --> Chunks\n    Fixed --> Chunks\n\n    Chunks --> STEmbed\n    STEmbed --> Vectors\n    Vectors --> Store\n\n    %% Query Flow\n    Q --> QEmbed\n    QEmbed --> Search\n    Store -.->|similarity search| Search\n    Search --> RankS\n    RankS -->|true| BGE\n    RankS -->|false| Noop\n    BGE --> Results\n    Noop --> Results\n\n    %% Styling\n    classDef interface fill:#e1f5fe,stroke:#0288d1,stroke-width:2px\n    classDef impl fill:#fff3e0,stroke:#ff9800,stroke-width:1px\n    classDef data fill:#f3e5f5,stroke:#9c27b0,stroke-width:1px\n    classDef store fill:#e8f5e9,stroke:#4caf50,stroke-width:2px\n\n    class Router,ChunkS,RankS interface\n    class DocE,CodeE,MdE,EpubE,JupyE,Hybrid,Semantic,Fixed,STEmbed,BGE,Noop impl\n    class Doc,Raw,Chunks,Vectors,Q,Results data\n    class Store store\n",
+  "content_size": 2741,
+  "collected_at": "2026-02-06T01:44:03.166877",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License (Assumed)",
+  "license_url": null,
+  "repo_stars": 6,
+  "repo_forks": 1,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

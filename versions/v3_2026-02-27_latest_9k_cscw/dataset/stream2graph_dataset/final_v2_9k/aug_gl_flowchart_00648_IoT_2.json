@@ -1,0 +1,18 @@
+{
+  "id": "aug_gl_flowchart_00648_IoT_2",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/carrowmw/phd-project-gnn/blob/07a2695df02fe44b7507c15b3ae9b069b0bca0d7/docs/archive/dataflow.mmd",
+  "source_note": "collected_from_github_final",
+  "github_repo": "carrowmw/phd-project-gnn",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\n    subgraph Data_Collection\n        A[IoT_Industrial_MQTT_Broker] --> |Get Sensor Locations| B[IoT_Industrial_TelemetryStream]\n        A --> |Get Traffic Data| C[IoT_Industrial_MQTT_Broker]\n        C --> |Convert to DataFrame| D[IoT_Industrial_MQTT_Broker]\n        D --> |Transform to time series dict| E[IoT_Industrial_ActuatorController]\n    end\n\n    subgraph Graph_Processing\n        F[IoT_Industrial_MQTT_Broker] --> |\"load_graph_data(IoT_Industrial_PLC_Logic)\"| G[IoT_Industrial_EdgeNode]\n        G --> |\"compute_adjacency_matrix(IoT_Industrial_MQTT_Broker)\"| H[IoT_Industrial_MQTT_Broker]\n    end\n\n    subgraph Data_Preprocessing\n        E --> |\"TimeSeriesPreprocessor.create_windows(IoT_Industrial_PLC_Logic)\"| I[IoT_Industrial_MQTT_Broker]\n        I --> |\"Filter valid nodes\"| J[IoT_Industrial_TelemetryStream]\n        J --> |\"Create subgraph for valid nodes\"| K[IoT_Industrial_ActuatorController]\n        K --> |\"Split data into train/val\"| L[IoT_Industrial_MQTT_Broker]\n        L --> |\"create_dataloader(IoT_Industrial_PLC_Logic)\"| M[IoT_Industrial_PLC_Logic]\n    end\n\n    subgraph Model_Training\n        M --> |\"train_model(IoT_Industrial_ActuatorController)\"| N[IoT_Industrial_PLC_Logic]\n        N --> |\"Train each epoch\"| O[IoT_Industrial_PLC_Logic]\n        O --> |\"Save model\"| P[IoT_Industrial_ActuatorController]\n    end\n\n    B -.-> E\n    G -.-> K\n    H -.-> K",
+  "content_size": 1110,
+  "collected_at": "2026-02-06T14:18:26.241600",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "IoT_Industrial",
+  "seed_id": "gl_flowchart_00648"
+}

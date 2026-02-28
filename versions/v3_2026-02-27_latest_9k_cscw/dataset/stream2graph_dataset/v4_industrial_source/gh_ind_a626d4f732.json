@@ -1,0 +1,9 @@
+{
+  "id": "gh_ind_a626d4f732",
+  "source": "github_industrial",
+  "repo": "aws-samples/sample-volumeScaler",
+  "license": "mit",
+  "code": "flowchart TD\n    A[Start VolumeScaler Operator]\n    B[Initialize Kubernetes Clients & Recorder]\n    C[Load Kubernetes Configuration - inClusterOrKubeconfig]\n    D[Enter mainLoop]\n    \n    E[Discover Local PVC Mounts - getPVCUIDsFromLocalMounts]\n    F[List All Cluster PVCs]\n    G[List VolumeScaler CRs]\n    \n    H[For Each PVC with an Associated VolumeScaler]\n    I[Parse VolumeScaler Spec Fields - Threshold, Scale, MaxSize]\n    J[Convert PVC and CR Sizes to GiB]\n    K[Measure Disk Usage via df - measureUsage]\n    \n    L{Has PVC reached Max Size?}\n    M{Is a Resize Operation In Progress?}\n    N{Resize Completed?}\n    O{Usage exceeds Threshold?}\n    \n    P[Calculate New Size using Current Size and Scale Percentage]\n    Q[Cap New Size at Maximum Allowed Size if Needed]\n    R[Patch PVC Spec to Request New Size]\n    S[Update VolumeScaler Status with resizeInProgress, scaledAt, lastRequestedSize, and reachedMaxSize]\n    \n    T[Emit Events for Each Significant Action or Error]\n    U[Sleep for 60 Seconds]\n    V[Repeat mainLoop]\n    \n    %% Flow connections\n    A --> B\n    B --> C\n    C --> D\n    D --> E\n    E --> F\n    F --> G\n    G --> H\n    H --> I\n    I --> J\n    J --> K\n    K --> L\n    \n    L -- Yes --> T\n    L -- No --> M\n    M -- Yes --> N\n    N -- Completed --> S\n    N -- Still in progress --> T\n    M -- No --> O\n    O -- Usage High --> P\n    P --> Q\n    Q --> R\n    R --> T\n    O -- Usage low --> T\n    \n    T --> U\n    U --> V\n    V --> D",
+  "diagram_type": "size:1000..1500",
+  "collected_at": "2026-02-27T03:26:22.602186"
+}

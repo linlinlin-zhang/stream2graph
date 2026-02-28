@@ -1,0 +1,16 @@
+{
+  "id": "gl_flowchart_00760",
+  "source": "gitlab",
+  "source_url": "https://github.com/taekyung00/CodePistols_DragonicTactics/blob/9657c421be4fb0eb678e64bea439a1726ae4ed79/project/architecture/character_flowchart/rouge.mmd",
+  "source_note": "collected_from_github_final",
+  "github_repo": "taekyung00/CodePistols_DragonicTactics",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\n    %% --- 1. 목표 설정 단계 ---\n    SettingTarget(\"목표 설정\")\n    SettingTarget           --> AreWeInDanger(\"도망쳐야하는 상황인가?\")\n\n    AreWeInDanger -- \"Yes\"   --> TargetExit(\"목표 = 출구\")\n    AreWeInDanger -- \"No\"    --> ShouldIUseSmokescreen(\"연막탄 사용 조건 충족?<br>(부상당한 아군 2명 이상 밀집)\")\n\n    ShouldIUseSmokescreen -- \"Yes\" --> TargetSmokescreen(\"목표 = 연막탄 투척 위치\")\n    ShouldIUseSmokescreen -- \"No\"  --> IsStealthed(\"현재 은신 상태인가?\")\n\n    IsStealthed -- \"Yes\"     --> TargetFlank(\"목표 = 드래곤의 측면/후방\")\n    IsStealthed -- \"No\"      --> DoIHaveSpellSlot(\"주문 슬롯(은신)이 있는가?\")\n\n    DoIHaveSpellSlot -- \"No\" --> TargetFlank(\"목표 = 드래곤의 측면/후방\")\n    DoIHaveSpellSlot -- \"Yes\"--> UseStealth(\"은신 사용\")\n\n    UseStealth              --> DecreaseSpellSlot(\"주문 슬롯 1 소모\")\n    DecreaseSpellSlot       --> DecreaseActionPointsForStealth(\"행동력 1 소모\")\n    DecreaseActionPointsForStealth --> TargetFlank(\"목표 = 드래곤의 측면/후방\")\n    \n    TargetExit              --> MoveStart(\"행동 시작\")\n    TargetFlank             --> MoveStart(\"행동 시작\")\n    TargetSmokescreen       --> MoveStart(\"행동 시작\")\n\n    %% --- 2. 이동 및 행동 결정 ---\n    MoveStart               --> CanIMove(\"이동력이 1 이상인가?\")\n    \n    CanIMove      -- \"Yes\"   --> MoveToTarget(\"목표로 1칸 이동\")\n    CanIMove      -- \"No\"    --> PostMoveAction(\"이동 후 행동 결정\")\n\n    MoveToTarget            --> DecreaseMovePoint(\"이동력 1 소모\")\n    DecreaseMovePoint       --> CanIMove\n\n    %% --- 3. 최종 행동 실행 단계 ---\n    PostMoveAction          --> CanIAct(\"행동력이 1 이상인가?\")\n    CanIAct       -- \"No\"    --> TurnEnd(\"턴 종료\")\n    CanIAct       -- \"Yes\"   --> WhatIsMyGoal{현재 목표는?}\n\n    WhatIsMyGoal -- \"목표==연막탄\" --> UseSmokescreen(\"연막탄 사용\")\n    WhatIsMyGoal -- \"그 외 목표\" --> IsDragonInRange(\"드래곤이 공격 범위 안에 있나?\")\n\n    UseSmokescreen          --> DecreaseSpellSlotForSmoke(\"주문 슬롯 1 소모\")\n    DecreaseSpellSlotForSmoke --> DecreaseActionPointsForSmoke(\"행동력 1 소모\")\n    DecreaseActionPointsForSmoke --> TurnEnd(\"턴 종료\")\n\n    IsDragonInRange -- \"No\"  --> TurnEnd(\"턴 종료\")\n    IsDragonInRange -- \"Yes\" --> IsAtFlank(\"현재 위치가<br>드래곤의 측/후방인가?\")\n\n    IsAtFlank -- \"Yes\"       --> SneakAttack(\"기습 공격\")\n    IsAtFlank -- \"No\"        --> Attack(\"일반 공격\")\n\n    SneakAttack             --> WasIStealthed(\"공격 시 은신 상태였는가?\")\n    WasIStealthed -- \"Yes\"   --> BreakStealth(\"은신 해제\")\n    WasIStealthed -- \"No\"    --> DecreaseActionPoints(\"행동력 1 소모\")\n    \n    BreakStealth            --> DecreaseActionPoints(\"행동력 1 소모\")\n    Attack                  --> DecreaseActionPoints(\"행동력 1 소모\")\n\n    DecreaseActionPoints    --> PostMoveAction(\"추가 행동 결정\")",
+  "content_size": 2483,
+  "collected_at": "2026-02-06T14:19:56.348870",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

@@ -1,0 +1,636 @@
+{
+  "id": "gh_architecture_01852",
+  "source": "github",
+  "source_url": "https://github.com/atoxfy/kikwiflow/blob/50f543c2bc2f5bbf3a389f97aba094843e707314/docs/cqrs-spring-boot-app.mmd",
+  "github_repo": "atoxfy/kikwiflow",
+  "github_file_path": "docs/cqrs-spring-boot-app.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TD\n    subgraph \"Aplicação Final do Utilizador\"\n        App[\"Your Spring Boot App<br>(Contém o seu código de negócio)\"]\n    end\n\n    subgraph \"Ecossistema kikwi-flow (Módulos)\"\n        Starter[kikwi-spring-boot-starter]\n        Autoconfigure[kikwi-spring-boot-autoconfigure]\n        QuerySpringBootAutoconfigure[\"kikwi-query-spring-boot-autoconfigure<br><i>(Contém a implementação e a auto-configuração da API de Consulta)</i>\"]\n\n        subgraph \"Camada de Consulta (API)\"\n            QueryApi[\"kikwi-query-api<br><i>(Contrato de alto nível para a Aplicação)</i>\"]\n        end\n\n        subgraph \"Engine\"\n            EngineCore[kikwi-core]\n        end\n\n        subgraph \"Camada de Persistência (Implementações)\"\n            PersistenceMongo[kikwi-persistence-mongodb]\n            PersistencePostgres[\"kikwi-persistence-postgres<br>(Futuro)\"]\n        end\n\n        subgraph \"Camada de Persistência (Contrato)\"\n            PersistenceApi[\"kikwi-runtime-persistence-api<br><i>(Contém as interfaces de persistência)</i>\"]\n            CommandRepo[\"CommandRepository (Interface)\"]\n            QueryRepo[\"QueryRepository (Interface)\"]\n            PersistenceApi -- \"Contém\" --> CommandRepo\n            PersistenceApi -- \"Contém\" --> QueryRepo\n        end\n\n        subgraph \"Fundação\"\n            Model[kikwi-model]\n            EventsApi[kikwi-lightweight-events-api]\n        end\n    end\n\n%% Dependências do Maven (o que é \"puxado\")\n    App -- \"1. Adiciona dependência para\" --> Starter\n    App -- \"2. ESCOLHE E adiciona dependências para\" --> PersistenceMongo\n    App -- \"3. (Opcional) Adiciona dependência para\" --> QuerySpringBootAutoconfigure\n\n    Starter -- \"Depende de (agrega)\" --> Autoconfigure\n\n    Autoconfigure -- \"Depende de\" --> EngineCore\n    QuerySpringBootAutoconfigure -- \"Depende de (para implementar)\" --> QueryApi\n    QuerySpringBootAutoconfigure -- \"Depende de (para consultar)\" --> PersistenceApi\n\n%% A linha tracejada indica uma dependência opcional/condicional.\n    Autoconfigure -. \"Configura se presente\" .-> PersistenceMongo\n\n    EngineCore -- \"Depende de\" --> PersistenceApi\n    EngineCore -- \"Depende de\" --> Model\n    EngineCore -- \"Depende de\" --> EventsApi\n\n    PersistenceMongo -- \"Implementa\" --> PersistenceApi\n    PersistenceApi -- \"Depende de\" --> Model\n\n    QueryApi -- \"Depende de\" --> Model\n\n%% Fluxo de Configuração do Spring (o que é \"embarcado\")\n    subgraph \"Contexto da Aplicação Spring (Runtime)\"\n        SpringBoot[\"Spring Boot<br>Application Context\"]\n\n        EngineBean[\"KikwiFlowEngine (Bean)\"]\n        QueryBean[\"ExternalTaskQueryService (Bean)<br><i>from query-spring-boot-autoconfigure</i>\"]\n        RepoBean[\"KikwiEngineRepository (Bean)<br><i>from persistence impl</i>\"]\n        AppServiceBean[\"HumanTaskApplicationService (Bean)<br><i>from Your App</i>\"]\n    end\n\n    Autoconfigure -- \"Fornece 'receitas' para a Engine\" --> SpringBoot\n    QuerySpringBootAutoconfigure -- \"Fornece 'receitas' de consulta (se presente)\" --> SpringBoot\n\n    SpringBoot -- \"Cria e injeta\" --> EngineBean\n    SpringBoot -- \"Cria e injeta\" --> QueryBean\n    SpringBoot -- \"Cria e injeta\" --> RepoBean\n    SpringBoot -- \"Cria e injeta\" --> AppServiceBean\n\n    AppServiceBean -- \"Usa (injeta)\" --> EngineBean\n    AppServiceBean -- \"Usa (injeta)\" --> QueryBean\n    QueryBean -- \"Usa (injeta)\" --> RepoBean\n\n    EngineBean -- \"Usa (injeta)\" --> RepoBean\n",
+  "content_size": 3381,
+  "collected_at": "2026-02-06T02:04:07.851457",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 14,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Your Spring Boot App<br>(Contém o seu código de negócio 和 Módulos。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Your Spring Boot App<br>(Contém o seu código de negócio 和 Módulos'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "App",
+        "flow"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 kikwi-spring-boot-starter 和 kikwi-spring-boot-autoconfigure 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'kikwi-spring-boot-starter 和 kikwi-spring-boot-autoconfigure'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Starter",
+        "Autoconfigure"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"kikwi-query-spring-boot-autoconfigure<br><i>(Contém a implementação e a auto-configuração da API de Consulta 和 API。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"kikwi-query-spring-boot-autoconfigure<br><i>(Contém a implementação e a auto-configuração da API de Consulta 和 API'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "QuerySpringBootAutoconfigure",
+        "Consulta"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"kikwi-query-api<br><i>(Contrato de alto nível para a Aplicação 和 kikwi-core 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 \"kikwi-query-api<br><i>(Contrato de alto nível para a Aplicação处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"kikwi-query-api<br><i>(Contrato de alto nível para a Aplicação处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "QueryApi",
+        "EngineCore"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Implementações 和 kikwi-persistence-mongodb 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Implementações 和 kikwi-persistence-mongodb'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Persistência",
+        "PersistenceMongo"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"kikwi-persistence-postgres<br>(Futuro 和 Contrato 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"kikwi-persistence-postgres<br>(Futuro 和 Contrato'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PersistencePostgres",
+        "Persistência"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"kikwi-runtime-persistence-api<br><i>(Contém as interfaces de persistência 和 \"CommandRepository (Interface 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"kikwi-runtime-persistence-api<br><i>(Contém as interfaces de persistência 和 \"CommandRepository (Interface'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PersistenceApi",
+        "CommandRepo"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"QueryRepository (Interface 和 kikwi-model 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"QueryRepository (Interface 和 kikwi-model'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "QueryRepo",
+        "Model"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 kikwi-lightweight-events-api 和 o que é \"puxado\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 kikwi-lightweight-events-api处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'kikwi-lightweight-events-api处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EventsApi",
+        "Maven"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 agrega 和 para implementar 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'agrega 和 para implementar'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "de",
+        "de"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 para consultar 和 o que é \"embarcado\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'para consultar 和 o que é \"embarcado\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "de",
+        "Spring"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Runtime 和 \"Spring Boot<br>Application Context\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Runtime 和 \"Spring Boot<br>Application Context\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Spring",
+        "SpringBoot"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"KikwiFlowEngine (Bean 和 \"ExternalTaskQueryService (Bean 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"KikwiFlowEngine (Bean 和 \"ExternalTaskQueryService (Bean'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EngineBean",
+        "QueryBean"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"KikwiEngineRepository (Bean 和 \"HumanTaskApplicationService (Bean 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"KikwiEngineRepository (Bean 和 \"HumanTaskApplicationService (Bean'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "RepoBean",
+        "AppServiceBean"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 se presente 和 injeta 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'se presente 和 injeta'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "consulta",
+        "Usa"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 injeta 和 injeta。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'injeta 和 injeta'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Usa",
+        "Usa"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 injeta 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'injeta'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Usa"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 70,
+    "repair_count": 2,
+    "grounding_acts_count": 34,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

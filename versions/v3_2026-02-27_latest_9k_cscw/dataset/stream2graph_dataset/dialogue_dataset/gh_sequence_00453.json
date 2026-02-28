@@ -1,0 +1,329 @@
+{
+  "id": "gh_sequence_00453",
+  "source": "github",
+  "source_url": "https://github.com/MNRainDrop/CECS-491A-Spec/blob/1b550d3e51d8eb2f48b176e022a02ab51d3e46b3/Project%20Documents/Low%20Level%20Designs/VehicleProfileLLD/VP1-VehicleProfileCreation/VehicleProfileLibrary_ProfileCreation_APIFail.mmd",
+  "github_repo": "MNRainDrop/CECS-491A-Spec",
+  "github_file_path": "Project Documents/Low Level Designs/VehicleProfileLLD/VP1-VehicleProfileCreation/VehicleProfileLibrary_ProfileCreation_APIFail.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\nparticipant u as Browser\nparticipant az as AuthN/AuthZ<br>(Entry Point)\nparticipant e as VehicleProfileEntryPoint<br>(Entry Point)\nparticipant vpm as VehicleProfileManager<br>(Manager Layer)\nparticipant vps as VehicleProfileCreationService<br>(Services Layer)\nparticipant ll as LogService<br>(Services Layer)\nparticipant dg as SqlDbVehicleTarget<br>(Data Gateway)\nparticipant da as SqlServerDAO<br>(Data Access Object)\nparticipant ds as Data Store<br>(Sql Server)\n\nNote Left of u: User attempts to to create new vehicle profile\nu->>+az: CheckToken() \n    Note over u,az: *Temporary method signature*<br>Browser checks for<br>authorized access to the page.<br>See authorization success case\naz-->>-u: Return valid check\n\nu->>+e: CreateVehicleProfile(vin: string, licensePlate: string, make: string, model: string, year: int, color: string, description: string, userAccount: IUserAccount) : IActionResult\n    Note over u,e: Invoked when user accepts inputs for all fields to<br>Create VehicleProfile\n\n    e->>+vpm: CreateVehicleProfile(vin: string, licensePlate: string, make: string, model: string, year: int, color: string, description: string, userAccont: IUserAccount) : IResponse\n        Note over e,vpm: Entry point calls upon manager<br>to create vehicle profiles\n        \n        vpm->>vpm: Validate Parameters\n\n        vpm->>+vps: CreateVehicleProfile(vin: string, licensePlate: string, make: string, model: string, year: int, color: string, description: string, userAccount: IUserAccount) : IResponse\n            Note over vpm,vps: VehicleProfileManager calls upon<br>VehicleProfileCreationService to create the vehicle\n\n            vps->>vps: Validate Parameters\n\n            # Use api to search for other details on the vehicle\n            vps->>vps: HttpCleint.SendAsync(request: HttpRequestMessage) : Task<HttpResponseMessage>\n                Note over vps,vps: Requests information from API using the vin of the vehicle\n\n            vps->>vps: API Fails to retrieve necessary details\n\n            vps->>vps: Generate IResponse object\n                Note over vps,vps: HasError = true<br>ErrorMessage = \"Failed to retrieve data from API\"\n\n            # Log unsuccessful vehicle creation\n            vps-->>ll: CreateLogAsync(logLevel: string, logCategory: string, logContext: string, userHash: string) : IResponse\n                Note over vps,ll: VehicleProfileCreationService calls upon LogService to log<br>unsuccessful creation of vehicle profile.<br>See logging success case\n\n        vps-->>-vpm: IResponse object returned\n\n        vpm->>vpm: Check for violation of business rules\n\n        # Log unsuccessful vehicle creation\n        vpm-->>ll: CreateLogAsync(logLevel: string, logCategory: string, logContext: string, userHash: string) : IResponse\n            Note over vpm,ll: VehicleProfileManager calls upon LogService to log<br>unsuccessful creation of vehicle profile.<br>See logging success case\n        \n    vpm-->>-e: IResponse object returned\n\n    e->>e: Check for errors in returned IResponse object\n\ne-->>-u: Return StatusCode(500, IResponseObject.ErrorMessage)",
+  "content_size": 3107,
+  "collected_at": "2026-02-06T01:32:28.396514",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 2,
+  "repo_forks": 0,
+  "repo_owner": "MNRainDrop",
+  "repo_name": "CECS-491A-Spec",
+  "repo_description": "CECS 491A repository for Team Spec",
+  "repo_language": "C#",
+  "repo_topics": [],
+  "repo_created_at": "2023-09-07T01:55:44Z",
+  "repo_updated_at": "2024-12-17T23:27:38Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Browser、AuthN/AuthZ<br>(Entry Point)应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "u",
+        "az"
+      ],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含VehicleProfileEntryPoint<br>(Entry Point)这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，VehicleProfileEntryPoint<br>(Entry Point)是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "e"
+      ],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含VehicleProfileManager<br>(Manager Layer)、VehicleProfileCreationService<br>(Services Layer)这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，VehicleProfileManager<br>(Manager Layer)、VehicleProfileCreationService<br>(Services Layer)是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "vpm",
+        "vps"
+      ],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "LogService<br>(Services Layer)、SqlDbVehicleTarget<br>(Data Gateway)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "ll",
+        "dg"
+      ],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "关于SqlServerDAO<br>(Data Access Object)，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，SqlServerDAO<br>(Data Access Object)的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "da"
+      ],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下Data Store<br>(Sql Server)吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "ds"
+      ],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有Validate Parameters、Validate Parameters。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Validate Parameters、Validate Parameters的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_0",
+        "msg_1"
+      ],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将HttpCleint.SendAsync(request: HttpRequestMessage) : Task<HttpResponseMessage>、API Fails to retrieve necessary details分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，HttpCleint.SendAsync(request: HttpRequestMessage) : Task<HttpResponseMessage>、API Fails to retrieve necessary details的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，HttpCleint.SendAsync(request: HttpRequestMessage) : Task<HttpResponseMessage>、API Fails to retrieve necessary details有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_2",
+        "msg_3"
+      ],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下Generate IResponse object吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "Generate IResponse object负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_4"
+      ],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Check for violation of business rules分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Check for violation of business rules应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Check for violation of business rules应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Check for violation of business rules就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_5"
+      ],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含Check for errors in returned IResponse object这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "最后，流程到达Check for errors in returned IResponse object结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_6"
+      ],
+      "timestamp_offset": 480
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 32,
+    "speaker_distribution": {
+      "Speaker_B": 16,
+      "Speaker_A": 16
+    },
+    "speech_act_distribution": {
+      "sequential": 3,
+      "clarify": 6,
+      "structural": 5,
+      "confirm": 5,
+      "inform": 6,
+      "classification": 3,
+      "request": 3,
+      "contrastive": 1
+    },
+    "avg_turn_length": 48.71875,
+    "dialogue_duration": 480
+  }
+}

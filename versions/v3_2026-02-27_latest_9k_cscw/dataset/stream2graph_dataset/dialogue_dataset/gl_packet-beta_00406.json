@@ -1,0 +1,48 @@
+{
+  "id": "gl_packet-beta_00406",
+  "source": "gitlab",
+  "source_url": "https://github.com/Lucascis/discord_bot/blob/3c98f8c01a7f4e2f2e4770f9209b19c752940a0f/docs/architecture/diagrams/container.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "Lucascis/discord_bot",
+  "diagram_type": "packet-beta",
+  "code": "%% Container Diagram (C4 Model - Level 2)\n%% Purpose: Shows the internal architecture of the Discord Music Bot system\n%% Author: Discord Bot Team\n%% Last Updated: 2025-11-03\n\ngraph TB\n    %% External Users/Systems\n    User[\"👤 Discord User<br/>[Person]\"]\n    Discord[\"Discord API<br/>[External System]\"]\n    MusicAPIs[\"Music APIs<br/>[External System]<br/>YouTube, Spotify,<br/>SoundCloud\"]\n    Stripe[\"Stripe API<br/>[External System]\"]\n\n    %% Application Layer\n    subgraph DiscordBot[\"Discord Music Bot [Software System]\"]\n\n        %% Gateway Service\n        Gateway[\"Gateway Service<br/>[Node.js Container]<br/><br/>Handles Discord<br/>interactions, slash<br/>commands, and events<br/><br/>Technology:<br/>Discord.js, TypeScript\"]\n\n        %% Audio Service\n        Audio[\"Audio Service<br/>[Node.js Container]<br/><br/>Manages music playback,<br/>queue operations, and<br/>Lavalink integration<br/><br/>Technology:<br/>lavalink-client, TypeScript\"]\n\n        %% API Service\n        API[\"API Service<br/>[Node.js Container]<br/><br/>Provides REST endpoints<br/>for webhooks, analytics,<br/>and external access<br/><br/>Technology:<br/>Express.js, TypeScript\"]\n\n        %% Worker Service\n        Worker[\"Worker Service<br/>[Node.js Container]<br/><br/>Handles background jobs,<br/>cleanup tasks, and<br/>scheduled operations<br/><br/>Technology:<br/>Node.js, TypeScript\"]\n\n        %% Lavalink\n        Lavalink[\"Lavalink<br/>[Java Container]<br/><br/>Audio processing server<br/>with advanced plugins<br/>for music streaming<br/><br/>Technology:<br/>Lavalink 4.1.1, Java\"]\n    end\n\n    %% Data Layer\n    subgraph Data[\"Data Layer\"]\n        PostgreSQL[\"PostgreSQL<br/>[Database]<br/><br/>Persistent storage<br/>for queues, settings,<br/>and subscriptions<br/><br/>Technology:<br/>PostgreSQL 15\"]\n\n        Redis[\"Redis<br/>[Cache & Pub/Sub]<br/><br/>Caching, session<br/>management, and<br/>inter-service messaging<br/><br/>Technology:<br/>Redis 7\"]\n    end\n\n    %% User Interactions\n    User -->|\"Slash commands<br/>HTTPS/WSS\"| Discord\n    Discord -->|\"Events & Commands<br/>Gateway WebSocket\"| Gateway\n\n    %% Service Interactions\n    Gateway -->|\"Publishes commands<br/>redis pub/sub\"| Redis\n    Gateway -->|\"Reads/Writes<br/>guild settings\"| PostgreSQL\n    Gateway -->|\"Sends UI updates<br/>REST API\"| Discord\n\n    Redis -->|\"Subscribes to commands<br/>redis pub/sub\"| Audio\n    Audio -->|\"Publishes UI updates<br/>redis pub/sub\"| Redis\n    Redis -->|\"Receives UI updates<br/>redis pub/sub\"| Gateway\n\n    Audio -->|\"Reads/Writes queue<br/>SQL queries\"| PostgreSQL\n    Audio -->|\"Manages players<br/>WebSocket\"| Lavalink\n    Audio -->|\"Caches search results<br/>GET/SET\"| Redis\n\n    Lavalink -->|\"Streams audio<br/>UDP packets\"| Discord\n    Lavalink -->|\"Fetches music<br/>HTTPS\"| MusicAPIs\n\n    API -->|\"Receives webhooks<br/>HTTPS POST\"| Stripe\n    API -->|\"Reads/Writes<br/>subscriptions\"| PostgreSQL\n    API -->|\"Publishes events<br/>redis pub/sub\"| Redis\n    API -->|\"Caches data<br/>GET/SET\"| Redis\n\n    Worker -->|\"Cleanup operations<br/>SQL queries\"| PostgreSQL\n    Worker -->|\"Publishes jobs<br/>redis pub/sub\"| Redis\n\n    %% External Integrations\n    Discord -->|\"Voice connection<br/>UDP\"| Lavalink\n\n    %% Styling\n    classDef person fill:#08427b,stroke:#052e56,color:#fff\n    classDef container fill:#1168bd,stroke:#0b4884,color:#fff\n    classDef database fill:#2b7a2b,stroke:#1a5c1a,color:#fff\n    classDef external fill:#999999,stroke:#6b6b6b,color:#fff\n\n    class User person\n    class Gateway,Audio,API,Worker,Lavalink container\n    class PostgreSQL,Redis database\n    class Discord,MusicAPIs,Stripe external\n",
+  "content_size": 3627,
+  "collected_at": "2026-02-06T14:09:07.850753",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在Generic Diagram完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "root"
+      ],
+      "timestamp_offset": 30
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 2,
+    "speaker_distribution": {
+      "Speaker_B": 1,
+      "Speaker_A": 1
+    },
+    "speech_act_distribution": {
+      "sequential": 2
+    },
+    "avg_turn_length": 21.5,
+    "dialogue_duration": 30
+  }
+}

@@ -1,0 +1,399 @@
+{
+  "id": "gh_class_01111",
+  "source": "github",
+  "source_url": "https://github.com/Propultech/AC-Fintoc-Payment/blob/a5dee33752be0ec37f7fb9275d914c73eb88126e/docs/uml-class-diagram.mmd",
+  "github_repo": "Propultech/AC-Fintoc-Payment",
+  "github_file_path": "docs/uml-class-diagram.mmd",
+  "diagram_type": "class",
+  "code": "%% Fintoc_Payment — UML Class Diagram (Mermaid)\nclassDiagram\n  %% Api\n  class Api_ConfigurationServiceInterface {<<interface>>}\n  class Api_LoggerServiceInterface {<<interface>>}\n  class Api_RefundServiceInterface {<<interface>>}\n  class Api_RefundsApiClientInterface {<<interface>>}\n  class Api_TransactionServiceInterface {<<interface>>}\n  class Api_TransactionRepositoryInterface {<<interface>>}\n  class Api_Data_TransactionInterface {<<interface>>}\n  class Api_Data_TransactionSearchResultsInterface {<<interface>>}\n  class Api_Webhook_WebhookRequestValidatorInterface {<<interface>>}\n  class Api_Webhook_WebhookRequestParserInterface {<<interface>>}\n  class Api_Webhook_WebhookIdempotencyServiceInterface {<<interface>>}\n  class Api_Webhook_WebhookRouterInterface {<<interface>>}\n  class Api_Webhook_WebhookHandlerInterface {<<interface>>}\n  class Api_Checkout_RequestBuilderInterface {<<interface>>}\n  class Api_Checkout_MetadataBuilderInterface {<<interface>>}\n\n  %% Model\n  class Model_Payment {\n    +canUseForCurrency()\n    +isAvailable()\n  }\n  class Model_Transaction\n  class Model_TransactionSearchResults\n  class Model_TransactionRepository\n  class Model_ResourceModel_Transaction\n  class Model_ResourceModel_Transaction_Collection\n  class Model_Ui_ConfigProvider\n\n  %% Service\n  class Service_ConfigurationService\n  class Service_LoggerService\n  class Service_RefundsApiClient\n  class Service_RefundService\n  class Service_TransactionService {\n    +createPreAuthorizationTransaction()\n    +createPostAuthorizationTransaction()\n    +createCaptureTransaction()\n    +createRefundTransaction()\n    +createVoidTransaction()\n    +createWebhookTransaction()\n    +appendWebhookData()\n  }\n  class Service_Webhook_WebhookEvent\n  class Service_Webhook_WebhookRequestValidator\n  class Service_Webhook_WebhookRequestParser\n  class Service_Webhook_WebhookIdempotencyService\n  class Service_Webhook_WebhookRouter\n  class Service_Webhook_AbstractWebhookHandler\n  class Service_Webhook_AbstractPaymentIntentHandler\n  class Service_Webhook_PaymentIntentSucceededHandler\n  class Service_Webhook_PaymentIntentFailedHandler\n  class Service_Webhook_PaymentIntentPendingHandler\n  class Service_Webhook_CheckoutSessionFinishedHandler\n  class Service_Webhook_CheckoutSessionExpiredHandler\n  class Service_Webhook_RefundSucceededHandler\n  class Service_Webhook_RefundFailedHandler\n  class Service_Webhook_RefundInProgressHandler\n  class Service_Checkout_RequestBuilder\n  class Service_Checkout_MetadataBuilder\n\n  %% Controller\n  class Controller_Checkout_Create\n  class Controller_Checkout_Commit\n  class Controller_Webhook_Index\n\n  %% Logger\n  class Logger_Logger\n  class Logger_Handler\n\n  %% Block (selected)\n  class Block_Info_Fintoc\n  class Block_Admin_Order_View_TransactionInfo\n\n  %% Interfaces to implementations\n  Api_ConfigurationServiceInterface <|.. Service_ConfigurationService\n  Api_LoggerServiceInterface <|.. Service_LoggerService\n  Api_RefundsApiClientInterface <|.. Service_RefundsApiClient\n  Api_RefundServiceInterface <|.. Service_RefundService\n  Api_TransactionServiceInterface <|.. Service_TransactionService\n  Api_TransactionRepositoryInterface <|.. Model_TransactionRepository\n  Api_Data_TransactionInterface <|.. Model_Transaction\n  Api_Data_TransactionSearchResultsInterface <|.. Model_TransactionSearchResults\n\n  Api_Webhook_WebhookRequestValidatorInterface <|.. Service_Webhook_WebhookRequestValidator\n  Api_Webhook_WebhookRequestParserInterface <|.. Service_Webhook_WebhookRequestParser\n  Api_Webhook_WebhookIdempotencyServiceInterface <|.. Service_Webhook_WebhookIdempotencyService\n  Api_Webhook_WebhookRouterInterface <|.. Service_Webhook_WebhookRouter\n  Api_Webhook_WebhookHandlerInterface <|.. Service_Webhook_AbstractWebhookHandler\n  Api_Checkout_RequestBuilderInterface <|.. Service_Checkout_RequestBuilder\n  Api_Checkout_MetadataBuilderInterface <|.. Service_Checkout_MetadataBuilder\n\n  %% Inheritance among webhook handlers\n  Service_Webhook_AbstractWebhookHandler <|-- Service_Webhook_AbstractPaymentIntentHandler\n  Service_Webhook_AbstractPaymentIntentHandler <|-- Service_Webhook_PaymentIntentSucceededHandler\n  Service_Webhook_AbstractPaymentIntentHandler <|-- Service_Webhook_PaymentIntentFailedHandler\n  Service_Webhook_AbstractPaymentIntentHandler <|-- Service_Webhook_PaymentIntentPendingHandler\n  Service_Webhook_AbstractWebhookHandler <|-- Service_Webhook_CheckoutSessionFinishedHandler\n  Service_Webhook_AbstractWebhookHandler <|-- Service_Webhook_CheckoutSessionExpiredHandler\n  Service_Webhook_AbstractWebhookHandler <|-- Service_Webhook_RefundSucceededHandler\n  Service_Webhook_AbstractWebhookHandler <|-- Service_Webhook_RefundFailedHandler\n  Service_Webhook_AbstractWebhookHandler <|-- Service_Webhook_RefundInProgressHandler\n\n  %% Associations\n  Controller_Webhook_Index --> Service_Webhook_WebhookRequestValidator : uses\n  Controller_Webhook_Index --> Service_Webhook_WebhookRequestParser : uses\n  Controller_Webhook_Index --> Service_Webhook_WebhookIdempotencyService : uses\n  Controller_Webhook_Index --> Service_Webhook_WebhookRouter : dispatches\n  Controller_Webhook_Index --> Service_TransactionService : uses\n  Controller_Checkout_Create --> Service_ConfigurationService : uses\n  Controller_Checkout_Create --> Api_Checkout_RequestBuilderInterface : uses\n  Controller_Checkout_Create --> Logger_Logger : logs\n  Controller_Checkout_Commit --> Logger_Logger : logs\n  Service_Checkout_RequestBuilder --> Api_Checkout_MetadataBuilderInterface : uses\n\n  Model_TransactionRepository --> Model_ResourceModel_Transaction : persists\n  Model_TransactionRepository --> Model_ResourceModel_Transaction_Collection : queries\n  Service_TransactionService --> Api_TransactionRepositoryInterface : uses\n  Service_RefundService --> Service_RefundsApiClient : calls\n  Logger_Logger o-- Logger_Handler\n\n  Model_Payment --> Api_ConfigurationServiceInterface : reads config\n  Model_Ui_ConfigProvider --> Api_ConfigurationServiceInterface : reads config\n\n  Block_Info_Fintoc --> Model_TransactionRepository : reads\n  Block_Admin_Order_View_TransactionInfo --> Model_TransactionRepository : reads\n",
+  "content_size": 6120,
+  "collected_at": "2026-02-06T01:53:06.067531",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 5,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Mermaid 和 <<interface>> 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 Mermaid处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Mermaid处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Diagram",
+        "Api_ConfigurationServiceInterface"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 <<interface>> 和 <<interface>> 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '<<interface>> 和 <<interface>>'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Api_LoggerServiceInterface",
+        "Api_RefundServiceInterface"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 <<interface>> 和 <<interface>>。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 <<interface>>处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '<<interface>>处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Api_RefundsApiClientInterface",
+        "Api_TransactionServiceInterface"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 <<interface>> 和 <<interface>> 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '<<interface>> 和 <<interface>>'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Api_TransactionRepositoryInterface",
+        "Api_Data_TransactionInterface"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 <<interface>> 和 <<interface>>。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '<<interface>> 和 <<interface>>'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Api_Data_TransactionSearchResultsInterface",
+        "Api_Webhook_WebhookRequestValidatorInterface"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 <<interface>> 和 <<interface>> 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 <<interface>>处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '<<interface>>处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Api_Webhook_WebhookRequestParserInterface",
+        "Api_Webhook_WebhookIdempotencyServiceInterface"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 <<interface>> 和 <<interface>>。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '<<interface>> 和 <<interface>>'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Api_Webhook_WebhookRouterInterface",
+        "Api_Webhook_WebhookHandlerInterface"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 <<interface>> 和 <<interface>> 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '<<interface>> 和 <<interface>>'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Api_Checkout_RequestBuilderInterface",
+        "Api_Checkout_MetadataBuilderInterface"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 +canUseForCurrency( 和 +createPreAuthorizationTransaction( 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '+canUseForCurrency( 和 +createPreAuthorizationTransaction('。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Model_Payment",
+        "Service_TransactionService"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 selected。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'selected'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Block"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 43,
+    "repair_count": 3,
+    "grounding_acts_count": 20,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

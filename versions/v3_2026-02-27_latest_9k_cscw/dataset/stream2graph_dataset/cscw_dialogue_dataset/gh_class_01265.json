@@ -1,0 +1,445 @@
+{
+  "id": "gh_class_01265",
+  "source": "github",
+  "source_url": "https://github.com/gmorklla/diplomado-cotizador/blob/71f300928941a2da4e8418f0090c1d2d714b2014/diagramas/05_mermaid.mmd",
+  "github_repo": "gmorklla/diplomado-cotizador",
+  "github_file_path": "diagramas/05_mermaid.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n    %% Relaciones de Dependencia\n    TestCotizador ..> Cotizador\n    TestCotizador ..> Articulo\n    TestCotizador ..> Pc\n\n    %% Relaciones de Herencia\n    Articulo <|-- Monitor\n    Articulo <|-- TarjetaVideo\n    Articulo <|-- DiscoDuro\n    Articulo <|-- Pc\n\n    %% Relaciones de Implementación\n    IComponentePc <|.. Monitor\n    IComponentePc <|.. TarjetaVideo\n    IComponentePc <|.. DiscoDuro\n\n    %% Relaciones de Agregación\n    Cotizador o-- \"1..*\" Articulo : IstArticulos\n    Pc o-- \"1..*\" IComponentePc : IstComponentes\n\n    %% Dependencia del Builder\n    Pc ..> PcBuilder : usa\n    PcBuilder ..> Pc : crea\n\n    %% Enum\n    class TipoArticulo {\n        <<enumeration>>\n        TARJETA_VIDEO\n        MONITOR\n        DISCO_DURO\n        PC\n    }\n\n    class TestCotizador {\n        +main() void\n        +testCotizador() void\n    }\n\n    class Cotizador {\n        -lstArticulos: List~Articulo~\n        -lstCantidades: List~Integer~\n        +cotizar() void\n        +agregarItemCotizacion(Articulo, Integer) void\n    }\n\n    class Articulo {\n        -marca: String\n        -modelo: String\n        -precioBase: BigDecimal\n        -costo: BigDecimal\n        -sku: String\n        +getters() void\n        +setters() void\n        +cotizar(Integer) BigDecimal\n        +getTipo() TipoArticulo\n        +crearArticulo(Map~String,Object~) Articulo\n    }\n\n    class Monitor {\n        +cotizar(Integer) BigDecimal\n    }\n\n    class TarjetaVideo {\n        -memoria: String\n        -PROMO_LLEVE_N_XM_VALOR_N: int (readOnly)\n        -PROMO_LLEVE_N_XM_VALOR_M: int (readOnly)\n        +cotizar(Integer) BigDecimal\n    }\n\n    class DiscoDuro {\n        -capacidadAlmacenamiento: String\n        +cotizar(Integer) BigDecimal\n    }\n\n    class IComponentePc {\n        <<interface>>\n        +getArticulo() Articulo\n    }\n\n    class Pc {\n        -lstComponentes: List~IComponentePc~\n        +cotizar(Integer) BigDecimal\n        +agregarComponente(IComponentePc) void\n        +getBuilder() PcBuilder\n    }\n\n    class PcBuilder {\n        -MAX_DISCOS: int = 4 (readOnly)\n        -MAX_MONITORES: int = 2 (readOnly)\n        -MAX_TARJETAS: int = 1 (readOnly)\n        -lstDiscos: List~DiscoDuro~\n        -lstMonitores: List~Monitor~\n        -tarjeta: TarjetaVideo\n        -parametros: Map~String,Object~\n        +agregarParametro(String, Object) PcBuilder\n        +agregarDiscoDuro(IComponentePc) PcBuilder\n        +agregarMonitor(IComponentePc) PcBuilder\n        +agregarTarjetaVideo(IComponentePc) PcBuilder\n        +build() Pc\n        -configuracionValida() boolean\n        +validarConfiguracion() Map~String,String~\n    }\n\n    %% Notas\n    note for PcBuilder \"Configurar correctamente un objeto de estructura compleja (la pc)\"\n    \n    Articulo ..> TipoArticulo",
+  "content_size": 2742,
+  "collected_at": "2026-02-06T01:55:23.685627",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 <<enumeration>>\n        TARJETA_VIDEO\n        MONITOR\n        DISCO_DURO\n        PC\n     和 +main( 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '<<enumeration>>\n        TARJETA_VIDEO\n        MONITOR\n        DISCO_DURO\n        PC\n     和 +main('？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TipoArticulo",
+        "TestCotizador"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 -lstArticulos: List~Articulo~\n        -lstCantidades: List~Integer~\n        +cotizar( 和 Articulo, Integer 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '-lstArticulos: List~Articulo~\n        -lstCantidades: List~Integer~\n        +cotizar( 和 Articulo, Integer'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Cotizador",
+        "agregarItemCotizacion"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 -marca: String\n        -modelo: String\n        -precioBase: BigDecimal\n        -costo: BigDecimal\n        -sku: String\n        +getters( 和 Integer。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '-marca: String\n        -modelo: String\n        -precioBase: BigDecimal\n        -costo: BigDecimal\n        -sku: String\n        +getters( 和 Integer'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Articulo",
+        "cotizar"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Map~String,Object~ 和 +cotizar(Integer 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Map~String,Object~ 和 +cotizar(Integer'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "crearArticulo",
+        "Monitor"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 -memoria: String\n        -PROMO_LLEVE_N_XM_VALOR_N: int (readOnly 和 readOnly 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '-memoria: String\n        -PROMO_LLEVE_N_XM_VALOR_N: int (readOnly 和 readOnly'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TarjetaVideo",
+        "int"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Integer 和 -capacidadAlmacenamiento: String\n        +cotizar(Integer 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Integer 和 -capacidadAlmacenamiento: String\n        +cotizar(Integer'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "cotizar",
+        "DiscoDuro"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 <<interface>>\n        +getArticulo( 和 -lstComponentes: List~IComponentePc~\n        +cotizar(Integer 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '<<interface>>\n        +getArticulo( 和 -lstComponentes: List~IComponentePc~\n        +cotizar(Integer'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "IComponentePc",
+        "Pc"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 IComponentePc 和 -MAX_DISCOS: int = 4 (readOnly。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'IComponentePc 和 -MAX_DISCOS: int = 4 (readOnly'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "agregarComponente",
+        "PcBuilder"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 readOnly 和 readOnly 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'readOnly 和 readOnly'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "2",
+        "1"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 String, Object 和 IComponentePc 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'String, Object 和 IComponentePc'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "agregarParametro",
+        "agregarDiscoDuro"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 IComponentePc 和 IComponentePc 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'IComponentePc 和 IComponentePc'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "agregarMonitor",
+        "agregarTarjetaVideo"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 la pc 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'la pc'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "compleja"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 48,
+    "repair_count": 0,
+    "grounding_acts_count": 24,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00554",
+  "source": "github",
+  "source_url": "https://github.com/Nick0oo/pyllren/blob/2beb9fefad97fa3143d2274717b63caf8fbd8898/diagrams/sequences/tokenrefresh.mmd",
+  "github_repo": "Nick0oo/pyllren",
+  "github_file_path": "diagrams/sequences/tokenrefresh.mmd",
+  "diagram_type": "sequence",
+  "code": "%% Mermaid sequence diagram - Recommended detailed token refresh flow\n%% File: diagrams/sequences/tokenrefresh.mmd\nsequenceDiagram\n  %% NOTE: Refresh token flow is RECOMMENDED; the current codebase may not implement it.\n  participant FE as Frontend (SPA)\n  participant Proxy as Traefik/Nginx\n  participant API as FastAPI (Auth routes)\n  participant DB as Postgres\n  participant Cache as Redis (optional revocation)\n  participant Security as Security helpers (`create_access_token`)\n\n  Note over FE: Recommended secure approach\n  FE->>Proxy: POST /api/v1/login/refresh  (HttpOnly cookie: RefreshToken)\n  Proxy->>API: Forward request\n\n  API->>Cache: Validate refresh token jti not revoked (if using blacklist)\n  alt revoked or invalid\n    API-->>FE: 401 Unauthorized (refresh invalid)\n  else valid\n    API->>DB: Optionally validate refresh session record (user_sessions)\n    DB-->>API: session valid\n    API->>Security: create_access_token(subject=user.id, short_expiry)\n    Security-->>API: new access_token\n    API-->>FE: 200 OK { access_token }\n    Note over FE: FE replaces in-memory token and continues; refresh cookie remains HttpOnly\n  end\n\n  %% Optional: revoke on logout\n  FE->>Proxy: POST /api/v1/login/logout (HttpOnly cookie included)\n  Proxy->>API: Forward logout request\n  API->>Cache: add refresh jti to blacklist OR mark session revoked in DB\n  API-->>FE: 200 OK\n",
+  "content_size": 1377,
+  "collected_at": "2026-02-06T01:33:53.376117",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 1,
+  "repo_forks": 1
+}

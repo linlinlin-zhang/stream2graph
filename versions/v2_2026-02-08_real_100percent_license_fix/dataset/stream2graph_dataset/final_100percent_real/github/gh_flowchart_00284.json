@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00284",
+  "source": "github",
+  "source_url": "https://github.com/JanDuchscherer104/NBV/blob/d39856848579411ee062f2e0a1dca498f7100a56/docs/figures/diagrams/oracle_rri/mermaid/candidate_depth_renderer.mmd",
+  "github_repo": "JanDuchscherer104/NBV",
+  "github_file_path": "docs/figures/diagrams/oracle_rri/mermaid/candidate_depth_renderer.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart LR\n  %% Stage: CandidateDepthRenderer (candidate_depth_renderer.py)\n  %% Expanded view (includes pytorch3d_depth_renderer.py internals)\n  %%\n  %% Symbols:\n  %% - N: rendered candidates\n  %% - H,W: render resolution\n  %% - V,F: mesh vertices / faces\n  %%\n  %% Frames:\n  %% - w: world frame\n  %% - r: reference rig frame\n  %% - q: candidate camera frame\n\n  sample[\"Input: EfmSnippetView<br/>\\(\\mathcal{M}_{GT}=(\\mathbf{V}^w,\\mathcal{F}_{GT})\\)\"]\n  cand[\"Input: CandidateSamplingResult<br/>\\(\\texttt{views}:\\texttt{CameraTW}^{N}\\)<br/>\\(\\mathbf{T}_{r}^{w}\\in\\mathrm{SE}(3)\\)\"]\n\n  sel[\"Select candidate subset<br/>\\(\\texttt{\\_select\\_candidate\\_views}\\)<br/>\\(\\texttt{candidate\\_indices}\\)\"]\n  posew[\"Derive cam2world poses<br/>\\(\\mathbf{T}_{q}^{w}=\\mathbf{T}_{r}^{w}(\\mathbf{T}_{r}^{q})^{-1}\\)\"]\n  scale[\"Optional resolution scaling<br/>\\(C_q\\leftarrow \\texttt{CameraTW.scale\\_to\\_size}\\)\"]\n\n  p3d[\"Build PyTorch3D cameras<br/>\\(\\texttt{PerspectiveCameras}(R,T,C_q)\\)\"]\n  rast[\"Rasterize mesh<br/>\\(\\texttt{MeshRasterizer}(\\mathcal{M}_{GT})\\Rightarrow (\\texttt{zbuf},\\texttt{pix\\_to\\_face})\\)\"]\n  valid[\"Valid pixels<br/>\\(\\texttt{valid}=(\\texttt{pix\\_to\\_face}\\ge 0)\\wedge(z\\in[z_{near},z_{far}])\\)\"]\n\n  out[\"Output: CandidateDepths<br/>\\(D_q\\in\\mathbb{R}^{N\\times H\\times W}\\)<br/>\\(\\texttt{p3d\\_cameras}\\Rightarrow C_q\\) + \\(\\texttt{valid}\\)\"]\n\n  %% Dataflow\n  cand -->|\"\\(\\texttt{views}:\\texttt{CameraTW}^{N}\\)\"| sel\n  cand -->|\"\\(\\mathbf{T}_{r}^{w}\\)\"| posew\n  sel -->|\"\\(\\mathbf{T}_{r}^{q}=\\texttt{views.T\\_camera\\_rig}\\Rightarrow (\\mathbf{T}_{r}^{q})^{-1}=\\mathbf{T}_{q}^{r}\\)\"| posew\n  posew -->|\"\\(\\mathbf{T}_{q}^{w}\\)\"| scale\n  sel -->|\"\\(C_q\\)\"| scale\n\n  sample -->|\"\\(\\mathcal{M}_{GT}\\)\"| rast\n  scale -->|\"\\(C_q\\)\"| p3d\n  posew -->|\"\\(\\mathbf{T}_{q}^{w}\\)\"| p3d\n  p3d -->|\"\\(\\texttt{PerspectiveCameras}\\)\"| rast\n  rast -->|\"\\(\\texttt{zbuf}\\equiv D_q,\\ \\texttt{pix\\_to\\_face}\\)\"| valid\n  valid -->|\"\\(D_q,\\ \\texttt{valid}\\)\"| out\n\n  %% Styling\n  classDef input fill:#d5e8d4,stroke:#82b366,stroke-width:2px;\n  classDef compute fill:#e1d5e7,stroke:#9673a6,stroke-width:2px;\n  classDef neutral fill:#f5f5f5,stroke:#666666,stroke-width:2px;\n  classDef output fill:#fff2cc,stroke:#d6b656,stroke-width:2px;\n\n  class sample,cand input;\n  class sel,posew,scale neutral;\n  class p3d,rast,valid compute;\n  class out output;\n",
+  "content_size": 2333,
+  "collected_at": "2026-02-06T01:43:09.208145",
+  "compilation_status": "failed",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

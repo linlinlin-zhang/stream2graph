@@ -1,0 +1,170 @@
+{
+  "id": "gh_ind_d12ae5f8de",
+  "source": "github_industrial",
+  "repo": "sidetrip-ai/ici-core",
+  "license": "mit",
+  "code": "sequenceDiagram\n    participant User\n    participant Orchestrator\n    participant ChatHistoryManager\n    participant Validator\n    participant Embedder\n    participant VectorStore\n    participant PromptBuilder\n    participant Generator\n    participant Logger\n\n    User->>Orchestrator: process_query(user_id, input, chat_id?)\n    \n    alt chat_id is None\n        Orchestrator->>ChatHistoryManager: create_chat(user_id)\n        ChatHistoryManager-->>Orchestrator: new_chat_id\n    else\n        Note over Orchestrator: Use provided chat_id\n    end\n    \n    Orchestrator->>Orchestrator: get_rules(user_id)\n    Orchestrator->>Orchestrator: build_context(user_id)\n    Orchestrator->>Validator: validate(input, context, rules)\n    Validator-->>Orchestrator: validation_result\n    \n    alt validation_result == True\n        Orchestrator->>ChatHistoryManager: get_messages(chat_id, limit)\n        ChatHistoryManager-->>Orchestrator: chat_history\n        \n        Orchestrator->>Embedder: embed(input)\n        Embedder-->>Orchestrator: query_vector\n        \n        Orchestrator->>VectorStore: search(query_vector, num_results, filters)\n        VectorStore-->>Orchestrator: documents\n        \n        Orchestrator->>PromptBuilder: build_prompt(input, documents, chat_history)\n        PromptBuilder-->>Orchestrator: prompt\n        \n        Orchestrator->>Generator: generate(prompt)\n        Generator-->>Orchestrator: response\n        \n        Orchestrator->>ChatHistoryManager: add_message(chat_id, input, \"user\")\n        Orchestrator->>ChatHistoryManager: add_message(chat_id, response, \"assistant\")\n        \n        alt New or short chat\n            Orchestrator->>ChatHistoryManager: generate_title(chat_id)\n            ChatHistoryManager-->>Orchestrator: title\n        end\n        \n        Orchestrator-->>User: {\"response\": response, \"chat_id\": chat_id}\n    else\n        Orchestrator-->>User: {\"error\": \"Access denied\"}\n    end\n    \n    Orchestrator->>Logger: Log query processing",
+  "diagram_type": "participant size:>1500",
+  "collected_at": "2026-02-27T03:31:08.873522",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_0"
+      ],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将create_chat(user_id)、get_rules(user_id)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "create_chat(user_id)、get_rules(user_id)和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_1",
+        "msg_2",
+        "msg_3"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理validate(input, context, rules)、get_messages(chat_id, limit)？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，validate(input, context, rules)、get_messages(chat_id, limit)的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_4",
+        "msg_5",
+        "msg_6"
+      ],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由search(query_vector, num_results, filters)、build_prompt(input, documents, chat_history)组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_7",
+        "msg_8"
+      ],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由generate(prompt)、add_message(chat_id, input, \"user\")组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，generate(prompt)、add_message(chat_id, input, \"user\")就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_9",
+        "msg_10",
+        "msg_11"
+      ],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下generate_title(chat_id)、Log query processing吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，generate_title(chat_id)、Log query processing就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在generate_title(chat_id)、Log query processing完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_12",
+        "msg_13"
+      ],
+      "timestamp_offset": 225
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 15,
+    "speaker_distribution": {
+      "Speaker_B": 8,
+      "Speaker_A": 7
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "inform": 3,
+      "classification": 1,
+      "confirm": 3,
+      "contrastive": 1,
+      "request": 2,
+      "clarify": 1,
+      "structural": 2
+    },
+    "avg_turn_length": 47.13333333333333,
+    "dialogue_duration": 225
+  }
+}

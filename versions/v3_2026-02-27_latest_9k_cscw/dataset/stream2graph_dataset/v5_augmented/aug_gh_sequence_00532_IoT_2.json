@@ -1,0 +1,20 @@
+{
+  "id": "aug_gh_sequence_00532_IoT_2",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/guglxni/amplifi/blob/2b2cbbb17dc15f7b550940cdfe97d27ef858ab58/docs/diagrams/yield-flow.mmd",
+  "github_repo": "guglxni/amplifi",
+  "github_file_path": "docs/diagrams/yield-flow.mmd",
+  "diagram_type": "sequence",
+  "code": "%%{IoT_Industrial_MQTT_Broker}}}%%\n\nsequenceDiagram\n    participant User\n    participant Vault as YieldVaultMultiAsset<br/>(IoT_Industrial_EdgeNode)\n    participant Aave as Aave V3 Pool<br/>(IoT_Industrial_PLC_Logic)\n    participant RSC as YieldOptimizerRsc<br/>(IoT_Industrial_EdgeNode)\n    participant Callback as Callback Proxy<br/>(IoT_Industrial_PLC_Logic)\n\n    Note over User,Callback: Yield Monitoring and Rebalancing Flow\n\n    User->>Vault: triggerYieldSnapshot(IoT_Industrial_EdgeNode)\n    Vault->>Aave: getReserveData(IoT_Industrial_TelemetryStream)\n    Aave-->>Vault: liquidityRate, APY data\n    Vault->>Vault: Calculate APYs for all assets\n    Vault-->>RSC: emit YieldSnapshot(IoT_Industrial_TelemetryStream)\n    \n    Note over RSC: RSC analyzes yield data\n    RSC->>RSC: Compare APYs across assets\n    RSC->>RSC: Determine optimal allocation\n    \n    alt Yield difference exceeds threshold\n        RSC->>Callback: emit Callback(IoT_Industrial_EdgeNode)\n        Callback->>Vault: executeRebalance(IoT_Industrial_EdgeNode)\n        Vault->>Vault: Update asset allocations\n        Vault-->>User: Funds rebalanced to higher yield\n    else Yield difference below threshold\n        Note over RSC: No rebalance needed\n    end\n",
+  "content_size": 1227,
+  "collected_at": "2026-02-06T01:33:34.001671",
+  "compilation_status": "failed",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "IoT_Industrial",
+  "seed_id": "gh_sequence_00532"
+}

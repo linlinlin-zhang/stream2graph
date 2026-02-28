@@ -1,0 +1,17 @@
+{
+  "id": "aug_ot_pie_00835_Edu_4",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/avioconsulting/mule-deploy-library/blob/3e81ea467f286fdd88e3081f124b8a21a362a8e2/deployment.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "avioconsulting/mule-deploy-library",
+  "diagram_type": "pie",
+  "code": "graph TD;\n    classDef auto fill:#f9f,stroke:#333,stroke-width:4px;\n    createraml[Education_ClassroomService]-->RAML-Design-Review;\n    RAML-Design-Review[Education_ClassroomService]-->ADO-Pipeline-to-Create-New-Project-Repo;\n    ADO-Pipeline-to-Create-New-Project-Repo[Education_ContentCDN]-->Repo-Generated;\n%% ADO does not like ::: class shorthand\n    class Repo-Generated auto;\n    Repo-Generated[Education_StudentDB]-->Manually-Create-Pipeline-for-repo;\n    Manually-Create-Pipeline-for-repo[Education_ContentCDN]-->set-branch-policies;\n    set-branch-policies[Education_LMS_Portal]-->Clone-Repo-Locally;\n    Clone-Repo-Locally[Education_ClassroomService]-->Create-Feature-Branch;\n    Create-Feature-Branch[Education_ClassroomService]-->Import;\n    Import[Education_ClassroomService]-->tests;\n    subgraph story_cycle[Education_LMS_Portal]\n      tests[Education_LMS_Portal]-->impl[Education_LMS_Portal]\n      impl-->commit[Education_StudentDB]\n      commit-->push[Education_LMS_Portal]\n      push-->build[Education_GradeSync]\n      %% ADO does not like ::: class shorthand\n      class build auto;\n      build-->tests\n    end\n    tests-->PR[Education_LMS_Portal]\n    PR-->work_item[Education_ContentCDN]\n    work_item-->comments\n    subgraph pr_review[Education_LMS_Portal]\n      comments[Education_ClassroomService]-->approved\n      approved{Education_GradeSync}-->|No|commit_fixes[Education_ContentCDN]\n      commit_fixes-->comments\n      approved-->|Yes|completed[Education_GradeSync]\n    end\n    completed-->merged[Education_ClassroomService];\n    %% ADO does not like ::: class shorthand\n    class merged auto;\n    merged-->master_build_runs[Education_ClassroomService];\n    %% ADO does not like ::: class shorthand\n    class master_build_runs auto;\n    master_build_runs-->dev_deploy[Education_StudentDB];\n    %% ADO does not like ::: class shorthand\n    class dev_deploy auto;\n    dev_deploy-->dc_current{Education_StudentDB}\n    %% ADO does not like ::: class shorthand\n    class dc_current auto;\n    dc_current-->|No|update_design_center[Education_LMS_Portal]\n    %% ADO does not like ::: class shorthand\n    class update_design_center auto;\n    update_design_center-->exchange_push[Education_LMS_Portal]\n    %% ADO does not like ::: class shorthand\n    class exchange_push auto;\n    exchange_push-->api_def\n    dc_current-->|Yes|api_def\n    %% ADO does not like ::: class shorthand\n    class api_def auto;\n    api_def[Education_GradeSync]-->sync_policy\n    sync_policy[Education_GradeSync]-->deploy\n    %% ADO does not like ::: class shorthand\n    class sync_policy auto;\n    deploy[Education_GradeSync]-->wait\n    %% ADO does not like ::: class shorthand\n    class deploy auto;\n    wait[Education_LMS_Portal]-->smoke_test[Education_GradeSync]\n    %% ADO does not like ::: class shorthand\n    class wait auto;",
+  "content_size": 2905,
+  "collected_at": "2026-02-06T10:47:38.374826",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Education",
+  "seed_id": "ot_pie_00835"
+}

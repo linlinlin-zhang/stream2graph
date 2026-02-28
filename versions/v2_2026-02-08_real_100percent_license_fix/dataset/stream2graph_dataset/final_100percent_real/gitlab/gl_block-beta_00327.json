@@ -1,0 +1,16 @@
+{
+  "id": "gl_block-beta_00327",
+  "source": "gitlab",
+  "source_url": "https://github.com/muunkky/dotmatrix/blob/f1d83e050e960a066b861974682ef2cce2400e42/flowchart%20TD.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "muunkky/dotmatrix",
+  "diagram_type": "block-beta",
+  "code": "flowchart TD\n    subgraph Input[\"Input Layer\"]\n        CLI[\"cli.py<br/>Entry Point\"]\n        ConfigL[\"config_loader.py<br/>JSON/YAML Config\"]\n        ConfigP[\"config.py<br/>Settings\"]\n        ImageL[\"image_loader.py<br/>cv2.imread → BGR\"]\n    end\n    \n    subgraph Detection[\"Detection Layer\"]\n        CircleD[\"circle_detector.py<br/>Hough Transform\"]\n        ConvexD[\"convex_detector.py<br/>CMYK Separation\"]\n        ColorPal[\"color_palette_detector.py<br/>Palette Detection\"]\n        ColorSep[\"color_separation.py<br/>K-means Clustering\"]\n        HistC[\"histogram_colors.py<br/>Histogram Analysis\"]\n    end\n    \n    subgraph Color[\"Color Processing\"]\n        ColorExt[\"color_extractor.py<br/>Extract from Circles\"]\n        ColorClust[\"color_clustering.py<br/>Group Similar Colors\"]\n        BlackV[\"black_verification.py<br/>Detection QA\"]\n        CMYKAcc[\"cmyk_accuracy.py<br/>Accuracy Measurement\"]\n        Calib[\"calibration.py<br/>Radius Calibration\"]\n        FitM[\"fit_metric.py<br/>Fit Quality\"]\n    end\n    \n    subgraph Cluster[\"Cluster Processing\"]\n        ClusterPC[\"cluster_pixel_counter.py<br/>KDTree Assignment\"]\n        SlidingW[\"sliding_window.py<br/>Large Image Tiles\"]\n    end\n    \n    subgraph GPU[\"GPU Acceleration\"]\n        GPUCore[\"gpu.py<br/>CuPy/CUDA Setup\"]\n        GPURend[\"gpu_renderer.py<br/>Parallel Rendering\"]\n    end\n    \n    subgraph Render[\"Rendering Layer\"]\n        CircleR[\"circle_renderer.py<br/>Flower Pattern\"]\n        ClusterR[\"cluster_renderer.py<br/>Bullseye Pattern\"]\n        BlockR[\"block_renderer.py<br/>Stacked Bars\"]\n        TreemapR[\"treemap_renderer.py<br/>Proportional Rects\"]\n    end\n    \n    subgraph Output[\"Output Layer\"]\n        Formatter[\"formatter.py<br/>JSON/CSV\"]\n        ImageExt[\"image_extractor.py<br/>PNG Export\"]\n        Manifest[\"manifest.py<br/>Run Metadata\"]\n        RunMgr[\"run_manager.py<br/>Output Organization\"]\n        Runs[\"runs.py<br/>Run History\"]\n    end\n    \n    CLI --> ConfigL & ImageL\n    ConfigL --> ConfigP\n    ImageL -->|BGR| Detection\n    \n    CircleD -->|Standard Mode| ColorExt\n    ConvexD -->|CMYK Mode| ClusterPC\n    ColorSep --> ConvexD\n    HistC --> ColorPal\n    \n    ColorExt --> ColorClust\n    BlackV --> ConvexD\n    CMYKAcc --> Render\n    \n    ClusterPC -->|ClusterResult| Render\n    SlidingW -->|Per-Tile| ClusterPC\n    \n    GPUCore --> GPURend\n    GPURend --> CircleR\n    ClusterPC --> GPUCore\n    \n    CircleR & ClusterR & BlockR & TreemapR --> ImageExt\n    \n    Formatter --> Output\n    ImageExt --> RunMgr\n    Manifest --> RunMgr",
+  "content_size": 2527,
+  "collected_at": "2026-02-06T14:07:21.030046",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

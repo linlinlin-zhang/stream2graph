@@ -1,0 +1,146 @@
+{
+  "id": "gh_class_01534",
+  "source": "github",
+  "source_url": "https://github.com/aristanetworks/anta/blob/516fbdf92bdf410ef50efa1fe1ed8b894714d279/docs/api/class-diagram.mmd",
+  "github_repo": "aristanetworks/anta",
+  "github_file_path": "docs/api/class-diagram.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n  class AntaDevice {\n    <<Abstract>>\n    name : str\n    tags : Optional[set[str]]\n    hw_model : str | None\n    established : bool\n    is_online : bool\n    cache_statistics : dict[str, Any]\n    collect(command: AntaCommand) None\n    collect_commands(commands: list[AntaCommand]) None\n    copy(sources: list[Path], destination: Path, direction: Literal['to', 'from']) None\n    refresh()* None\n    _collect(command: AntaCommand)* None\n  }\n  class AntaTest {\n    <<Abstract>>\n    name : str$\n    description : str$\n    categories : list[str]$\n    commands : list[AntaTemplate | AntaCommand]$\n    device : AntaDevice\n    inputs : Input\n    result : TestResult\n    instance_commands : list[AntaCommand]\n    failed_commands : list[AntaCommand]\n    collected : bool\n    blocked : bool\n    module : str\n    logger : Logger\n    anta_test(function: F) Callable[..., Coroutine[Any, Any, TestResult]]$\n    save_commands_data(eos_data: list[dict[str, Any] | str]) None\n    render(template: AntaTemplate) list[AntaCommand]\n    test() None*\n  }\n  class AntaCommand:::pydantic {\n    command : str\n    version : Literal[1, 'latest']\n    revision : Revision | None\n    ofmt : Literal['json', 'text']\n    output : dict[str, Any] | str | None\n    json_output : dict[str, Any]\n    text_output : str\n    uid : str\n    template : AntaTemplate | None\n    params : AntaParamsBaseModel\n    errors : list[str]\n    error : bool\n    use_cache : bool\n    collected : bool\n    requires_privileges : bool\n    returned_known_eos_error : bool\n    supported : bool\n  }\n  class AntaTemplate {\n    template : str\n    version : Literal[1, 'latest']\n    revision : Revision | None\n    ofmt : Literal['json', 'text']\n    use_cache : bool\n    render() AntaCommand\n  }\n  class AntaTestStatus {\n    <<Enumeration>>\n    UNSET\n    SUCCESS\n    FAILURE\n    ERROR\n    SKIPPED\n  }\n  class Input:::pydantic {\n    filters : Filters | None\n    result_overwrite : ResultOverwrite | None\n  }\n  class ResultManager {\n    results : list[TestResult]\n    status: AntaTestStatus\n    error_status : bool\n    results_by_status: dict[AntaTestStatus, list[TestResult]]\n    sorted_category_stats: dict[str, CategoryStats]\n    dump: list[dict[str, Any]]\n    json : str\n    test_stats: dict[str, TestStats]\n    device_stats: dict[str, DeviceStats]\n    category_stats: dict[str, CategoryStats]\n    add(result: TestResult) None\n    filter(hide: set[AntaTestStatus]) ResultManager\n    filter_by_devices(devices: set[str]) ResultManager\n    filter_by_tests(tests: set[str]) ResultManager\n    get_results(status: set[AntaTestStatus] | None, sort_by: list[str] | None) list[TestResult]\n    get_total_results(status: set[AntaTestStatus] | None) int\n    get_status() str\n    get_tests() set[str]\n    get_devices() set[str]\n    reset() None\n  }\n  class AsyncEOSDevice {\n    enable : bool\n    copy(sources: list[Path], destination: Path, direction: Literal['to', 'from']) None\n    refresh() None\n    _collect(command: AntaCommand) None\n  }\n  class TestResult:::pydantic {\n    name : str\n    test : str\n    categories : list[str]\n    description : str\n    messages : list[str]\n    result : AntaTestStatus\n    custom_field : str | None\n    is_error(message: str | None) None\n    is_failure(message: str | None) None\n    is_skipped(message: str | None) None\n    is_success(message: str | None) None\n  }\nclass AntaCatalog {\n    tests : list[AntaTestDefinition]\n    filename: Path | None\n    indexes_built : bool\n    tag_to_tests : defaultdict[str | None, set[AntaTestDefinition]]\n    parse(filename: str | Path, file_format: Literal['yaml', 'json']) AntaCatalog$\n    from_dict(data: RawCatalogInput, filename: str | Path | None) AntaCatalog$\n    from_list(data: ListAntaTestTuples) AntaCatalog$\n    build_indexes(filtered_tests: set[str] | None) None\n    clear_indexes() None\n    get_tests_by_tags(tags: set[str]) set[AntaTestDefinition]\n    merge_catalogs(catalogs: list[AntaCatalog]) AntaCatalog\n    dump() AntaCatalogFile\n  }\n  class AntaCatalogFile:::pydantic {\n    root : dict[ImportString[Any], list[AntaTestDefinition]]\n    yaml() str\n  }\n  class AntaTestDefinition:::pydantic {\n    inputs : Input\n    test : type[AntaTest]\n    check_inputs() Self\n    instantiate_inputs(data: AntaTest.Input | dict[str, Any] | None, info: ValidationInfo) AntaTest.Input\n    serialize_model() dict[str, AntaTest.Input]\n  }\n  class AntaInventory {\n    devices : list[AntaDevice]\n    parse(filename: str | Path, username: str, password: str, enable_password: str | None, timeout: float | None) AntaInventory$\n    add_device(device: AntaDevice) None\n    connect_inventory() None\n    get_inventory() AntaInventory\n  }\n  class AntaInventoryHost:::pydantic {\n    disable_cache : bool\n    host : Hostname | IPvAnyAddress\n    name : str | None\n    port : Port | None\n    tags : set[str] | None\n  }\n  class AntaInventoryInput:::pydantic {\n    hosts : list[AntaInventoryHost] | None\n    networks : list[AntaInventoryNetwork] | None\n    ranges : list[AntaInventoryRange] | None\n    yaml() str\n  }\n  class AntaInventoryNetwork:::pydantic {\n    disable_cache : bool\n    network : IPvAnyNetwork, str\n    tags : set[str] | None\n  }\n  class AntaInventoryRange:::pydantic {\n    disable_cache : bool\n    end : IPvAnyAddress, str\n    start : IPvAnyAddress, str\n    tags : set[str] | None\n  }\n  AsyncEOSDevice --|> AntaDevice\n  Input --* AntaTestDefinition : inputs\n  Input --* AntaTest : inputs\n  AntaTestStatus --* ResultManager : status\n  AntaTestStatus --* TestResult : result\n  TestResult --* AntaTest : result\n  AntaDevice --o AntaTest : device\n  AntaTestDefinition --o AntaCatalog : tests\n  AntaCommand --o AntaTest : commands\n  AntaTemplate ..> AntaCommand : render()\n  AntaTemplate --o AntaTest : commands\n  AntaDevice --o AntaInventory : devices\n  AntaCatalog ..> AntaCatalogFile\n  AntaInventory ..> AntaInventoryInput\n  AntaInventoryInput ..> AntaInventoryHost\n  AntaInventoryInput ..> AntaInventoryNetwork\n  AntaInventoryInput ..> AntaInventoryRange\n  classDef pydantic fill:#D63965\n",
+  "content_size": 5999,
+  "collected_at": "2026-02-06T01:59:02.051670",
+  "compilation_status": "failed",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 74,
+  "repo_forks": 39,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是AntaDevice、AntaTest应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "AntaDevice",
+        "AntaTest"
+      ],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含AntaTemplate、AntaTestStatus这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，AntaTemplate、AntaTestStatus是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "AntaTemplate",
+        "AntaTestStatus"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由ResultManager、AsyncEOSDevice组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，ResultManager、AsyncEOSDevice是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "ResultManager",
+        "AsyncEOSDevice",
+        "AntaCatalog"
+      ],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理AntaInventory？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，AntaInventory是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "AntaInventory和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "最后，流程到达AntaInventory结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "AntaInventory"
+      ],
+      "timestamp_offset": 180
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 12,
+    "speaker_distribution": {
+      "Speaker_B": 6,
+      "Speaker_A": 6
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "clarify": 1,
+      "confirm": 4,
+      "structural": 2,
+      "inform": 1,
+      "request": 1,
+      "contrastive": 1
+    },
+    "avg_turn_length": 27.833333333333332,
+    "dialogue_duration": 180
+  }
+}

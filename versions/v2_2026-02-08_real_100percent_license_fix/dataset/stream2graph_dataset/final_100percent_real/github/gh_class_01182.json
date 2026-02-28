@@ -1,0 +1,18 @@
+{
+  "id": "gh_class_01182",
+  "source": "github",
+  "source_url": "https://github.com/Imsharad/openai-code-interpreter/blob/acd945352ee589aec72be4ef1257c90aa4696ba9/resources/diagrams/src/uml.mmd",
+  "github_repo": "Imsharad/openai-code-interpreter",
+  "github_file_path": "resources/diagrams/src/uml.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n\n    %% ==========================\n    %% Abstract Classes\n    %% ==========================\n    class BaseAgent {\n        - model_name: str\n        - messages: ChatMessages\n        - tool_manager: ToolManager\n        - logger: Logger\n        - language_model_interface: LanguageModelInterface\n\n        + __init__(developer_prompt: str, model_name: str)\n        + setup_tools(): void  %% abstract\n        + add_context(content: str): void\n        + add_message(content: str): void\n        + task(user_task: str, tool_call_enabled: bool, return_tool_response_as_is: bool): str\n    }\n\n    class ToolInterface {\n        + get_definition(): Dict[str, Any]\n        + run(arguments: Dict[str, Any]): str\n    }\n\n    class LanguageModelInterface {\n        + generate_completion(\n            model: str, \n            messages: List<Dict[str, str]], \n            tools: List[Dict[str, Any]]\n        ): Dict[str, Any]\n    }\n\n\n    %% ==========================\n    %% Concrete Classes\n    %% ==========================\n    class ChatMessages {\n        - messages: List<Dict[str, str]>\n\n        + __init__(developer_prompt: str)\n        + add_developer_message(content: str): void\n        + add_user_message(content: str): void\n        + add_assistant_message(content: str): void\n        + get_messages(): List<Dict[str, str]>\n    }\n\n    class ToolManager {\n        - tools: Dict[str, ToolInterface]\n        - logger: Logger\n        - language_model_interface: LanguageModelInterface\n\n        + __init__()\n        + register_tool(tool: ToolInterface): void\n        + get_tool_definitions(): List<Dict[str, Any]>\n        + handle_tool_call_sequence(\n            response: str, \n            return_tool_response_as_is: bool, \n            messages: ChatMessages\n        ): str\n    }\n\n    class OpenAILanguageModel {\n        - openai_client: OpenAI\n        - logger: Logger\n\n        + __init__()\n        + generate_completion(\n            model: str, \n            messages: List<Dict[str, str]], \n            tools: List<Dict[str, Any]]\n        ): Dict[str, Any]\n    }\n\n    class OpenAIClientFactory {\n        + create_client(api_key: str): OpenAI\n        - _resolve_api_key(api_key: str): str\n    }\n\n\n    %% ==========================\n    %% Relationships\n    %% ==========================\n    BaseAgent --> ChatMessages : uses\n    BaseAgent --> LanguageModelInterface : uses\n    BaseAgent --> ToolManager : optionally uses\n\n    ToolManager \"0..*\" --> \"1\" ToolInterface : manages\n    ToolManager --> ChatMessages : uses\n    ToolManager --> LanguageModelInterface : uses\n\n    LanguageModelInterface <|-- OpenAILanguageModel\n    OpenAILanguageModel --> OpenAIClientFactory : uses",
+  "content_size": 2674,
+  "collected_at": "2026-02-06T01:54:08.796967",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

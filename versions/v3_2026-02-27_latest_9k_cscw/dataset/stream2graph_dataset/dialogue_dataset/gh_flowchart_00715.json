@@ -1,0 +1,614 @@
+{
+  "id": "gh_flowchart_00715",
+  "source": "github",
+  "source_url": "https://github.com/pawafulu7/techtrend/blob/12fca8f1e5d47a4c38328a261acca80ee3021dec/docs/presentations/assets/techtrend-architecture.mmd",
+  "github_repo": "pawafulu7/techtrend",
+  "github_file_path": "docs/presentations/assets/techtrend-architecture.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart LR\n    subgraph Sources[\"情報ソース\"]\n        RSS[\"RSSフィード<br/>（AI/LLM・企業ブログ・技術メディア）\"]\n        Scrape[\"スクレイピング対象<br/>（Speaker Deck ・ Docswell）\"]\n        API[\"API提供ソース\"]\n    end\n\n    subgraph Scheduler[\"取得・処理スケジューラ\"]\n        Cron[\"ローカル cron ・ PM2 Scheduler\"]\n        GitHubActions[\"GitHub Actions Workflows<br/>（RSS毎時 ・ スクレイピング12h ・ 品質日次）\"]\n    end\n\n    subgraph Pipeline[\"収集・要約パイプライン\"]\n        Fetchers[\"Fetchers 41種<br/>（Node.js ・ TypeScript）\"]\n        Enrichers[\"Enrichers<br/>（本文取得 ・ サムネ ・ メタデータ）\"]\n        Summarizer[\"AI Summary Service<br/>Transport → Adapter → Service<br/>QualityChecker ・ PostProcessor\"]\n    end\n\n    subgraph Persistence[\"データレイヤ\"]\n        Postgres[\"PostgreSQL<br/>Prisma ORM\"]\n        Redis[\"Redis<br/>L1/L2キャッシュ\"]\n        ProcessingLog[\"ProcessingLog ・ 差分タイムスタンプ\"]\n    end\n\n    subgraph Application[\"アプリケーション\"]\n        NextAPI[\"Next.js 15 App Router<br/>API Routes ・ Auth.js\"]\n        Client[\"React 19 UI<br/>Tailwind + shadcn/ui\"]\n        Metrics[\"ダッシュボード ・ トレンド ・ お気に入り\"]\n    end\n\n    subgraph Observability[\"監視・運用\"]\n        OTel[\"OpenTelemetry Collectors\"]\n        Grafana[\"Grafana + Loki + Tempo\"]\n        NewRelic[\"New Relic APM\"]\n        CI[\"Dockerベース CI ・ Tests\"]\n    end\n\n    Sources -->|記事情報| Fetchers\n    Scheduler -->|収集トリガー| Fetchers\n    Fetchers --> Enrichers --> Summarizer\n    Summarizer -->|要約・品質| Postgres\n    Enrichers -->|本文/サムネ| Postgres\n    Postgres -->|キャッシュ投入| Redis\n    ProcessingLog --> Scheduler\n    Postgres --> NextAPI --> Client\n    Redis --> NextAPI\n    NextAPI --> Metrics\n    Summarizer -->|Gemini API| ExternalAI((\"Google Gemini 2.5 Flash\"))\n    ExternalAI -. テレメトリ .-> OTel\n\n    Fetchers -. ログ .-> OTel\n    Postgres --> CI\n    Scheduler --> CI\n    OTel --> Grafana\n    OTel --> NewRelic\n",
+  "content_size": 1752,
+  "collected_at": "2026-02-06T01:47:09.378903",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达\"情報ソース\"、\"RSSフィード<br/>（AI/LLM・企業ブログ・技術メディア）\"结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将\"情報ソース\"、\"RSSフィード<br/>（AI/LLM・企業ブログ・技術メディア）\"分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "Sources",
+        "RSS"
+      ],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将\"スクレイピング対象<br/>（Speaker Deck ・ Docswell）\"、\"API提供ソース\"分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，\"スクレイピング対象<br/>（Speaker Deck ・ Docswell）\"、\"API提供ソース\"就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，\"スクレイピング対象<br/>（Speaker Deck ・ Docswell）\"、\"API提供ソース\"是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "\"スクレイピング対象<br/>（Speaker Deck ・ Docswell）\"、\"API提供ソース\"和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "Scrape",
+        "API",
+        "Scheduler"
+      ],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "关于\"ローカル cron ・ PM2 Scheduler\"，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "Cron"
+      ],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下\"GitHub Actions Workflows<br/>（RSS毎時 ・ スクレイピング12h ・ 品質日次）\"吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，\"GitHub Actions Workflows<br/>（RSS毎時 ・ スクレイピング12h ・ 品質日次）\"的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有\"GitHub Actions Workflows<br/>（RSS毎時 ・ スクレイピング12h ・ 品質日次）\"。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "GitHubActions"
+      ],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有\"収集・要約パイプライン\"、\"Fetchers 41種<br/>（Node.js ・ TypeScript）\"。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，\"収集・要約パイプライン\"、\"Fetchers 41種<br/>（Node.js ・ TypeScript）\"就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "Pipeline",
+        "Fetchers"
+      ],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由\"Enrichers<br/>（本文取得 ・ サムネ ・ メタデータ）\"组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "Enrichers"
+      ],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由\"AI Summary Service<br/>Transport → Adapter → Service<br/>QualityChecker ・ PostProcessor\"组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "Summarizer"
+      ],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由\"データレイヤ\"、\"PostgreSQL<br/>Prisma ORM\"组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，\"データレイヤ\"、\"PostgreSQL<br/>Prisma ORM\"是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "Persistence",
+        "Postgres",
+        "Redis"
+      ],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理\"ProcessingLog ・ 差分タイムスタンプ\"？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "相较于方案A，\"ProcessingLog ・ 差分タイムスタンプ\"有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是\"ProcessingLog ・ 差分タイムスタンプ\"应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "ProcessingLog"
+      ],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理\"アプリケーション\"？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "Application"
+      ],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由\"Next.js 15 App Router<br/>API Routes ・ Auth.js\"、\"React 19 UI<br/>Tailwind + shadcn/ui\"组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，\"Next.js 15 App Router<br/>API Routes ・ Auth.js\"、\"React 19 UI<br/>Tailwind + shadcn/ui\"是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在\"Next.js 15 App Router<br/>API Routes ・ Auth.js\"、\"React 19 UI<br/>Tailwind + shadcn/ui\"完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "NextAPI",
+        "Client"
+      ],
+      "timestamp_offset": 495
+    },
+    {
+      "turn_id": 34,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由\"ダッシュボード ・ トレンド ・ お気に入り\"组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 510
+    },
+    {
+      "turn_id": 35,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 525
+    },
+    {
+      "turn_id": 36,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 540
+    },
+    {
+      "turn_id": 37,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下\"ダッシュボード ・ トレンド ・ お気に入り\"吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "Metrics"
+      ],
+      "timestamp_offset": 555
+    },
+    {
+      "turn_id": 38,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有\"監視・運用\"、\"OpenTelemetry Collectors\"。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 570
+    },
+    {
+      "turn_id": 39,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，\"監視・運用\"、\"OpenTelemetry Collectors\"的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "Observability",
+        "OTel"
+      ],
+      "timestamp_offset": 585
+    },
+    {
+      "turn_id": 40,
+      "speaker": "Speaker_A",
+      "utterance": "关于\"Grafana + Loki + Tempo\"，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 600
+    },
+    {
+      "turn_id": 41,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，\"Grafana + Loki + Tempo\"就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 615
+    },
+    {
+      "turn_id": 42,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将\"Grafana + Loki + Tempo\"分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "Grafana"
+      ],
+      "timestamp_offset": 630
+    },
+    {
+      "turn_id": 43,
+      "speaker": "Speaker_B",
+      "utterance": "\"New Relic APM\"、\"Dockerベース CI ・ Tests\"主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 645
+    },
+    {
+      "turn_id": 44,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，\"New Relic APM\"、\"Dockerベース CI ・ Tests\"就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 660
+    },
+    {
+      "turn_id": 45,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由\"New Relic APM\"、\"Dockerベース CI ・ Tests\"组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "NewRelic",
+        "CI",
+        "ExternalAI"
+      ],
+      "timestamp_offset": 675
+    },
+    {
+      "turn_id": 46,
+      "speaker": "Speaker_A",
+      "utterance": "記事情報、収集トリガー主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 690
+    },
+    {
+      "turn_id": 47,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 705
+    },
+    {
+      "turn_id": 48,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将記事情報、収集トリガー分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 720
+    },
+    {
+      "turn_id": 49,
+      "speaker": "Speaker_B",
+      "utterance": "首先，我们需要定义流程的起点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "edge_0",
+        "edge_1"
+      ],
+      "timestamp_offset": 735
+    },
+    {
+      "turn_id": 50,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理、要約・品質？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 750
+    },
+    {
+      "turn_id": 51,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，、要約・品質的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_2",
+        "edge_3"
+      ],
+      "timestamp_offset": 765
+    },
+    {
+      "turn_id": 52,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有本文/サムネ、キャッシュ投入。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 780
+    },
+    {
+      "turn_id": 53,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是本文/サムネ、キャッシュ投入应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_4",
+        "edge_5"
+      ],
+      "timestamp_offset": 795
+    },
+    {
+      "turn_id": 54,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将、分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 810
+    },
+    {
+      "turn_id": 55,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，、就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_6",
+        "edge_7"
+      ],
+      "timestamp_offset": 825
+    },
+    {
+      "turn_id": 56,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 840
+    },
+    {
+      "turn_id": 57,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 855
+    },
+    {
+      "turn_id": 58,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "edge_8"
+      ],
+      "timestamp_offset": 870
+    },
+    {
+      "turn_id": 59,
+      "speaker": "Speaker_B",
+      "utterance": "、Gemini API主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 885
+    },
+    {
+      "turn_id": 60,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是、Gemini API应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_9",
+        "edge_10"
+      ],
+      "timestamp_offset": 900
+    },
+    {
+      "turn_id": 61,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有、。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 915
+    },
+    {
+      "turn_id": 62,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_11",
+        "edge_12"
+      ],
+      "timestamp_offset": 930
+    },
+    {
+      "turn_id": 63,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由、组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 945
+    },
+    {
+      "turn_id": 64,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在、完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "edge_13",
+        "edge_14"
+      ],
+      "timestamp_offset": 960
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 64,
+    "speaker_distribution": {
+      "Speaker_B": 32,
+      "Speaker_A": 32
+    },
+    "speech_act_distribution": {
+      "sequential": 6,
+      "inform": 10,
+      "classification": 9,
+      "confirm": 11,
+      "contrastive": 2,
+      "request": 7,
+      "clarify": 6,
+      "structural": 13
+    },
+    "avg_turn_length": 35.609375,
+    "dialogue_duration": 960
+  }
+}

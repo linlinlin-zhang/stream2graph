@@ -1,0 +1,579 @@
+{
+  "id": "aug_gl_packet-beta_00454_Ret_8",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/Ghenghis/SvonyBrowser/blob/b02803cf7b47e7d54ef3c45466f973948f5a47d4/docs/v2.0.6/diagrams/IPC_COMMUNICATION.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "Ghenghis/SvonyBrowser",
+  "diagram_type": "packet-beta",
+  "code": "%%{Retail_CustomerLoyalty}}}%%\nsequenceDiagram\n    autonumber\n    participant R as 🖼️ Renderer<br/>(Retail_CouponSystem)\n    participant P as 📡 Preload<br/>(Retail_Inventory)\n    participant M as 🖥️ Main<br/>(Retail_PointOfSale)\n    participant S as ⚙️ Services\n    participant MCP as 🤖 MCP Servers\n    participant LM as 🧠 LM Studio\n    \n    Note over R,LM: Application Initialization\n    \n    R->>P: DOMContentLoaded\n    P->>M: ipcRenderer.invoke(Retail_OrderManagement)\n    M-->>P: {Retail_Inventory}\n    P-->>R: version\n    \n    R->>P: Initialize LM Studio\n    P->>M: ipcRenderer.invoke(Retail_OrderManagement)\n    M->>S: lmStudioClient.connect(Retail_CouponSystem)\n    S->>LM: HTTP GET /v1/models\n    LM-->>S: {Retail_CouponSystem] }\n    S-->>M: {Retail_CouponSystem}\n    M-->>P: status\n    P-->>R: Update UI\n    \n    Note over R,LM: Chat Message Flow\n    \n    R->>P: User sends chat message\n    P->>M: ipcRenderer.invoke(Retail_OrderManagement)\n    M->>S: chatbotService.processMessage(Retail_OrderManagement)\n    \n    alt Intent: Knowledge Query\n        S->>MCP: evony_search(Retail_PointOfSale)\n        MCP-->>S: {Retail_PointOfSale] }\n    else Intent: Calculation\n        S->>MCP: calc_training(Retail_CouponSystem)\n        MCP-->>S: {Retail_PointOfSale} }\n    else Intent: Protocol\n        S->>MCP: protocol_lookup(Retail_CouponSystem)\n        MCP-->>S: {Retail_CouponSystem} }\n    end\n    \n    S->>S: Build context from MCP results\n    S->>LM: POST /v1/chat/completions\n    LM-->>S: {Retail_CustomerLoyalty}\n    S-->>M: formatted response\n    M-->>P: response\n    P-->>R: Display in chat\n    \n    Note over R,LM: Traffic Capture Flow\n    \n    R->>P: Webview traffic detected\n    P->>M: ipcRenderer.send(Retail_OrderManagement)\n    M->>S: proxyMonitor.processPacket(Retail_CouponSystem)\n    S->>S: Decode AMF3\n    S->>S: Identify action\n    S->>S: Update game state\n    M->>P: mainWindow.webContents.send(Retail_OrderManagement)\n    P->>R: Update traffic list\n    \n    Note over R,LM: Settings Flow\n    \n    R->>P: User saves settings\n    P->>M: ipcRenderer.invoke(Retail_CustomerLoyalty)\n    M->>S: store.set(Retail_Inventory)\n    M->>S: lmStudioClient.updateSettings(Retail_CouponSystem)\n    S->>LM: Reconnect if URL changed\n    M-->>P: {Retail_PointOfSale}\n    P-->>R: Show confirmation\n",
+  "content_size": 2201,
+  "collected_at": "2026-02-06T14:10:02.606566",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Retail",
+  "seed_id": "gl_packet-beta_00454",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "首先，我们需要定义流程的起点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是🖼️ Renderer<br/>(Retail_CouponSystem)应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下🖼️ Renderer<br/>(Retail_CouponSystem)吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将🖼️ Renderer<br/>(Retail_CouponSystem)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "R"
+      ],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理📡 Preload<br/>(Retail_Inventory)？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，📡 Preload<br/>(Retail_Inventory)是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由📡 Preload<br/>(Retail_Inventory)组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "P"
+      ],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将🖥️ Main<br/>(Retail_PointOfSale)、⚙️ Services分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，🖥️ Main<br/>(Retail_PointOfSale)、⚙️ Services是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "M",
+        "S"
+      ],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "关于🤖 MCP Servers，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，🤖 MCP Servers的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在🤖 MCP Servers完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "MCP"
+      ],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理🧠 LM Studio、DOMContentLoaded？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是🧠 LM Studio、DOMContentLoaded应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "LM",
+        "msg_0"
+      ],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "ipcRenderer.invoke(Retail_OrderManagement)、Initialize LM Studio主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "相较于方案A，ipcRenderer.invoke(Retail_OrderManagement)、Initialize LM Studio有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "ipcRenderer.invoke(Retail_OrderManagement)、Initialize LM Studio负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_1",
+        "msg_2",
+        "msg_3"
+      ],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "lmStudioClient.connect(Retail_CouponSystem)、HTTP GET /v1/models主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，lmStudioClient.connect(Retail_CouponSystem)、HTTP GET /v1/models就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将lmStudioClient.connect(Retail_CouponSystem)、HTTP GET /v1/models分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "msg_4",
+        "msg_5"
+      ],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "User sends chat message、ipcRenderer.invoke(Retail_OrderManagement)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_6",
+        "msg_7"
+      ],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "chatbotService.processMessage(Retail_OrderManagement)、evony_search(Retail_PointOfSale)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，chatbotService.processMessage(Retail_OrderManagement)、evony_search(Retail_PointOfSale)的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_8",
+        "msg_9"
+      ],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含calc_training(Retail_CouponSystem)这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_10"
+      ],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将protocol_lookup(Retail_CouponSystem)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在protocol_lookup(Retail_CouponSystem)完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "protocol_lookup(Retail_CouponSystem)负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_11"
+      ],
+      "timestamp_offset": 495
+    },
+    {
+      "turn_id": 34,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有Build context from MCP results、POST /v1/chat/completions。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 510
+    },
+    {
+      "turn_id": 35,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 525
+    },
+    {
+      "turn_id": 36,
+      "speaker": "Speaker_A",
+      "utterance": "关于Build context from MCP results、POST /v1/chat/completions，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "msg_12",
+        "msg_13",
+        "msg_14"
+      ],
+      "timestamp_offset": 540
+    },
+    {
+      "turn_id": 37,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下ipcRenderer.send(Retail_OrderManagement)吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 555
+    },
+    {
+      "turn_id": 38,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 570
+    },
+    {
+      "turn_id": 39,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，ipcRenderer.send(Retail_OrderManagement)有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_15"
+      ],
+      "timestamp_offset": 585
+    },
+    {
+      "turn_id": 40,
+      "speaker": "Speaker_A",
+      "utterance": "proxyMonitor.processPacket(Retail_CouponSystem)、Decode AMF3主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 600
+    },
+    {
+      "turn_id": 41,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，proxyMonitor.processPacket(Retail_CouponSystem)、Decode AMF3就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 615
+    },
+    {
+      "turn_id": 42,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 630
+    },
+    {
+      "turn_id": 43,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，proxyMonitor.processPacket(Retail_CouponSystem)、Decode AMF3是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_16",
+        "msg_17"
+      ],
+      "timestamp_offset": 645
+    },
+    {
+      "turn_id": 44,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有Identify action、Update game state。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 660
+    },
+    {
+      "turn_id": 45,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Identify action、Update game state的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 675
+    },
+    {
+      "turn_id": 46,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下Identify action、Update game state吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 690
+    },
+    {
+      "turn_id": 47,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理Identify action、Update game state？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "msg_18",
+        "msg_19"
+      ],
+      "timestamp_offset": 705
+    },
+    {
+      "turn_id": 48,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将mainWindow.webContents.send(Retail_OrderManagement)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 720
+    },
+    {
+      "turn_id": 49,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 735
+    },
+    {
+      "turn_id": 50,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，mainWindow.webContents.send(Retail_OrderManagement)是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 750
+    },
+    {
+      "turn_id": 51,
+      "speaker": "Speaker_B",
+      "utterance": "mainWindow.webContents.send(Retail_OrderManagement)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "msg_20"
+      ],
+      "timestamp_offset": 765
+    },
+    {
+      "turn_id": 52,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Update traffic list、User saves settings分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 780
+    },
+    {
+      "turn_id": 53,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 795
+    },
+    {
+      "turn_id": 54,
+      "speaker": "Speaker_A",
+      "utterance": "Update traffic list、User saves settings主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 810
+    },
+    {
+      "turn_id": 55,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Update traffic list、User saves settings的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_21",
+        "msg_22",
+        "msg_23"
+      ],
+      "timestamp_offset": 825
+    },
+    {
+      "turn_id": 56,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含store.set(Retail_Inventory)这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 840
+    },
+    {
+      "turn_id": 57,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 855
+    },
+    {
+      "turn_id": 58,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下store.set(Retail_Inventory)吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "msg_24"
+      ],
+      "timestamp_offset": 870
+    },
+    {
+      "turn_id": 59,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有lmStudioClient.updateSettings(Retail_CouponSystem)、Reconnect if URL changed。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 885
+    },
+    {
+      "turn_id": 60,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，lmStudioClient.updateSettings(Retail_CouponSystem)、Reconnect if URL changed就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 900
+    },
+    {
+      "turn_id": 61,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达lmStudioClient.updateSettings(Retail_CouponSystem)、Reconnect if URL changed结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_25",
+        "msg_26"
+      ],
+      "timestamp_offset": 915
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 61,
+    "speaker_distribution": {
+      "Speaker_B": 31,
+      "Speaker_A": 30
+    },
+    "speech_act_distribution": {
+      "sequential": 4,
+      "clarify": 6,
+      "request": 9,
+      "classification": 13,
+      "confirm": 14,
+      "structural": 8,
+      "inform": 5,
+      "contrastive": 2
+    },
+    "avg_turn_length": 47.0,
+    "dialogue_duration": 915
+  }
+}

@@ -1,0 +1,31 @@
+{
+  "id": "gh_sequence_00682",
+  "source": "github",
+  "source_url": "https://github.com/coherosphere/architecture/blob/598bb65467787da38ac4029e35bdead27e7799ee/assets/diagrams/C4_sequences/C4-13_Hub_Creation_Registration_Manifesto_Sync.mmd",
+  "github_repo": "coherosphere/architecture",
+  "github_file_path": "assets/diagrams/C4_sequences/C4-13_Hub_Creation_Registration_Manifesto_Sync.mmd",
+  "diagram_type": "sequence",
+  "code": "%%{init: {'theme':'base','themeVariables':{ 'sequenceNumberColor':'#334155'}}}%%\nsequenceDiagram\nautonumber\n\nactor H as Hub Steward\n\nbox #8b5cf6 UI\n  participant UI as C2-12 Resonance Board UI\nend\n\nbox #fde68a Control or API\n  participant API as C2-11 Public API Gateway\nend\n\nbox #ff8b00 Core Services\n  participant HUB as C2-06 Local Hub and Federation\n  participant ETH as C2-08 Manifesto and Ethics Guard\n  participant ID as C2-05 Identity PoCI\n  participant GOV as C2-03 Governance and DAO\n  participant MET as C2-07 Metrics and Analytics\n  participant SEC as C2-10 Security and Audit\nend\n\n%% -------- Start hub creation --------\nH ->> UI: create hub request metadata contacts region\nUI ->> API: POST /hubs register payload\nAPI ->> ID: verifyIdentity steward DID or org credential\nID -->> API: IdentityVerified DDD EVT 16\nAPI ->> ETH: preflightAlignment hub profile manifesto attestation\nETH -->> API: AlignmentChecked DDD EVT 03 with guidance\n\nalt alignment ok\n  API ->> HUB: registerHub payload and attestations\n  HUB ->> SEC: audit log hub registration start\n  HUB -->> API: hubId issued\n  HUB -->> MET: HubRegistered DDD EVT 38\n  MET -->> MET: KPIUpdated DDD EVT 26\nelse alignment failed\n  API -->> UI: registration rejected with guidance\n  UI -->> H: show rejection and remediation\n  %% stop path on failure\nend\n\n%% -------- Optional governance participation --------\nopt register for governance\n  API ->> GOV: registerHubForParticipation hubId\n  GOV -->> API: ack registration\n  GOV -->> MET: KPIUpdated DDD EVT 26\nend\n\n%% -------- Manifesto sync and version pin --------\nAPI ->> ETH: getCurrentManifestoVersion\nETH -->> API: manifestoVersion and rubric hash\nAPI ->> HUB: setManifestoVersion hubId version hash\nHUB -->> MET: ManifestoSynced DDD EVT 39\nMET -->> MET: KPIUpdated DDD EVT 26\n\n%% -------- Baseline signals and health --------\nHUB ->> MET: publish HubSignal baseline\nMET -->> MET: KPIUpdated DDD EVT 26\nHUB -->> SEC: store hub attestations and version refs\n\n%% -------- Completion --------\nAPI -->> UI: hub registration complete hubId manifesto version\nUI -->> H: display hub created and synced\n\n%% Notes\nNote over HUB,MET: HubRegistered DDD EVT 38 marks successful registration\nNote over HUB,ETH: ManifestoSynced DDD EVT 39 records pinned manifesto version\nNote over ID: IdentityVerified DDD EVT 16 for steward or org identity",
+  "content_size": 2348,
+  "collected_at": "2026-02-06T01:35:36.784692",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License (Assumed)",
+  "license_url": null,
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "repo_owner": "coherosphere",
+  "repo_name": "architecture",
+  "repo_description": "The cohersphere architecture — structural blueprint of the resonance network. Defines the modular layers connecting app, API, and governance protocols. Outlines data flows for Proof-of-Contribution, c",
+  "repo_language": "Mermaid",
+  "repo_topics": [
+    "architecture",
+    "c4",
+    "distributed-systems",
+    "modular-architecture",
+    "system-design"
+  ],
+  "repo_created_at": "2025-10-29T09:30:02Z",
+  "repo_updated_at": "2026-02-06T04:58:50Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

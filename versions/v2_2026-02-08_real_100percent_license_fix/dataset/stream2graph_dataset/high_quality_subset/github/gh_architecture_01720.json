@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01720",
+  "source": "github",
+  "source_url": "https://github.com/aazad612/gcp-healthcare-data-landing-zone/blob/d0a894047af6203a677e8f15f81405eae0985cf6/infra/03-networking/network-detailed.mmd",
+  "github_repo": "aazad612/gcp-healthcare-data-landing-zone",
+  "github_file_path": "infra/03-networking/network-detailed.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TD\n    %% =========================================\n    %% 0. THE INTERNET\n    %% =========================================\n    Internet((☁️ Internet))\n\n    %% =========================================\n    %% 1. ON-PREMISE CONNECTIVITY\n    %% =========================================\n    subgraph OnPrem_Zone [🏢 On-Premise & Interconnect]\n        OnPrem[Legacy Data Center<br/>VPN - Direct Connect]\n        Interconnect((⚡ Dedicated<br/>Interconnect))\n    end\n\n    %% =========================================\n    %% 2. THE HUB (Networking Core)\n    %% =========================================\n    subgraph Hub_Project [PROJECT: prj-net-common-pd-host]\n        subgraph Hub_VPC [vpc-hub-main]\n            direction TB\n            Hub_Subnet[\"subnet: sb-hub-main-usc1<br/>10.0.0.0/24\"]\n            Hub_NAT[Cloud NAT - Router]\n        end\n    end\n\n    %% =========================================\n    %% 3. THE SPOKES (Domain Host Projects)\n    %% =========================================\n\n    %% --- CLINICAL SPOKE (High Security) ---\n    subgraph Clin_Project [PROJECT: prj-net-clin-pd-host]\n        subgraph Clin_VPC [vpc-clin-prod]\n            direction TB\n            %% Firewall Node representing the separation\n            FW_Ingress{🔥 FW: Ingress<br/>Allow 443}\n            FW_Internal{🔥 FW: Internal<br/>Allow 10.x Only}\n            \n            Clin_Subnet_Ext[\"subnet: sb-clin-prod-ext-usc1<br/>10.10.2.0/24<br/>🌐 External-Ingress\"]\n            Clin_Subnet_Int[\"subnet: sb-clin-prod-int-usc1<br/>10.10.1.0/24<br/>🔒 Private-Internal\"]\n        end\n    end\n\n    %% --- ENTERPRISE SPOKE (Standard) ---\n    subgraph Ent_Project [PROJECT: prj-net-ent-pd-host]\n        subgraph Ent_VPC [vpc-ent-prod]\n            Ent_Subnet[\"subnet: sb-ent-prod-int-usc1<br/>10.20.1.0/24\"]\n        end\n    end\n\n    %% --- RESEARCH SPOKE (Standard) ---\n    subgraph Res_Project [PROJECT: prj-net-res-pd-host]\n        subgraph Res_VPC [vpc-res-prod]\n            Res_Subnet[\"subnet: sb-res-prod-int-usc1<br/>10.30.1.0/24\"]\n        end\n    end\n\n    %% =========================================\n    %% CONNECTIONS & PEERING\n    %% =========================================\n\n    %% 1. Hybrid Link\n    OnPrem === Interconnect\n    Interconnect ===|BGP Routing| Hub_NAT\n\n    %% 2. Internet Connectivity\n    Hub_NAT ==>|NAT Egress| Internet\n    Internet -.->|HTTPS Ingress| FW_Ingress\n    FW_Ingress ==> Clin_Subnet_Ext\n    \n    %% 3. Internal Security Flow\n    Clin_Subnet_Ext -.-> FW_Internal\n    FW_Internal ==> Clin_Subnet_",
+  "content_size": 2511,
+  "collected_at": "2026-02-06T02:02:31.337481",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

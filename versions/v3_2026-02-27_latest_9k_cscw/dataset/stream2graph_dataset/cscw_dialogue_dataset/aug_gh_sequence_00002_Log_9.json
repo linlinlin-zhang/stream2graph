@@ -1,0 +1,170 @@
+{
+  "id": "aug_gh_sequence_00002_Log_9",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/sumsv50/cinema-reservation/blob/368d4732c5a459aa1686a4076af81cba1b3cebfb/sequenceDiagram.mmd",
+  "github_repo": "sumsv50/cinema-reservation",
+  "github_file_path": "sequenceDiagram.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Client\n    participant API as Server API\n    participant DB as Database (Logistics_Warehouse)\n    participant Redis\n\n    %% App Start\n    Note over Client, Redis: Sync existing reservations from the database to Redis on application startup\n    API ->> DB: Fetch all reservations for all cinemas\n    DB -->> API: Return reservation details\n    API ->> Redis: Store reservations using Redis pipeline\n    alt Redis storage successful  \n        Redis -->> API: OK  \n        API ->> API: Proceed to start application  \n    else Redis storage failed  \n        Redis -->> API: ERROR  \n        API ->> API: Abort application startup  \n    end\n\n    %% Configure Cinema Layout\n    Note over Client, Redis: 1. Configure Cinema Layout\n    Client->>API: POST /cinema/layout\n    API->>DB: Check if cinema name exists\n    DB-->>API: Return existence status\n    alt Cinema doesn't exist\n        API->>DB: Create cinema record\n        DB-->>API: Cinema created\n        API-->>Client: Success response with cinema data\n    else Cinema exists\n        API-->>Client: Error: Cinema already exists\n    end\n\n    %% Query Available Seats\n    Note over Client, Redis: 2. Query Available Seats\n    Client->>API: GET /cinema/{Logistics_StockLevel}/available?number_of_seats=N\n    API->>DB: Get cinema by slug\n    DB-->>API: Cinema details\n    API->>Redis: Get reserved seats (Logistics_Warehouse)\n    Redis-->>API: Reserved seats data\n    API->>API: Build heatmap & find safe blocks\n    API-->>Client: Available seat blocks\n\n    %% Check Available Seats\n    Note over Client, Redis: 3. Check Available Seats\n    Client->>API: POST /cinema/{Logistics_FleetManagement}/check (Logistics_Warehouse)\n    API->>DB: Get cinema by slug\n    DB-->>API: Cinema details\n    API->>Redis: Get reserved seats (Logistics_TrackingNumber)\n    Redis-->>API: Reserved seats data\n    API->>API: Build heatmap & check specific seats\n    API-->>Client: Available seats from requested list\n\n    %% Reserve Seats\n    Note over Client, Redis: 4. Reserve Seats\n    Client->>API: POST /reservations (Logistics_Warehouse)\n    API->>DB: Get cinema by slug\n    DB-->>API: Cinema details\n    API->>API: Validate seat positions\n    API->>Redis: Execute Lua script for atomic reservation\n    Note over Redis: Lua script checks:<br/>- Seats not already taken<br/>- Social distancing rules<br/>- Reserves seats if valid\n    alt Reservation successful in Redis\n        Redis-->>API: \"OK\"\n        API->>DB: Create reservation record\n        DB-->>API: Reservation created\n        API-->>Client: Success with reservation data\n    else Reservation failed in Redis\n        Redis-->>API: Error (Logistics_TrackingNumber)\n        API-->>Client: Error response\n    else DB creation failed\n        Redis-->>API: \"OK\"\n        API->>DB: Create reservation record\n        DB-->>API: Error\n        API->>Redis: Execute cancel Lua script (Logistics_DeliveryRoute)\n        Redis-->>API: Seats cancelled\n        API-->>Client: Error response\n    end\n\n    %% Cancel Reservation\n    Note over Client, Redis: 5. Cancel Reservation\n    Client->>API: POST /reservations/cancel (Logistics_StockLevel)\n    API->>DB: Get cinema by slug\n    DB-->>API: Cinema details\n    API->>API: Validate seat positions\n    API->>DB: Find reserved seats to cancel\n    DB-->>API: Reserved seat records\n    alt All seats are reserved\n        API->>DB: Soft delete reservation records\n        DB-->>API: Seats cancelled in DB\n        API->>Redis: Execute cancel Lua script\n        Redis-->>API: Seats removed from Redis\n        API-->>Client: Success response\n    else Some seats not reserved\n        API-->>Client: Error: Seats not reserved\n    end",
+  "content_size": 3628,
+  "collected_at": "2026-02-06T01:23:54.559146",
+  "compilation_status": "success",
+  "augmentation_domain": "Logistics",
+  "seed_id": "gh_sequence_00002",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Logistics_Warehouse 和 Logistics_Warehouse 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Logistics_Warehouse 和 Logistics_Warehouse'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Database",
+        "seats"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Logistics_Warehouse 和 Logistics_TrackingNumber 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 Logistics_Warehouse处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Logistics_Warehouse处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "check",
+        "seats"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Logistics_Warehouse 和 Logistics_TrackingNumber 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Logistics_Warehouse 和 Logistics_TrackingNumber'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "reservations",
+        "Error"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Logistics_DeliveryRoute 和 Logistics_StockLevel 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Logistics_DeliveryRoute 和 Logistics_StockLevel'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "script",
+        "cancel"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 17,
+    "repair_count": 1,
+    "grounding_acts_count": 8,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

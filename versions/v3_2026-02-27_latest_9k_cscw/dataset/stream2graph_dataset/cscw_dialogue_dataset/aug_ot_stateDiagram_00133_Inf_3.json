@@ -1,0 +1,200 @@
+{
+  "id": "aug_ot_stateDiagram_00133_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/verysys-pal/DCM_CCV2/blob/9bb087e210674f73be7e568d5d9e538ad9f2a59e/docs/mermaid/SystemState.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "verysys-pal/DCM_CCV2",
+  "diagram_type": "stateDiagram",
+  "code": "%%{Infra_EtcdCluster}}}%%\n\nstateDiagram-v2\n  [Infra_EtcdCluster] --> OFF\n  %% 시작 경로\n  OFF --> WARMUP: START(Infra_LoadBalancer) + MODE=WARM_UP\n  OFF --> INIT: START(Infra_LoadBalancer)\n  INIT --> PRECOOL: init_seconds elapsed\n  PRECOOL --> RUN: T5 <= TSP - precool_band\n  %% READY 표출 (Infra_LoadBalancer)\n  INIT --> READY: ready flag true\n  PRECOOL --> READY: ready flag true\n  RUN --> READY: ready flag true\n  READY --> RUN: ready flag cleared\n  %% 보류/재개\n  RUN --> HOLD: HOLD(Infra_IngressController)\n  READY --> HOLD: HOLD(Infra_IngressController)\n  HOLD --> RUN: RESUME(Infra_LoadBalancer)\n  %% 정지/전원 OFF\n  any --> OFF: STOP(Infra_WorkerNode) or OFF(Infra_WorkerNode)\n  WARMUP --> OFF: warm reached\n  %% 안전 전이\n  state SAFE_SHUTDOWN\n  INIT --> SAFE_SHUTDOWN: Safety\n  PRECOOL --> SAFE_SHUTDOWN: Safety\n  RUN --> SAFE_SHUTDOWN: Safety\n  READY --> SAFE_SHUTDOWN: Safety\n  HOLD --> SAFE_SHUTDOWN: Safety\n  WARMUP --> SAFE_SHUTDOWN: Safety\n  SAFE_SHUTDOWN --> OFF: RESET(Infra_EtcdCluster)=ACK_ALARM\n",
+  "content_size": 915,
+  "collected_at": "2026-02-06T10:38:17.122867",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "ot_stateDiagram_00133",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Infra_EtcdCluster 和 Infra_LoadBalancer 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Infra_EtcdCluster 和 Infra_LoadBalancer'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2",
+        "START"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Infra_LoadBalancer 和 Infra_LoadBalancer。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Infra_LoadBalancer 和 Infra_LoadBalancer'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "START",
+        "표출"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Infra_IngressController 和 Infra_IngressController 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Infra_IngressController 和 Infra_IngressController'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "HOLD",
+        "HOLD"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Infra_LoadBalancer 和 Infra_WorkerNode 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Infra_LoadBalancer 和 Infra_WorkerNode'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "RESUME",
+        "STOP"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Infra_WorkerNode 和 Infra_EtcdCluster 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Infra_WorkerNode 和 Infra_EtcdCluster'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OFF",
+        "RESET"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 20,
+    "repair_count": 0,
+    "grounding_acts_count": 10,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

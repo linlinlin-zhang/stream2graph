@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01403",
+  "source": "github",
+  "source_url": "https://github.com/CorndogMillionaire/AAPE/blob/5a1f5d06ba749366f16ca7d3212de9c95e38aba4/specs/L2/L2.mmd",
+  "github_repo": "CorndogMillionaire/AAPE",
+  "github_file_path": "specs/L2/L2.mmd",
+  "diagram_type": "architecture",
+  "code": "flowchart LR\n\n  %% Classes (color scheme)\n  classDef edge fill:#E6F2FF,stroke:#2E6DA4,stroke-width:1px,color:#103B5C\n  classDef core fill:#E8FFF5,stroke:#2D8A57,stroke-width:1px,color:#0B3D2E\n  classDef infra fill:#F3EEFF,stroke:#6B3FA0,stroke-width:1px,color:#352B4A\n  classDef svc fill:#FFF5E6,stroke:#A6651A,stroke-width:1px,color:#5A3200\n  classDef ext fill:#FFF7F0,stroke:#774,stroke-width:1px,color:#5C3D00\n  classDef legend fill:#FFFFFF,stroke:#999,stroke-dasharray:5 5\n\n  %% External systems\n  subgraph EX[\"External Systems\"]\n    Client[\"Client/Developer\"]:::ext\n    IdP[\"Identity Provider (JWT)\"]:::ext\n    TOOLAPIs[\"External Tool APIs\"]:::ext\n    OBS[\"Observability (Prometheus/OTel/Jaeger)\"]:::ext\n  end\n\n  %% Our platform\n  subgraph MAP[\"Modular Agent Platform\"]\n    %% Edge/API\n    subgraph EDGE[\"Edge\"]\n      GW[\"API Gateway\"]:::edge\n    end\n\n    %% Core runtime (Akka.NET)\n    subgraph Cluster[\"Actor System Service (Akka.NET Cluster)\"]\n      SR[\"ShardRegion\"]:::core\n      AG[\"AgentActor (Mediator)\"]:::core\n      ENA[\"EngineAdapterActor\"]:::core\n      ENG[\"Engine (InProc/WASM)\"]:::core\n      MEM[\"MemoryControllerActor (Persistent)\"]:::core\n      TR[\"ToolRequesterActor\"]:::core\n      EVG[\"EventGatewayActor\"]:::core\n      MUX[\"EventMultiplexer (node-local)\"]:::core\n    end\n\n    %% Platform infrastructure (adapter-backed)\n    subgraph INFRA[\"Platform Infrastructure\"]\n      DB[\"Primary Database\"]:::infra\n      OBJ[\"Object Storage\"]:::infra\n      Q[\"Job Queue\"]:::infra\n    end\n\n    %% Internal services (deployables)\n    subgraph SVC[\"Internal Services\"]\n      WK[\"Worker Service(s) (Tier 3 executors)\"]:::svc\n    end\n  end\n\n  %% Shapes for infra\n  DB@{ shape: cyl }\n  OBJ@{ shape: cyl }\n  Q@{ shape: cyl }\n\n  %% Ingress/auth\n  Client -- \"HTTPS (DTO → Envelope)\" --> GW\n  IdP -- \"JWT validate/authorize\" --> GW\n\n  %% API → Cluster\n  GW -- \"CommandEnvelope\" --> SR\n  SR -- \"Route by AgentId\" --> AG\n\n  %% Intra-cluster (mediated)\n  AG -- \"Execute\" --> ENA\n  ENA -- \"Select runtime\" --> ENG\n  AG -- \"Persist (Patch API)\" --> MEM\n  AG -- \"Tools\" --> TR\n  AG -- \"Events\" --> EVG\n  EVG --- MUX\n\n  %% Cluster → Infra\n  MEM -- \"Journal/Snapshots/Policies/Registry\" --> DB\n  GW -- \"Upload Behavior Graphs\" --> OBJ\n  TR -- \"Enqueue (Tier 3 job)\" --> Q\n  WK -- \"Consume/Complete\" --> Q\n  WK -- \"Invoke tools\" --> TOOLAPIs\n\n  %% Observability\n  AG -. \"Metrics/Traces/Logs\" .-> OBS\n  GW -. \"Metrics/Traces/Logs\" .-> OBS\n\n  %% Legend\n  subgraph LEGEND[\"Legend (color semantics)\"]\n    L_edge[\"Edge/API\"]:::edge\n    L_core[\"Core Runtime (Actors)\"]:::core\n    L_infra[\"Platform Infrastructure (DB/Object/Queue)\"]:::infra\n    L_svc[\"Internal Services (Workers)\"]:::svc\n    L_ext[\"External Dependencies (IdP/APIs/Observability)\"]:::ext\n  end\n\n\n",
+  "content_size": 2747,
+  "collected_at": "2026-02-06T01:45:47.947151",
+  "license": "none",
+  "license_name": "No License",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 0
+}

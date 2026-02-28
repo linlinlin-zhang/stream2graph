@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00677",
+  "source": "github",
+  "source_url": "https://github.com/pagopa/p4pa-doc/blob/7e7885cceb7021d36015482fc7455c44951d6b3f/design/workflow/ricevuteRT/seq_paSendRT.mmd",
+  "github_repo": "pagopa/p4pa-doc",
+  "github_file_path": "design/workflow/ricevuteRT/seq_paSendRT.mmd",
+  "diagram_type": "sequence",
+  "code": "---\ntitle: Ricezione ricevuta RT\n---\nsequenceDiagram\n    actor PAGOPA as Nodo Pagamenti\n    participant MS_PAGOPA_PAY as p4pa-pagopa-payments\n    participant MS_AUTH as p4pa-auth\n    participant MS_FILESHARE as p4pa-file-share\n    participant MS_PROCESS_EXECUTIONS as p4pa-process-executions\n    participant MS_WF as p4pa-workflow-hub\n    participant WF as Temporal\n    participant MS_DP as p4pa-debt-positions\n    participant SHARED as Shared Folder\n    participant KAFKA as Kafka\n    participant SIL\n\n    PAGOPA ->>+ MS_PAGOPA_PAY: paSendRT<BR />paSendRTV2\n        MS_PAGOPA_PAY ->> MS_AUTH: postToken()\n        MS_PAGOPA_PAY ->>+ MS_FILESHARE: POST file + jwt<BR />flowType=RECEIPT_PAGOPA\n            MS_FILESHARE ->> MS_AUTH: getUserInfo()\n            MS_FILESHARE ->> MS_FILESHARE: Autorizza la chiamata<BR />Cifra il file\n            MS_FILESHARE ->> SHARED: Deposita file cifrato\n            MS_FILESHARE ->>+ MS_PROCESS_EXECUTIONS: createIngestionFlowFile()\n                MS_PROCESS_EXECUTIONS ->> MS_PROCESS_EXECUTIONS: Crea entità ingestion_flow_file<BR />Status=UPLOADED\n                MS_PROCESS_EXECUTIONS ->>+ MS_WF: Richiesta avvio WF LoadReceiptPagoPa<BR />input=ingestionFlowFileId\n                    MS_WF ->>+ WF: Avvia WF\n                    MS_WF -->>- MS_PROCESS_EXECUTIONS: workflowId\n                MS_PROCESS_EXECUTIONS -->>- MS_FILESHARE: ingestionFlowFileId\n            MS_FILESHARE -->>- MS_PAGOPA_PAY: ingestionFlowFileId\n        MS_PAGOPA_PAY -->>- PAGOPA: ok\n\n    WF ->> MS_PROCESS_EXECUTIONS: Aggiorna stato ingestion_flow_file in<BR />PROCESSING\n    WF ->> SHARED: Recupero file\n    WF ->> WF: Decifratura file\n    WF ->>+ MS_DP: createReceipt()\n        alt Posizione debitoria esistente\n            MS_DP ->> MS_DP: Aggiorna stato Installment<BR />PaymentOptions/DebtPosition\n            alt Almeno una PaymentOption è da invalidare\n                MS_DP ->> MS_DP: Setta a TO_SYNC e stato successivo INVALID<BR />le altre PaymentOption in stato UNPAID\n            end\n            MS_DP ->>+ MS_WF: Avvio WF Sincronizzazione PaymentOption invalidate\n            note left of MS_DP: Chiamato anche per prevedere<BR />l'aggiornamento della schedulazione<BR />per la scadenza degli Installment<BR/>e per la pubblicazione dell'Evento\n        else\n            MS_DP ->> MS_DP: Creazione Posizione debitoria fittizia\n            MS_DP ->> KAFKA: Notifica ricezione ricevuta\n        end\n        note left of MS_WF: Per semplicità associato alla<BR/>barra di vita di work-flow-hub,<BR/>ma è eseguito in async dal WF avviato\n        MS_WF -->> KAFKA: Notifica ricezione ricevuta\n        deactivate MS_WF\n        note right of KAFKA: Tra i suoi consumer<BR />p4pa-workflow-hub per<BR/>avvio classificazione IUD\n        MS_DP -->>- WF: Receipt\n    WF ->> SHARED: Archiviazione file\n    WF ->> MS_PROCESS_EXECUTIONS: Aggiorna stato ingestion_flow_file in<BR />COMPLETED\n    WF ->> SIL: Notifica SIL\n    WF ->> WF: Notifica cittadino tramite email\n\n    deactivate WF\n",
+  "content_size": 2993,
+  "collected_at": "2026-02-06T01:35:33.352826",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

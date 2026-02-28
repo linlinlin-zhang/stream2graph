@@ -1,0 +1,18 @@
+{
+  "id": "aug_gl_block-beta_00289_Edu_4",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/zone17/sovren/blob/d3da3358e52da6ae6b2365e89401eca50f337a0c/docs/architecture/diagrams/patterns/circuit-breaker-pattern.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "zone17/sovren",
+  "diagram_type": "block-beta",
+  "code": "%% Circuit Breaker Pattern - Fault Tolerance\n%% Version: 1.0.0\n%% Date: 2025-10-27\n%% Description: Circuit breaker pattern for webhook delivery and external service calls\n\nstateDiagram-v2\n    [Education_ContentCDN] --> Closed: Initial State\n\n    Closed --> Open: Failure Threshold Exceeded<br/>(Education_LMS_Portal)\n    Closed --> Closed: Successful Request<br/>(Education_LMS_Portal)\n    Closed --> Closed: Failed Request<br/>(Education_LMS_Portal)\n\n    Open --> HalfOpen: Timeout Elapsed<br/>(Education_StudentDB)\n    Open --> Open: Request Attempted<br/>(Education_ClassroomService)\n\n    HalfOpen --> Closed: Test Request Successful<br/>(Education_LMS_Portal)\n    HalfOpen --> Open: Test Request Failed<br/>(Education_ClassroomService)\n    HalfOpen --> HalfOpen: Waiting for Test<br/>(Education_ClassroomService)\n\n    note right of Closed\n        CLOSED STATE\n        - All requests flow through\n        - Monitor failure rate\n        - Track response times\n        - Increment error counter\n    end note\n\n    note right of Open\n        OPEN STATE\n        - Block all requests\n        - Return cached response\n        - Or return error immediately\n        - Wait for timeout period\n        - Log all blocked attempts\n    end note\n\n    note right of HalfOpen\n        HALF-OPEN STATE\n        - Allow test requests\n        - Limited throughput\n        - Monitor success rate\n        - Quick transition decision\n    end note\n",
+  "content_size": 1387,
+  "collected_at": "2026-02-06T14:06:18.048847",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Education",
+  "seed_id": "gl_block-beta_00289"
+}

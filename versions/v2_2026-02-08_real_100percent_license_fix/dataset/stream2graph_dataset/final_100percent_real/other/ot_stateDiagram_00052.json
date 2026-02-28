@@ -1,0 +1,15 @@
+{
+  "id": "ot_stateDiagram_00052",
+  "source": "other",
+  "source_url": "https://github.com/timfornell/StockScreener/blob/c2207e1c48de8d77025e6ab50d872a68992d9f55/Doc/OverviewFlow.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "timfornell/StockScreener",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n\n    state ForkState <<fork>>\n    state JoinState <<join>>\n\n    GUIProcess: Process for displaying\\n GUI is started\n    GUIInit: GUI initializes data interface\\n and components\n    GUI: GUI is opened and shows\\n list of stocks\n    ReadData: Data interface reads\\n relevant pickle file\n    StockHandled: The data for the stock\\n has been updated\n    FindStock: Find stock with mising data\n    DataGathererProcess: Process for gathering\\n data is started\n    WriteData: Data is written to\\n pickle file\n    DataGatherer: DataGatherer scrapes\\n webpages\n    GatherData: Stock data is gathered\n\n    [*] --> ForkState: Program is started\n    ForkState --> GUIProcess\n    ForkState --> DataGathererProcess\n    GUIProcess --> JoinState\n    DataGathererProcess --> GatherData\n    GatherData --> WriteData\n    WriteData --> JoinState\n    JoinState --> GUIInit: Data exists in file\n    GUIInit --> ReadData: GUI requests data\n    ReadData --> GUI: Data interface returns data\n    GUI --> UpdateData: Every 500ms\n    GUI --> RefreshData: User requests data\\n to be updated\n    GUI --> FilterData: User creates a filter\n    GUI --> SortData: User requests data\\n to be sorted\n    GUI --> [*]: User closes GUI\n    StockHandled --> GUI: Tell the GUI that new\\n data is available\n    RefreshButton --> GUI: Data interface\\n returns data\n    Filter --> GUI: Data interface\\n returns data\n    Sort --> GUI: Data interface\\n returns data\n\n    state RefreshData {\n        RefreshButton: Data interface reads\\n relevant picke file\n        [*] --> RefreshButton\n    }\n\n    state SortData {\n        Sort: Data interface sorts the\\n currently displayed data\n        [*] --> Sort: Send column and sort direction\\n to data interface\n    }\n\n    state FilterData {\n        Filter: Data interface filters the\\n currently displayed data\n        [*] --> Filter: Send filter type to\\n data interface\n    }\n\n    state UpdateData {\n        [*] --> FindStock\n        FindStock --> [*]: No stock found\n        FindStock --> DataGatherer: Send stock to data\\n gathering process\n        DataGatherer --> StockHandled\n    }\n",
+  "content_size": 2102,
+  "collected_at": "2026-02-06T10:37:16.280414",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

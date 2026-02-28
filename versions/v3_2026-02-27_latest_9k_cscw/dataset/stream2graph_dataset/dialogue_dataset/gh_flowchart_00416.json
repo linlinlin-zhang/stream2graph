@@ -1,0 +1,1919 @@
+{
+  "id": "gh_flowchart_00416",
+  "source": "github",
+  "source_url": "https://github.com/SecretLab-com/locoman-expo/blob/64fcd5fa1808b42d0596355cfafa63ec4047a40c/docs/navigation-chart.mmd",
+  "github_repo": "SecretLab-com/locoman-expo",
+  "github_file_path": "docs/navigation-chart.mmd",
+  "diagram_type": "flowchart",
+  "code": "%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#0a7ea4', 'primaryTextColor': '#fff', 'primaryBorderColor': '#0a7ea4', 'lineColor': '#9BA1A6', 'secondaryColor': '#1e2022', 'tertiaryColor': '#151718'}}}%%\nflowchart TB\n    subgraph Entry[\"Entry Points\"]\n        START((App Start))\n        LOGIN[Login Screen]\n        REGISTER[Register Screen]\n        OAUTH[OAuth Callback]\n    end\n\n    subgraph Auth[\"Authentication\"]\n        START --> |Unauthenticated| LOGIN\n        LOGIN --> |Sign Up| REGISTER\n        REGISTER --> |Back| LOGIN\n        LOGIN --> |OAuth| OAUTH\n        OAUTH --> |Success| ROLE_CHECK{Check User Role}\n        LOGIN --> |Success| ROLE_CHECK\n        REGISTER --> |Success| ROLE_CHECK\n    end\n\n    subgraph RoleRouting[\"Role-Based Routing\"]\n        ROLE_CHECK --> |Shopper| SHOPPER_TABS\n        ROLE_CHECK --> |Client| CLIENT_TABS\n        ROLE_CHECK --> |Trainer| TRAINER_TABS\n        ROLE_CHECK --> |Manager| MANAGER_TABS\n        ROLE_CHECK --> |Coordinator| COORD_TABS\n    end\n\n    subgraph ShopperFlow[\"Shopper Experience\"]\n        subgraph SHOPPER_TABS[\"Bottom Tabs\"]\n            S_BUNDLES[Bundles]\n            S_PRODUCTS[Products]\n            S_TRAINERS[Trainers]\n            S_CART[Cart]\n        end\n        \n        S_PROFILE[Profile]\n        S_BUNDLES --> |FAB| S_PROFILE\n        S_PRODUCTS --> |FAB| S_PROFILE\n        S_TRAINERS --> |FAB| S_PROFILE\n        S_CART --> |FAB| S_PROFILE\n        \n        S_BUNDLES --> |Tap Bundle| BUNDLE_DETAIL\n        S_PRODUCTS --> |Tap Product| PRODUCT_SHEET\n        S_TRAINERS --> |Tap Trainer| TRAINER_PROFILE\n        S_CART --> |Checkout| CHECKOUT\n        \n        CHECKOUT --> |Place Order| CONFIRMATION\n        CONFIRMATION --> |Continue| S_BUNDLES\n        \n        S_PROFILE --> |Logout| LOGIN\n        S_PROFILE --> |Messages| MESSAGES\n    end\n\n    subgraph ClientFlow[\"Client Experience\"]\n        subgraph CLIENT_TABS[\"Bottom Tabs\"]\n            C_HOME[Home]\n            C_PROGRAMS[Programs]\n            C_DELIVERIES[Deliveries]\n            C_SPENDING[Spending]\n        end\n        \n        C_HOME --> |View Orders| C_ORDERS\n        C_HOME --> |View Program| BUNDLE_DETAIL\n        C_PROGRAMS --> |Tap Subscription| BUNDLE_DETAIL\n        C_ORDERS[Orders]\n        C_ORDERS --> |Tap Order| BUNDLE_DETAIL\n    end\n\n    subgraph TrainerFlow[\"Trainer Experience\"]\n        subgraph TRAINER_TABS[\"Bottom Tabs\"]\n            T_DASH[Dashboard]\n            T_CALENDAR[Calendar]\n            T_CLIENTS[Clients]\n            T_DELIVERIES[Deliveries]\n            T_EARNINGS[Earnings]\n        end\n        \n        T_DASH --> |My Bundles| T_BUNDLES\n        T_DASH --> |Orders| T_ORDERS\n        T_DASH --> |Settings| T_SETTINGS\n        T_DASH --> |Points| T_POINTS\n        T_DASH --> |Partnerships| T_PARTNERSHIPS\n        T_DASH --> |Join Requests| T_JOIN_REQ\n        \n        T_BUNDLES[My Bundles]\n        T_ORDERS[Orders]\n        T_SETTINGS[Settings]\n        T_POINTS[Points and Status]\n        T_PARTNERSHIPS[Partnerships]\n        T_JOIN_REQ[Join Requests]\n        T_INVITE[Invite Client]\n        \n        T_BUNDLES --> |Create or Edit| BUNDLE_EDITOR\n        T_BUNDLES --> |View| BUNDLE_DETAIL\n        T_CLIENTS --> |Tap Client| CLIENT_DETAIL\n        T_CLIENTS --> |Invite| T_INVITE\n        \n        CLIENT_DETAIL[Client Detail]\n        CLIENT_DETAIL --> |Message| MESSAGES\n    end\n\n    subgraph ManagerFlow[\"Manager Experience\"]\n        subgraph MANAGER_TABS[\"Bottom Tabs\"]\n            M_DASH[Dashboard]\n            M_APPROVALS[Approvals]\n            M_USERS[Users]\n            M_ANALYTICS[Analytics]\n        end\n        \n        M_DASH --> |Trainers| M_TRAINERS\n        M_DASH --> |Templates| M_TEMPLATES\n        M_DASH --> |Invitations| M_INVITATIONS\n        M_DASH --> |Deliveries| M_DELIVERIES\n        M_DASH --> |Products| M_PRODUCTS\n        \n        M_TRAINERS[Trainers]\n        M_TEMPLATES[Templates]\n        M_INVITATIONS[Invitations]\n        M_DELIVERIES[Manager Deliveries]\n        M_PRODUCTS[Manager Products]\n        \n        M_TEMPLATES --> |Edit| TEMPLATE_EDITOR\n        M_APPROVALS --> |View Bundle| BUNDLE_DETAIL\n    end\n\n    subgraph CoordFlow[\"Coordinator Experience\"]\n        subgraph COORD_TABS[\"Bottom Tabs\"]\n            CO_CATALOG[Catalog]\n            CO_IMPERSONATE[Impersonate]\n            CO_LOGS[Logs]\n        end\n        \n        CO_IMPERSONATE --> |Select User| ROLE_CHECK\n        CO_CATALOG --> |View Bundle| BUNDLE_DETAIL\n    end\n\n    subgraph SharedScreens[\"Shared Screens\"]\n        BUNDLE_DETAIL[Bundle Detail]\n        BUNDLE_EDITOR[Bundle Editor]\n        TEMPLATE_EDITOR[Template Editor]\n        TRAINER_PROFILE[Trainer Profile]\n        MESSAGES[Messages]\n        MSG_THREAD[Message Thread]\n        CHECKOUT[Checkout]\n        CONFIRMATION[Order Confirmed]\n        PRODUCT_SHEET[Product Sheet]\n        INVITE_PAGE[Invitation Page]\n        BROWSE[Browse All]\n        \n        MESSAGES --> |Tap Conversation| MSG_THREAD\n        TRAINER_PROFILE --> |Request to Join| TRAINER_PROFILE\n        TRAINER_PROFILE --> |View Bundle| BUNDLE_DETAIL\n        BUNDLE_DETAIL --> |Add to Cart| S_CART\n        BUNDLE_DETAIL --> |Message Trainer| MESSAGES\n    end\n\n    subgraph DeepLinks[\"Deep Links\"]\n        DL_INVITE[\"invite/token\"]\n        DL_BUNDLE[\"bundle/id\"]\n        DL_TRAINER[\"trainer/id\"]\n        \n        DL_INVITE --> INVITE_PAGE\n        DL_BUNDLE --> BUNDLE_DETAIL\n        DL_TRAINER --> TRAINER_PROFILE\n    end\n\n    %% Styling\n    classDef entry fill:#22C55E,stroke:#22C55E,color:#000\n    classDef auth fill:#F59E0B,stroke:#F59E0B,color:#000\n    classDef tabs fill:#0a7ea4,stroke:#0a7ea4,color:#fff\n    classDef screen fill:#1e2022,stroke:#334155,color:#ECEDEE\n    classDef shared fill:#8B5CF6,stroke:#8B5CF6,color:#fff\n    classDef deeplink fill:#EF4444,stroke:#EF4444,color:#fff\n    \n    class START entry\n    class LOGIN,REGISTER,OAUTH,ROLE_CHECK auth\n    class S_BUNDLES,S_PRODUCTS,S_TRAINERS,S_CART,C_HOME,C_PROGRAMS,C_DELIVERIES,C_SPENDING,T_DASH,T_CALENDAR,T_CLIENTS,T_DELIVERIES,T_EARNINGS,M_DASH,M_APPROVALS,M_USERS,M_ANALYTICS,CO_CATALOG,CO_IMPERSONATE,CO_LOGS tabs\n    class BUNDLE_DETAIL,BUNDLE_EDITOR,TEMPLATE_EDITOR,TRAINER_PROFILE,MESSAGES,MSG_THREAD,CHECKOUT,CONFIRMATION,PRODUCT_SHEET,INVITE_PAGE,BROWSE shared\n    class DL_INVITE,DL_BUNDLE,DL_TRAINER deeplink\n",
+  "content_size": 6266,
+  "collected_at": "2026-02-06T01:43:56.845393",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "repo_owner": "SecretLab-com",
+  "repo_name": "locoman-expo",
+  "repo_description": "A fitness and wellness platform connecting trainers with clients. Features include catalog browsing, bundle management, order tracking, trainer dashboards, and client management with multi-platform su",
+  "repo_language": "TypeScript",
+  "repo_topics": [],
+  "repo_created_at": "2026-01-25T18:06:26Z",
+  "repo_updated_at": "2026-02-05T18:59:09Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "Entry",
+        "START"
+      ],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由Login Screen组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，Login Screen是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "Login Screen负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "LOGIN"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理Register Screen、OAuth Callback？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Register Screen、OAuth Callback就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达Register Screen、OAuth Callback结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "Register Screen、OAuth Callback和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "REGISTER",
+        "OAUTH"
+      ],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将\"Authentication\"、Check User Role分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将\"Authentication\"、Check User Role分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "Auth",
+        "ROLE_CHECK"
+      ],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "关于\"Role-Based Routing\"，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "RoleRouting"
+      ],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将\"Shopper Experience\"分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在\"Shopper Experience\"完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，\"Shopper Experience\"就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "ShopperFlow"
+      ],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "关于\"Bottom Tabs\"、Bundles，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，\"Bottom Tabs\"、Bundles是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "\"Bottom Tabs\"、Bundles和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，\"Bottom Tabs\"、Bundles的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "SHOPPER_TABS",
+        "S_BUNDLES"
+      ],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由Products组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Products应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "Products和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Products的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "S_PRODUCTS"
+      ],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "Trainers、Cart主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Trainers、Cart应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "S_TRAINERS",
+        "S_CART",
+        "S_PROFILE"
+      ],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将\"Client Experience\"、\"Bottom Tabs\"分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有\"Client Experience\"、\"Bottom Tabs\"。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 495
+    },
+    {
+      "turn_id": 34,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，\"Client Experience\"、\"Bottom Tabs\"是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "ClientFlow",
+        "CLIENT_TABS"
+      ],
+      "timestamp_offset": 510
+    },
+    {
+      "turn_id": 35,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由Home、Programs组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 525
+    },
+    {
+      "turn_id": 36,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 540
+    },
+    {
+      "turn_id": 37,
+      "speaker": "Speaker_B",
+      "utterance": "Home、Programs主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "C_HOME",
+        "C_PROGRAMS",
+        "C_DELIVERIES"
+      ],
+      "timestamp_offset": 555
+    },
+    {
+      "turn_id": 38,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Spending分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 570
+    },
+    {
+      "turn_id": 39,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 585
+    },
+    {
+      "turn_id": 40,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Spending分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 600
+    },
+    {
+      "turn_id": 41,
+      "speaker": "Speaker_B",
+      "utterance": "Spending负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "C_SPENDING"
+      ],
+      "timestamp_offset": 615
+    },
+    {
+      "turn_id": 42,
+      "speaker": "Speaker_A",
+      "utterance": "关于Orders、\"Trainer Experience\"，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 630
+    },
+    {
+      "turn_id": 43,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "C_ORDERS",
+        "TrainerFlow"
+      ],
+      "timestamp_offset": 645
+    },
+    {
+      "turn_id": 44,
+      "speaker": "Speaker_A",
+      "utterance": "\"Bottom Tabs\"、Dashboard主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 660
+    },
+    {
+      "turn_id": 45,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是\"Bottom Tabs\"、Dashboard应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 675
+    },
+    {
+      "turn_id": 46,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 690
+    },
+    {
+      "turn_id": 47,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，\"Bottom Tabs\"、Dashboard就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "TRAINER_TABS",
+        "T_DASH"
+      ],
+      "timestamp_offset": 705
+    },
+    {
+      "turn_id": 48,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Calendar、Clients分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 720
+    },
+    {
+      "turn_id": 49,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Calendar、Clients的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 735
+    },
+    {
+      "turn_id": 50,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有Calendar、Clients。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "T_CALENDAR",
+        "T_CLIENTS"
+      ],
+      "timestamp_offset": 750
+    },
+    {
+      "turn_id": 51,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由Deliveries、Earnings组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 765
+    },
+    {
+      "turn_id": 52,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Deliveries、Earnings就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "T_DELIVERIES",
+        "T_EARNINGS"
+      ],
+      "timestamp_offset": 780
+    },
+    {
+      "turn_id": 53,
+      "speaker": "Speaker_B",
+      "utterance": "My Bundles、Orders主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 795
+    },
+    {
+      "turn_id": 54,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，My Bundles、Orders就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "T_BUNDLES",
+        "T_ORDERS"
+      ],
+      "timestamp_offset": 810
+    },
+    {
+      "turn_id": 55,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理Settings？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 825
+    },
+    {
+      "turn_id": 56,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Settings就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 840
+    },
+    {
+      "turn_id": 57,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "T_SETTINGS"
+      ],
+      "timestamp_offset": 855
+    },
+    {
+      "turn_id": 58,
+      "speaker": "Speaker_A",
+      "utterance": "关于Points and Status，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 870
+    },
+    {
+      "turn_id": 59,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "T_POINTS"
+      ],
+      "timestamp_offset": 885
+    },
+    {
+      "turn_id": 60,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理Partnerships、Join Requests？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 900
+    },
+    {
+      "turn_id": 61,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 915
+    },
+    {
+      "turn_id": 62,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Partnerships、Join Requests应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "T_PARTNERSHIPS",
+        "T_JOIN_REQ",
+        "T_INVITE"
+      ],
+      "timestamp_offset": 930
+    },
+    {
+      "turn_id": 63,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Client Detail分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 945
+    },
+    {
+      "turn_id": 64,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，Client Detail是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "CLIENT_DETAIL"
+      ],
+      "timestamp_offset": 960
+    },
+    {
+      "turn_id": 65,
+      "speaker": "Speaker_B",
+      "utterance": "关于\"Manager Experience\"、\"Bottom Tabs\"，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 975
+    },
+    {
+      "turn_id": 66,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，\"Manager Experience\"、\"Bottom Tabs\"是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 990
+    },
+    {
+      "turn_id": 67,
+      "speaker": "Speaker_B",
+      "utterance": "\"Manager Experience\"、\"Bottom Tabs\"和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1005
+    },
+    {
+      "turn_id": 68,
+      "speaker": "Speaker_A",
+      "utterance": "关于\"Manager Experience\"、\"Bottom Tabs\"，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "ManagerFlow",
+        "MANAGER_TABS",
+        "M_DASH"
+      ],
+      "timestamp_offset": 1020
+    },
+    {
+      "turn_id": 69,
+      "speaker": "Speaker_B",
+      "utterance": "Approvals、Users主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1035
+    },
+    {
+      "turn_id": 70,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1050
+    },
+    {
+      "turn_id": 71,
+      "speaker": "Speaker_B",
+      "utterance": "关于Approvals、Users，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "M_APPROVALS",
+        "M_USERS"
+      ],
+      "timestamp_offset": 1065
+    },
+    {
+      "turn_id": 72,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Analytics、Trainers组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1080
+    },
+    {
+      "turn_id": 73,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "M_ANALYTICS",
+        "M_TRAINERS"
+      ],
+      "timestamp_offset": 1095
+    },
+    {
+      "turn_id": 74,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含Templates这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1110
+    },
+    {
+      "turn_id": 75,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Templates应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "M_TEMPLATES"
+      ],
+      "timestamp_offset": 1125
+    },
+    {
+      "turn_id": 76,
+      "speaker": "Speaker_A",
+      "utterance": "Invitations、Manager Deliveries主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1140
+    },
+    {
+      "turn_id": 77,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Invitations、Manager Deliveries就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1155
+    },
+    {
+      "turn_id": 78,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Invitations、Manager Deliveries分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "M_INVITATIONS",
+        "M_DELIVERIES"
+      ],
+      "timestamp_offset": 1170
+    },
+    {
+      "turn_id": 79,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Manager Products、\"Coordinator Experience\"分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1185
+    },
+    {
+      "turn_id": 80,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Manager Products、\"Coordinator Experience\"的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1200
+    },
+    {
+      "turn_id": 81,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，Manager Products、\"Coordinator Experience\"是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "M_PRODUCTS",
+        "CoordFlow",
+        "COORD_TABS"
+      ],
+      "timestamp_offset": 1215
+    },
+    {
+      "turn_id": 82,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理Catalog？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1230
+    },
+    {
+      "turn_id": 83,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Catalog应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "CO_CATALOG"
+      ],
+      "timestamp_offset": 1245
+    },
+    {
+      "turn_id": 84,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Impersonate、Logs组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1260
+    },
+    {
+      "turn_id": 85,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Impersonate、Logs就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1275
+    },
+    {
+      "turn_id": 86,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含Impersonate、Logs这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1290
+    },
+    {
+      "turn_id": 87,
+      "speaker": "Speaker_B",
+      "utterance": "Impersonate、Logs和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "CO_IMPERSONATE",
+        "CO_LOGS",
+        "SharedScreens"
+      ],
+      "timestamp_offset": 1305
+    },
+    {
+      "turn_id": 88,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Bundle Detail、Bundle Editor分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1320
+    },
+    {
+      "turn_id": 89,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Bundle Detail、Bundle Editor的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "BUNDLE_DETAIL",
+        "BUNDLE_EDITOR"
+      ],
+      "timestamp_offset": 1335
+    },
+    {
+      "turn_id": 90,
+      "speaker": "Speaker_A",
+      "utterance": "Template Editor、Trainer Profile主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1350
+    },
+    {
+      "turn_id": 91,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Template Editor、Trainer Profile应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "TEMPLATE_EDITOR",
+        "TRAINER_PROFILE"
+      ],
+      "timestamp_offset": 1365
+    },
+    {
+      "turn_id": 92,
+      "speaker": "Speaker_A",
+      "utterance": "Messages、Message Thread主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1380
+    },
+    {
+      "turn_id": 93,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Messages、Message Thread就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1395
+    },
+    {
+      "turn_id": 94,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，Messages、Message Thread是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1410
+    },
+    {
+      "turn_id": 95,
+      "speaker": "Speaker_B",
+      "utterance": "在Messages、Message Thread中，我们需要定义核心逻辑。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "MESSAGES",
+        "MSG_THREAD",
+        "CHECKOUT"
+      ],
+      "timestamp_offset": 1425
+    },
+    {
+      "turn_id": 96,
+      "speaker": "Speaker_A",
+      "utterance": "Order Confirmed、Product Sheet主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1440
+    },
+    {
+      "turn_id": 97,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Order Confirmed、Product Sheet的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1455
+    },
+    {
+      "turn_id": 98,
+      "speaker": "Speaker_A",
+      "utterance": "关于Order Confirmed、Product Sheet，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1470
+    },
+    {
+      "turn_id": 99,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "CONFIRMATION",
+        "PRODUCT_SHEET",
+        "INVITE_PAGE"
+      ],
+      "timestamp_offset": 1485
+    },
+    {
+      "turn_id": 100,
+      "speaker": "Speaker_A",
+      "utterance": "Browse All主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1500
+    },
+    {
+      "turn_id": 101,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Browse All就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "BROWSE"
+      ],
+      "timestamp_offset": 1515
+    },
+    {
+      "turn_id": 102,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由\"Deep Links\"组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1530
+    },
+    {
+      "turn_id": 103,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "DeepLinks"
+      ],
+      "timestamp_offset": 1545
+    },
+    {
+      "turn_id": 104,
+      "speaker": "Speaker_A",
+      "utterance": "\"invite/token\"主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1560
+    },
+    {
+      "turn_id": 105,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是\"invite/token\"应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "DL_INVITE"
+      ],
+      "timestamp_offset": 1575
+    },
+    {
+      "turn_id": 106,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下\"bundle/id\"吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1590
+    },
+    {
+      "turn_id": 107,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，\"bundle/id\"的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1605
+    },
+    {
+      "turn_id": 108,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "DL_BUNDLE"
+      ],
+      "timestamp_offset": 1620
+    },
+    {
+      "turn_id": 109,
+      "speaker": "Speaker_B",
+      "utterance": "\"trainer/id\"、Unauthenticated主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1635
+    },
+    {
+      "turn_id": 110,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，\"trainer/id\"、Unauthenticated就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1650
+    },
+    {
+      "turn_id": 111,
+      "speaker": "Speaker_B",
+      "utterance": "\"trainer/id\"、Unauthenticated主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1665
+    },
+    {
+      "turn_id": 112,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "DL_TRAINER",
+        "edge_0"
+      ],
+      "timestamp_offset": 1680
+    },
+    {
+      "turn_id": 113,
+      "speaker": "Speaker_B",
+      "utterance": "Sign Up、Back主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1695
+    },
+    {
+      "turn_id": 114,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_1",
+        "edge_2",
+        "edge_3"
+      ],
+      "timestamp_offset": 1710
+    },
+    {
+      "turn_id": 115,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由Success、Success组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1725
+    },
+    {
+      "turn_id": 116,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_4",
+        "edge_5"
+      ],
+      "timestamp_offset": 1740
+    },
+    {
+      "turn_id": 117,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含Success这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1755
+    },
+    {
+      "turn_id": 118,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Success就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1770
+    },
+    {
+      "turn_id": 119,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Success分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "edge_6"
+      ],
+      "timestamp_offset": 1785
+    },
+    {
+      "turn_id": 120,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下Shopper、Client吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1800
+    },
+    {
+      "turn_id": 121,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1815
+    },
+    {
+      "turn_id": 122,
+      "speaker": "Speaker_A",
+      "utterance": "最后，流程到达Shopper、Client结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1830
+    },
+    {
+      "turn_id": 123,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Shopper、Client分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "edge_7",
+        "edge_8",
+        "edge_9"
+      ],
+      "timestamp_offset": 1845
+    },
+    {
+      "turn_id": 124,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含Manager这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1860
+    },
+    {
+      "turn_id": 125,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Manager就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1875
+    },
+    {
+      "turn_id": 126,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Manager分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "edge_10"
+      ],
+      "timestamp_offset": 1890
+    },
+    {
+      "turn_id": 127,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含Coordinator、FAB这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1905
+    },
+    {
+      "turn_id": 128,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Coordinator、FAB就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1920
+    },
+    {
+      "turn_id": 129,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含Coordinator、FAB这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "edge_11",
+        "edge_12"
+      ],
+      "timestamp_offset": 1935
+    },
+    {
+      "turn_id": 130,
+      "speaker": "Speaker_A",
+      "utterance": "FAB、FAB主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1950
+    },
+    {
+      "turn_id": 131,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1965
+    },
+    {
+      "turn_id": 132,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有FAB、FAB。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1980
+    },
+    {
+      "turn_id": 133,
+      "speaker": "Speaker_B",
+      "utterance": "FAB、FAB主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "edge_13",
+        "edge_14"
+      ],
+      "timestamp_offset": 1995
+    },
+    {
+      "turn_id": 134,
+      "speaker": "Speaker_A",
+      "utterance": "关于FAB，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2010
+    },
+    {
+      "turn_id": 135,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，FAB就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2025
+    },
+    {
+      "turn_id": 136,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将FAB分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2040
+    },
+    {
+      "turn_id": 137,
+      "speaker": "Speaker_B",
+      "utterance": "FAB和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "edge_15"
+      ],
+      "timestamp_offset": 2055
+    },
+    {
+      "turn_id": 138,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Tap Bundle、Tap Product组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2070
+    },
+    {
+      "turn_id": 139,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2085
+    },
+    {
+      "turn_id": 140,
+      "speaker": "Speaker_A",
+      "utterance": "最后，流程到达Tap Bundle、Tap Product结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2100
+    },
+    {
+      "turn_id": 141,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下Tap Bundle、Tap Product吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "edge_16",
+        "edge_17"
+      ],
+      "timestamp_offset": 2115
+    },
+    {
+      "turn_id": 142,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Tap Trainer、Checkout分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2130
+    },
+    {
+      "turn_id": 143,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2145
+    },
+    {
+      "turn_id": 144,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Tap Trainer、Checkout组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "edge_18",
+        "edge_19"
+      ],
+      "timestamp_offset": 2160
+    },
+    {
+      "turn_id": 145,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理Place Order、Continue？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2175
+    },
+    {
+      "turn_id": 146,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Place Order、Continue就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2190
+    },
+    {
+      "turn_id": 147,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，Place Order、Continue有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "edge_20",
+        "edge_21"
+      ],
+      "timestamp_offset": 2205
+    },
+    {
+      "turn_id": 148,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含Logout、Messages这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2220
+    },
+    {
+      "turn_id": 149,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2235
+    },
+    {
+      "turn_id": 150,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Logout、Messages就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2250
+    },
+    {
+      "turn_id": 151,
+      "speaker": "Speaker_B",
+      "utterance": "Logout、Messages主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "edge_22",
+        "edge_23"
+      ],
+      "timestamp_offset": 2265
+    },
+    {
+      "turn_id": 152,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由View Orders组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2280
+    },
+    {
+      "turn_id": 153,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，View Orders是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2295
+    },
+    {
+      "turn_id": 154,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，View Orders就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_24"
+      ],
+      "timestamp_offset": 2310
+    },
+    {
+      "turn_id": 155,
+      "speaker": "Speaker_B",
+      "utterance": "View Program主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2325
+    },
+    {
+      "turn_id": 156,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2340
+    },
+    {
+      "turn_id": 157,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下View Program吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2355
+    },
+    {
+      "turn_id": 158,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_25"
+      ],
+      "timestamp_offset": 2370
+    },
+    {
+      "turn_id": 159,
+      "speaker": "Speaker_B",
+      "utterance": "关于Tap Subscription、Tap Order，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2385
+    },
+    {
+      "turn_id": 160,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Tap Subscription、Tap Order应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_26",
+        "edge_27"
+      ],
+      "timestamp_offset": 2400
+    },
+    {
+      "turn_id": 161,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有My Bundles、Orders。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2415
+    },
+    {
+      "turn_id": 162,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2430
+    },
+    {
+      "turn_id": 163,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有My Bundles、Orders。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "edge_28",
+        "edge_29"
+      ],
+      "timestamp_offset": 2445
+    },
+    {
+      "turn_id": 164,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Settings分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2460
+    },
+    {
+      "turn_id": 165,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2475
+    },
+    {
+      "turn_id": 166,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下Settings吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "edge_30"
+      ],
+      "timestamp_offset": 2490
+    },
+    {
+      "turn_id": 167,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Points、Partnerships分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2505
+    },
+    {
+      "turn_id": 168,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2520
+    },
+    {
+      "turn_id": 169,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Points、Partnerships就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2535
+    },
+    {
+      "turn_id": 170,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Points、Partnerships分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "edge_31",
+        "edge_32"
+      ],
+      "timestamp_offset": 2550
+    },
+    {
+      "turn_id": 171,
+      "speaker": "Speaker_B",
+      "utterance": "Join Requests、Create or Edit主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2565
+    },
+    {
+      "turn_id": 172,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2580
+    },
+    {
+      "turn_id": 173,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2595
+    },
+    {
+      "turn_id": 174,
+      "speaker": "Speaker_A",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "edge_33",
+        "edge_34"
+      ],
+      "timestamp_offset": 2610
+    },
+    {
+      "turn_id": 175,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下View吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2625
+    },
+    {
+      "turn_id": 176,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是View应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2640
+    },
+    {
+      "turn_id": 177,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有View。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "edge_35"
+      ],
+      "timestamp_offset": 2655
+    },
+    {
+      "turn_id": 178,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Tap Client、Invite分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2670
+    },
+    {
+      "turn_id": 179,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2685
+    },
+    {
+      "turn_id": 180,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有Tap Client、Invite。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "edge_36",
+        "edge_37",
+        "edge_38"
+      ],
+      "timestamp_offset": 2700
+    },
+    {
+      "turn_id": 181,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理Trainers、Templates？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2715
+    },
+    {
+      "turn_id": 182,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Trainers、Templates的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2730
+    },
+    {
+      "turn_id": 183,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Trainers、Templates应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2745
+    },
+    {
+      "turn_id": 184,
+      "speaker": "Speaker_A",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "edge_39",
+        "edge_40"
+      ],
+      "timestamp_offset": 2760
+    },
+    {
+      "turn_id": 185,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含Invitations这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2775
+    },
+    {
+      "turn_id": 186,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Invitations应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_41"
+      ],
+      "timestamp_offset": 2790
+    },
+    {
+      "turn_id": 187,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理Deliveries、Products？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2805
+    },
+    {
+      "turn_id": 188,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_42",
+        "edge_43"
+      ],
+      "timestamp_offset": 2820
+    },
+    {
+      "turn_id": 189,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有Edit。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2835
+    },
+    {
+      "turn_id": 190,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2850
+    },
+    {
+      "turn_id": 191,
+      "speaker": "Speaker_B",
+      "utterance": "关于Edit，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2865
+    },
+    {
+      "turn_id": 192,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_44"
+      ],
+      "timestamp_offset": 2880
+    },
+    {
+      "turn_id": 193,
+      "speaker": "Speaker_B",
+      "utterance": "View Bundle、Select User主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2895
+    },
+    {
+      "turn_id": 194,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2910
+    },
+    {
+      "turn_id": 195,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是View Bundle、Select User应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_45",
+        "edge_46",
+        "edge_47"
+      ],
+      "timestamp_offset": 2925
+    },
+    {
+      "turn_id": 196,
+      "speaker": "Speaker_A",
+      "utterance": "关于Tap Conversation、Request to Join，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2940
+    },
+    {
+      "turn_id": 197,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Tap Conversation、Request to Join应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2955
+    },
+    {
+      "turn_id": 198,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有Tap Conversation、Request to Join。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 2970
+    },
+    {
+      "turn_id": 199,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Tap Conversation、Request to Join的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_48",
+        "edge_49",
+        "edge_50"
+      ],
+      "timestamp_offset": 2985
+    },
+    {
+      "turn_id": 200,
+      "speaker": "Speaker_A",
+      "utterance": "Add to Cart主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 3000
+    },
+    {
+      "turn_id": 201,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 3015
+    },
+    {
+      "turn_id": 202,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理Add to Cart？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 3030
+    },
+    {
+      "turn_id": 203,
+      "speaker": "Speaker_B",
+      "utterance": "Add to Cart主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "edge_51"
+      ],
+      "timestamp_offset": 3045
+    },
+    {
+      "turn_id": 204,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Message Trainer、分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 3060
+    },
+    {
+      "turn_id": 205,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Message Trainer、应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 3075
+    },
+    {
+      "turn_id": 206,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Message Trainer、组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "edge_52",
+        "edge_53"
+      ],
+      "timestamp_offset": 3090
+    },
+    {
+      "turn_id": 207,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将、分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 3105
+    },
+    {
+      "turn_id": 208,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，、是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 3120
+    },
+    {
+      "turn_id": 209,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，、就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 3135
+    },
+    {
+      "turn_id": 210,
+      "speaker": "Speaker_A",
+      "utterance": "最后，流程到达、结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "edge_54",
+        "edge_55"
+      ],
+      "timestamp_offset": 3150
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 210,
+    "speaker_distribution": {
+      "Speaker_B": 105,
+      "Speaker_A": 105
+    },
+    "speech_act_distribution": {
+      "sequential": 9,
+      "inform": 31,
+      "structural": 32,
+      "confirm": 37,
+      "request": 26,
+      "contrastive": 7,
+      "classification": 44,
+      "clarify": 24
+    },
+    "avg_turn_length": 25.16190476190476,
+    "dialogue_duration": 3150
+  }
+}

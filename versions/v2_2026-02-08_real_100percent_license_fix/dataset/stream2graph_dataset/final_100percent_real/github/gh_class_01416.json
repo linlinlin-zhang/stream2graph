@@ -1,0 +1,20 @@
+{
+  "id": "gh_class_01416",
+  "source": "github",
+  "source_url": "https://github.com/nicola-ferrarese/Tyrian-Timetable/blob/7d37cb247c3b43d98adba997c4439d119a4fb234/UML/application.mmd",
+  "github_repo": "nicola-ferrarese/Tyrian-Timetable",
+  "github_file_path": "UML/application.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n    class SL_Station {\n        +String id\n        +String name\n        +String transportType\n    }\n    class SL_Departure {\n        +String id\n        +String transportType\n        +String destination\n        +String scheduledTime\n        +String status\n    }\n\n\n    class Station {\n        +String id\n        +String name\n        +TransportType transportType\n    }\n    class Departure {\n        +String id\n        +TransportType transportType\n        +String destination\n        +LocalDateTime scheduledTime\n        +DepartureStatus status\n    }\n\n\n    SL_Station .. Station : Converted to\n    SL_Departure .. Departure : Converted to\n\n\n\nclass Station {\n+String id\n+String name\n}\n\nclass Departure {\n+String line\n+String destination\n+TransportType transportType\n+LocalDateTime scheduledTime\n+LocalDateTime expectedTime\n+String waitingTime\n}\n\nclass Model {\n+Either[String, List[Station]] slStations\n+Option[List[Departure]] slDepartures\n+Boolean isTestMode\n+Station selectedStation\n+String output\n+Boolean searchVisible\n+Option[List[Station]] slFilteredStations\n+TransportType slTransportTypeFilter\n+String subdomain\n}\n\n\n\n\nclass TransportApi {\n<<interface>>\n+loadStations() IO[Either[String, List[Station]]]\n+loadDepartures(String stationId) IO[Option[List[Departure]]]\n}\n\nclass SLApi {\n+loadStations() IO[Either[String, List[Station]]]\n+loadDepartures(String stationId, TransportType filter) IO[Option[List[Departure]]]\n}\n\nclass TransportFacade {\n-SLApi slApi\n+loadSLStations() IO[Either[String, List[Station]]]\n+getSLDepartures(String stationId, TransportType filter) IO[Option[List[Departure]]]\n}\n\nclass SLHandler {\n-TransportFacade transportFacade\n+handle(SLCommand) IO[SLEvent]\n}\n\nclass TransportApp {\n+init(Map[String, String]) (Model, Cmd[IO, Msg])\n+update(Model) Msg => (Model, Cmd[IO, Msg])\n+view(Model) Html[Msg]\n+subscriptions(Model) Sub[IO, Msg]\n}\n\n\nTransportApi <|.. SLApi\nTransportFacade --> SLApi\nSLHandler --> TransportFacade\nTransportApp --> SLHandler\nTransportApp --> Model\nTransportApp --> TransportFacade\nModel --> Station\nModel --> Departure\n",
+  "content_size": 2073,
+  "collected_at": "2026-02-06T01:57:30.862538",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 3,
+  "repo_forks": 0,
+  "repo_owner": "nicola-ferrarese",
+  "repo_name": "Tyrian-Timetable",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

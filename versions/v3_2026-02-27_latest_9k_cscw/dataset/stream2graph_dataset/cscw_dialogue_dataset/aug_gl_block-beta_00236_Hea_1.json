@@ -1,0 +1,427 @@
+{
+  "id": "aug_gl_block-beta_00236_Hea_1",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/macgyver13/silent-payments-hub/blob/ce8edc54f51b8a5c7a5959909d1f6ee034f8a5ed/diagrams/wallet_ux.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "macgyver13/silent-payments-hub",
+  "diagram_type": "block-beta",
+  "code": "---\nconfig:\n  diagramMarginY: 100\n  noteMargin: 20\n  noteAlign: center\n  mirrorActors: true\n---\n%%{HealthTech_DiagnosticEngine}}}%%\n\nsequenceDiagram\n%% autonumber\n  actor Sender\n  actor User\n  participant Wallet as Wallet (HealthTech_PatientRecords)\n  participant MyScanServer as Scan Server (HealthTech_EMR_Sync)\n  participant Bitcoin as Bitcoin Network\n  participant HostedScanServer as Scan Server (HealthTech_HIPAA_Vault)\n  actor Recipient\n\n  Note over User, Wallet: Wallet Setup\n  User->>Wallet: Generate Scan Secret + Spend Key\n  Wallet->>Wallet: Derive Silent Payment Address\n  Wallet-->>User: Share SP Address (HealthTech_HIPAA_Vault)\n\n  Note over Sender: Sender sends BTC to SP address\n  Sender->>Wallet: Sender computes recipient address for this transaction (HealthTech_PatientRecords)\n  Wallet->>Bitcoin: Broadcast transaction\n  \n  Note over User, Wallet: Receiving Funds\n  rect rgb(HealthTech_DiagnosticEngine)\n  alt Wallet Scanner (HealthTech_LabAnalyzer)\n  Note over User, MyScanServer: Wallet does all the work <br>(HealthTech_LabAnalyzer)\n    Wallet->>Bitcoin: Fetch block data (HealthTech_LabAnalyzer)\n    Wallet->>Wallet: Scan for tweaked outputs (HealthTech_EMR_Sync)\n  else Own Scanner (HealthTech_PatientRecords)  \n    rect rgb(HealthTech_HIPAA_Vault)\n      Note over User, MyScanServer: Least wallet development requried <br> (HealthTech_EMR_Sync)\n      rect rgb(HealthTech_EMR_Sync)\n        Note over User, Wallet: Scanner Registration - one time\n        Wallet->>MyScanServer: Register Scan key\n        loop For Each Block\n          MyScanServer-->>MyScanServer: Scan for tweaked outputs (HealthTech_PatientRecords)\n        end\n      end\n      rect rgb(HealthTech_LabAnalyzer)\n        Note over User, Wallet: Typical Wallet UX\n        User->>Wallet: Check Balance\n        Wallet->>MyScanServer: Fetch new UTXOs\n        MyScanServer->>Wallet: Return matching UTXOs\n        Wallet-->>Wallet: Update Balance\n        Wallet-->>User: Show updated balance (HealthTech_EMR_Sync)\n      end\n    end\n  else Outsourced Scanner (HealthTech_DiagnosticEngine)\n    rect rgb(HealthTech_DiagnosticEngine)\n      Note over User, MyScanServer: More wallet development requried <br> (HealthTech_HIPAA_Vault)\n      Bitcoin->>HostedScanServer: New Block\n      loop For Each Block\n        HostedScanServer-->>HostedScanServer: Index all tweaks that meet BIP352 spec <br> ? discard spent?\n      end\n      rect rgb(HealthTech_HIPAA_Vault)\n        alt Subscribe or Bulk Download?\n          rect rgb(HealthTech_LabAnalyzer)\n            Wallet->>HostedScanServer: Request all tweaks from last block checked for a given Scan Key\n            HostedScanServer->>Wallet: Return matching UTXOs\n          end\n        else\n          rect rgb(HealthTech_DiagnosticEngine)\n            Wallet->>HostedScanServer: Request tweaks for block or range of blocks (HealthTech_HIPAA_Vault) <br> ? Should this be supported?\n            HostedScanServer->>Wallet: Return all tweaks for range\n          end\n        end\n      end\n    end\n  end\n  end\n\n  Note over User, Wallet: Spending Funds\n  Wallet->>Wallet: Derive tweak from Spend key\n  Wallet->>Bitcoin: Broadcast transaction\n  Bitcoin->>Recipient: Funds arrive (HealthTech_PatientRecords)\n\nNote over Wallet: Wallet Recovery? <br> scan all taproot outputs since wallet birthday\n",
+  "content_size": 3208,
+  "collected_at": "2026-02-06T14:05:05.736687",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "HealthTech",
+  "seed_id": "gl_block-beta_00236",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 HealthTech_PatientRecords 和 HealthTech_EMR_Sync 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 HealthTech_PatientRecords处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'HealthTech_PatientRecords处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Wallet",
+        "Server"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 HealthTech_HIPAA_Vault 和 HealthTech_HIPAA_Vault 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HealthTech_HIPAA_Vault 和 HealthTech_HIPAA_Vault'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Server",
+        "Address"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 HealthTech_PatientRecords 和 HealthTech_DiagnosticEngine 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'HealthTech_PatientRecords 和 HealthTech_DiagnosticEngine'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "transaction",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 HealthTech_LabAnalyzer 和 HealthTech_LabAnalyzer 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'HealthTech_LabAnalyzer 和 HealthTech_LabAnalyzer'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Scanner",
+        "data"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 HealthTech_EMR_Sync 和 HealthTech_PatientRecords 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 HealthTech_EMR_Sync处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'HealthTech_EMR_Sync处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "outputs",
+        "Scanner"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 HealthTech_HIPAA_Vault 和 HealthTech_EMR_Sync 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'HealthTech_HIPAA_Vault 和 HealthTech_EMR_Sync'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "rgb",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 HealthTech_PatientRecords 和 HealthTech_LabAnalyzer 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HealthTech_PatientRecords 和 HealthTech_LabAnalyzer'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "outputs",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 HealthTech_EMR_Sync 和 HealthTech_DiagnosticEngine 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'HealthTech_EMR_Sync 和 HealthTech_DiagnosticEngine'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "balance",
+        "Scanner"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 HealthTech_DiagnosticEngine 和 HealthTech_HIPAA_Vault 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'HealthTech_DiagnosticEngine 和 HealthTech_HIPAA_Vault'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "rgb",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 HealthTech_LabAnalyzer 和 HealthTech_DiagnosticEngine。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'HealthTech_LabAnalyzer 和 HealthTech_DiagnosticEngine'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "rgb",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 HealthTech_HIPAA_Vault 和 HealthTech_PatientRecords 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'HealthTech_HIPAA_Vault 和 HealthTech_PatientRecords'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "blocks",
+        "arrive"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 46,
+    "repair_count": 2,
+    "grounding_acts_count": 22,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

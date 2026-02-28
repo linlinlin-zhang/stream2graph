@@ -1,0 +1,311 @@
+{
+  "id": "gh_sequence_00631",
+  "source": "github",
+  "source_url": "https://github.com/IrfanMusthofa/veripass/blob/22c4b762707548cfdc7305441f00632cbc960b27/docs/diagrams/auth-flow.mmd",
+  "github_repo": "IrfanMusthofa/veripass",
+  "github_file_path": "docs/diagrams/auth-flow.mmd",
+  "diagram_type": "sequence",
+  "code": "%%{init: {\n  'theme': 'base',\n  'themeVariables': {\n    'primaryColor': '#003366',\n    'primaryTextColor': '#ffffff',\n    'primaryBorderColor': '#002244',\n    'secondaryColor': '#8b5cf6',\n    'tertiaryColor': '#10b981',\n    'lineColor': '#003366',\n    'fontFamily': 'Inter, system-ui, sans-serif',\n    'fontSize': '13px',\n    'actorLineColor': '#003366',\n    'noteBkgColor': '#f5f3ff',\n    'noteTextColor': '#003366',\n    'noteBorderColor': '#8b5cf6'\n  }\n}}%%\n\nsequenceDiagram\n    autonumber\n\n    participant User as 👤 User\n    participant Frontend as ⚛️ React Frontend\n    participant RK as 🌈 RainbowKit\n    participant Wallet as 🦊 MetaMask\n    participant Backend as 🖥️ Backend API\n    participant DB as 🗄️ PostgreSQL\n\n    %% Phase 1: Wallet Connection\n    rect rgb(245, 243, 255)\n        Note over User,Wallet: Phase 1: Wallet Connection\n\n        User->>+Frontend: Click \"Connect Wallet\"\n\n        Frontend->>+RK: Open wallet modal\n\n        RK->>User: Select wallet provider\n        User->>RK: Choose MetaMask\n\n        RK->>+Wallet: Request connection\n        Wallet->>User: Approve connection?\n        User->>Wallet: Approve\n\n        Wallet-->>-RK: Connected<br/>address: 0x1234...\n\n        RK-->>-Frontend: Wallet connected\n        Frontend-->>-User: Wallet connected<br/>Display: 0x1234...abcd\n    end\n\n    %% Phase 2: Authentication Request\n    rect rgb(240, 249, 255)\n        Note over Frontend,DB: Phase 2: Request Nonce\n\n        Frontend->>Frontend: useAccount() hook<br/>Get connected address\n\n        Frontend->>+Backend: POST /api/auth/nonce<br/>Content-Type: application/json\n        Note right of Frontend: { address: \"0x1234...\" }\n\n        Backend->>Backend: Validate address format<br/>(42 chars, starts with 0x)\n\n        Backend->>Backend: Generate random nonce<br/>crypto.randomBytes(32)\n\n        Backend->>+DB: UPSERT auth_nonces<br/>address, nonce, expiresAt\n        Note right of Backend: expiresAt = NOW() + 5 min\n\n        DB-->>-Backend: Nonce stored\n\n        Backend-->>-Frontend: 200 OK<br/>{ nonce: \"0x9a8b7c...\" }\n    end\n\n    %% Phase 3: Message Signing\n    rect rgb(254, 249, 195)\n        Note over Frontend,Wallet: Phase 3: Sign Authentication Message\n\n        Frontend->>Frontend: Construct message\n        Note over Frontend: \"Sign this message to<br/>authenticate with VeriPass\\n\\n<br/>Nonce: 0x9a8b7c...\\n<br/>Timestamp: 2024-01-15T10:30:00Z\"\n\n        Frontend->>+Wallet: signMessage(message)\n        Note right of Frontend: wagmi useSignMessage hook\n\n        Wallet->>User: Sign message?<br/>Display message content\n        User->>Wallet: Sign\n\n        Wallet->>Wallet: ECDSA signature<br/>using private key\n\n        Wallet-->>-Frontend: signature: 0xabcd...\n        Note over Frontend: 65-byte signature<br/>(r, s, v)\n    end\n\n    %% Phase 4: Verification & JWT\n    rect rgb(236, 253, 245)\n        Note over Frontend,DB: Phase 4: Verify & Issue JWT\n\n        Frontend->>+Backend: POST /api/auth/verify\n        Note right of Frontend: { address, message, signature }\n\n        Backend->>Backend: Parse nonce from message\n\n        Backend->>+DB: SELECT * FROM auth_nonces<br/>WHERE address = ?\n        DB-->>-Backend: { nonce, expiresAt }\n\n        alt Nonce expired\n            Backend-->>Frontend: 401 Unauthorized<br/>\"Nonce expired\"\n        else Nonce not found\n            Backend-->>Frontend: 401 Unauthorized<br/>\"Invalid nonce\"\n        else Valid nonce\n            Backend->>Backend: ethers.verifyMessage(<br/>  message, signature<br/>)\n            Note over Backend: Recovers signer address\n\n            alt Address mismatch\n                Backend-->>Frontend: 401 Unauthorized<br/>\"Signature mismatch\"\n            else Address matches\n                Backend->>+DB: DELETE FROM auth_nonces<br/>WHERE address = ?\n                Note right of Backend: One-time use nonce\n                DB-->>-Backend: Deleted\n\n                Backend->>Backend: Generate JWT<br/>payload: { address }<br/>expiry: 7 days\n\n                Backend-->>-Frontend: 200 OK<br/>{ token: \"eyJ...\", address }\n            end\n        end\n    end\n\n    %% Phase 5: Token Storage & Usage\n    rect rgb(237, 233, 254)\n        Note over Frontend,User: Phase 5: Token Management\n\n        Frontend->>Frontend: localStorage.setItem(<br/>  'veripass_token', token<br/>)\n\n        Frontend->>Frontend: AuthContext update<br/>isAuthenticated: true<br/>user: { address }\n\n        Frontend->>User: Authentication success!<br/>Redirect to dashboard\n    end\n\n    %% Subsequent Requests\n    rect rgb(240, 249, 255)\n        Note over Frontend,Backend: Subsequent API Requests\n\n        loop Every authenticated request\n            Frontend->>+Backend: GET /api/assets<br/>Authorization: Bearer {JWT}\n\n            Backend->>Backend: authMiddleware<br/>jwt.verify(token, secret)\n\n            alt Token valid\n                Backend->>Backend: Extract address from payload\n                Backend->>Backend: Set c.set('userAddress', address)\n                Backend-->>-Frontend: 200 OK + data\n            else Token expired/invalid\n                Backend-->>Frontend: 401 Unauthorized\n                Frontend->>Frontend: Clear localStorage\n                Frontend->>User: Session expired<br/>Please sign in again\n            end\n        end\n    end\n\n    %% Logout\n    rect rgb(254, 226, 226)\n        Note over User,Frontend: Logout\n\n        User->>+Frontend: Click \"Disconnect\"\n\n        Frontend->>Frontend: localStorage.removeItem(<br/>  'veripass_token'<br/>)\n\n        Frontend->>RK: Disconnect wallet\n\n        Frontend->>Frontend: AuthContext reset<br/>isAuthenticated: false<br/>user: null\n\n        Frontend-->>-User: Logged out\n    end\n",
+  "content_size": 5636,
+  "collected_at": "2026-02-06T01:34:59.635078",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 1,
+  "repo_owner": "IrfanMusthofa",
+  "repo_name": "veripass",
+  "repo_description": "A decentralized asset passport enabling authenticity, ownership provenance, and verifiable lifecycle events for resale markets.",
+  "repo_language": "TypeScript",
+  "repo_topics": [],
+  "repo_created_at": "2025-12-26T08:52:11Z",
+  "repo_updated_at": "2026-01-14T09:33:01Z",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 245, 243, 255 和 240, 249, 255 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '245, 243, 255 和 240, 249, 255'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "rgb",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 32 和 254, 249, 195 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '32 和 254, 249, 195'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "randomBytes",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 message 和 236, 253, 245 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'message 和 236, 253, 245'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "signMessage",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 <br/>  message, signature<br/> 和 237, 233, 254 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '<br/>  message, signature<br/> 和 237, 233, 254'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "verifyMessage",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 <br/>  'veripass_token', token<br/> 和 240, 249, 255 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '<br/>  'veripass_token', token<br/> 和 240, 249, 255'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "setItem",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 JWT 和 token, secret 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'JWT 和 token, secret'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Bearer",
+        "verify"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 'userAddress', address 和 254, 226, 226 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 ''userAddress', address 和 254, 226, 226'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "set",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 <br/>  'veripass_token'<br/>。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '<br/>  'veripass_token'<br/>'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "removeItem"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 32,
+    "repair_count": 0,
+    "grounding_acts_count": 16,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

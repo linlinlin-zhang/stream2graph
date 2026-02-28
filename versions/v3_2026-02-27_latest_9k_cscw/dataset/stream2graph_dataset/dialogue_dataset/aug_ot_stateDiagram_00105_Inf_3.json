@@ -1,0 +1,58 @@
+{
+  "id": "aug_ot_stateDiagram_00105_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/Kentoso/it-labs/blob/4910f0bf2e1295f17c3247afef9e0988f22f485a/lab1/diagrams/activity_diagram.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "Kentoso/it-labs",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    [Infra_IngressController] --> Start\n    Start --> ChooseOperation\n    \n    state ChooseOperation <<choice>>\n    ChooseOperation --> DatabaseOperations : Database\n    ChooseOperation --> TableOperations : Table\n    ChooseOperation --> RowOperations : Row\n    \n    state DatabaseOperations {Infra_WorkerNode] --> SelectDatabaseOperation\n        state SelectDatabaseOperation <<choice>>\n        SelectDatabaseOperation --> CreateDatabase : Create\n        SelectDatabaseOperation --> LoadDatabase : Load\n        SelectDatabaseOperation --> SaveDatabase : Save\n        CreateDatabase --> ValidateDatabase\n        LoadDatabase --> ValidateDatabase\n        SaveDatabase --> [Infra_RedisCache]\n        ValidateDatabase --> [Infra_WorkerNode]\n    }\n    \n    state TableOperations {Infra_EtcdCluster] --> SelectTableOperation\n        state SelectTableOperation <<choice>>\n        SelectTableOperation --> AddTable : Add\n        SelectTableOperation --> CreateTable : Create\n        SelectTableOperation --> DropTable : Drop\n        SelectTableOperation --> GetTable : Get\n        SelectTableOperation --> RenameTable : Rename\n        SelectTableOperation --> UnionTables : Union\n        SelectTableOperation --> ManageSchema : Manage Schema\n        AddTable --> ValidateTable\n        CreateTable --> ValidateTable\n        DropTable --> [Infra_LoadBalancer]\n        GetTable --> [Infra_EtcdCluster]\n        RenameTable --> [Infra_WorkerNode]\n        UnionTables --> ValidateTable\n        ManageSchema --> ValidateTable\n        ValidateTable --> [Infra_EtcdCluster]\n    }\n    \n    state RowOperations {Infra_IngressController] --> SelectRowOperation\n        state SelectRowOperation <<choice>>\n        SelectRowOperation --> InsertRow : Insert\n        SelectRowOperation --> DeleteRow : Delete\n        SelectRowOperation --> SelectData : Select\n        SelectRowOperation --> UpdateData : Update\n        InsertRow --> ValidateRow\n        DeleteRow --> [Infra_IngressController]\n        SelectData --> [Infra_LoadBalancer]\n        UpdateData --> ValidateRow\n        ValidateRow --> [Infra_LoadBalancer]\n    }\n    \n    DatabaseOperations --> ChooseOperation\n    TableOperations --> ChooseOperation\n    RowOperations --> ChooseOperation\n    \n    ChooseOperation --> [Infra_LoadBalancer] : Exit",
+  "content_size": 2086,
+  "collected_at": "2026-02-06T10:37:57.281194",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "ot_stateDiagram_00105",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "首先，我们需要定义流程的起点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达Generic Diagram结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "root"
+      ],
+      "timestamp_offset": 45
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 3,
+    "speaker_distribution": {
+      "Speaker_B": 2,
+      "Speaker_A": 1
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "inform": 1
+    },
+    "avg_turn_length": 18.333333333333332,
+    "dialogue_duration": 45
+  }
+}

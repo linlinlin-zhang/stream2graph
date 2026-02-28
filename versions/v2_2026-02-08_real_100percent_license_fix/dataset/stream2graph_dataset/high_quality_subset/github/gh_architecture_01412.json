@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01412",
+  "source": "github",
+  "source_url": "https://github.com/ryosuke1219aka/mmwaveradarandcamera/blob/c5b5305de095a3af9bb0ada7c0f1a6676601044f/Mermaid.mmd",
+  "github_repo": "ryosuke1219aka/mmwaveradarandcamera",
+  "github_file_path": "Mermaid.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TD\n    A[Start] --> B[初期化: データセット, YOLOモデル読込];\n    B --> C{シーンループ: for scene in scenes};\n    C --> D{サンプルループ: for frame in scene};\n    D --> E[1. レーダー点群をカメラ画像へ投影];\n    E --> F[2. 投影点からROI注目領域を生成];\n    F --> G{ROIは生成されたか？};\n\n    subgraph \"3. YOLO推論 (状況に応じてモード切替)\"\n        G -->|Yes| H[\"✅ ROIモード: ROI切抜きでYOLO実行 (高速)\"];\n        G -->|No| I{\"🤔 適応的フルスキャンを実行するか？ (ROI無しが続いた等)\"};\n        I -->|Yes| J[\"🔥 フルスキャンモード: 画像全体でYOLO実行 (低速)\"];\n        I -->|No| K[\"⚠️ フォールバックモード: 粗いグリッドでYOLO実行\"];\n    end\n\n    H --> L[検出結果を統合];\n    J --> L;\n    K --> L;\n\n    L --> M[4. 正解データGround Truthを取得];\n    M --> N[5. YOLOの検出結果と正解を比較・評価];\n    N --> O{検出漏れFNはあったか？};\n    O -->|Yes| P[失敗原因を分析 ROIの質 or YOLOの問題];\n    P --> Q[分析結果をCSV記録 & 失敗画像を保存];\n    Q --> R{次のサンプルはあるか？};\n\n    O -->|No| R;\n\n    R -->|Yes| D;\n    R -->|No| S{次のシーンはあるか？};\n    S -->|Yes| C;\n    S -->|No| T[最終結果を集計・レポート表示];\n    T --> U[End];\n\n    style H fill:#e6ffed,stroke:#333,stroke-width:2px\n    style J fill:#ffe6e6,stroke:#333,stroke-width:2px\n    style K fill:#fff7e6,stroke:#333,stroke-width:2px\n",
+  "content_size": 1049,
+  "collected_at": "2026-02-06T01:45:54.460288",
+  "license": "none",
+  "license_name": "No License",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

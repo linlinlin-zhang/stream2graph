@@ -1,0 +1,359 @@
+{
+  "id": "gh_sequence_00218",
+  "source": "github",
+  "source_url": "https://github.com/MyoMyatAung/nestjs-graphql-course/blob/10b585e41234ca0668caf316b19a908eccd83454/docs/auth-flow.mmd",
+  "github_repo": "MyoMyatAung/nestjs-graphql-course",
+  "github_file_path": "docs/auth-flow.mmd",
+  "diagram_type": "sequence",
+  "code": "%% Authentication flow (Mermaid sequence diagram)\n%% File: docs/auth-flow.mmd\nsequenceDiagram\n  participant Client\n  participant GraphQL as GraphQL Server\n  participant GqlJwtGuard as GqlJwtGuard\n  participant Passport as Passport(jwt)\n  participant JwtStrategy as JwtStrategy\n  participant AuthService as AuthService\n  participant DB as Database\n  participant Resolver\n\n  Note over Client,AuthService: Sign-in / Issue token\n  Client->>GraphQL: mutation signIn(email,password)\n  GraphQL->>AuthService: AuthResolver.signIn -> verify password (argon2)\n  AuthService->>AuthService: jwtService.sign({ sub: { userId } })\n  AuthService-->>Client: AuthPayload { accessToken, userId, role }\n\n  Note over Client,Resolver: Protected request using token\n  Client->>GraphQL: Query/Mutation with header Authorization: Bearer <token>\n  GraphQL->>GqlJwtGuard: guard invoked (@UseGuards(GqlJwtGuard))\n  GqlJwtGuard->>GqlJwtGuard: getRequest(context) -> return req\n  GqlJwtGuard->>Passport: delegate to AuthGuard('jwt')\n\n  Passport->>Passport: Extract token from header\n  Passport->>Passport: Verify signature & expiry (secret)\n  Passport->>JwtStrategy: call validate(decodedPayload)\n\n  JwtStrategy->>AuthService: validate(payload) -> validateJwtUser(userId)\n  AuthService->>DB: find user by id\n  DB-->>AuthService: user entity\n  AuthService-->>JwtStrategy: JwtUser { userId, role }\n  JwtStrategy-->>Passport: return JwtUser -> attached to req.user\n\n  Passport-->>Resolver: allow request to continue\n  Resolver->>Resolver: @CurrentUser() reads req.user\n  Resolver-->>Client: GraphQL response\n\n  Note over Passport,Client: Failure modes\n  Passport->>Client: Unauthorized (missing/invalid/expired)\n  JwtStrategy->>Client: Unauthorized (user not found/disabled)\n",
+  "content_size": 1742,
+  "collected_at": "2026-02-06T01:29:18.001492",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "repo_owner": "MyoMyatAung",
+  "repo_name": "nestjs-graphql-course",
+  "repo_description": "NestJS GraphQL Course",
+  "repo_language": "TypeScript",
+  "repo_topics": [],
+  "repo_created_at": "2025-11-12T05:18:46Z",
+  "repo_updated_at": "2025-11-12T11:44:37Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是GraphQL Server应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "GraphQL Server主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "GraphQL Server负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "GraphQL"
+      ],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "GqlJwtGuard、Passport(jwt)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下GqlJwtGuard、Passport(jwt)吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "GqlJwtGuard",
+        "Passport"
+      ],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下JwtStrategy、AuthService吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是JwtStrategy、AuthService应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有JwtStrategy、AuthService。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "JwtStrategy",
+        "AuthService",
+        "DB"
+      ],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理mutation signIn(email,password)？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，mutation signIn(email,password)是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "mutation signIn(email,password)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "msg_0"
+      ],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下AuthResolver.signIn -> verify password (argon2)、jwtService.sign({ sub: { userId } })吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_1",
+        "msg_2",
+        "msg_3"
+      ],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含guard invoked (@UseGuards(GqlJwtGuard))这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是guard invoked (@UseGuards(GqlJwtGuard))应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_4"
+      ],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将getRequest(context) -> return req、delegate to AuthGuard('jwt')分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是getRequest(context) -> return req、delegate to AuthGuard('jwt')应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_5",
+        "msg_6",
+        "msg_7"
+      ],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "关于Verify signature & expiry (secret)，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Verify signature & expiry (secret)的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_8"
+      ],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有call validate(decodedPayload)。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_9"
+      ],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由validate(payload) -> validateJwtUser(userId)组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由validate(payload) -> validateJwtUser(userId)组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_10"
+      ],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "关于find user by id、@CurrentUser() reads req.user，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_11",
+        "msg_12",
+        "msg_13"
+      ],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Unauthorized (user not found/disabled)组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Unauthorized (user not found/disabled)就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 495
+    },
+    {
+      "turn_id": 34,
+      "speaker": "Speaker_A",
+      "utterance": "Unauthorized (user not found/disabled)和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 510
+    },
+    {
+      "turn_id": 35,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达Unauthorized (user not found/disabled)结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_14"
+      ],
+      "timestamp_offset": 525
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 35,
+    "speaker_distribution": {
+      "Speaker_B": 18,
+      "Speaker_A": 17
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "clarify": 5,
+      "classification": 4,
+      "structural": 7,
+      "inform": 6,
+      "request": 6,
+      "confirm": 4,
+      "contrastive": 1
+    },
+    "avg_turn_length": 37.34285714285714,
+    "dialogue_duration": 525
+  }
+}

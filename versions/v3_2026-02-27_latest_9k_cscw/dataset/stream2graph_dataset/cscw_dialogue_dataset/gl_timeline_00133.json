@@ -1,0 +1,311 @@
+{
+  "id": "gl_timeline_00133",
+  "source": "gitlab",
+  "source_url": "https://github.com/les-incesissables/CesiMange/blob/5b2d2cace7423ff3e6d6e9bd5d7ea622d15b06f5/docs/conceptions/bdd/Editor%20_%20Mermaid%20Chart-2025-04-01-131348.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "les-incesissables/CesiMange",
+  "diagram_type": "timeline",
+  "code": "erDiagram\n    %% MONGODB (NoSQL) - Optimisé pour les bonnes pratiques\n    MONGODB {\n        string note \"BASE NOSQL - DONNÉES ORIENTÉES DOCUMENT\"\n    }\n    \n    USERS {\n        string _id PK\n        int auth_id FK \"Référence SQL Server\"\n        string first_name\n        string last_name\n        string email\n        string phone\n        array addresses\n        string profile_picture\n        object preferences\n        string user_type \"client/restaurant_owner/driver\"\n        int loyalty_points\n        datetime last_login\n        array payment_methods\n        datetime created_at\n        datetime updated_at\n    }\n    \n    RESTAURANTS {\n        string _id PK\n        int auth_id FK \"Référence SQL Server\"\n        string name\n        string description\n        object location \"adresse + coordonnées GeoJSON\"\n        array categories\n        number rating\n        number order_count\n        object schedule \"Horaires formatés par jour\"\n        array payment_methods\n        object delivery_settings \"Frais, minimum, zones\"\n        array photos\n        datetime created_at\n        datetime updated_at\n        boolean active\n    }\n    \n    MENU_ITEMS {\n        string _id PK\n        string restaurant_id FK\n        string name\n        string description\n        number price\n        string category\n        array options \"Personnalisations possibles\"\n        array allergens\n        string photo\n        boolean available\n        number preparation_time\n        datetime created_at\n        datetime updated_at\n    }\n    \n    ORDERS {\n        string _id PK\n        string customer_id FK\n        string restaurant_id FK\n        string driver_id FK\n        object delivery_location \"adresse + coordonnées GeoJSON\"\n        array items \"Produits avec quantités et options\"\n        string status\n        number subtotal\n        number delivery_fee\n        number service_fee\n        number tax\n        number total\n        string payment_id\n        string payment_method\n        object timeline \"Suivi des étapes avec timestamps\"\n        string special_instructions\n        datetime created_at\n        datetime updated_at\n    }\n    \n    DELIVERIES {\n        string _id PK\n        string order_id FK\n        string driver_id FK\n        string status\n        object current_location \"GeoJSON Point\"\n        array route \"Array de positions avec timestamps\"\n        datetime estimated_arrival\n        datetime actual_pickup\n        datetime actual_delivery\n        object delivery_proof\n        datetime created_at\n        datetime updated_at\n    }\n    \n    RATINGS {\n        string _id PK\n        string order_id FK\n        string user_id FK\n        string target_type \"restaurant/driver/app\"\n        string target_id\n        number rating\n        string comment\n        array photos\n        boolean flagged\n        datetime created_at\n    }\n    \n    PROMOTIONS {\n        string _id PK\n        string code\n        string description\n        number value\n        string type \"percentage/fixed/free_item\"\n        array applicable_items\n        array applicable_restaurants\n        number usage_limit\n        number usage_count\n        datetime start_date\n        datetime end_date\n        object conditions\n        datetime created_at\n        datetime updated_at\n    }\n    \n    NOTIFICATIONS {\n        string _id PK\n        string recipient_id FK\n        string type\n        string title\n        string body\n        object data\n        boolean read\n        datetime created_at\n        datetime read_at\n    }\n    \n    %% SQL SERVER (Relationnel) - Optimisé pour les bonnes pratiques\n    SQLSERVER {\n        string note \"BASE SQL - AUTHENTIFICATION ET TRANSACTIONS\"\n    }\n    \n    AUTH_USERS {\n        int id PK\n        string email\n        string phone_number\n        string password_hash\n        string role \"client/restaurant/driver/admin\"\n        boolean email_verified\n        boolean phone_verified\n        datetime last_login\n        string refresh_token\n        boolean active\n        datetime created_at\n        datetime updated_at\n    }\n    \n    TRANSACTIONS {\n        int id PK\n        string order_id FK\n        string payment_intent_id \"ID externe du processeur de paiement\"\n        decimal amount\n        string currency\n        string status\n        string payment_method\n        string payment_provider \"Stripe/PayPal/etc.\"\n        datetime created_at\n        datetime updated_at\n    }\n    \n    AUDIT_LOGS {\n        int id PK\n        int user_id FK\n        string action\n        string entity_type\n        string entity_id\n        string ip_address\n        string user_agent\n        json changes\n        datetime timestamp\n    }\n    \n    %% Relations principales\n    MONGODB ||--|{ USERS : contient\n    MONGODB ||--|{ RESTAURANTS : contient\n    MONGODB ||--|{ MENU_ITEMS : contient\n    MONGODB ||--|{ ORDERS : contient\n    MONGODB ||--|{ DELIVERIES : contient\n    MONGODB ||--|{ RATINGS : contient\n    MONGODB ||--|{ PROMOTIONS : contient\n    MONGODB ||--|{ NOTIFICATIONS : contient\n    \n    SQLSERVER ||--|{ AUTH_USERS : contient\n    SQLSERVER ||--|{ TRANSACTIONS : contient\n    SQLSERVER ||--|{ AUDIT_LOGS : contient\n\n    %% Relations entre les entités\n    AUTH_USERS ||--|| USERS : authentifie\n    RESTAURANTS ||--o{ MENU_ITEMS : propose\n    USERS ||--o{ ORDERS : passe\n    RESTAURANTS ||--o{ ORDERS : reçoit\n    ORDERS ||--|| DELIVERIES : génère\n    ORDERS ||--o{ RATINGS : reçoit\n    ORDERS ||--|| TRANSACTIONS : entraîne",
+  "content_size": 5429,
+  "collected_at": "2026-02-06T14:03:23.995574",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 NoSQL 和 string note \"BASE NOSQL - DONNÉES ORIENTÉES DOCUMENT\"\n     的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'NoSQL 和 string note \"BASE NOSQL - DONNÉES ORIENTÉES DOCUMENT\"\n    '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MONGODB",
+        "MONGODB"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 string _id PK\n        int auth_id FK \"Référence SQL Server\"\n        string first_name\n        string last_name\n        string email\n        string phone\n        array addresses\n        string profile_picture\n        object preferences\n        string user_type \"client/restaurant_owner/driver\"\n        int loyalty_points\n        datetime last_login\n        array payment_methods\n        datetime created_at\n        datetime updated_at\n     和 string _id PK\n        int auth_id FK \"Référence SQL Server\"\n        string name\n        string description\n        object location \"adresse + coordonnées GeoJSON\"\n        array categories\n        number rating\n        number order_count\n        object schedule \"Horaires formatés par jour\"\n        array payment_methods\n        object delivery_settings \"Frais, minimum, zones\"\n        array photos\n        datetime created_at\n        datetime updated_at\n        boolean active\n     的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'string _id PK\n        int auth_id FK \"Référence SQL Server\"\n        string first_name\n        string last_name\n        string email\n        string phone\n        array addresses\n        string profile_picture\n        object preferences\n        string user_type \"client/restaurant_owner/driver\"\n        int loyalty_points\n        datetime last_login\n        array payment_methods\n        datetime created_at\n        datetime updated_at\n     和 string _id PK\n        int auth_id FK \"Référence SQL Server\"\n        string name\n        string description\n        object location \"adresse + coordonnées GeoJSON\"\n        array categories\n        number rating\n        number order_count\n        object schedule \"Horaires formatés par jour\"\n        array payment_methods\n        object delivery_settings \"Frais, minimum, zones\"\n        array photos\n        datetime created_at\n        datetime updated_at\n        boolean active\n    '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "USERS",
+        "RESTAURANTS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 string _id PK\n        string restaurant_id FK\n        string name\n        string description\n        number price\n        string category\n        array options \"Personnalisations possibles\"\n        array allergens\n        string photo\n        boolean available\n        number preparation_time\n        datetime created_at\n        datetime updated_at\n     和 string _id PK\n        string customer_id FK\n        string restaurant_id FK\n        string driver_id FK\n        object delivery_location \"adresse + coordonnées GeoJSON\"\n        array items \"Produits avec quantités et options\"\n        string status\n        number subtotal\n        number delivery_fee\n        number service_fee\n        number tax\n        number total\n        string payment_id\n        string payment_method\n        object timeline \"Suivi des étapes avec timestamps\"\n        string special_instructions\n        datetime created_at\n        datetime updated_at\n     的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'string _id PK\n        string restaurant_id FK\n        string name\n        string description\n        number price\n        string category\n        array options \"Personnalisations possibles\"\n        array allergens\n        string photo\n        boolean available\n        number preparation_time\n        datetime created_at\n        datetime updated_at\n     和 string _id PK\n        string customer_id FK\n        string restaurant_id FK\n        string driver_id FK\n        object delivery_location \"adresse + coordonnées GeoJSON\"\n        array items \"Produits avec quantités et options\"\n        string status\n        number subtotal\n        number delivery_fee\n        number service_fee\n        number tax\n        number total\n        string payment_id\n        string payment_method\n        object timeline \"Suivi des étapes avec timestamps\"\n        string special_instructions\n        datetime created_at\n        datetime updated_at\n    '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MENU_ITEMS",
+        "ORDERS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 string _id PK\n        string order_id FK\n        string driver_id FK\n        string status\n        object current_location \"GeoJSON Point\"\n        array route \"Array de positions avec timestamps\"\n        datetime estimated_arrival\n        datetime actual_pickup\n        datetime actual_delivery\n        object delivery_proof\n        datetime created_at\n        datetime updated_at\n     和 string _id PK\n        string order_id FK\n        string user_id FK\n        string target_type \"restaurant/driver/app\"\n        string target_id\n        number rating\n        string comment\n        array photos\n        boolean flagged\n        datetime created_at\n     的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 string _id PK\n        string order_id FK\n        string driver_id FK\n        string status\n        object current_location \"GeoJSON Point\"\n        array route \"Array de positions avec timestamps\"\n        datetime estimated_arrival\n        datetime actual_pickup\n        datetime actual_delivery\n        object delivery_proof\n        datetime created_at\n        datetime updated_at\n    处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'string _id PK\n        string order_id FK\n        string driver_id FK\n        string status\n        object current_location \"GeoJSON Point\"\n        array route \"Array de positions avec timestamps\"\n        datetime estimated_arrival\n        datetime actual_pickup\n        datetime actual_delivery\n        object delivery_proof\n        datetime created_at\n        datetime updated_at\n    处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DELIVERIES",
+        "RATINGS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 string _id PK\n        string code\n        string description\n        number value\n        string type \"percentage/fixed/free_item\"\n        array applicable_items\n        array applicable_restaurants\n        number usage_limit\n        number usage_count\n        datetime start_date\n        datetime end_date\n        object conditions\n        datetime created_at\n        datetime updated_at\n     和 string _id PK\n        string recipient_id FK\n        string type\n        string title\n        string body\n        object data\n        boolean read\n        datetime created_at\n        datetime read_at\n    。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'string _id PK\n        string code\n        string description\n        number value\n        string type \"percentage/fixed/free_item\"\n        array applicable_items\n        array applicable_restaurants\n        number usage_limit\n        number usage_count\n        datetime start_date\n        datetime end_date\n        object conditions\n        datetime created_at\n        datetime updated_at\n     和 string _id PK\n        string recipient_id FK\n        string type\n        string title\n        string body\n        object data\n        boolean read\n        datetime created_at\n        datetime read_at\n    '。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PROMOTIONS",
+        "NOTIFICATIONS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Relationnel 和 string note \"BASE SQL - AUTHENTIFICATION ET TRANSACTIONS\"\n     的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Relationnel 和 string note \"BASE SQL - AUTHENTIFICATION ET TRANSACTIONS\"\n    '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SERVER",
+        "SQLSERVER"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 int id PK\n        string email\n        string phone_number\n        string password_hash\n        string role \"client/restaurant/driver/admin\"\n        boolean email_verified\n        boolean phone_verified\n        datetime last_login\n        string refresh_token\n        boolean active\n        datetime created_at\n        datetime updated_at\n     和 int id PK\n        string order_id FK\n        string payment_intent_id \"ID externe du processeur de paiement\"\n        decimal amount\n        string currency\n        string status\n        string payment_method\n        string payment_provider \"Stripe/PayPal/etc.\"\n        datetime created_at\n        datetime updated_at\n     的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'int id PK\n        string email\n        string phone_number\n        string password_hash\n        string role \"client/restaurant/driver/admin\"\n        boolean email_verified\n        boolean phone_verified\n        datetime last_login\n        string refresh_token\n        boolean active\n        datetime created_at\n        datetime updated_at\n     和 int id PK\n        string order_id FK\n        string payment_intent_id \"ID externe du processeur de paiement\"\n        decimal amount\n        string currency\n        string status\n        string payment_method\n        string payment_provider \"Stripe/PayPal/etc.\"\n        datetime created_at\n        datetime updated_at\n    '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AUTH_USERS",
+        "TRANSACTIONS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 int id PK\n        int user_id FK\n        string action\n        string entity_type\n        string entity_id\n        string ip_address\n        string user_agent\n        json changes\n        datetime timestamp\n     这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'int id PK\n        int user_id FK\n        string action\n        string entity_type\n        string entity_id\n        string ip_address\n        string user_agent\n        json changes\n        datetime timestamp\n    '。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AUDIT_LOGS"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 33,
+    "repair_count": 1,
+    "grounding_acts_count": 16,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

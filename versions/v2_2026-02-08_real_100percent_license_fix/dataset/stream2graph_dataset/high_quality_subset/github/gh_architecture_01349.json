@@ -1,0 +1,20 @@
+{
+  "id": "gh_architecture_01349",
+  "source": "github",
+  "source_url": "https://github.com/NigudhaLoka/documentation/blob/cdb026ece6997b2017184daefa7d05094c551a7f/Design.mmd",
+  "github_repo": "NigudhaLoka/documentation",
+  "github_file_path": "Design.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TD\n    subgraph \"User Layer\"\n        User([\"<br><b>User</b><br>Interacts with<br>Web/Mobile App\"])\n    end\n\n    subgraph \"Client Applications\"\n        direction LR\n        WebApp[\"<br><b>frontend-web</b><br>Next.js & Tailwind\"]\n        MobileApp[\"<br><b>frontend-mobile</b><br>React Native / Flutter\"]\n    end\n\n    subgraph \"Gateway & Security\"\n        direction TB\n        Cloudflare[\"<br><b>Cloudflare</b><br>DDoS, WAF\"]\n        Gateway[\"<br><b>gateway-php</b><br>PHP Intermediary<br>Captcha Validation\"]\n    end\n\n    subgraph \"Core Backend Services\"\n        direction TB\n        BackendAPI[\"<br><b>backend-api</b><br>Python (FastAPI)<br>Core Business Logic\"]\n    end\n\n    subgraph \"Data & Storage Platform (Firebase & MySQL)\"\n        direction LR\n        FirebasePlatform[(\"<b>Firebase Platform</b>\")]\n        MySQLDB[\"<br><b>MySQL Database</b><br>Snapshot Queue<br>Gateway-specific tasks\"]\n    end\n    \n    subgraph FirebasePlatform\n        direction TB\n        FirebaseAuth[\"<br><b>Firebase Authentication</b><br>User Identity\"]\n        Firestore[\"<br><b>Firestore</b><br>Profiles, Metadata, Threads\"]\n        CloudStorage[\"<br><b>Cloud Storage</b><br>Media & Snapshots\"]\n        CloudFunctions[\"<br><b>Cloud Functions</b><br>Async Tasks<br>(e.g., Snapshot Generation)\"]\n    end\n\n    %% Defining Connections\n    User --> WebApp\n    User --> MobileApp\n    \n    WebApp -- \"HTTP/S Requests\" --> Cloudflare\n    MobileApp -- \"HTTP/S Requests\" --> Cloudflare\n    \n    Cloudflare --> Gateway\n    Gateway -- \"Forwards Validated Requests (w/ JWT)\" --> BackendAPI\n    Gateway -- \"Manages Snapshot Queue\" --> MySQLDB\n\n    BackendAPI -- \"Handles Logic & Data Operations\" --> FirebasePlatform\n    \n    subgraph \"Backend to Firebase Interactions\"\n        direction TB\n        BackendAPI -- \"Uses\" --> FirebaseAuth\n        BackendAPI -- \"Uses\" --> Firestore\n        BackendAPI -- \"Reads/Writes to\" --> CloudStorage\n        BackendAPI -- \"Triggers / Is deployed as\" --> CloudFunctions\n    end\n",
+  "content_size": 1988,
+  "collected_at": "2026-02-06T01:45:06.133766",
+  "license": "cc0-1.0",
+  "license_name": "Creative Commons Zero v1.0 Universal",
+  "license_url": "https://api.github.com/licenses/cc0-1.0",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "repo_owner": "NigudhaLoka",
+  "repo_name": "documentation",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

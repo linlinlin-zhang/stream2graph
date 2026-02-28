@@ -1,0 +1,18 @@
+{
+  "id": "gh_class_01101",
+  "source": "github",
+  "source_url": "https://github.com/abrayko/raspidrum_ui/blob/131cca5029f06f2a7bde19a980f9d67f5ef4a444/doc/complete_class.mmd",
+  "github_repo": "abrayko/raspidrum_ui",
+  "github_file_path": "doc/complete_class.mmd",
+  "diagram_type": "class",
+  "code": "---\ntitle: Domain Model\n---\nclassDiagram\ndirection TB\n\nclass Kit {\n  *string id\n  *string name\n  *string author\n  *Engine engine\n  *List<Instrument> instruments\n}\n\nKit o-- Instrument : \"1..*\" instruments\nKit o-- Engine : \"1..1\" engine\n\nclass Engine {\n  *string key\n  *string name\n  *EngineType type\n}\n\nEngine -- EngineType : type\n\nclass EngineType {\n  <<Enumeration>>\n  sfz\n  sf2\n  gig\n}\n\nclass Instrument {\n  *string key\n  *string name\n  List<FX> tunes\n  List<Layer> layers\n}\n\nInstrument o-- Layer : \"1..*\" layers\nInstrument o-- FX : \"0..*\" tunes\n\nclass Layer {\n  *string key\n  *string name\n  *boolean isFXable\n  List<FX> defaultEffects\n}\n\nLayer o-- FX : \"0..*\" defaultEffects\n\nclass FX {\n  *string key\n  *string name\n  List<FXParam> params\n}\n\nFX o-- FXParam : \"1..*\" params\n\nclass FXParam {\n  *string key\n  *string name\n  *int order\n  *FXParamType type\n  double min\n  double max\n  *int divisions\n  List<FXParamDiscreteVal> discrete_vals\n}\n\nFXparam -- FXParamType : type\nFXparam o-- FXParamDiscreteVal : \"0..*\" discrete_vals\n\nclass FXParamType {\n<<Enumeration>>\n  range\n  fixed\n  boolean\n}\n\nclass FXParamDiscreteVal {\n  string name\n  *double val\n}\n\n\nclass ChannelMeta {\n  *ChannelType type\n  *boolean isMutable\n  *boolean isSoloable\n  *boolean isTunable\n  *boolean isFXable\n  *boolean isLayerFXable\n}\n\nChannelMeta -- ChannelType : type\n\nclass ChannelType {\n<<Enumeration>>\n  global\n  sampler\n  instrument\n  mixer\n  player\n}\n\n\nclass Preset {\n  *string key #readOnly\n  *string name\n  string description\n  *List<ChannelPset> channels\n}\nPreset o-- ChannelPset : \"1..*\" channels\n\nclass ChannelPset {\n  *string key #readOnly\n  *string name\n  *ChannelType type\n  *double: level\n  *double: pan \n  List<FXPset> fxs\n  List<InstrumentPset> instruments\n}\nChannelPset .. ChannelMeta\nChannelPset o-- InstrumentPset : \"1..*\" instruments\nChannelPset o-- FXPset : \"0..*\" fxs\n\nclass InstrumentPset {\n  *string key #readOnly\n  *string name #readOnly\n  List<FXPset> tunes\n  List<LayerPset> layers\n}\nInstrumentPset .. Instrument\nInstrumentPset o-- LayerPset : \"1..*\" layers \nInstrumentPset o-- FXPset : \"0..*\" tunes\n\n%% if level is null, then layer inherite channel level\nclass LayerPset {\n  *string key #readOnly\n  *string name #readOnly\n  double level\n  List<FXPset> fxs\n}\nLayerPset .. Layer\nLayerPset o-- FXPset : \"0..*\" fxs\n\nclass FXPset {\n  *string key #readOnly\n  *string name #readOnly\n  *int order\n  *List<FXParamPset> params\n}\nFXPset o-- FXParamPset : \"1..*\" params\nFXPset .. FX\n\nclass FXParamPset {\n  *string key #readOnly\n  *string name #readOnly\n  *int order #readOnly\n  *FXParamType type #readOnly\n  double min #readOnly\n  double max #readOnly\n  int divisions #readOnly\n  List<FXParamDiscreteVal> discrete_vals #readOnly\n  double value\n  boolean value\n}\n\nFXParamPset .. FXParam",
+  "content_size": 2770,
+  "collected_at": "2026-02-06T01:52:58.701825",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 1
+}

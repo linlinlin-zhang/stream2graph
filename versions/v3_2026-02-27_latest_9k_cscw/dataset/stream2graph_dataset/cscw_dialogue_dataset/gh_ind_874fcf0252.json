@@ -1,0 +1,86 @@
+{
+  "id": "gh_ind_874fcf0252",
+  "source": "github_industrial",
+  "repo": "enzokro/fast-mermaid",
+  "license": "apache-2.0",
+  "code": "sequenceDiagram\n    participant User\n    participant Browser\n    participant Server\n    participant MermaidInk\n\n    User->>Browser: Open Mermaid Editor\n    Browser->>Server: GET /\n    Server-->>Browser: Return HTML with Editor UI\n    Browser->>User: Display Editor UI\n\n    Note over User,Browser: User types or edits Mermaid code\n\n    Browser->>Server: POST /render (HTMX request on keyup, change, or htmx:afterSettle)\n    Server->>MermaidInk: GET SVG for Mermaid code\n    MermaidInk-->>Server: Return SVG\n    Server-->>Browser: Return SVG content\n    Note over Server: Extract and adjust viewBox\n    Browser->>User: Update rendered diagram\n\n    Note over User,Browser: User uploads Mermaid file\n\n    User->>Browser: Select Mermaid file\n    Browser->>Server: POST /upload (HTMX request)\n    Server-->>Browser: Return updated textarea content\n    Note over Browser: htmx:afterSettle event triggered\n    Browser->>Server: POST /render (HTMX request)\n    Server->>MermaidInk: GET SVG for uploaded content\n    MermaidInk-->>Server: Return SVG\n    Server-->>Browser: Return SVG content\n    Note over Server: Extract and adjust viewBox\n    Browser->>User: Display uploaded diagram\n\n    Note over User,Browser: User continues editing...\n",
+  "diagram_type": "size:1000..1500",
+  "collected_at": "2026-02-27T03:25:53.785716",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 HTMX request on keyup, change, or htmx:afterSettle 和 HTMX request 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HTMX request on keyup, change, or htmx:afterSettle 和 HTMX request'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "render",
+        "upload"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 HTMX request 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HTMX request'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "render"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 8,
+    "repair_count": 0,
+    "grounding_acts_count": 4,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

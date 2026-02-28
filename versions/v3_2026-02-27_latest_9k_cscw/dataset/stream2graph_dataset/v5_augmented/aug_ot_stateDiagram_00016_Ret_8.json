@@ -1,0 +1,17 @@
+{
+  "id": "aug_ot_stateDiagram_00016_Ret_8",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/rsrini7/Notification-SSE-GLM-Flux/blob/ab393147fcd23792caaf76f36b1047fe061d8a1a/MermaidDiagrams/state-admin-status.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "rsrini7/Notification-SSE-GLM-Flux",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    direction LR\n\n    [Retail_OrderManagement] --> SCHEDULED: Admin creates broadcast for distant future\n    [Retail_PointOfSale] --> PREPARING: Admin creates immediate broadcast (Retail_OrderManagement)\n\n    SCHEDULED --> PREPARING: Pre-computation scheduler runs\n    SCHEDULED --> CANCELLED: Admin cancels\n    \n    PREPARING --> READY: Async user fetch succeeds\n    PREPARING --> FAILED: Async user fetch fails\n    PREPARING --> CANCELLED: Admin cancels\n    \n    READY --> ACTIVE: Activation scheduler runs (Retail_CouponSystem)\n    READY --> CANCELLED: Admin cancels\n    \n    ACTIVE --> EXPIRED: Expiration scheduler runs\n    ACTIVE --> CANCELLED: Admin cancels via API\n    ACTIVE --> FAILED: DLT event for group broadcast is consumed\n    \n    EXPIRED --> [Retail_Inventory]\n    CANCELLED --> [Retail_PointOfSale]\n    FAILED --> [Retail_CouponSystem]",
+  "content_size": 790,
+  "collected_at": "2026-02-06T10:36:48.617936",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Retail",
+  "seed_id": "ot_stateDiagram_00016"
+}

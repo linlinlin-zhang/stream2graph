@@ -1,0 +1,103 @@
+{
+  "id": "gh_sequence_00622",
+  "source": "github",
+  "source_url": "https://github.com/aws-samples/sample-semantic-layer-using-agents/blob/d1f1fb31a657f4a0daf1806897f939e229463782/docs/diagrams/06-entity-resolution-flow.mmd",
+  "github_repo": "aws-samples/sample-semantic-layer-using-agents",
+  "github_file_path": "docs/diagrams/06-entity-resolution-flow.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Doc as Document Processing\n    participant APIGW as API Gateway\n    participant Proxy as Entity Resolution Proxy\n    participant Cache as DynamoDB Cache\n    participant Agent as Entity Resolution Agent\n    participant Catalog as Entity Discovery\n    participant RDS as RDS Database\n\n    Doc->>APIGW: Extract entities from document\n    APIGW->>Proxy: POST /v3/discover/resolve\n    Proxy->>Cache: Check cache (mentions hash)\n\n    alt Cache Hit\n        Cache-->>Proxy: Return cached resolutions\n    else Cache Miss\n        Cache-->>Proxy: Cache miss\n        Proxy->>Agent: Invoke AgentCore Runtime\n        Agent->>Catalog: Get entity catalog\n        Catalog-->>Agent: Entity types and patterns\n        Agent->>RDS: Search for candidate entities\n        RDS-->>Agent: Candidate matches\n        Agent->>Agent: Calculate similarity scores\n\n        alt High confidence (>0.7)\n            Agent->>Agent: Auto-resolve\n        else Low confidence (<0.7)\n            Agent->>Agent: Flag for review\n        end\n\n        Agent-->>Proxy: Resolutions + unresolved list\n        Proxy->>Cache: Store result\n    end\n\n    Proxy-->>APIGW: Return results\n    APIGW-->>Doc: Resolved entities\n",
+  "content_size": 1202,
+  "collected_at": "2026-02-06T01:34:52.659887",
+  "compilation_status": "failed",
+  "license": "mit-0",
+  "license_name": "MIT No Attribution",
+  "license_url": "https://api.github.com/licenses/mit-0",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 mentions hash 和 >0.7 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'mentions hash 和 >0.7'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "cache",
+        "confidence"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 <0.7 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 <0.7处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '<0.7处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "confidence"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 9,
+    "repair_count": 1,
+    "grounding_acts_count": 4,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

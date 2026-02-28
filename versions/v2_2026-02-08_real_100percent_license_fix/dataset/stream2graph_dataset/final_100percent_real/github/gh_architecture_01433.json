@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01433",
+  "source": "github",
+  "source_url": "https://github.com/garimto81/claude/blob/17a1883944b3dd5942e519485daa21d6689e31f3/youtuber_vertuber/docs/images/vseface-architecture.mmd",
+  "github_repo": "garimto81/claude",
+  "github_file_path": "youtuber_vertuber/docs/images/vseface-architecture.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TD\n    %% External Components\n    WebCam[웹캠<br/>Face Tracking]\n    VSeeFace[VSeeFace<br/>VMC Protocol v1.13.38+<br/>Port 39539]\n    GitHub[GitHub Webhook<br/>Events: Commit, PR, CI]\n    ChatBot[youtuber_chatbot<br/>Port 3002<br/>Ollama + Qwen 3]\n    OBS[OBS Studio<br/>WebSocket 4.9.1+<br/>Port 4455]\n\n    %% youtuber Packages\n    subgraph YoutuberMonorepo[youtuber Monorepo]\n        VTuberPkg[packages/vtuber<br/>━━━━━━━━━━━━<br/>VMC Client<br/>Avatar Controller<br/>Reaction Mapper]\n\n        StreamServer[packages/stream-server<br/>━━━━━━━━━━━━<br/>Express Port 3001<br/>WebSocket Manager<br/>GitHub Webhook Handler<br/>VTuber Routes]\n\n        Overlay[packages/overlay<br/>━━━━━━━━━━━━<br/>Browser Source<br/>Vite + TypeScript]\n\n        Shared[packages/shared<br/>━━━━━━━━━━━━<br/>Type Definitions<br/>VTuber Types]\n    end\n\n    %% Data Flow\n    WebCam -->|얼굴 추적 데이터| VSeeFace\n    VSeeFace -->|VMC UDP<br/>BlendShapes 30fps| VTuberPkg\n    VTuberPkg -->|표정 제어<br/>Blend Apply| VSeeFace\n    VTuberPkg -->|WebSocket<br/>vtuber:expression| StreamServer\n\n    GitHub -->|POST /webhook/github<br/>HMAC SHA256| StreamServer\n    ChatBot -->|GET /api/chat/analyze<br/>emotion result| StreamServer\n\n    StreamServer -->|WebSocket Broadcast<br/>vtuber channel| Overlay\n    StreamServer -->|OBS WebSocket<br/>Scene Control| OBS\n\n    Overlay -->|Browser Source<br/>http://localhost:3001| OBS\n    VSeeFace -->|Window Capture<br/>320x180| OBS\n\n    %% Shared Types\n    Shared -.->|Import Types| VTuberPkg\n    Shared -.->|Import Types| StreamServer\n    Shared -.->|Import Types| Overlay\n\n    %% Styling\n    classDef external fill:#667eea,stroke:#764ba2,stroke-width:3px,color:#fff\n    classDef package fill:#8957e5,stroke:#58a6ff,stroke-width:2px,color:#fff\n    classDef shared fill:#3fb950,stroke:#1f6feb,stroke-width:2px,color:#fff\n\n    class WebCam,VSeeFace,GitHub,ChatBot,OBS external\n    class VTuberPkg,StreamServer,Overlay package\n    class Shared shared\n",
+  "content_size": 1952,
+  "collected_at": "2026-02-06T01:46:10.035957",
+  "license": "none",
+  "license_name": "No License (Assumed)",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": null,
+  "repo_stars": 1,
+  "repo_forks": 0
+}

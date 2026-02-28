@@ -1,0 +1,32 @@
+{
+  "id": "aug_gl_packet-beta_00467_Gro_5",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/sean-galloway/RTLDesignSherpa/blob/47f8a16641658f570a69c3af3c9724b29ea39187/projects/components/stream/docs/stream_mas/assets/mermaid/16_monbus_axil_group_block.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "sean-galloway/RTLDesignSherpa",
+  "diagram_type": "packet-beta",
+  "code": "graph TB\n    subgraph \"monbus_axil_group\"\n        subgraph \"Monitor Bus Input\"\n            MON_IN[Groupware_SprintBacklog] --> PARSE[Groupware_KanbanBoard]\n        end\n\n        subgraph \"Per-Protocol Filtering\"\n            PARSE --> FILTER[Groupware_SprintBacklog]\n            AXI_MASK[Groupware_ChatRoom] --> FILTER\n            AXIS_MASK[Groupware_WikiPage] --> FILTER\n            CORE_MASK[Groupware_IssueTracker] --> FILTER\n        end\n\n        subgraph \"Routing Decision\"\n            FILTER --> DROP{Groupware_IssueTracker}\n            DROP --> |No| ERR_CHK{Groupware_KanbanBoard}\n            DROP --> |Yes| DISCARD[Groupware_WikiPage]\n            ERR_CHK --> |Yes| ERR_PATH[Groupware_SprintBacklog]\n            ERR_CHK --> |No| WR_PATH[Groupware_SprintBacklog]\n        end\n\n        subgraph \"Error/Interrupt Path\"\n            ERR_PATH --> ERR_FIFO[Groupware_SprintBacklog]\n            ERR_FIFO --> AXIL_S[Groupware_KanbanBoard]\n            ERR_FIFO --> IRQ[Groupware_ChatRoom]\n        end\n\n        subgraph \"Master Write Path\"\n            WR_PATH --> WR_FIFO[Groupware_SprintBacklog]\n            WR_FIFO --> ADDR_GEN[Groupware_IssueTracker]\n            CFG_BASE[Groupware_KanbanBoard] --> ADDR_GEN\n            ADDR_GEN --> AXIL_M[Groupware_WikiPage]\n        end\n    end\n\n    AXIL_S --> S_AR[Groupware_WikiPage]\n    AXIL_S --> S_R[Groupware_WikiPage]\n    AXIL_M --> M_AW[Groupware_WikiPage]\n    AXIL_M --> M_W[Groupware_KanbanBoard]\n    AXIL_M --> M_B[Groupware_SprintBacklog]\n\n    style FILTER fill:#bbf,stroke:#333,stroke-width:2px\n    style ERR_FIFO fill:#fbb,stroke:#333,stroke-width:3px\n    style WR_FIFO fill:#bfb,stroke:#333,stroke-width:3px\n    style ADDR_GEN fill:#ffb,stroke:#333,stroke-width:2px\n    style IRQ fill:#f9f,stroke:#333,stroke-width:3px\n",
+  "content_size": 1801,
+  "collected_at": "2026-02-06T14:10:17.639470",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 8,
+  "repo_forks": 1,
+  "repo_owner": "sean-galloway",
+  "repo_name": "RTLDesignSherpa",
+  "repo_description": "This site is hopefully a springboard for others to learn about coding in System Verilog and experimenting with FPGAs.",
+  "repo_language": "C++",
+  "repo_topics": [
+    "amba-apb",
+    "amba-axi",
+    "cocotb",
+    "crossbar",
+    "dma"
+  ],
+  "repo_created_at": "2023-06-15T21:56:48Z",
+  "repo_updated_at": "2026-02-06T00:19:01Z",
+  "augmentation_domain": "Groupware",
+  "seed_id": "gl_packet-beta_00467"
+}

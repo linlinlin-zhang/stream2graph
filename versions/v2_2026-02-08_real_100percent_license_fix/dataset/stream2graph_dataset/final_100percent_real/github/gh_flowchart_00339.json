@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00339",
+  "source": "github",
+  "source_url": "https://github.com/jb-8200/dox-asdlc/blob/14d5c4a7a4d5de8b6cec311194fe1abbd94e5204/docs/diagrams/08-development-tdd-workflow.mmd",
+  "github_repo": "jb-8200/dox-asdlc",
+  "github_file_path": "docs/diagrams/08-development-tdd-workflow.mmd",
+  "diagram_type": "flowchart",
+  "code": "%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#E6F0FF'}}}%%\n\nflowchart TD\n    Start([\"Task: Implement Feature\"])\n    --> CreateTodo[\"TodoWrite:\\nCreate task checklist\"]\n    --> ReadSpec[\"Read task specification\\nfrom /workspace/design/tasks.json\"]\n\n    ReadSpec --> QueryRAG[\"mcp__rag__query_codebase:\\n'How are similar features implemented?'\"]\n    QueryRAG --> UnderstandPatterns[\"Understand existing\\npatterns and conventions\"]\n\n    UnderstandPatterns --> TDDLoop\n\n    subgraph TDDLoop[\"TDD Cycle\"]\n        subgraph Red[\"🔴 RED Phase\"]\n            WriteTest[\"Subagent: test-first\\nWrite failing test\"]\n            RunTest1[\"Bash: npm test\\nConfirm test FAILS\"]\n        end\n\n        subgraph Green[\"🟢 GREEN Phase\"]\n            Implement[\"Subagent: backend/frontend\\nWrite minimal code\"]\n            RunTest2[\"Bash: npm test\\nCheck if passes\"]\n            PassCheck{Tests\\npass?}\n        end\n\n        subgraph Debug[\"🔧 DEBUG Phase\"]\n            AnalyzeError[\"Analyze test failure\"]\n            NeedDeep{Complex\\nissue?}\n            CallRLM[\"Subagent: debugger\\nmcp__rlm__deep_analyze\"]\n            SimpleFix[\"Apply simple fix\"]\n        end\n\n        subgraph Refactor[\"♻️ REFACTOR Phase\"]\n            CleanUp[\"Refactor code\\nwhile keeping tests green\"]\n            RunTest3[\"Bash: npm test\\nConfirm still green\"]\n        end\n    end\n\n    WriteTest --> RunTest1\n    RunTest1 -->|\"✗ Fails (good!)\"| Implement\n    Implement --> RunTest2\n    RunTest2 --> PassCheck\n\n    PassCheck -->|\"✓ Yes\"| UpdateTodo1[\"TodoWrite:\\nMark step complete\"]\n    PassCheck -->|\"✗ No\"| AnalyzeError\n\n    AnalyzeError --> NeedDeep\n    NeedDeep -->|\"Yes\"| CallRLM\n    NeedDeep -->|\"No\"| SimpleFix\n    CallRLM --> Implement\n    SimpleFix --> Implement\n\n    UpdateTodo1 --> MoreTasks{More\\ntasks?}\n    MoreTasks -->|\"Yes\"| WriteTest\n    MoreTasks -->|\"No\"| CleanUp\n\n    CleanUp --> RunTest3\n    RunTest3 -->|\"✓ Green\"| Commit[\"mcp__git__commit:\\nCommit changes\"]\n    RunTest3 -->|\"✗ Red\"| CleanUp\n\n    Commit --> UpdateTodo2[\"TodoWrite:\\nMark all complete\"]\n    UpdateTodo2 --> Complete([\"Phase Complete\\nPublish to Redis\"])\n\n    %% Styling\n    classDef start fill:#D0E8FF,stroke:#0b1559,stroke-width:2px\n    classDef red fill:#FEE2E2,stroke:#dc2626,stroke-width:2px\n    classDef green fill:#DCFCE7,stroke:#16a34a,stroke-width:2px\n    classDef debug fill:#FEF3C7,stroke:#d97706,stroke-width:2px\n    classDef refactor fill:#E0E7FF,stroke:#6366f1,stroke-width:2px\n    classDef decision fill:#FFF7ED,stroke:#EA580C,stroke-width:2px\n    classDef tool fill:#F3E8FF,stroke:#9333ea,stroke-width:2px\n\n    class Start,Complete start\n    class WriteTest,RunTest1 red\n    class Implement,RunTest2 green\n    class AnalyzeError,CallRLM,SimpleFix debug\n    class CleanUp,RunTest3 refactor\n    class PassCheck,NeedDeep,MoreTasks decision\n    class CreateTodo,QueryRAG,Commit,UpdateTodo1,UpdateTodo2 tool\n",
+  "content_size": 2876,
+  "collected_at": "2026-02-06T01:43:30.639510",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 2,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

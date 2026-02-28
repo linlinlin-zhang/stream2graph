@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00300",
+  "source": "github",
+  "source_url": "https://github.com/qxl0/service-mesh-poc/blob/071fc609494d5f31274cfe5d1891c1a8aadce126/diagrams/diagram_v2.mmd",
+  "github_repo": "qxl0/service-mesh-poc",
+  "github_file_path": "diagrams/diagram_v2.mmd",
+  "diagram_type": "flowchart",
+  "code": "%%{init: {\"theme\":\"base\",\"flowchart\":{\"curve\":\"basis\"},\"themeVariables\":{\n  \"fontFamily\":\"Inter, ui-sans-serif, system-ui\",\n  \"primaryColor\":\"#e0f2fe\",\n  \"primaryTextColor\":\"#0f172a\",\n  \"primaryBorderColor\":\"#0284c7\",\n  \"lineColor\":\"#334155\",\n  \"tertiaryColor\":\"#f8fafc\"\n}}}%%\n\nflowchart LR\n\n%% ====== BOOKINFO ======\nsubgraph NS_BOOKINFO[\"bookinfo namespace (data plane)\"]\ndirection LR\nclassDef bookinfo fill:#dbeafe,stroke:#2563eb,stroke-width:2px,color:#0f172a;\n\nsleep[\"sleep svc\\n10.217.5.111:80\"]\nsleepEnvoy[\"sleep envoy\"]\n\nproduct[\"productpage svc\\n10.217.4.168:9080\"]\nproductEnvoy[\"productpage envoy\"]\n\ndetails[\"details svc\\n10.217.4.241:9080\"]\ndetailsEnvoy[\"details envoy\"]\n\nreviews[\"reviews svc (v1/v2/v3)\\n10.217.5.185:9080\"]\nreviewsEnvoy[\"reviews envoy\"]\n\nratings[\"ratings svc\\n10.217.5.37:9080\"]\nratingsEnvoy[\"ratings envoy\"]\n\nclass sleep,sleepEnvoy,product,productEnvoy,details,detailsEnvoy,reviews,reviewsEnvoy,ratings,ratingsEnvoy bookinfo;\n\nsleep --> sleepEnvoy --> productEnvoy --> product\nproductEnvoy --> detailsEnvoy --> details\nproductEnvoy --> reviewsEnvoy --> reviews\nreviewsEnvoy --> ratingsEnvoy --> ratings\nend\n\n%% ====== ISTIO SYSTEM ======\nsubgraph NS_ISTIO[\"istio-system namespace\"]\ndirection TB\nclassDef istio fill:#ede9fe,stroke:#7c3aed,stroke-width:2px,color:#1e1b4b;\n\nistiod[\"istiod\\n10.217.5.24\"]\notelSvc[\"otel-collector\\n10.217.5.112\"]\nprom[\"prometheus\\n10.217.4.193\"]\ngraf[\"grafana\\n10.217.4.219\"]\nkiali[\"kiali\\n10.217.5.82\"]\n\nclass istiod,otelSvc,prom,graf,kiali istio;\nend\n\n%% ====== TRACING ======\nsubgraph NS_TRACING[\"tracing-system namespace\"]\ndirection TB\nclassDef tracing fill:#dcfce7,stroke:#16a34a,stroke-width:2px,color:#052e16;\n\ntempo[\"tempo\\n10.217.4.121\"]\nminio[\"minio\\n10.217.4.226\"]\n\nclass tempo,minio tracing;\nend\n\n%% ====== FLOWS ======\nistiod -.-> sleepEnvoy\nistiod -.-> productEnvoy\nistiod -.-> detailsEnvoy\nistiod -.-> reviewsEnvoy\nistiod -.-> ratingsEnvoy\n\nsleepEnvoy --> otelSvc\nproductEnvoy --> otelSvc\ndetailsEnvoy --> otelSvc\nreviewsEnvoy --> otelSvc\nratingsEnvoy --> otelSvc\n\notelSvc --> tempo\ntempo --> minio\ntempo --> prom\nprom --> graf\nprom --> kiali\n",
+  "content_size": 2116,
+  "collected_at": "2026-02-06T01:43:15.041377",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

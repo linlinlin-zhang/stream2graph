@@ -1,0 +1,18 @@
+{
+  "id": "gh_er_02391",
+  "source": "github",
+  "source_url": "https://github.com/jtarriela/RoleRadar/blob/521a49a1e042b9314ac1e25a7ecc103f4858b8f1/eer.mmd",
+  "github_repo": "jtarriela/RoleRadar",
+  "github_file_path": "eer.mmd",
+  "diagram_type": "er",
+  "code": "erDiagram\n    COMPANIES ||--o{ JOBS : \"has\"\n    COMPANIES ||--o{ SCRAPING_TASKS : \"tracks\"\n    JOBS ||--o{ JOB_MATCHES : \"matched_in\"\n    RESUMES ||--o{ JOB_MATCHES : \"generates\"\n\n    COMPANIES {\n        uuid id PK\n        text name UK \"NOT NULL\"\n        text careers_url\n        text sitemap_url\n        timestamptz last_scraped\n        text status \"DEFAULT active\"\n        timestamptz created_at \"DEFAULT NOW()\"\n    }\n\n    JOBS {\n        uuid id PK\n        uuid company_id FK \"NOT NULL\"\n        text url UK \"NOT NULL\"\n        text title \"NOT NULL\"\n        text location\n        text seniority\n        text employment_type\n        integer salary_min\n        integer salary_max\n        jsonb parsed_data \"NOT NULL\"\n        text_array skills_extracted\n        text requirements_summary\n        tsvector jd_tsv \"GIN indexed\"\n        timestamptz scraped_at \"DEFAULT NOW()\"\n        timestamptz updated_at \"DEFAULT NOW()\"\n        text scrape_fingerprint\n    }\n\n    RESUMES {\n        uuid id PK\n        uuid user_id\n        text filename \"NOT NULL\"\n        jsonb parsed_data \"NOT NULL\"\n        text candidate_name\n        text email\n        text phone\n        text location\n        integer experience_years\n        text_array skills_extracted\n        timestamptz uploaded_at \"DEFAULT NOW()\"\n        boolean is_active \"DEFAULT true\"\n        integer version \"DEFAULT 1\"\n    }\n\n    JOB_MATCHES {\n        uuid id PK\n        uuid resume_id FK \"NOT NULL\"\n        uuid job_id FK \"NOT NULL\"\n        decimal match_score \"NOT NULL (0-100)\"\n        decimal skill_match_score\n        decimal experience_match_score\n        decimal location_match_score\n        text_array matching_skills\n        text_array missing_skills\n        text recommendations\n        text status \"DEFAULT pending\"\n        timestamptz applied_at\n        timestamptz created_at \"DEFAULT NOW()\"\n    }\n\n    SCRAPING_TASKS {\n        uuid id PK\n        uuid company_id FK\n        text task_type \"NOT NULL\"\n        text status \"DEFAULT queued\"\n        integer urls_found \"DEFAULT 0\"\n        integer urls_processed \"DEFAULT 0\"\n        integer jobs_extracted \"DEFAULT 0\"\n        text error_message\n        integer retry_count \"DEFAULT 0\"\n        timestamptz started_at\n        timestamptz completed_at\n        timestamptz created_at \"DEFAULT NOW()\"\n    }\n",
+  "content_size": 2302,
+  "collected_at": "2026-02-06T02:12:06.233259",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

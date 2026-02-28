@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00788",
+  "source": "github",
+  "source_url": "https://github.com/indoria/persona-net/blob/fe49c6e47334abee7df38baa90abc09bd3cf3858/mmd/arch-3.mmd",
+  "github_repo": "indoria/persona-net",
+  "github_file_path": "mmd/arch-3.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\n    %% ========== User Interface Layer ==========\n    subgraph \"User Interface (Web UI)\"\n        UI_Form[\"Form Input<br>• Capture Pitch<br>• Select Persona\"]\n        UI_Display[\"Response Display<br>• Shows Persona Replies\"]\n    end\n\n    %% ========== Application Layer ==========\n    subgraph \"Flask Application Layer (app.py)\"\n        Route_index[\"Route: index()<br>- Public:<br>  • GET/POST /<br>  • Handles pitch/response cycle<br>- State:<br>  • Session<br>  • Request Data\"]\n    end\n\n    %% ========== AI Persona Engine ==========\n    subgraph \"AI Persona Engine (ai_persona.py)\"\n        PersonaResponse[\"persona_response(journalist, pitch_text, conv_history)<br>- Public\"]\n        ExtractTopics[\"extract_topics(pitch_text)<br>- Private\"]\n    end\n\n    %% ========== NLP & ML Layer ==========\n    subgraph \"NLP & Summarization\"\n        Spacy[\"spaCy NER<br>- Public: nlp(text) → doc\"]\n        Summarizer[\"Huggingface Summarizer<br>- Public: summarizer(text)\"]\n    end\n\n    %% ========== Data & Knowledge Layer ==========\n    subgraph \"Persistence & Knowledge Graph (models.py, SQLite)\"\n        Journalists[\"Journalist Table<br>- State:<br>  • name<br>  • interests<br>  • style<br>  • sample_articles<br>- Public: Add/query/update\"]\n        Interactions[\"Interaction Table<br>- State:<br>  • journalist_id<br>  • pitch<br>  • response<br>- Public: Add/query/update\"]\n    end\n\n    DB[\"SQLite DB File\"]\n\n    %% Data Flow\n    UI_Form -- \"POST pitch, persona_id\" --> Route_index\n    Route_index -- \"Render response\" --> UI_Display\n\n    Route_index -- \"Query journalists, log interaction\" --> Journalists\n    Route_index -- \"Create interaction\" --> Interactions\n\n    Journalists <--> DB\n    Interactions <--> DB\n\n    Route_index -- \"Call persona_response()\" --> PersonaResponse\n\n    PersonaResponse -- \"extract_topics()\" --> ExtractTopics\n    ExtractTopics -- \"spaCy NER\" --> Spacy\n    PersonaResponse -- \"summarizer()\" --> Summarizer\n\n    %% Knowledge Graph connection (implicit with Journalists Table)\n    %% (for future expansion with Neo4j, etc.)",
+  "content_size": 2061,
+  "collected_at": "2026-02-06T01:48:04.707131",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

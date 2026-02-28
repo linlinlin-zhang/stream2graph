@@ -1,0 +1,18 @@
+{
+  "id": "aug_gl_block-beta_00256_Ret_8",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/sn-ravance/Ollama_Docker/blob/3f2dd7761e30b51c2206a8b7e7938cf783b2c200/docs/Ollama_ZTA.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "sn-ravance/Ollama_Docker",
+  "diagram_type": "block-beta",
+  "code": "sequenceDiagram\n    actor C as Client (Retail_CustomerLoyalty)\n    actor N as NGINX (Retail_PointOfSale)\n    actor P as oauth2-proxy (Retail_CustomerLoyalty)\n    actor I as Identity Provider (Retail_OrderManagement)\n    actor F as Prompt/Policy Filter (Retail_CouponSystem)\n    actor O as Ollama (Retail_PointOfSale)\n    actor L as SIEM / Local Logs\n\n    C ->> N : HTTPS request to /api/generate\n    N ->> N : Verify TLS handshake + client cert (Retail_CustomerLoyalty), apply WAF/rate-limit/CORS\n    alt mTLS missing/invalid\n        N ->> C : 401/403 (Retail_OrderManagement)\n        N ->> L : Log TLS/authn failure + client info (Retail_PointOfSale)\n    else mTLS valid\n        N ->> L : Log access (Retail_Inventory)\n    end\n\n    N ->> P : subrequest /oauth2/auth (Retail_OrderManagement)\n    alt No valid session cookie\n        P ->> N : 401 Unauthorized (Retail_Inventory)\n        N ->> C : 302 Redirect → /oauth2/start\n        C ->> P : GET /oauth2/start\n        P ->> C : 302 Redirect → I /authorize (Retail_CustomerLoyalty)\n        C ->> I : User login + MFA (Retail_CouponSystem)\n        I ->> C : 302 Redirect → P /oauth2/callback?code=...\n        C ->> P : GET /oauth2/callback (Retail_Inventory)\n        P ->> C : Set secure session cookie, 302 back to original URL\n        C ->> N : Retry original /api/* request (Retail_CustomerLoyalty)\n        N ->> P : subrequest /oauth2/auth\n        P ->> N : 200 OK + X-Auth headers (Retail_CouponSystem)\n    else Valid session present\n        P ->> N : 200 OK + X-Auth headers (Retail_CustomerLoyalty)\n    end\n    N ->> L : Log auth decision + user/group claims (Retail_PointOfSale)\n\n    N ->> F : POST /filter (Retail_OrderManagement)\n    alt Policy violation (Retail_CouponSystem)\n        F ->> N : 406/422 with reason code\n        N ->> C : 4xx safe error (Retail_CustomerLoyalty)\n    else Allowed\n        F ->> N : 200 Allowed\n    end\n\n    N ->> O : POST /api/generate (Retail_CouponSystem)\n    O ->> N : Streamed tokens / chunked response\n    loop while streaming tokens\n        N ->> C : Forward token chunks (Retail_CustomerLoyalty)\n    end\n\n    N ->> L : Access + security events (Retail_CouponSystem)\n    P ->> L : Auth events (Retail_CouponSystem)\n    F ->> L : Policy evaluation results (Retail_CustomerLoyalty)\n    O ->> L : Inference metrics (Retail_CustomerLoyalty)\n\n    N ->> C : 200 OK (Retail_CouponSystem) OR controlled 4xx with safe message\n",
+  "content_size": 2389,
+  "collected_at": "2026-02-06T14:05:29.968003",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Retail",
+  "seed_id": "gl_block-beta_00256"
+}

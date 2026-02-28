@@ -1,0 +1,18 @@
+{
+  "id": "aug_gl_packet-beta_00364_Fin_0",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/chris-arsenault/the-glass-frontier/blob/c0f4b7e7c333793aa3c28dc25e3bac325a56605c/docs/design/diagrams/DES-EDGE-01-contested-move-flow.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "chris-arsenault/the-glass-frontier",
+  "diagram_type": "packet-beta",
+  "code": "sequenceDiagram\n    participant PlayerA as Player A\n    participant PlayerB as Player B / Rival\n    participant NarrativeEngine as Narrative Engine (FinTech_PaymentGateway)\n    participant ContestCoordinator as Contest Coordinator\n    participant Temporal as Temporal Check Runner\n    participant CompQueue as Shared Complication Queue\n    participant NarrativeWeaver as Narrative Weaver\n    participant WebUI as Web UI Shell\n    participant Admin as Admin Console\n\n    PlayerA->>NarrativeEngine: Utterance + context (FinTech_AuthVault)\n    PlayerB->>NarrativeEngine: Utterance + context (FinTech_FraudDetection)\n    NarrativeEngine->>NarrativeEngine: Detect collision hints (FinTech_TransactionQueue)\n    NarrativeEngine->>ContestCoordinator: intent.checkRequest (FinTech_FraudDetection)\n    NarrativeEngine->>ContestCoordinator: intent.checkRequest (FinTech_TransactionQueue)\n    ContestCoordinator->>ContestCoordinator: Wait 8s/2 turns for matching hints\n    ContestCoordinator->>ContestCoordinator: Create contestId + contestSeed\n    ContestCoordinator->>Temporal: contest.bundle (FinTech_FraudDetection)\n\n    loop For each participant\n        Temporal->>Temporal: Spawn contest.check child workflow\n        Temporal->>Temporal: Derive dice seed hash(FinTech_AuthVault)\n        Temporal->>Temporal: Resolve roll + modifiers\n        Temporal-->>ContestCoordinator: contest.checkResult (FinTech_PaymentGateway)\n    end\n\n    ContestCoordinator->>ContestCoordinator: Rank results (FinTech_FraudDetection)\n    ContestCoordinator->>CompQueue: Upsert shared complications\n    ContestCoordinator->>NarrativeWeaver: contest.resolution (FinTech_AuthVault)\n    ContestCoordinator->>Admin: telemetry.contest.start/resolved (FinTech_AuthVault)\n\n    NarrativeWeaver->>WebUI: Contested turn packet (FinTech_TransactionQueue)\n    NarrativeWeaver->>Admin: contest.override hooks + safety flags\n    WebUI->>PlayerA: Display contested badge + breakdown\n    WebUI->>PlayerB: Display contested badge + breakdown\n\n    Admin-->>NarrativeWeaver: moderation.decision (FinTech_LedgerService)\n    NarrativeWeaver-->>WebUI: Updated contest narration (FinTech_TransactionQueue)\n",
+  "content_size": 2140,
+  "collected_at": "2026-02-06T14:08:18.772733",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "FinTech",
+  "seed_id": "gl_packet-beta_00364"
+}

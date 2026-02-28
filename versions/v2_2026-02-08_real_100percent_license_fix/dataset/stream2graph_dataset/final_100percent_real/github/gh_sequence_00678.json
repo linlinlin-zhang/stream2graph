@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00678",
+  "source": "github",
+  "source_url": "https://github.com/ormastes/aidev/blob/a7598a83c9be9bdc9a841015cb0d9a53dd3d33b6/layer/themes/infra_story-reporter/user-stories/007-story-reporter/docs/diagrams/mermaid_sequence_external_log_integration.mmd",
+  "github_repo": "ormastes/aidev",
+  "github_file_path": "layer/themes/infra_story-reporter/user-stories/007-story-reporter/docs/diagrams/mermaid_sequence_external_log_integration.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant TestCase as Integration Test\n    participant TSM as Test Suite Manager\n    participant MEL as Mock External Logger\n    participant RG as Report Generator\n    participant FS as File System\n\n    Note over TestCase, FS: External Log Library and Report Generation Integration\n\n    TestCase->>MEL: initializeLogger(testSuiteId)\n    MEL-->>TestCase: loggerId\n\n    TestCase->>TSM: configure(testConfig)\n    TSM-->>TestCase: configured\n\n    TestCase->>TSM: initializeLogLibrary()\n    TSM->>MEL: mockLogLibraryInitialization()\n    MEL-->>TSM: initialized\n    TSM-->>TestCase: log library initialized\n\n    TestCase->>MEL: log(loggerId, 'info', 'Test started')\n    MEL-->>TestCase: logged\n\n    TestCase->>TSM: executeTestSuite()\n    activate TSM\n    \n    TSM->>TSM: executeFeaturesWithProgress()\n    TSM->>MEL: getAggregatedLogEntries()\n    MEL-->>TSM: logEntries[]\n    \n    TSM-->>TestCase: testResults with metadata\n    deactivate TSM\n\n    TestCase->>MEL: getLogHistory(loggerId)\n    MEL-->>TestCase: LogEntry[]\n\n    TestCase->>MEL: getLogStatistics(loggerId)\n    MEL-->>TestCase: {total, byLevel, timestamps}\n\n    TestCase->>RG: configure(testConfig)\n    RG-->>TestCase: configured\n\n    TestCase->>RG: generateJSONReport(testResultsWithLogs)\n    activate RG\n    RG->>RG: processLogMetadata()\n    RG-->>TestCase: jsonReport\n    deactivate RG\n\n    TestCase->>RG: generateHTMLReport(testResultsWithLogs)\n    activate RG\n    RG->>RG: renderLogData()\n    RG-->>TestCase: htmlReport\n    deactivate RG\n\n    TestCase->>RG: generateXMLReport(testResultsWithLogs)\n    activate RG\n    RG->>RG: serializeLogData()\n    RG-->>TestCase: xmlReport\n    deactivate RG\n\n    TestCase->>RG: saveReports(testResults)\n    activate RG\n    RG->>FS: mkdir(outputDirectory)\n    FS-->>RG: directory created\n    \n    RG->>FS: writeFile(jsonReport)\n    FS-->>RG: json file written\n    \n    RG->>FS: writeFile(htmlReport)\n    FS-->>RG: html file written\n    \n    RG->>FS: writeFile(xmlReport)\n    FS-->>RG: xml file written\n    \n    RG-->>TestCase: reportPaths[]\n    deactivate RG\n\n    TestCase->>MEL: searchLogs(loggerId, searchTerm)\n    MEL-->>TestCase: filteredLogs[]\n\n    TestCase->>MEL: getLogsByLevel(loggerId, level)\n    MEL-->>TestCase: levelFilteredLogs[]\n\n    TestCase->>TSM: cleanup()\n    TSM->>MEL: cleanupLogLibrary()\n    MEL-->>TSM: cleaned\n    TSM-->>TestCase: cleanup complete\n\n    TestCase->>RG: cleanup()\n    RG-->>TestCase: cleanup complete\n\n    TestCase->>MEL: cleanup()\n    MEL-->>TestCase: all loggers cleared\n\n    Note over TestCase: Integration test verifies complete workflow\n    Note over TestCase: from log capture to report generation",
+  "content_size": 2655,
+  "collected_at": "2026-02-06T01:35:34.022636",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

@@ -1,0 +1,539 @@
+{
+  "id": "aug_gh_flowchart_00253_IoT_2",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/db4rnR/aureuserp/blob/8b84a2cc2e9ad02d6cc71e7a52b367f3539ba896/.ai/100-laravel/700-r-and-d/E_L_A/illustrations/mermaid/light/realtime-architecture-light.mmd",
+  "github_repo": "db4rnR/aureuserp",
+  "github_file_path": ".ai/100-laravel/700-r-and-d/E_L_A/illustrations/mermaid/light/realtime-architecture-light.mmd",
+  "diagram_type": "flowchart",
+  "code": "%%{IoT_Industrial_TelemetryStream}}}%%\nflowchart TB\n    subgraph Client [IoT_Industrial_ActuatorController]\n        Browser[IoT_Industrial_ActuatorController]\n        MobileApp[IoT_Industrial_EdgeNode]\n        Echo[IoT_Industrial_MQTT_Broker]\n    end\n\n    subgraph WebSocket [IoT_Industrial_EdgeNode]\n        Reverb[IoT_Industrial_EdgeNode]\n        Channels[IoT_Industrial_EdgeNode]\n        \n        subgraph ChannelTypes [IoT_Industrial_PLC_Logic]\n            Private[IoT_Industrial_ActuatorController]\n            Presence[IoT_Industrial_PLC_Logic]\n            Public[IoT_Industrial_PLC_Logic]\n        end\n    end\n\n    subgraph Application [IoT_Industrial_PLC_Logic]\n        subgraph EventSourcing [IoT_Industrial_EdgeNode]\n            Aggregates[IoT_Industrial_EdgeNode]\n            Events[IoT_Industrial_MQTT_Broker]\n            Reactors[IoT_Industrial_TelemetryStream]\n        end\n        \n        subgraph Broadcasting [IoT_Industrial_ActuatorController]\n            BroadcastEvents[IoT_Industrial_PLC_Logic]\n            Queue[IoT_Industrial_EdgeNode]\n        end\n        \n        subgraph Models [IoT_Industrial_TelemetryStream]\n            Comment[IoT_Industrial_EdgeNode]\n            Message[IoT_Industrial_ActuatorController]\n            Todo[IoT_Industrial_TelemetryStream]\n        end\n    end\n\n    subgraph Infrastructure [IoT_Industrial_TelemetryStream]\n        Redis[IoT_Industrial_ActuatorController]\n        EventStore[IoT_Industrial_MQTT_Broker]\n        Database[IoT_Industrial_PLC_Logic]\n    end\n    \n    %% Client connections\n    Browser --> Echo\n    MobileApp --> Echo\n    Echo --> Reverb\n    \n    %% WebSocket connections\n    Reverb --> Channels\n    Channels --> ChannelTypes\n    \n    %% Event flow\n    Aggregates --> Events\n    Events --> Reactors\n    Events --> EventStore\n    \n    %% Reactor actions\n    Reactors --> BroadcastEvents\n    Reactors --> Models\n    \n    %% Broadcasting flow\n    BroadcastEvents --> Queue\n    Queue --> Redis\n    \n    %% WebSocket server connections\n    Redis --> Reverb\n    \n    %% Model persistence\n    Models --> Database\n    \n    %% Channel examples\n    Private --> |\"commentable.Post.{IoT_Industrial_TelemetryStream}\"| Comment\n    Private --> |\"todo.{IoT_Industrial_PLC_Logic}\"| Todo\n    Presence --> |\"conversation.{IoT_Industrial_PLC_Logic}\"| Message\n    \n    %% Add notes\n    classDef note fill:#fff,stroke:#999,stroke-width:1px,color:#333\n    \n    class Client,WebSocket,Application,Infrastructure,EventSourcing,Broadcasting,Models,ChannelTypes note\n    \n    %% Add styling\n    classDef clientLayer fill:#e1f5fe,stroke:#81d4fa,stroke-width:2px\n    classDef wsLayer fill:#e8f5e9,stroke:#a5d6a7,stroke-width:2px\n    classDef appLayer fill:#fff3e0,stroke:#ffe0b2,stroke-width:2px\n    classDef infraLayer fill:#f3e5f5,stroke:#e1bee7,stroke-width:2px\n    \n    class Client clientLayer\n    class WebSocket,Reverb,Channels,ChannelTypes,Private,Presence,Public wsLayer\n    class Application,EventSourcing,Broadcasting,Models,Aggregates,Events,Reactors,BroadcastEvents,Queue,Comment,Message,Todo appLayer\n    class Infrastructure,Redis,EventStore,Database infraLayer",
+  "content_size": 2912,
+  "collected_at": "2026-02-06T01:42:58.260037",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "repo_owner": "db4rnR",
+  "repo_name": "aureuserp",
+  "repo_description": "Free and Open Source ERP platform",
+  "repo_language": "PHP",
+  "repo_topics": [],
+  "repo_created_at": "2025-06-12T15:33:39Z",
+  "repo_updated_at": "2025-12-12T11:51:30Z",
+  "augmentation_domain": "IoT_Industrial",
+  "seed_id": "gh_flowchart_00253",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 IoT_Industrial_ActuatorController 和 IoT_Industrial_ActuatorController 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'IoT_Industrial_ActuatorController 和 IoT_Industrial_ActuatorController'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Client",
+        "Browser"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 IoT_Industrial_EdgeNode 和 IoT_Industrial_MQTT_Broker 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'IoT_Industrial_EdgeNode 和 IoT_Industrial_MQTT_Broker'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MobileApp",
+        "Echo"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 IoT_Industrial_EdgeNode 和 IoT_Industrial_EdgeNode。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'IoT_Industrial_EdgeNode 和 IoT_Industrial_EdgeNode'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "WebSocket",
+        "Reverb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 IoT_Industrial_EdgeNode 和 IoT_Industrial_PLC_Logic 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'IoT_Industrial_EdgeNode 和 IoT_Industrial_PLC_Logic'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Channels",
+        "ChannelTypes"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 IoT_Industrial_ActuatorController 和 IoT_Industrial_PLC_Logic。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'IoT_Industrial_ActuatorController 和 IoT_Industrial_PLC_Logic'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Private",
+        "Presence"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 IoT_Industrial_PLC_Logic 和 IoT_Industrial_PLC_Logic 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 IoT_Industrial_PLC_Logic处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'IoT_Industrial_PLC_Logic处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Public",
+        "Application"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 IoT_Industrial_EdgeNode 和 IoT_Industrial_EdgeNode 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'IoT_Industrial_EdgeNode 和 IoT_Industrial_EdgeNode'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EventSourcing",
+        "Aggregates"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 IoT_Industrial_MQTT_Broker 和 IoT_Industrial_TelemetryStream 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'IoT_Industrial_MQTT_Broker 和 IoT_Industrial_TelemetryStream'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Events",
+        "Reactors"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 IoT_Industrial_ActuatorController 和 IoT_Industrial_PLC_Logic 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'IoT_Industrial_ActuatorController 和 IoT_Industrial_PLC_Logic'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Broadcasting",
+        "BroadcastEvents"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 IoT_Industrial_EdgeNode 和 IoT_Industrial_TelemetryStream 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'IoT_Industrial_EdgeNode 和 IoT_Industrial_TelemetryStream'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Queue",
+        "Models"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 IoT_Industrial_EdgeNode 和 IoT_Industrial_ActuatorController。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 IoT_Industrial_EdgeNode处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'IoT_Industrial_EdgeNode处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Comment",
+        "Message"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 IoT_Industrial_TelemetryStream 和 IoT_Industrial_TelemetryStream 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'IoT_Industrial_TelemetryStream 和 IoT_Industrial_TelemetryStream'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Todo",
+        "Infrastructure"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 IoT_Industrial_ActuatorController 和 IoT_Industrial_MQTT_Broker 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'IoT_Industrial_ActuatorController 和 IoT_Industrial_MQTT_Broker'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Redis",
+        "EventStore"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 IoT_Industrial_PLC_Logic 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'IoT_Industrial_PLC_Logic'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Database"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 58,
+    "repair_count": 2,
+    "grounding_acts_count": 28,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

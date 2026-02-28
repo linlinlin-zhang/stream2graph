@@ -1,0 +1,163 @@
+{
+  "id": "ot_stateDiagram_00064",
+  "source": "other",
+  "source_url": "https://github.com/punkouter26/PoTicTac/blob/96d9dd073ec367f1d30e9a898203bc83b0a78874/docs/StateTransition.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "punkouter26/PoTicTac",
+  "diagram_type": "stateDiagram",
+  "code": "%%{ init: { 'theme': 'dark', 'themeVariables': { 'primaryColor': '#00d9ff' } } }%%\n\n%% PoTicTac State Transition Diagram\n%% Tracks the lifecycle of a game from start to end\n\nstateDiagram-v2\n    [*] --> Menu: App Loaded\n    \n    state Menu {\n        [*] --> NameEntry\n        NameEntry --> ModeSelection: Name entered\n        ModeSelection --> DifficultySelection: \"Single Player\" selected\n        DifficultySelection --> ReadyToStart: Difficulty chosen\n        ReadyToStart --> [*]: Click \"Start Game\"\n    }\n    \n    Menu --> Playing: startSinglePlayerGame()\n    \n    state Playing {\n        [*] --> PlayerTurn\n        \n        PlayerTurn --> ValidatingMove: Click cell\n        ValidatingMove --> PlayerTurn: Invalid move (cell occupied)\n        ValidatingMove --> CheckingWin: Valid move made\n        \n        CheckingWin --> PlayerWon: 4-in-a-row detected\n        CheckingWin --> CheckingDraw: No winner\n        \n        CheckingDraw --> Draw: Board full\n        CheckingDraw --> AIThinking: Board not full\n        \n        AIThinking --> AIMove: AI calculates move\n        AIMove --> CheckingAIWin: AI places mark\n        \n        CheckingAIWin --> AIWon: 4-in-a-row detected\n        CheckingAIWin --> CheckingAIDraw: No winner\n        \n        CheckingAIDraw --> Draw: Board full\n        CheckingAIDraw --> PlayerTurn: Board not full\n    }\n    \n    Playing --> GameOver: Game ends\n    \n    state GameOver {\n        [*] --> DisplayResult\n        DisplayResult --> SavingStats: Stats not saved yet\n        SavingStats --> LocalSave: Save to LocalStorage\n        LocalSave --> CloudSave: Attempt API save\n        CloudSave --> StatsComplete: Success or offline fallback\n        StatsComplete --> [*]\n    }\n    \n    state GameResult <<choice>>\n    GameOver --> GameResult\n    GameResult --> PlayerWonState: Player won\n    GameResult --> AIWonState: AI won\n    GameResult --> DrawState: Draw\n    \n    state PlayerWonState {\n        WinAnimation: Show winning cells\n        WinMessage: \"You Win! 🎉\"\n        UpdateStreak: Increment win streak\n    }\n    \n    state AIWonState {\n        LoseAnimation: Show AI winning cells\n        LoseMessage: \"AI Wins!\"\n        ResetStreak: Reset win streak to 0\n    }\n    \n    state DrawState {\n        DrawAnimation: Flash all cells\n        DrawMessage: \"It's a Draw!\"\n        KeepStreak: Maintain current streak\n    }\n    \n    GameOver --> Menu: \"Play Again\" or \"Back to Menu\"\n    \n    note right of Playing\n        Race Condition Prevention:\n        - moveLockRef prevents double moves\n        - isAiThinking blocks user input\n        - statsSaved prevents double save\n    end note\n    \n    note right of Menu\n        State Persistence:\n        - playerName → LocalStorage\n        - difficulty → LocalStorage\n        - Stats synced on game end\n    end note\n",
+  "content_size": 2792,
+  "collected_at": "2026-02-06T10:37:24.869496",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 * 和 [* 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '* 和 [*'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2",
+        "Menu"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 [* 和 cell occupied 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '[* 和 cell occupied'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Playing",
+        "move"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 [* 和 WinAnimation: Show winning cells\n        WinMessage: \"You Win! 🎉\"\n        UpdateStreak: Increment win streak\n     的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '[* 和 WinAnimation: Show winning cells\n        WinMessage: \"You Win! 🎉\"\n        UpdateStreak: Increment win streak\n    '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "GameOver",
+        "PlayerWonState"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 LoseAnimation: Show AI winning cells\n        LoseMessage: \"AI Wins!\"\n        ResetStreak: Reset win streak to 0\n     和 DrawAnimation: Flash all cells\n        DrawMessage: \"It's a Draw!\"\n        KeepStreak: Maintain current streak\n     的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'LoseAnimation: Show AI winning cells\n        LoseMessage: \"AI Wins!\"\n        ResetStreak: Reset win streak to 0\n     和 DrawAnimation: Flash all cells\n        DrawMessage: \"It's a Draw!\"\n        KeepStreak: Maintain current streak\n    '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AIWonState",
+        "DrawState"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 16,
+    "repair_count": 0,
+    "grounding_acts_count": 8,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

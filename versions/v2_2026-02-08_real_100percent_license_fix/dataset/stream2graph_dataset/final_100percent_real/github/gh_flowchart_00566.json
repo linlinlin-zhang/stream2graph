@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00566",
+  "source": "github",
+  "source_url": "https://github.com/tnn1t1s/piensa/blob/2e2dd2b94dee8e4770bae2460a70c295c94745fc/papers/001-fle-lora/figures/architecture.mmd",
+  "github_repo": "tnn1t1s/piensa",
+  "github_file_path": "papers/001-fle-lora/figures/architecture.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TB\n    subgraph Training[\"LoRA Adapter Training\"]\n        direction TB\n        ALP_EN[Alpaca EN<br/>5K samples]\n        ALP_ES[Alpaca ES<br/>5K samples]\n        ALP_HE[Alpaca HE<br/>5K samples]\n        ALP_ZH[Alpaca ZH<br/>4.75K samples]\n\n        LORA_CFG[LoRA Config<br/>rank=8, alpha=16<br/>100 iterations]\n\n        ALP_EN --> EN_A[EN Adapter]\n        ALP_ES --> ES_A[ES Adapter]\n        ALP_HE --> HE_A[HE Adapter]\n        ALP_ZH --> ZH_A[ZH Adapter]\n        LORA_CFG -.-> EN_A\n        LORA_CFG -.-> ES_A\n        LORA_CFG -.-> HE_A\n        LORA_CFG -.-> ZH_A\n    end\n\n    subgraph Prompts[\"Multilingual Prompts\"]\n        direction LR\n        RP[\"Role Prefix<br/>(4 languages)\"]\n        SC[\"Asian Disease<br/>Gain / Loss\"]\n        RP --> PROMPT[Combined Prompt]\n        SC --> PROMPT\n    end\n\n    subgraph Inference[\"Inference (MLX)\"]\n        BASE[Mistral-7B-Instruct-v0.3<br/>4-bit quantized]\n        EN_A --> BASE\n        ES_A --> BASE\n        HE_A --> BASE\n        ZH_A --> BASE\n    end\n\n    subgraph Experiment[\"4 x 4 x 2 Factorial\"]\n        COND[32 Conditions<br/>adapter x prompt x frame]\n        TRIALS[50 Trials Each<br/>temp=0.7, max=256]\n        COND --> TRIALS\n    end\n\n    subgraph Judge[\"LLM Judge\"]\n        EXTRACT[ChoiceExtractor<br/>GPT-4-turbo]\n        CLASS[\"A | B | unclear | refused\"]\n        EXTRACT --> CLASS\n    end\n\n    subgraph Results[\"Output Metrics\"]\n        STATS[\"P(A), P(B), P(unclear)\"]\n        DELTA[\"Framing Effect Delta<br/>= P(A|gain) - P(A|loss)\"]\n        STATS --> DELTA\n    end\n\n    subgraph Reviews[\"Paper Review Pipeline\"]\n        PAPER[Paper Draft<br/>paper.md]\n        COGSCI[CogSci Review<br/>claude-sonnet-4.5]\n        METHODS[Methods Review<br/>claude-sonnet-4]\n        EPISTEMIC[Epistemic Review<br/>claude-sonnet-4.5]\n        PAPER --> COGSCI\n        PAPER --> METHODS\n        PAPER --> EPISTEMIC\n        COGSCI --> FINAL[reviews/*_final.md]\n        METHODS --> FINAL\n        EPISTEMIC --> FINAL\n    end\n\n    PROMPT --> COND\n    BASE --> COND\n    TRIALS --> EXTRACT\n    CLASS --> STATS\n    DELTA --> PAPER\n",
+  "content_size": 2066,
+  "collected_at": "2026-02-06T01:45:14.979331",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

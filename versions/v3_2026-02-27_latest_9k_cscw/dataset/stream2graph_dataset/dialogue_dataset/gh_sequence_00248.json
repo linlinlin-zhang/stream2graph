@@ -1,0 +1,89 @@
+{
+  "id": "gh_sequence_00248",
+  "source": "github",
+  "source_url": "https://github.com/apache/arrow/blob/f39f2758df9a92a34ad8192250266df0f08e2b4c/docs/source/format/DissociatedIPC/SequenceDiagramSeparate.mmd",
+  "github_repo": "apache/arrow",
+  "github_file_path": "docs/source/format/DissociatedIPC/SequenceDiagramSeparate.mmd",
+  "diagram_type": "sequence",
+  "code": "%% Licensed to the Apache Software Foundation (ASF) under one\n%% or more contributor license agreements.  See the NOTICE file\n%% distributed with this work for additional information\n%% regarding copyright ownership.  The ASF licenses this file\n%% to you under the Apache License, Version 2.0 (the\n%% \"License\"); you may not use this file except in compliance\n%% with the License.  You may obtain a copy of the License at\n%%\n%%   http://www.apache.org/licenses/LICENSE-2.0\n%%\n%% Unless required by applicable law or agreed to in writing,\n%% software distributed under the License is distributed on an\n%% \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n%% KIND, either express or implied.  See the License for the\n%% specific language governing permissions and limitations\n%% under the License.\n\nsequenceDiagram\n  participant D as Data Stream\n  participant C as Client\n  participant M as Metadata Stream\n\n  activate C\n  C-->>+M: TaggedMessage(server.want_data, bytes=ID_of_desired_data)\n  C-->>+D: TaggedMessage(server.want_data, bytes=ID_of_desired_data)\n  M-->>C: Message(bytes([1]) + le_bytes(sequence_number) + schema_metadata)\n  loop each batch\n    par\n      M-->>C: Message(bytes([1]) + le_bytes(sequence_number) + batch_metadata)\n    and\n      alt\n        D-->>C: TaggedMessage((bytes[0] << 55) | le_bytes(sequence_number),<br/>bytes=batch_data)\n      else\n        D-->>C: TaggedMessage((bytes[1] << 55) | le_bytes(sequence_number),<br/>bytes=uint64_pairs)\n      end\n    end\n  end\n  M-->>C: Message(bytes([0]) + le_bytes(sequence_number))\n  deactivate M\n  loop\n    C-->>D: TaggedMessage(server.free_data, bytes=uint64_list)\n  end\n  deactivate D\n  deactivate C\n",
+  "content_size": 1673,
+  "collected_at": "2026-02-06T01:29:42.534924",
+  "compilation_status": "failed",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 16486,
+  "repo_forks": 4005,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Data Stream、Client分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "D",
+        "C"
+      ],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下Metadata Stream吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在Metadata Stream完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "M"
+      ],
+      "timestamp_offset": 90
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 6,
+    "speaker_distribution": {
+      "Speaker_B": 3,
+      "Speaker_A": 3
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "inform": 1,
+      "confirm": 1,
+      "classification": 1,
+      "request": 1
+    },
+    "avg_turn_length": 20.833333333333332,
+    "dialogue_duration": 90
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "id": "gh_ind_4121f6effb",
+  "source": "github_industrial",
+  "repo": "Migorithm/duva",
+  "license": "apache-2.0",
+  "code": "---\ntitle : Idempotent receiver\n---\nsequenceDiagram\n    participant A as NodeA\n    participant B as NodeB\n    participant C as NodeC\n    Actor Migo\n\n    C ->> C : elected, term=1\n\n    Migo ->> C : register()\n    C ->>C : generate unique id\n    C ->>C : repl(cliend_id = 'migo')\n\n    C ->>B : repl(cliend_id = 'migo')\n    C ->>A : repl(cliend_id = 'migo')\n\n    C ->>Migo : client_id = 'migo'\n\n    Note over A,C : nodes maintain a client request table for registered table\n\n    Migo ->> C : client_id = 'migo', request_id=1, payload\n    C ->>C : rep(migo:1:payload, term=1)\n    C ->>B : rep(migo:1:payload, term=1)\n    C ->>A : rep(migo:1:payload, term=1)\n    B --)C : ack\n    C ->>C : is_quorum_reached\n    C ->>C : apply(migo:1:payload, term=1)\n\n    Note right of C: ClientTable<br>==migo==<br>1:payload<br>term=1\n\n    rect rgb(134, 35, 44)\n    C --xC : crash\n    end\n\n    A <<-->> B : elect leader\n    B --> B : elected (term=2)\n    B ->> A : repl(migo:1:palyoad, term=2)\n    A ->> B : ack\n    B ->> B : is_quorum_reached\n    B ->> B : apply(migo:1:payload)\n    Note right of B: ClientTable<br>==migo==<br>1:payload<br>term=2\n\n\n    Migo ->> B: client_id = 'migo', request_id=1, payload\n    rect rgb(40, 80, 120)\n    B ->> B : is_already_applied(migo:1)\n    end\n    B ->> Migo : Success\n\n    \n\n    \n   \n\n    \n\n\n",
+  "diagram_type": "actor size:900..1500",
+  "collected_at": "2026-02-27T04:27:33.983519"
+}

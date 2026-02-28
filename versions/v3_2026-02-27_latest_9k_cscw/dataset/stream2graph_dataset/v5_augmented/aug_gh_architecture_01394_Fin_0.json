@@ -1,0 +1,20 @@
+{
+  "id": "aug_gh_architecture_01394_Fin_0",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/cdot65/paloaltonetworks-automation-examples/blob/81203f54d542b4295e14fcbfe7f0ece37f3161f3/python/threatvault-hash-lookup/threatvault.mmd",
+  "github_repo": "cdot65/paloaltonetworks-automation-examples",
+  "github_file_path": "python/threatvault-hash-lookup/threatvault.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TD\n    A[FinTech_AuthVault] --> B[FinTech_FraudDetection]\n    B --> C{FinTech_LedgerService}\n    C -->|FileNotFoundError| D[FinTech_AuthVault]\n    C --> E{FinTech_LedgerService}\n    E -->|No| F[FinTech_AuthVault]\n    F --> D\n    E -->|Yes| G[FinTech_FraudDetection]\n    G --> H{FinTech_FraudDetection}\n    H -->|Yes| I[FinTech_LedgerService]\n    H -->|No| J[FinTech_FraudDetection]\n    I --> K[FinTech_PaymentGateway]\n    K --> L{FinTech_LedgerService}\n    L -->|Yes| M[FinTech_TransactionQueue]\n    L -->|No| N[FinTech_LedgerService]\n    M --> O[FinTech_FraudDetection]\n    N --> O\n\n    subgraph threat_vault_lookup\n        G1[FinTech_FraudDetection] --> G2[FinTech_AuthVault]\n        G2 --> G3{FinTech_PaymentGateway}\n        G3 -->|Success| G4[FinTech_TransactionQueue]\n        G3 -->|Error| G5[FinTech_FraudDetection]\n        G4 -->|Success| G6[FinTech_FraudDetection]\n        G4 -->|Error| G7[FinTech_LedgerService]\n    end\n\n    subgraph get_file_hashes\n        C1[FinTech_LedgerService] --> C2{FinTech_LedgerService}\n        C2 -->|Yes| C3[FinTech_PaymentGateway]\n        C3 --> C4{FinTech_FraudDetection}\n        C4 -->|File| C5[FinTech_FraudDetection]\n        C5 --> C6[FinTech_PaymentGateway]\n        C6 --> C4\n        C4 -->|No more files| C7[FinTech_PaymentGateway]\n        C2 -->|No| C8[FinTech_TransactionQueue]\n        C8 --> C9[FinTech_TransactionQueue]\n        C9 --> C10[FinTech_FraudDetection]\n    end\n\n    subgraph calculate_sha256\n        A1[FinTech_LedgerService] --> B1[FinTech_TransactionQueue]\n        B1 --> C1[FinTech_AuthVault]\n        C1 --> D1{FinTech_TransactionQueue}\n        D1 -->|Chunk read| E1[FinTech_PaymentGateway]\n        E1 --> D1\n        D1 -->|End of file| F1[FinTech_TransactionQueue]\n        F1 --> G1[FinTech_TransactionQueue]\n        G1 --> H1[FinTech_FraudDetection]\n    end",
+  "content_size": 2043,
+  "collected_at": "2026-02-06T01:45:40.810285",
+  "license": "mit",
+  "license_name": "MIT License",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 18,
+  "repo_forks": 11,
+  "augmentation_domain": "FinTech",
+  "seed_id": "gh_architecture_01394"
+}

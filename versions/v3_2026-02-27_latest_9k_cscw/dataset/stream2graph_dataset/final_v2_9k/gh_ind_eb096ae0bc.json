@@ -1,0 +1,9 @@
+{
+  "id": "gh_ind_eb096ae0bc",
+  "source": "github_industrial",
+  "repo": "showa-yojyo/notebook",
+  "license": "mit",
+  "code": "classDiagram\n    direction TB\n\n    document <-- Node: document\n    document <-- NodeVisitor: document\n\n    class Node{\n        +walk(NodeVisitor)\n        +walkabout(NodeVisitor)\n    }\n\n    class NodeVisitor{\n        <<abstract>>\n        +dispatch_visit(Node)\n        +dispatch_departure(Node)\n        #unknown_visit(Node)\n        #unknown_departure(Node)\n    }\n\n    class SparseNodeVisitor{\n        +visit_CLASSNAME(Node)\n        +depart_CLASSNAME(Node)\n    }\n\n    class GenericNodeVisitor{\n        <<abstract>>\n        +dispatch_visit(Node)\n        +dispatch_departure(Node)\n        +visit_CLASSNAME(Node)\n        +depart_CLASSNAME(Node)\n        +default_visit(Node)*\n        +default_departure(Node)*\n    }\n\n    Node <--> NodeVisitor\n        NodeVisitor <|-- SparseNodeVisitor\n            %%SparseNodeVisitor <|-- ODFTranslator\n            SparseNodeVisitor <|-- DanglingReferencesVisitor\n            SparseNodeVisitor <|-- PRPZeroSpecial\n        NodeVisitor <|-- GenericNodeVisitor\n            GenericNodeVisitor <|-- SimpleListChecker\n            GenericNodeVisitor <|-- XMLTranslator\n            GenericNodeVisitor <|-- ODFTranslator\n            GenericNodeVisitor <|-- TreeCopyVisitor\n\n    class DanglingReferencesVisitor{\n        #unknown_visit(Node)\n        +visit_reference(Node)\n    }\n\n    class TreeCopyVisitor{\n        -Node parent\n        -list parent_stack\n        +default_visit(Node)\n        +default_departure(Node)\n        +get_tree_copy() Node\n    }\n",
+  "diagram_type": "node size:900..1500",
+  "collected_at": "2026-02-27T05:29:47.499361"
+}

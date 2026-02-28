@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00234",
+  "source": "github",
+  "source_url": "https://github.com/Behordeun/biometric_authentication_system/blob/66b7e53473f7a9db5cb12cb3718088a88ce874be/diagrams/oauth2-flow.mmd",
+  "github_repo": "Behordeun/biometric_authentication_system",
+  "github_file_path": "diagrams/oauth2-flow.mmd",
+  "diagram_type": "sequence",
+  "code": "%%{init: { 'theme': 'default', 'themeVariables': { 'background': '#ffffff' } }}%%\nsequenceDiagram\n    participant User\n    participant ClientApp\n    participant Browser\n    participant AuthServer\n    participant ResourceAPI\n\n    Note over User,ResourceAPI: OAuth2 Authorization Code Flow\n\n    User->>ClientApp: Click Login\n    ClientApp->>Browser: Redirect to /oauth2/authorize\n    \n    Browser->>AuthServer: GET /oauth2/authorize\n    AuthServer->>AuthServer: Validate client_id\n    \n    alt User Not Authenticated\n        AuthServer->>Browser: Show Biometric Login\n        Browser->>User: Prompt Biometric\n        User->>Browser: Authenticate\n        Browser->>AuthServer: POST /auth/login/verify\n        AuthServer->>AuthServer: Verify Credential\n    end\n    \n    AuthServer->>Browser: Show Consent Screen\n    Browser->>User: Display Permissions\n    User->>Browser: Click Allow\n    \n    Browser->>AuthServer: POST /oauth2/authorize/consent\n    AuthServer->>AuthServer: Generate Auth Code\n    AuthServer->>AuthServer: Store code in DB\n    \n    AuthServer->>Browser: Redirect with code\n    Browser->>ClientApp: GET /callback?code=xxx\n    \n    ClientApp->>AuthServer: POST /oauth2/token\n    \n    AuthServer->>AuthServer: Validate Code\n    AuthServer->>AuthServer: Validate Client\n    AuthServer->>AuthServer: Generate Tokens\n    AuthServer->>AuthServer: Delete Code\n    \n    AuthServer->>ClientApp: Return Tokens\n    ClientApp->>ClientApp: Store Tokens\n    ClientApp->>User: Login Successful\n    \n    Note over User,ResourceAPI: Using Access Token\n    \n    User->>ClientApp: Request Data\n    ClientApp->>ResourceAPI: GET /api/data + Bearer Token\n    \n    ResourceAPI->>AuthServer: Validate Token\n    AuthServer->>ResourceAPI: Token Valid\n    ResourceAPI->>ClientApp: Return Data\n    ClientApp->>User: Display Data\n    \n    Note over User,ResourceAPI: Token Refresh\n    \n    ClientApp->>ClientApp: Token Expired\n    ClientApp->>AuthServer: POST /oauth2/token + refresh_token\n    \n    AuthServer->>AuthServer: Validate Refresh Token\n    AuthServer->>AuthServer: Generate New Token\n    AuthServer->>ClientApp: Return New Token\n    ClientApp->>ClientApp: Update Token\n",
+  "content_size": 2163,
+  "collected_at": "2026-02-06T01:29:29.430454",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 1,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

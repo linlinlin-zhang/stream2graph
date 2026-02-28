@@ -1,0 +1,141 @@
+{
+  "id": "gh_sequence_00008",
+  "source": "github",
+  "source_url": "https://github.com/m9xxx/stepik_parser_test/blob/d536e191f149c760d2c453e9a73a2c2a9293d434/auth_sequence.mmd",
+  "github_repo": "m9xxx/stepik_parser_test",
+  "github_file_path": "auth_sequence.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Frontend\n    participant API as API (api.php)\n    participant AC as AuthController\n    participant User as User Model\n    participant DB as Database\n    \n    %% Успешный вход\n    Frontend->>API: POST /api/v1/auth/login\n    Note over Frontend,API: {email, password}\n    activate API\n    API->>AC: login()\n    activate AC\n    \n    %% Валидация входных данных\n    AC->>AC: Validate input\n    \n    alt Missing fields\n        AC-->>API: Error: Не все поля заполнены\n        API-->>Frontend: 400 Bad Request\n    else Has all fields\n        AC->>User: findByUsername(email)\n        activate User\n        User->>DB: SELECT query\n        activate DB\n        Note over DB: SELECT * FROM users WHERE username = email\n        DB-->>User: user data (including password hash)\n        deactivate DB\n        Note over User: Create User object with DB data\n        User-->>AC: User object\n        deactivate User\n        \n        alt User not found\n            AC-->>API: Error: Пользователь не найден\n            API-->>Frontend: 400 Bad Request\n        else User exists\n            AC->>User: authenticate(password)\n            activate User\n            Note over User: Compare password hash\\nwith stored hash\\n(no DB query needed)\n            \n            alt Invalid password\n                User-->>AC: false\n                AC-->>API: Error: Неверный пароль\n                API-->>Frontend: 400 Bad Request\n            else Valid password\n                User-->>AC: true\n                AC->>User: toArray()\n                Note over User: Convert object data to array\\n(using already loaded data)\n                User-->>AC: user data\n                AC-->>API: Success + user data\n                API-->>Frontend: 200 OK + user data\n            end\n            deactivate User\n        end\n    end\n    \n    deactivate AC\n    deactivate API ",
+  "content_size": 1863,
+  "collected_at": "2026-02-06T01:24:02.844657",
+  "compilation_status": "success",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 api.php 和 email 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 api.php处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'api.php处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "API",
+        "findByUsername"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 including password hash 和 password。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 including password hash处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'including password hash处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "data",
+        "authenticate"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 no DB query needed 和 using already loaded data 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'no DB query needed 和 using already loaded data'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "n",
+        "n"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 14,
+    "repair_count": 2,
+    "grounding_acts_count": 6,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

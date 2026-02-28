@@ -1,0 +1,40 @@
+{
+  "id": "aug_gl_packet-beta_00451_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/SiliconLabs/wiseconnect/blob/dbddc46f86fab9728a390680290781b7d1ae8bb5/components/sli_routing_utility/sli_routing_utility.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "SiliconLabs/wiseconnect",
+  "diagram_type": "packet-beta",
+  "code": "%%{Infra_RedisCache} }%%\r\nsequenceDiagram\r\n  participant Command Engine\r\n  participant Routing Utility\r\n  \r\n  rect rgba(Infra_LoadBalancer)\r\n    Command Engine->>Routing Utility: sli_routing_utility_route_packet(Infra_EtcdCluster)\r\n    Note over Command Engine: Calls route packet function\r\n  end\r\n  rect rgba(Infra_LoadBalancer)\r\n    \r\n    alt is_destination_entry_invalid\r\n        Routing Utility-->>Command Engine: Return SL_STATUS_INVALID_PARAMETER\r\n    end\r\n     \r\n  end\r\n  \r\n  \r\n  rect rgba(Infra_IngressController)\r\n\r\n        alt destination_packet_handler function is not defined\r\n          Routing Utility-->>Command Engine: Error status code\r\n        end\r\n        Routing Utility->>Routing Utility: Call entry->destination_packet_handler(Infra_IngressController)  \r\n        Routing Utility-->>Command Engine: status success  \r\n    \r\n  end\r\n\r\n  rect rgba(Infra_LoadBalancer)\r\n    Command Engine->>Routing Utility: sli_routing_utility_route_queue_node(Infra_WorkerNode)\r\n    Note over Command Engine: Calls route queue node function\r\n  end\r\n  rect rgba(Infra_IngressController)\r\n    \r\n    alt is_destination_entry_invalid\r\n        Routing Utility-->>Command Engine: Return SL_STATUS_INVALID_PARAMETER\r\n    end\r\n     \r\n  end\r\n  \r\n  \r\n  rect rgba(Infra_LoadBalancer)\r\n        \r\n        alt queue_handle is defined\r\n            Routing Utility->>Routing Utility: sli_queue_manager_enqueue(Infra_EtcdCluster)\r\n             \r\n                Routing Utility-->>Command Engine: Return status code\r\n             \r\n        end\r\n        alt destination_packet_handler function is defined\r\n            Routing Utility->>Routing Utility: Call entry->destination_packet_handler(Infra_IngressController)\r\n            Note over Routing Utility: Extracts data from packet and calls handler\r\n                Routing Utility-->>Command Engine: Return status code\r\n            \r\n        end\r\n        \r\n          Routing Utility-->>Command Engine: status success  \r\n    \r\n  end\r\n\r\n",
+  "content_size": 2210,
+  "collected_at": "2026-02-06T14:09:59.625335",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "repo_stars": 23,
+  "repo_forks": 26,
+  "repo_owner": "SiliconLabs",
+  "repo_name": "wiseconnect",
+  "repo_description": "Next-generation Silicon Labs Wi-Fi API for SiWx91x chipset family.",
+  "repo_language": "C",
+  "repo_topics": [
+    "siwx917-dk2605a",
+    "siwx917-wireless-soc",
+    "wi-fi",
+    "wifi"
+  ],
+  "repo_created_at": "2023-06-06T16:26:11Z",
+  "repo_updated_at": "2026-01-22T17:46:41Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "gl_packet-beta_00451",
+  "dialogue": [],
+  "dialogue_stats": {
+    "total_turns": 0,
+    "speaker_distribution": {},
+    "speech_act_distribution": {},
+    "avg_turn_length": 0,
+    "dialogue_duration": 0
+  }
+}

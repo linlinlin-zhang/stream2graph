@@ -1,0 +1,1205 @@
+{
+  "id": "aug_gh_architecture_01394_Hea_1",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/cdot65/paloaltonetworks-automation-examples/blob/81203f54d542b4295e14fcbfe7f0ece37f3161f3/python/threatvault-hash-lookup/threatvault.mmd",
+  "github_repo": "cdot65/paloaltonetworks-automation-examples",
+  "github_file_path": "python/threatvault-hash-lookup/threatvault.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TD\n    A[HealthTech_HIPAA_Vault] --> B[HealthTech_DiagnosticEngine]\n    B --> C{HealthTech_PatientRecords}\n    C -->|FileNotFoundError| D[HealthTech_HIPAA_Vault]\n    C --> E{HealthTech_DiagnosticEngine}\n    E -->|No| F[HealthTech_EMR_Sync]\n    F --> D\n    E -->|Yes| G[HealthTech_HIPAA_Vault]\n    G --> H{HealthTech_LabAnalyzer}\n    H -->|Yes| I[HealthTech_HIPAA_Vault]\n    H -->|No| J[HealthTech_LabAnalyzer]\n    I --> K[HealthTech_DiagnosticEngine]\n    K --> L{HealthTech_PatientRecords}\n    L -->|Yes| M[HealthTech_PatientRecords]\n    L -->|No| N[HealthTech_DiagnosticEngine]\n    M --> O[HealthTech_DiagnosticEngine]\n    N --> O\n\n    subgraph threat_vault_lookup\n        G1[HealthTech_DiagnosticEngine] --> G2[HealthTech_PatientRecords]\n        G2 --> G3{HealthTech_DiagnosticEngine}\n        G3 -->|Success| G4[HealthTech_PatientRecords]\n        G3 -->|Error| G5[HealthTech_HIPAA_Vault]\n        G4 -->|Success| G6[HealthTech_HIPAA_Vault]\n        G4 -->|Error| G7[HealthTech_LabAnalyzer]\n    end\n\n    subgraph get_file_hashes\n        C1[HealthTech_EMR_Sync] --> C2{HealthTech_DiagnosticEngine}\n        C2 -->|Yes| C3[HealthTech_EMR_Sync]\n        C3 --> C4{HealthTech_EMR_Sync}\n        C4 -->|File| C5[HealthTech_HIPAA_Vault]\n        C5 --> C6[HealthTech_LabAnalyzer]\n        C6 --> C4\n        C4 -->|No more files| C7[HealthTech_HIPAA_Vault]\n        C2 -->|No| C8[HealthTech_HIPAA_Vault]\n        C8 --> C9[HealthTech_LabAnalyzer]\n        C9 --> C10[HealthTech_EMR_Sync]\n    end\n\n    subgraph calculate_sha256\n        A1[HealthTech_DiagnosticEngine] --> B1[HealthTech_EMR_Sync]\n        B1 --> C1[HealthTech_LabAnalyzer]\n        C1 --> D1{HealthTech_EMR_Sync}\n        D1 -->|Chunk read| E1[HealthTech_HIPAA_Vault]\n        E1 --> D1\n        D1 -->|End of file| F1[HealthTech_DiagnosticEngine]\n        F1 --> G1[HealthTech_EMR_Sync]\n        G1 --> H1[HealthTech_HIPAA_Vault]\n    end",
+  "content_size": 2043,
+  "collected_at": "2026-02-06T01:45:40.810285",
+  "license": "mit",
+  "license_name": "MIT License",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 18,
+  "repo_forks": 11,
+  "augmentation_domain": "HealthTech",
+  "seed_id": "gh_architecture_01394",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，HealthTech_HIPAA_Vault的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "A"
+      ],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含HealthTech_DiagnosticEngine、HealthTech_PatientRecords这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，HealthTech_DiagnosticEngine、HealthTech_PatientRecords就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "B",
+        "C",
+        "D"
+      ],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有HealthTech_DiagnosticEngine、HealthTech_EMR_Sync。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，HealthTech_DiagnosticEngine、HealthTech_EMR_Sync是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "E",
+        "F",
+        "G"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理HealthTech_LabAnalyzer、HealthTech_HIPAA_Vault？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，HealthTech_LabAnalyzer、HealthTech_HIPAA_Vault的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "H",
+        "I"
+      ],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含HealthTech_LabAnalyzer这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，HealthTech_LabAnalyzer的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "J"
+      ],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "HealthTech_DiagnosticEngine主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，HealthTech_DiagnosticEngine的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "K"
+      ],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下HealthTech_PatientRecords、HealthTech_PatientRecords吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在HealthTech_PatientRecords、HealthTech_PatientRecords完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "HealthTech_PatientRecords、HealthTech_PatientRecords负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "L",
+        "M"
+      ],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由HealthTech_DiagnosticEngine、HealthTech_DiagnosticEngine组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "关于HealthTech_DiagnosticEngine、HealthTech_DiagnosticEngine，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "HealthTech_DiagnosticEngine、HealthTech_DiagnosticEngine负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "N",
+        "O"
+      ],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理HealthTech_EMR_Sync、HealthTech_PatientRecords？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，HealthTech_EMR_Sync、HealthTech_PatientRecords的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含HealthTech_EMR_Sync、HealthTech_PatientRecords这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "G1",
+        "G2"
+      ],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下HealthTech_DiagnosticEngine、HealthTech_PatientRecords吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是HealthTech_DiagnosticEngine、HealthTech_PatientRecords应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，HealthTech_DiagnosticEngine、HealthTech_PatientRecords是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "G3",
+        "G4",
+        "G5"
+      ],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理HealthTech_HIPAA_Vault、HealthTech_LabAnalyzer？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，HealthTech_HIPAA_Vault、HealthTech_LabAnalyzer就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，HealthTech_HIPAA_Vault、HealthTech_LabAnalyzer的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "G6",
+        "G7",
+        "C1"
+      ],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下HealthTech_DiagnosticEngine、HealthTech_EMR_Sync吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，HealthTech_DiagnosticEngine、HealthTech_EMR_Sync就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 495
+    },
+    {
+      "turn_id": 34,
+      "speaker": "Speaker_A",
+      "utterance": "最后，流程到达HealthTech_DiagnosticEngine、HealthTech_EMR_Sync结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 510
+    },
+    {
+      "turn_id": 35,
+      "speaker": "Speaker_B",
+      "utterance": "在HealthTech_DiagnosticEngine、HealthTech_EMR_Sync中，我们需要定义核心逻辑。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "C2",
+        "C3"
+      ],
+      "timestamp_offset": 525
+    },
+    {
+      "turn_id": 36,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下HealthTech_EMR_Sync、HealthTech_HIPAA_Vault吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 540
+    },
+    {
+      "turn_id": 37,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 555
+    },
+    {
+      "turn_id": 38,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是HealthTech_EMR_Sync、HealthTech_HIPAA_Vault应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "C4",
+        "C5"
+      ],
+      "timestamp_offset": 570
+    },
+    {
+      "turn_id": 39,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将HealthTech_LabAnalyzer分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 585
+    },
+    {
+      "turn_id": 40,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 600
+    },
+    {
+      "turn_id": 41,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含HealthTech_LabAnalyzer这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "C6"
+      ],
+      "timestamp_offset": 615
+    },
+    {
+      "turn_id": 42,
+      "speaker": "Speaker_A",
+      "utterance": "HealthTech_HIPAA_Vault、HealthTech_HIPAA_Vault主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 630
+    },
+    {
+      "turn_id": 43,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 645
+    },
+    {
+      "turn_id": 44,
+      "speaker": "Speaker_A",
+      "utterance": "HealthTech_HIPAA_Vault、HealthTech_HIPAA_Vault主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 660
+    },
+    {
+      "turn_id": 45,
+      "speaker": "Speaker_B",
+      "utterance": "HealthTech_HIPAA_Vault、HealthTech_HIPAA_Vault和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "C7",
+        "C8"
+      ],
+      "timestamp_offset": 675
+    },
+    {
+      "turn_id": 46,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含HealthTech_LabAnalyzer、HealthTech_EMR_Sync这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 690
+    },
+    {
+      "turn_id": 47,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 705
+    },
+    {
+      "turn_id": 48,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含HealthTech_LabAnalyzer、HealthTech_EMR_Sync这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "C9",
+        "C10"
+      ],
+      "timestamp_offset": 720
+    },
+    {
+      "turn_id": 49,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有HealthTech_DiagnosticEngine、HealthTech_EMR_Sync。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 735
+    },
+    {
+      "turn_id": 50,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 750
+    },
+    {
+      "turn_id": 51,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，HealthTech_DiagnosticEngine、HealthTech_EMR_Sync的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 765
+    },
+    {
+      "turn_id": 52,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "A1",
+        "B1",
+        "D1"
+      ],
+      "timestamp_offset": 780
+    },
+    {
+      "turn_id": 53,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含HealthTech_HIPAA_Vault这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 795
+    },
+    {
+      "turn_id": 54,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，HealthTech_HIPAA_Vault就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 810
+    },
+    {
+      "turn_id": 55,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含HealthTech_HIPAA_Vault这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 825
+    },
+    {
+      "turn_id": 56,
+      "speaker": "Speaker_A",
+      "utterance": "在HealthTech_HIPAA_Vault中，我们需要定义核心逻辑。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "E1"
+      ],
+      "timestamp_offset": 840
+    },
+    {
+      "turn_id": 57,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含HealthTech_DiagnosticEngine这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 855
+    },
+    {
+      "turn_id": 58,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 870
+    },
+    {
+      "turn_id": 59,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，HealthTech_DiagnosticEngine有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 885
+    },
+    {
+      "turn_id": 60,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，HealthTech_DiagnosticEngine是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "F1"
+      ],
+      "timestamp_offset": 900
+    },
+    {
+      "turn_id": 61,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含HealthTech_HIPAA_Vault、这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 915
+    },
+    {
+      "turn_id": 62,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，HealthTech_HIPAA_Vault、的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "H1",
+        "edge_0"
+      ],
+      "timestamp_offset": 930
+    },
+    {
+      "turn_id": 63,
+      "speaker": "Speaker_B",
+      "utterance": "FileNotFoundError主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 945
+    },
+    {
+      "turn_id": 64,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_1"
+      ],
+      "timestamp_offset": 960
+    },
+    {
+      "turn_id": 65,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含、No这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 975
+    },
+    {
+      "turn_id": 66,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 990
+    },
+    {
+      "turn_id": 67,
+      "speaker": "Speaker_B",
+      "utterance": "、No主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1005
+    },
+    {
+      "turn_id": 68,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，、No是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_2",
+        "edge_3",
+        "edge_4"
+      ],
+      "timestamp_offset": 1020
+    },
+    {
+      "turn_id": 69,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有Yes。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1035
+    },
+    {
+      "turn_id": 70,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，Yes是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1050
+    },
+    {
+      "turn_id": 71,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Yes就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1065
+    },
+    {
+      "turn_id": 72,
+      "speaker": "Speaker_A",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "edge_5"
+      ],
+      "timestamp_offset": 1080
+    },
+    {
+      "turn_id": 73,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1095
+    },
+    {
+      "turn_id": 74,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1110
+    },
+    {
+      "turn_id": 75,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "edge_6"
+      ],
+      "timestamp_offset": 1125
+    },
+    {
+      "turn_id": 76,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Yes、No分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1140
+    },
+    {
+      "turn_id": 77,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1155
+    },
+    {
+      "turn_id": 78,
+      "speaker": "Speaker_A",
+      "utterance": "相较于方案A，Yes、No有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "edge_7",
+        "edge_8"
+      ],
+      "timestamp_offset": 1170
+    },
+    {
+      "turn_id": 79,
+      "speaker": "Speaker_B",
+      "utterance": "主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1185
+    },
+    {
+      "turn_id": 80,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1200
+    },
+    {
+      "turn_id": 81,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "edge_9"
+      ],
+      "timestamp_offset": 1215
+    },
+    {
+      "turn_id": 82,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下、Yes吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1230
+    },
+    {
+      "turn_id": 83,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1245
+    },
+    {
+      "turn_id": 84,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1260
+    },
+    {
+      "turn_id": 85,
+      "speaker": "Speaker_B",
+      "utterance": "、Yes主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "edge_10",
+        "edge_11"
+      ],
+      "timestamp_offset": 1275
+    },
+    {
+      "turn_id": 86,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由No、组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1290
+    },
+    {
+      "turn_id": 87,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，No、就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_12",
+        "edge_13"
+      ],
+      "timestamp_offset": 1305
+    },
+    {
+      "turn_id": 88,
+      "speaker": "Speaker_A",
+      "utterance": "关于，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1320
+    },
+    {
+      "turn_id": 89,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1335
+    },
+    {
+      "turn_id": 90,
+      "speaker": "Speaker_A",
+      "utterance": "相较于方案A，有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1350
+    },
+    {
+      "turn_id": 91,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "edge_14"
+      ],
+      "timestamp_offset": 1365
+    },
+    {
+      "turn_id": 92,
+      "speaker": "Speaker_A",
+      "utterance": "、Success主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1380
+    },
+    {
+      "turn_id": 93,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，、Success的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_15",
+        "edge_16"
+      ],
+      "timestamp_offset": 1395
+    },
+    {
+      "turn_id": 94,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含Error这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1410
+    },
+    {
+      "turn_id": 95,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，Error是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1425
+    },
+    {
+      "turn_id": 96,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Error就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1440
+    },
+    {
+      "turn_id": 97,
+      "speaker": "Speaker_B",
+      "utterance": "Error负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "edge_17"
+      ],
+      "timestamp_offset": 1455
+    },
+    {
+      "turn_id": 98,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Success、Error组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1470
+    },
+    {
+      "turn_id": 99,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Success、Error应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_18",
+        "edge_19"
+      ],
+      "timestamp_offset": 1485
+    },
+    {
+      "turn_id": 100,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含Yes、这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1500
+    },
+    {
+      "turn_id": 101,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1515
+    },
+    {
+      "turn_id": 102,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Yes、应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_20",
+        "edge_21",
+        "edge_22"
+      ],
+      "timestamp_offset": 1530
+    },
+    {
+      "turn_id": 103,
+      "speaker": "Speaker_B",
+      "utterance": "主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1545
+    },
+    {
+      "turn_id": 104,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1560
+    },
+    {
+      "turn_id": 105,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_23"
+      ],
+      "timestamp_offset": 1575
+    },
+    {
+      "turn_id": 106,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含、No more files这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1590
+    },
+    {
+      "turn_id": 107,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1605
+    },
+    {
+      "turn_id": 108,
+      "speaker": "Speaker_A",
+      "utterance": "最后，流程到达、No more files结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1620
+    },
+    {
+      "turn_id": 109,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，、No more files有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "edge_24",
+        "edge_25"
+      ],
+      "timestamp_offset": 1635
+    },
+    {
+      "turn_id": 110,
+      "speaker": "Speaker_A",
+      "utterance": "No主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1650
+    },
+    {
+      "turn_id": 111,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是No应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1665
+    },
+    {
+      "turn_id": 112,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1680
+    },
+    {
+      "turn_id": 113,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理No？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "edge_26"
+      ],
+      "timestamp_offset": 1695
+    },
+    {
+      "turn_id": 114,
+      "speaker": "Speaker_A",
+      "utterance": "主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1710
+    },
+    {
+      "turn_id": 115,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1725
+    },
+    {
+      "turn_id": 116,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_27"
+      ],
+      "timestamp_offset": 1740
+    },
+    {
+      "turn_id": 117,
+      "speaker": "Speaker_B",
+      "utterance": "、主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1755
+    },
+    {
+      "turn_id": 118,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1770
+    },
+    {
+      "turn_id": 119,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有、。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1785
+    },
+    {
+      "turn_id": 120,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理、？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "edge_28",
+        "edge_29"
+      ],
+      "timestamp_offset": 1800
+    },
+    {
+      "turn_id": 121,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1815
+    },
+    {
+      "turn_id": 122,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1830
+    },
+    {
+      "turn_id": 123,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "edge_30"
+      ],
+      "timestamp_offset": 1845
+    },
+    {
+      "turn_id": 124,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Chunk read分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1860
+    },
+    {
+      "turn_id": 125,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_31"
+      ],
+      "timestamp_offset": 1875
+    },
+    {
+      "turn_id": 126,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理、End of file？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1890
+    },
+    {
+      "turn_id": 127,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是、End of file应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1905
+    },
+    {
+      "turn_id": 128,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在、End of file完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1920
+    },
+    {
+      "turn_id": 129,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_32",
+        "edge_33"
+      ],
+      "timestamp_offset": 1935
+    },
+    {
+      "turn_id": 130,
+      "speaker": "Speaker_A",
+      "utterance": "、主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1950
+    },
+    {
+      "turn_id": 131,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达、结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "edge_34",
+        "edge_35"
+      ],
+      "timestamp_offset": 1965
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 131,
+    "speaker_distribution": {
+      "Speaker_B": 66,
+      "Speaker_A": 65
+    },
+    "speech_act_distribution": {
+      "sequential": 7,
+      "clarify": 18,
+      "structural": 30,
+      "confirm": 22,
+      "request": 14,
+      "classification": 17,
+      "inform": 18,
+      "contrastive": 5
+    },
+    "avg_turn_length": 28.610687022900763,
+    "dialogue_duration": 1965
+  }
+}

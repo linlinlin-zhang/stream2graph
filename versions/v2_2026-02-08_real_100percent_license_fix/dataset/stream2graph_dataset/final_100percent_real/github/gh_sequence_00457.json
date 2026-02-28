@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00457",
+  "source": "github",
+  "source_url": "https://github.com/CPU-JIA/Flotilla/blob/002b7757d8792695a487c8d016779cb04a1d06bb/UML/diagrams/Mermaid/16-OAuth%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E5%BD%95%E6%97%B6%E5%BA%8F%E5%9B%BE.mmd",
+  "github_repo": "CPU-JIA/Flotilla",
+  "github_file_path": "UML/diagrams/Mermaid/16-OAuth第三方登录时序图.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    actor User as 用户\n    participant Frontend as Next.js前端\n    participant Backend as NestJS后端\n    participant OAuth as OAuth提供商<br/>(GitHub/Google)\n    participant Database as PostgreSQL\n    participant Redis as Redis缓存\n\n    User->>Frontend: 点击\"GitHub登录\"\n    Frontend->>Backend: GET /api/v1/auth/oauth/github\n    Backend->>Backend: 生成state参数(防CSRF)\n    Backend->>Redis: 存储state\n    Backend-->>Frontend: 302 Redirect to GitHub\n\n    Frontend->>OAuth: 重定向到GitHub授权页\n    User->>OAuth: 确认授权\n    OAuth-->>Frontend: 302 Redirect /callback?code=xxx&state=yyy\n\n    Frontend->>Backend: GET /api/v1/auth/oauth/github/callback\n    Backend->>Redis: 验证state参数\n\n    alt State验证失败\n        Backend-->>Frontend: 401 Invalid state\n        Frontend-->>User: 显示登录失败\n    else State验证通过\n        Backend->>OAuth: POST /access_token (code)\n        OAuth-->>Backend: {access_token}\n\n        Backend->>OAuth: GET /user (access_token)\n        OAuth-->>Backend: {id, email, name, avatar}\n\n        Backend->>Database: 查询OAuthAccount\n\n        alt 账号已关联\n            Database-->>Backend: 返回关联用户\n        else 账号未关联\n            Backend->>Database: 检查邮箱是否已注册\n\n            alt 邮箱已存在\n                Backend->>Database: 创建OAuthAccount关联\n            else 邮箱不存在\n                Backend->>Database: 创建新用户\n                Backend->>Database: 创建OAuthAccount关联\n            end\n        end\n\n        Backend->>Backend: 生成JWT Token\n        Backend->>Redis: 存储会话信息\n        Backend-->>Frontend: 200 OK {user, token}\n        Frontend->>Frontend: 存储Token\n        Frontend-->>User: 跳转到Dashboard\n    end\n",
+  "content_size": 1568,
+  "collected_at": "2026-02-06T01:32:31.058476",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 2,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

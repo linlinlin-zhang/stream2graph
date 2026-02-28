@@ -1,0 +1,651 @@
+{
+  "id": "gh_flowchart_00409",
+  "source": "github",
+  "source_url": "https://github.com/rhCat/lpp/blob/934e0f94ec2d8285397c1c5a9450b46b0a9436db/utils/event_simulator/results/event_simulator.mmd",
+  "github_repo": "rhCat/lpp",
+  "github_file_path": "utils/event_simulator/results/event_simulator.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\n    %% L++ Logic CAD: L++ Event Sequence Simulator\n        state_idle([\"idle<br>No blueprint loaded, waiting for input\"]):::entry\n    subgraph Processing\n        state_ready([\"ready<br>Blueprint loaded, ready to simulate\"]):::state\n        state_simulating([\"simulating<br>Actively simulating, can dispatch events\"]):::state\n    end\n\n    %% Transitions\n    gate_t0s0{{\"blueprint is None?\"}}:::gate\n    state_idle -- \"LOAD\" --> gate_t0s0\n    act_t0s0[[\"load_blueprint\"]]:::action\n    gate_t0s0 -- ✓ --> act_t0s0\n    act_t0s0 --> state_ready\n    act_t2s0[[\"load_blueprint\"]]:::action\n    state_ready -- \"LOAD\" --> act_t2s0\n    act_t2s0 --> state_ready\n    act_t3s0[[\"load_blueprint\"]]:::action\n    state_simulating -- \"LOAD\" --> act_t3s0\n    act_t3s0 --> state_ready\n    gate_t4s0{{\"blueprint is not None?\"}}:::gate\n    state_ready -- \"START\" --> gate_t4s0\n    act_t4s0[[\"init_simulation, render_status\"]]:::action\n    gate_t4s0 -- ✓ --> act_t4s0\n    act_t4s0 --> state_simulating\n    act_t5s0[[\"dispatch_event\"]]:::action\n    state_simulating -- \"DISPATCH\" --> act_t5s0\n    act_t5s0 --> state_simulating\n    act_t6s0[[\"set_context, get_available_events\"]]:::action\n    state_simulating -- \"SET_CONTEXT\" --> act_t6s0\n    act_t6s0 --> state_simulating\n    act_t7s0[[\"get_available_events, render_status\"]]:::action\n    state_simulating -- \"REFRESH\" --> act_t7s0\n    act_t7s0 --> state_simulating\n    act_t8s0[[\"evaluate_gates\"]]:::action\n    state_simulating -- \"EVAL_GATES\" --> act_t8s0\n    act_t8s0 --> state_simulating\n    act_t9s0[[\"fork_simulation\"]]:::action\n    state_simulating -- \"FORK\" --> act_t9s0\n    act_t9s0 --> state_simulating\n    gate_t10s0{{\"forks is not None and len(f...?\"}}:::gate\n    state_simulating -- \"SWITCH_FORK\" --> gate_t10s0\n    act_t10s0[[\"switch_fork\"]]:::action\n    gate_t10s0 -- ✓ --> act_t10s0\n    act_t10s0 --> state_simulating\n    gate_t11s0{{\"trace is not None and len(t...?\"}}:::gate\n    state_simulating -- \"STEP_BACK\" --> gate_t11s0\n    act_t11s0[[\"step_back\"]]:::action\n    gate_t11s0 -- ✓ --> act_t11s0\n    act_t11s0 --> state_simulating\n    act_t12s0[[\"set_sequence\"]]:::action\n    state_simulating -- \"SET_SEQUENCE\" --> act_t12s0\n    act_t12s0 --> state_simulating\n    gate_t13s0{{\"sequence is not None and le...?\"}}:::gate\n    state_simulating -- \"RUN_SEQUENCE\" --> gate_t13s0\n    act_t13s0[[\"run_sequence\"]]:::action\n    gate_t13s0 -- ✓ --> act_t13s0\n    act_t13s0 --> state_simulating\n    act_t14s0[[\"fuzz_run\"]]:::action\n    state_simulating -- \"FUZZ\" --> act_t14s0\n    act_t14s0 --> state_simulating\n    act_t15s0[[\"find_path\"]]:::action\n    state_simulating -- \"FIND_PATH\" --> act_t15s0\n    act_t15s0 --> state_simulating\n    act_t16s0[[\"explore_state_space\"]]:::action\n    state_simulating -- \"EXPLORE\" --> act_t16s0\n    act_t16s0 --> state_simulating\n    act_t17s0[[\"render_trace\"]]:::action\n    state_simulating -- \"VIEW_TRACE\" --> act_t17s0\n    act_t17s0 --> state_simulating\n    gate_t18s0{{\"state_space is not None?\"}}:::gate\n    state_simulating -- \"VIEW_SPACE\" --> gate_t18s0\n    act_t18s0[[\"render_state_space\"]]:::action\n    gate_t18s0 -- ✓ --> act_t18s0\n    act_t18s0 --> state_simulating\n    gate_t19s0{{\"trace is not None and len(t...?\"}}:::gate\n    state_simulating -- \"EXPORT\" --> gate_t19s0\n    act_t19s0[[\"export_trace\"]]:::action\n    gate_t19s0 -- ✓ --> act_t19s0\n    act_t19s0 --> state_simulating\n    gate_t20s0{{\"blueprint is not None?\"}}:::gate\n    state_simulating -- \"IMPORT\" --> gate_t20s0\n    act_t20s0[[\"import_trace\"]]:::action\n    gate_t20s0 -- ✓ --> act_t20s0\n    act_t20s0 --> state_simulating\n    act_t21s0[[\"reset_simulation\"]]:::action\n    state_simulating -- \"RESET\" --> act_t21s0\n    act_t21s0 --> state_simulating\n    state_simulating -- \"STOP\" --> state_ready\n    act_t23s0[[\"unload_blueprint\"]]:::action\n    state_ready -- \"UNLOAD\" --> act_t23s0\n    act_t23s0 --> state_idle\n    act_t24s0[[\"unload_blueprint\"]]:::action\n    state_simulating -- \"UNLOAD\" --> act_t24s0\n    act_t24s0 --> state_idle\n\n    %% Styling - ALL shapes have explicit fill and black text\n    classDef entry fill:#e1f5fe,stroke:#01579b,stroke-width:3px,color:#000\n    classDef terminal fill:#c8e6c9,stroke:#2e7d32,stroke-width:3px,color:#000\n    classDef errorState fill:#ffcdd2,stroke:#c62828,stroke-width:2px,color:#000\n    classDef state fill:#ffffff,stroke:#6a6aaa,stroke-width:2px,color:#000\n    classDef gate fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000\n    classDef action fill:#e3f2fd,stroke:#1565c0,stroke-width:1px,color:#000",
+  "content_size": 4516,
+  "collected_at": "2026-02-06T01:43:54.308845",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "repo_owner": "rhCat",
+  "repo_name": "lpp",
+  "repo_description": "L++ is not a programming language. It is a language-agnostic Logic Frame designed to execute business processes defined in purely symbolic, declarative blueprints.",
+  "repo_language": "Python",
+  "repo_topics": [],
+  "repo_created_at": "2025-12-28T01:54:34Z",
+  "repo_updated_at": "2026-01-17T05:54:51Z",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 [\"idle<br>No blueprint loaded, waiting for input\" 和 [\"ready<br>Blueprint loaded, ready to simulate\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '[\"idle<br>No blueprint loaded, waiting for input\" 和 [\"ready<br>Blueprint loaded, ready to simulate\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "state_idle",
+        "state_ready"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 [\"simulating<br>Actively simulating, can dispatch events\" 和 {\"blueprint is None?\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '[\"simulating<br>Actively simulating, can dispatch events\" 和 {\"blueprint is None?\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "state_simulating",
+        "gate_t0s0"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 [\"load_blueprint\" 和 [\"load_blueprint\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '[\"load_blueprint\" 和 [\"load_blueprint\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "act_t0s0",
+        "act_t2s0"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 [\"load_blueprint\" 和 {\"blueprint is not None?\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '[\"load_blueprint\" 和 {\"blueprint is not None?\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "act_t3s0",
+        "gate_t4s0"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 [\"init_simulation, render_status\" 和 [\"dispatch_event\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '[\"init_simulation, render_status\" 和 [\"dispatch_event\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "act_t4s0",
+        "act_t5s0"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 [\"set_context, get_available_events\" 和 [\"get_available_events, render_status\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '[\"set_context, get_available_events\" 和 [\"get_available_events, render_status\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "act_t6s0",
+        "act_t7s0"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 [\"evaluate_gates\" 和 [\"fork_simulation\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 [\"evaluate_gates\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '[\"evaluate_gates\"处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "act_t8s0",
+        "act_t9s0"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 {\"forks is not None and len(f...?\" 和 [\"switch_fork\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '{\"forks is not None and len(f...?\" 和 [\"switch_fork\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "gate_t10s0",
+        "act_t10s0"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 {\"trace is not None and len(t...?\" 和 [\"step_back\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '{\"trace is not None and len(t...?\" 和 [\"step_back\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "gate_t11s0",
+        "act_t11s0"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 [\"set_sequence\" 和 {\"sequence is not None and le...?\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '[\"set_sequence\" 和 {\"sequence is not None and le...?\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "act_t12s0",
+        "gate_t13s0"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 [\"run_sequence\" 和 [\"fuzz_run\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '[\"run_sequence\" 和 [\"fuzz_run\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "act_t13s0",
+        "act_t14s0"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 [\"find_path\" 和 [\"explore_state_space\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '[\"find_path\" 和 [\"explore_state_space\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "act_t15s0",
+        "act_t16s0"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 [\"render_trace\" 和 {\"state_space is not None?\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 [\"render_trace\"处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '[\"render_trace\"处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "act_t17s0",
+        "gate_t18s0"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 [\"render_state_space\" 和 {\"trace is not None and len(t...?\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '[\"render_state_space\" 和 {\"trace is not None and len(t...?\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "act_t18s0",
+        "gate_t19s0"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 [\"export_trace\" 和 {\"blueprint is not None?\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '[\"export_trace\" 和 {\"blueprint is not None?\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "act_t19s0",
+        "gate_t20s0"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 [\"import_trace\" 和 [\"reset_simulation\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '[\"import_trace\" 和 [\"reset_simulation\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "act_t20s0",
+        "act_t21s0"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 [\"unload_blueprint\" 和 [\"unload_blueprint\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 [\"unload_blueprint\"处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 69,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '[\"unload_blueprint\"处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "act_t23s0",
+        "act_t24s0"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 71,
+    "repair_count": 3,
+    "grounding_acts_count": 34,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

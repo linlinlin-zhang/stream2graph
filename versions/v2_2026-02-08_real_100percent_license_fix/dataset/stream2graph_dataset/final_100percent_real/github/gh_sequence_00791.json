@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00791",
+  "source": "github",
+  "source_url": "https://github.com/Helix-Flow/Platform/blob/b4f40a0a8236a89b434322c0226a0a236db49d92/diagrams/helixflow-component-interaction.mmd",
+  "github_repo": "Helix-Flow/Platform",
+  "github_file_path": "diagrams/helixflow-component-interaction.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Client as Client App<br/>(Web/Mobile/Desktop)\n    participant Gateway as API Gateway<br/>(Nginx/Traefik)\n    participant Auth as Auth Service<br/>(JWT/OAuth2)\n    participant API as HelixFlow API<br/>(Go + Gin)\n    participant Router as Model Router<br/>(Orchestrator)\n    participant Inference as Inference Engine<br/>(GPU Pool)\n    participant Cache as Cache Layer<br/>(Redis/CDN)\n    participant DB as PostgreSQL<br/>+ SQLCipher\n    participant Billing as Billing Service<br/>(Stripe/Regional)\n    participant Monitoring as Monitoring Stack<br/>(Prometheus/Grafana)\n\n    %% Authentication Flow\n    Client->>Gateway: API Request with JWT\n    Gateway->>Auth: Validate Token\n    Auth-->>Gateway: Token Valid\n    Gateway->>API: Forward Request\n\n    %% Request Processing\n    API->>Router: Route to Model\n    Router->>Cache: Check Cache\n    Cache-->>Router: Cache Miss\n    Router->>Inference: Execute Inference\n    Inference->>DB: Log Usage\n    Inference-->>Router: Model Response\n    Router->>Cache: Store Result\n    Router-->>API: Formatted Response\n\n    %% Billing Integration\n    API->>Billing: Update Usage\n    Billing->>DB: Store Billing Data\n    Billing-->>API: Billing Confirmation\n\n    %% Monitoring\n    API->>Monitoring: Send Metrics\n    Inference->>Monitoring: Performance Metrics\n    Gateway->>Monitoring: Request Metrics\n\n    %% Error Handling\n    Inference-->>Router: Error Response\n    Router-->>API: Error Handling\n    API-->>Client: Error Response with Details\n\n    %% Streaming Response\n    Client->>Gateway: Streaming Request\n    Gateway->>API: WebSocket/ SSE Setup\n    API->>Router: Streaming Inference\n    Router->>Inference: Start Streaming\n    loop Streaming Chunks\n        Inference-->>Router: Response Chunk\n        Router-->>API: Stream Chunk\n        API-->>Client: Real-time Chunk\n    end\n\n    %% Admin Operations\n    Client->>Gateway: Admin Request\n    Gateway->>Auth: Check Admin Permissions\n    Auth-->>Gateway: Admin Access Granted\n    Gateway->>API: Admin API Call\n    API->>DB: Admin Data Operations\n    DB-->>API: Operation Result\n    API-->>Client: Admin Response",
+  "content_size": 2128,
+  "collected_at": "2026-02-06T01:37:06.958656",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

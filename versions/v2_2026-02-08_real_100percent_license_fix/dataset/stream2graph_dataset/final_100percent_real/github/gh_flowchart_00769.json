@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00769",
+  "source": "github",
+  "source_url": "https://github.com/tmdc-io/vulcan-book/blob/e0655bbc141ecef215171ed7e5648d9af7e80506/docs/components/checks/anomaly-detection-flow.mmd",
+  "github_repo": "tmdc-io/vulcan-book",
+  "github_file_path": "docs/components/checks/anomaly-detection-flow.mmd",
+  "diagram_type": "flowchart",
+  "code": "%%{init: {'theme':'base', 'themeVariables': { 'primaryColor':'#ff6b6b','primaryTextColor':'#fff','primaryBorderColor':'#c92a2a','lineColor':'#495057','secondaryColor':'#4dabf7','tertiaryColor':'#51cf66'}}}%%\n\n%% Anomaly Detection Detailed Flow\n%% Shows how anomaly detection learns from history and detects outliers\n\nflowchart LR\n    subgraph \"Anomaly Detection Process\"\n        Start[Check Execution] --> |First Run| Collect1[Collect Metric Value<br/>e.g., row_count = 5000]\n        Collect1 --> |Store| History1[(History: Run 1<br/>5000)]\n        \n        Start --> |Run 2| Collect2[Collect Metric Value<br/>row_count = 5100]\n        Collect2 --> |Store| History2[(History: Run 2<br/>5100)]\n        \n        Start --> |Run 3| Collect3[Collect Metric Value<br/>row_count = 4950]\n        Collect3 --> |Store| History3[(History: Run 3<br/>4950)]\n        \n        Start --> |Run N<br/>After 30+ runs| Current[Current Value<br/>row_count = 8000]\n        \n        History1 --> |Query| Stats[Calculate Statistics<br/>Mean, StdDev, Trends]\n        History2 --> Stats\n        History3 --> Stats\n        \n        Stats --> |Build Model| Model[Statistical Model<br/>Mean: 5016<br/>StdDev: 75<br/>Expected: 4900-5132]\n        \n        Current --> |Compare| Compare{Within Range?}\n        Model --> Compare\n        \n        Compare -->|Yes ±3σ| Pass[✓ Pass<br/>Normal Value]\n        Compare -->|No >3σ| Fail[✗ Fail<br/>Anomaly Detected!]\n        \n        Fail --> Alert[Alert User<br/>Unusual Value Detected]\n    end\n\n    style Current fill:#ff6b6b\n    style Fail fill:#ff6b6b\n    style Pass fill:#51cf66\n    style Model fill:#ffd43b\n\n",
+  "content_size": 1624,
+  "collected_at": "2026-02-06T01:47:51.424758",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 1,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00615",
+  "source": "github",
+  "source_url": "https://github.com/HonoraryIndians/axon/blob/a9f706c1df9fbed67940bfc2db02938aac0907bb/mermaid/ok/flowchart-dashboard-analysis.mmd",
+  "github_repo": "HonoraryIndians/axon",
+  "github_file_path": "mermaid/ok/flowchart-dashboard-analysis.mmd",
+  "diagram_type": "flowchart",
+  "code": "%% Flowchart: 분석 대시보드 접근 및 데이터 조회 흐름\n\nflowchart TD\n    Start([마케터: 대시보드 접속]) --> SelectDashboard{대시보드 선택}\n\n    SelectDashboard -->|글로벌| LoadGlobal[글로벌 대시보드 로드]\n    SelectDashboard -->|캠페인| LoadCampaign[캠페인 대시보드 로드]\n    SelectDashboard -->|활동| LoadActivity[활동 대시보드 로드]\n    SelectDashboard -->|코호트| LoadCohort[코호트 대시보드 로드]\n\n    LoadGlobal --> GlobalAPI[\"GET /api/v1/dashboard/global<br/>?startDate=2025-01-01&endDate=2025-01-31\"]\n    LoadCampaign --> CampaignAPI[\"GET /api/v1/dashboard/campaign/:id<br/>?period=MONTHLY\"]\n    LoadActivity --> ActivityAPI[\"GET /api/v1/dashboard/activity/:id\"]\n    LoadCohort --> CohortAPI[\"GET /api/v1/dashboard/cohort/:id\"]\n\n    GlobalAPI --> GlobalService[\"캠페인 메트릭 서비스\"]\n    CampaignAPI --> CampaignService[\"캠페인 메트릭 서비스\"]\n    ActivityAPI --> ActivityService[\"캠페인 메트릭 서비스<br/>+ Redis 실시간 쿼리\"]\n    CohortAPI --> CohortService[\"코호트 분석 서비스\"]\n\n    GlobalService --> GlobalData[\"집계 데이터 수집\"]\n    CampaignService --> CampaignData[\"캠페인별 데이터\"]\n    ActivityService --> ActivityData[\"활동별 데이터\"]\n    CohortService --> CohortData[\"LTVBatch 쿼리\"]\n\n    GlobalData --> GlobalMetrics{메트릭 계산}\n    CampaignData --> CampaignMetrics{메트릭 계산}\n    ActivityData --> ActivityMetrics{메트릭 계산}\n    CohortData --> CohortMetrics{메트릭 계산}\n\n    GlobalMetrics -->|총 매출| GlobalResult[\"총 매출<br/>전체 캠페인<br/>전체 전환율<br/>평균 ROI\"]\n\n    CampaignMetrics -->|캠페인별| CampaignResult[\"캠페인별 매출<br/>ROI/ROAS<br/>참여자 수<br/>예산 효율성\"]\n\n    ActivityMetrics -->|활동별| ActivityResult[\"실시간 재고<br/>현재 참여자<br/>시간대별 트래픽<br/>전환 퍼널\"]\n\n    CohortMetrics -->|LTV 분석| CohortResult[\"LTV/CAC 비율<br/>월별 매출 추이<br/>재구매율<br/>손익분기월\"]\n\n    GlobalResult --> RenderGlobal[차트 렌더링]\n    CampaignResult --> RenderCampaign[차트 렌더링]\n    ActivityResult --> RenderActivity[차트 렌더링]\n    CohortResult --> RenderCohort[차트 렌더링]\n\n    RenderGlobal --> DisplayGlobal[사용자에게 표시]\n    RenderCampaign --> DisplayCampaign[사용자에게 표시]\n    RenderActivity --> DisplayActivity[사용자에게 표시]\n    RenderCohort --> DisplayCohort[사용자에게 표시]\n\n    DisplayGlobal --> Drilldown{드릴다운?}\n    DisplayCampaign --> Drilldown\n    DisplayActivity --> Drilldown\n    DisplayCohort --> Drilldown\n\n    Drilldown -->|캠페인으로| LoadCampaign\n    Drilldown -->|활동으로| LoadActivity\n    Drilldown -->|코호트로| LoadCohort\n    Drilldown -->|CSV 내보내기| ExportData[CSV 생성<br/>다운로드]\n    Drilldown -->|AI 질문| OpenChatbot[LLM 챗봇 열기]\n    Drilldown -->|새로고침| SelectDashboard\n\n    OpenChatbot --> ChatbotQuery[POST /api/v1/dashboard/query]\n    ChatbotQuery --> LLMProcess[\"LLM 서비스<br/>Gemini API 호출\"]\n    LLMProcess --> ChatbotResult[AI 인사이트 표시]\n    ChatbotResult --> Drilldown\n\n    ExportData --> End1([다운로드 완료])\n\n    style LoadGlobal fill:#81c784,stroke:#388e3c,stroke-width:2px\n    style LoadCampaign fill:#4fc3f7,stroke:#0277bd,stroke-width:2px\n    style LoadActivity fill:#ce93d8,stroke:#6a1b9a,stroke-width:2px\n    style LoadCohort fill:#fff176,stroke:#f57f17,stroke-width:2px\n\n    style OpenChatbot fill:#f48fb1,stroke:#c2185b,stroke-width:2px\n    style LLMProcess fill:#ce93d8,stroke:#7b1fa2,stroke-width:2px\n",
+  "content_size": 2990,
+  "collected_at": "2026-02-06T01:45:54.932901",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 6,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

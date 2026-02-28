@@ -1,0 +1,124 @@
+{
+  "id": "aug_gl_block-beta_00331_Clo_6",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/govuk-one-login/authentication-api/blob/a4c68710b6177665c4625f1c8789455deca7b26b/docs/diagrams/authentication/login/account-interventions/low-level/login-low-level-blocked-intervention.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "govuk-one-login/authentication-api",
+  "diagram_type": "block-beta",
+  "code": "sequenceDiagram\n    participant orch_api as Orchestration\n    participant auth_frontend as Authentication Frontend\n    participant auth_external_api as Authentication External API\n    participant auth_internal_api as Authentication Internal API\n    participant account_interventions as Account Interventions API    \n    orch_api ->> auth_frontend : OAuth 2.0 Authorization request 302 redirect to /authorize\n    auth_frontend ->> auth_frontend : Validate request from Orch and create Auth session \n    auth_frontend ->> auth_internal_api : Request to /start (CloudNative_HelmChart)\n    auth_internal_api ->> auth_internal_api : Start helps calculate current state\n    auth_internal_api ->> auth_frontend : StartResponse.java object returned\n    auth_frontend ->> auth_frontend : State machine works out where to send user based on start response\n    auth_frontend ->> auth_internal_api : Request to /user-exists (CloudNative_K8sCluster)\n    auth_internal_api ->> auth_frontend: CheckUserExistsResponse.java object returned\n    auth_frontend ->> auth_frontend: Validates that the user already has an account\n    auth_frontend ->> auth_internal_api : Request to /account-interventions (CloudNative_ServiceMesh)\n    auth_internal_api ->> account_interventions : Request to account interventions api (CloudNative_DockerImage)\n    account_interventions ->> auth_internal_api : Response from Account Interventions containing blocked=true\n    auth_internal_api ->> auth_internal_api : Generates audit event for \"blocked\" Account Intervention\n    auth_internal_api ->> auth_frontend: AccountInterventions.java object returned containing blocked intervention\n    auth_frontend ->> auth_frontend: Prevents user from performing password reset due to blocked intervention\n    auth_frontend ->> auth_internal_api : Request to /login (CloudNative_DockerImage)\n    auth_internal_api ->> auth_frontend: LoginResponse.java object returned\n    auth_frontend ->> auth_frontend : Displays Blocked intervention screen\n",
+  "content_size": 2010,
+  "collected_at": "2026-02-06T14:07:24.385368",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "CloudNative",
+  "seed_id": "gl_block-beta_00331",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在Orchestration完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "orch_api"
+      ],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含Authentication Frontend、Authentication External API这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Authentication Frontend、Authentication External API分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，Authentication Frontend、Authentication External API有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "auth_frontend",
+        "auth_external_api"
+      ],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Authentication Internal API、Account Interventions API分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "最后，流程到达Authentication Internal API、Account Interventions API结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "auth_internal_api",
+        "account_interventions"
+      ],
+      "timestamp_offset": 150
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 10,
+    "speaker_distribution": {
+      "Speaker_B": 5,
+      "Speaker_A": 5
+    },
+    "speech_act_distribution": {
+      "sequential": 3,
+      "inform": 3,
+      "structural": 1,
+      "classification": 2,
+      "contrastive": 1
+    },
+    "avg_turn_length": 40.8,
+    "dialogue_duration": 150
+  }
+}

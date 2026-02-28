@@ -1,0 +1,374 @@
+{
+  "id": "gl_block-beta_00310",
+  "source": "gitlab",
+  "source_url": "https://github.com/akvo/science-for-africa/blob/1ae68cc8d2a151e54752b27367002d83ee593ac8/docs/diagrams/entity-relationship.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "akvo/science-for-africa",
+  "diagram_type": "block-beta",
+  "code": "erDiagram\n    User ||--o| UserProfile : \"has\"\n    User ||--o{ ForumCategory : \"moderates\"\n    User ||--o{ Thread : \"creates\"\n    User ||--o{ Post : \"writes\"\n    User ||--o{ Tag : \"follows\"\n    User ||--o{ Report : \"submits\"\n    User ||--o{ Notification : \"receives\"\n    User ||--o{ UserGroup : \"member_of\"\n    User ||--o{ MentorshipRelation : \"mentor_or_mentee\"\n\n    ForumCategory ||--o| ForumCategory : \"parent\"\n    ForumCategory ||--o{ Thread : \"contains\"\n    ForumCategory ||--o| Community : \"belongs_to\"\n\n    Thread ||--o{ Post : \"has_replies\"\n    Thread ||--o{ Tag : \"tagged_with\"\n    Thread }o--|| User : \"created_by\"\n    Thread }o--|| ForumCategory : \"in_category\"\n\n    Post ||--o| Post : \"reply_to\"\n    Post }o--|| Thread : \"belongs_to\"\n    Post }o--|| User : \"authored_by\"\n    Post ||--o{ Report : \"reported_in\"\n\n    Tag ||--o{ Thread : \"applied_to\"\n    Tag ||--o{ Resource : \"tagged_on\"\n\n    Report }o--|| User : \"reported_by\"\n    Report }o--o| Post : \"targets_post\"\n    Report }o--o| Thread : \"targets_thread\"\n\n    Community ||--o{ ForumCategory : \"has_categories\"\n    Community ||--o{ Resource : \"has_resources\"\n    Community ||--o{ UserGroup : \"has_groups\"\n    Community ||--o{ Event : \"hosts\"\n\n    Resource ||--o{ Tag : \"tagged_with\"\n    Resource }o--|| User : \"uploaded_by\"\n    Resource ||--o{ ResourceVersion : \"has_versions\"\n\n    UserGroup ||--o{ User : \"has_members\"\n    UserGroup }o--|| Community : \"within\"\n\n    Event ||--o{ EventRegistration : \"has_registrations\"\n    Event }o--|| Community : \"hosted_by\"\n\n    EventRegistration }o--|| User : \"registered_by\"\n    EventRegistration }o--|| Event : \"for_event\"\n\n    User {\n        string documentId PK\n        string username UK\n        string email UK\n        string password\n        boolean confirmed\n        boolean blocked\n        datetime createdAt\n        datetime updatedAt\n    }\n\n    UserProfile {\n        string documentId PK\n        string display_name\n        text bio\n        string expertise_areas\n        string institution\n        string country\n        string linkedin_url\n        media avatar\n        integer reputation_score\n        integer post_count\n        enum trust_level\n        json notification_preferences\n        boolean available_as_mentor\n    }\n\n    Community {\n        string documentId PK\n        string name UK\n        string slug UK\n        text description\n        enum type\n        json settings\n        enum privacy_level\n        enum status\n        media logo\n    }\n\n    ForumCategory {\n        string documentId PK\n        string name\n        string slug UK\n        text description\n        integer sort_order\n        boolean is_locked\n        enum visibility\n        media icon\n    }\n\n    Thread {\n        string documentId PK\n        string title\n        string slug UK\n        richtext content\n        enum status\n        boolean is_pinned\n        boolean is_locked\n        boolean is_answered\n        integer view_count\n        integer reply_count\n        datetime last_activity_at\n    }\n\n    Post {\n        string documentId PK\n        richtext content\n        boolean is_accepted_answer\n        boolean is_hidden\n        string moderation_reason\n        integer upvote_count\n        integer downvote_count\n        datetime edited_at\n    }\n\n    Tag {\n        string documentId PK\n        string name UK\n        string slug UK\n        text description\n        string color\n        integer usage_count\n    }\n\n    Report {\n        string documentId PK\n        enum reason\n        text description\n        enum status\n        text moderator_notes\n        datetime resolved_at\n    }\n\n    Notification {\n        string documentId PK\n        enum type\n        string title\n        text message\n        boolean is_read\n        json metadata\n    }\n\n    Resource {\n        string documentId PK\n        string title\n        string slug UK\n        richtext description\n        enum resource_type\n        media file\n        string external_url\n        enum visibility\n        integer download_count\n        date publication_date\n        json metadata\n    }\n\n    ResourceVersion {\n        string documentId PK\n        string version_number\n        text change_notes\n        media file\n    }\n\n    UserGroup {\n        string documentId PK\n        string name\n        string slug UK\n        text description\n        enum group_type\n        enum privacy\n        media banner\n    }\n\n    Event {\n        string documentId PK\n        string title\n        richtext description\n        datetime start_datetime\n        datetime end_datetime\n        enum event_type\n        string location\n        string virtual_link\n        integer max_participants\n        boolean issues_certificate\n    }\n\n    EventRegistration {\n        string documentId PK\n        enum status\n        datetime registered_at\n        boolean attended\n        boolean certificate_issued\n    }\n\n    MentorshipRelation {\n        string documentId PK\n        enum status\n        text goals\n        datetime started_at\n        datetime ended_at\n    }\n",
+  "content_size": 5003,
+  "collected_at": "2026-02-06T14:06:55.704134",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 ForumCategory : \"moderates\"\n    User ||--o{ Thread : \"creates\"\n    User ||--o{ Post : \"writes\"\n    User ||--o{ Tag : \"follows\"\n    User ||--o{ Report : \"submits\"\n    User ||--o{ Notification : \"receives\"\n    User ||--o{ UserGroup : \"member_of\"\n    User ||--o{ MentorshipRelation : \"mentor_or_mentee\"\n\n    ForumCategory ||--o| ForumCategory : \"parent\"\n    ForumCategory ||--o{ Thread : \"contains\"\n    ForumCategory ||--o| Community : \"belongs_to\"\n\n    Thread ||--o{ Post : \"has_replies\"\n    Thread ||--o{ Tag : \"tagged_with\"\n    Thread  和 Report : \"reported_in\"\n\n    Tag ||--o{ Thread : \"applied_to\"\n    Tag ||--o{ Resource : \"tagged_on\"\n\n    Report  的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'ForumCategory : \"moderates\"\n    User ||--o{ Thread : \"creates\"\n    User ||--o{ Post : \"writes\"\n    User ||--o{ Tag : \"follows\"\n    User ||--o{ Report : \"submits\"\n    User ||--o{ Notification : \"receives\"\n    User ||--o{ UserGroup : \"member_of\"\n    User ||--o{ MentorshipRelation : \"mentor_or_mentee\"\n\n    ForumCategory ||--o| ForumCategory : \"parent\"\n    ForumCategory ||--o{ Thread : \"contains\"\n    ForumCategory ||--o| Community : \"belongs_to\"\n\n    Thread ||--o{ Post : \"has_replies\"\n    Thread ||--o{ Tag : \"tagged_with\"\n    Thread  和 Report : \"reported_in\"\n\n    Tag ||--o{ Thread : \"applied_to\"\n    Tag ||--o{ Resource : \"tagged_on\"\n\n    Report '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "o",
+        "o"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 ForumCategory : \"has_categories\"\n    Community ||--o{ Resource : \"has_resources\"\n    Community ||--o{ UserGroup : \"has_groups\"\n    Community ||--o{ Event : \"hosts\"\n\n    Resource ||--o{ Tag : \"tagged_with\"\n    Resource  和 ResourceVersion : \"has_versions\"\n\n    UserGroup ||--o{ User : \"has_members\"\n    UserGroup  的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'ForumCategory : \"has_categories\"\n    Community ||--o{ Resource : \"has_resources\"\n    Community ||--o{ UserGroup : \"has_groups\"\n    Community ||--o{ Event : \"hosts\"\n\n    Resource ||--o{ Tag : \"tagged_with\"\n    Resource  和 ResourceVersion : \"has_versions\"\n\n    UserGroup ||--o{ User : \"has_members\"\n    UserGroup '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "o",
+        "o"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 EventRegistration : \"has_registrations\"\n    Event  和 string documentId PK\n        string username UK\n        string email UK\n        string password\n        boolean confirmed\n        boolean blocked\n        datetime createdAt\n        datetime updatedAt\n     这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'EventRegistration : \"has_registrations\"\n    Event  和 string documentId PK\n        string username UK\n        string email UK\n        string password\n        boolean confirmed\n        boolean blocked\n        datetime createdAt\n        datetime updatedAt\n    '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "o",
+        "User"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 string documentId PK\n        string display_name\n        text bio\n        string expertise_areas\n        string institution\n        string country\n        string linkedin_url\n        media avatar\n        integer reputation_score\n        integer post_count\n        enum trust_level\n        json notification_preferences\n        boolean available_as_mentor\n     和 string documentId PK\n        string name UK\n        string slug UK\n        text description\n        enum type\n        json settings\n        enum privacy_level\n        enum status\n        media logo\n    。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'string documentId PK\n        string display_name\n        text bio\n        string expertise_areas\n        string institution\n        string country\n        string linkedin_url\n        media avatar\n        integer reputation_score\n        integer post_count\n        enum trust_level\n        json notification_preferences\n        boolean available_as_mentor\n     和 string documentId PK\n        string name UK\n        string slug UK\n        text description\n        enum type\n        json settings\n        enum privacy_level\n        enum status\n        media logo\n    '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "UserProfile",
+        "Community"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 string documentId PK\n        string name\n        string slug UK\n        text description\n        integer sort_order\n        boolean is_locked\n        enum visibility\n        media icon\n     和 string documentId PK\n        string title\n        string slug UK\n        richtext content\n        enum status\n        boolean is_pinned\n        boolean is_locked\n        boolean is_answered\n        integer view_count\n        integer reply_count\n        datetime last_activity_at\n     的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'string documentId PK\n        string name\n        string slug UK\n        text description\n        integer sort_order\n        boolean is_locked\n        enum visibility\n        media icon\n     和 string documentId PK\n        string title\n        string slug UK\n        richtext content\n        enum status\n        boolean is_pinned\n        boolean is_locked\n        boolean is_answered\n        integer view_count\n        integer reply_count\n        datetime last_activity_at\n    '。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ForumCategory",
+        "Thread"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 string documentId PK\n        richtext content\n        boolean is_accepted_answer\n        boolean is_hidden\n        string moderation_reason\n        integer upvote_count\n        integer downvote_count\n        datetime edited_at\n     和 string documentId PK\n        string name UK\n        string slug UK\n        text description\n        string color\n        integer usage_count\n    。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'string documentId PK\n        richtext content\n        boolean is_accepted_answer\n        boolean is_hidden\n        string moderation_reason\n        integer upvote_count\n        integer downvote_count\n        datetime edited_at\n     和 string documentId PK\n        string name UK\n        string slug UK\n        text description\n        string color\n        integer usage_count\n    '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Post",
+        "Tag"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 string documentId PK\n        enum reason\n        text description\n        enum status\n        text moderator_notes\n        datetime resolved_at\n     和 string documentId PK\n        enum type\n        string title\n        text message\n        boolean is_read\n        json metadata\n    。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'string documentId PK\n        enum reason\n        text description\n        enum status\n        text moderator_notes\n        datetime resolved_at\n     和 string documentId PK\n        enum type\n        string title\n        text message\n        boolean is_read\n        json metadata\n    '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Report",
+        "Notification"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 string documentId PK\n        string title\n        string slug UK\n        richtext description\n        enum resource_type\n        media file\n        string external_url\n        enum visibility\n        integer download_count\n        date publication_date\n        json metadata\n     和 string documentId PK\n        string version_number\n        text change_notes\n        media file\n     的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'string documentId PK\n        string title\n        string slug UK\n        richtext description\n        enum resource_type\n        media file\n        string external_url\n        enum visibility\n        integer download_count\n        date publication_date\n        json metadata\n     和 string documentId PK\n        string version_number\n        text change_notes\n        media file\n    '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Resource",
+        "ResourceVersion"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 string documentId PK\n        string name\n        string slug UK\n        text description\n        enum group_type\n        enum privacy\n        media banner\n     和 string documentId PK\n        string title\n        richtext description\n        datetime start_datetime\n        datetime end_datetime\n        enum event_type\n        string location\n        string virtual_link\n        integer max_participants\n        boolean issues_certificate\n     这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'string documentId PK\n        string name\n        string slug UK\n        text description\n        enum group_type\n        enum privacy\n        media banner\n     和 string documentId PK\n        string title\n        richtext description\n        datetime start_datetime\n        datetime end_datetime\n        enum event_type\n        string location\n        string virtual_link\n        integer max_participants\n        boolean issues_certificate\n    '？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "UserGroup",
+        "Event"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 string documentId PK\n        enum status\n        datetime registered_at\n        boolean attended\n        boolean certificate_issued\n     和 string documentId PK\n        enum status\n        text goals\n        datetime started_at\n        datetime ended_at\n     这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'string documentId PK\n        enum status\n        datetime registered_at\n        boolean attended\n        boolean certificate_issued\n     和 string documentId PK\n        enum status\n        text goals\n        datetime started_at\n        datetime ended_at\n    '，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EventRegistration",
+        "MentorshipRelation"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 40,
+    "repair_count": 0,
+    "grounding_acts_count": 20,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

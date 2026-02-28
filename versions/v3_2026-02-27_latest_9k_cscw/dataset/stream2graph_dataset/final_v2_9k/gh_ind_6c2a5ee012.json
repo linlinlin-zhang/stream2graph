@@ -1,0 +1,9 @@
+{
+  "id": "gh_ind_6c2a5ee012",
+  "source": "github_industrial",
+  "repo": "nduyhai/valjean",
+  "license": "mit",
+  "code": "sequenceDiagram\n    participant TG as Telegram\n    participant Web as Webhook Server (:8080)\n    participant App as UseCase: EvaluateMsg\n    participant LLM as LLM Client\n    participant MCP as MCP Client\n\n    TG->>Web: POST /webhook (Update)\n    Web->>App: HandleUpdate(update)\n    App->>App: Gate (mention/@bot or prefix: !eval)\n    App->>App: RateLimit & Moderation check\n    alt Engine = LLM\n        App->>LLM: Analyze(message)\n        LLM-->>App: summary/eval\n    else Engine = MCP\n        App->>MCP: call tools (search/eval)\n        MCP-->>App: tool results\n    else Engine = Hybrid\n        App->>MCP: context snippets\n        MCP-->>App: evidence\n        App->>LLM: Synthesize(evidence + msg)\n        LLM-->>App: final answer\n    end\n    App-->>Web: reply text\n    Web-->>TG: sendMessage\n",
+  "diagram_type": "size:600..800",
+  "collected_at": "2026-02-27T03:25:00.481937"
+}

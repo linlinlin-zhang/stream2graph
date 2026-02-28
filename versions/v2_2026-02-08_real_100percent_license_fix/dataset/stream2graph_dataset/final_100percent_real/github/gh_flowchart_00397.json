@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00397",
+  "source": "github",
+  "source_url": "https://github.com/liu0fanyi/async-summary/blob/d6bbd1ec1a3941225a8bf0cbc824029f962581b7/waiting/assets/ariel-os-executor-thread.mmd",
+  "github_repo": "liu0fanyi/async-summary",
+  "github_file_path": "waiting/assets/ariel-os-executor-thread.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\n  Init[\"Init\n    --------------\n初始化一个thread, 优先级很低默认8可以设置\n在其中运行一个定制的executor-thread\n生成一个static的spawner\n    \"]\n  Init --> |run| ExecutorThreadRun[\"\n    在init之后就会run起来\n    -------------------------\n    在loop里等待当前thread的THREAD_FLAG_WAKEUP\n    也就是wake之后就会重新轮询Poll\n\"]\n  Init --> |__pender| ExecutorThreadPender[\"\n经过了embassy的标准wake流程后走到了这里\n    --------------------------\n根据cx获得的threadid\nset 标志位THREAD_FLAG_WAKEUP\n根据更上面Thread-Scheduler已经描述过的，这会导致schedule\n\"]\n  Example --> ExampleTask\n  Example --> ExampleThread\nsubgraph task\n  ExampleTask[\"\n    标记一个task\n    默认不动\n    等待spawn\n  \"] -->\n   TaskLoop[\"loop\"] -->\n     TaskSignal[\"\n       里面使用了SIGNAL.signal(count)\n       一个值准备好可以读取\n       下次调用会直接覆盖\n       没有buffer\n     \"]\n      --> TaskTimer[\"延迟一段时间让出时间片\"] --> TaskLoop\nend\n\nsubgraph main-thread\n  TaskTimer -.让出时间片.-> BLOCKON \n  ExampleThread[\"\n    标记一个main thread\"]\n\n  ExampleThread --> SpawnTask[\"spawn了左边的task\ntask enqueue->ready，但优先级低还不会被dequeue\n\"] --> 循环10次读取 --> BLOCKON[\"block_on等待(SIGNAL.wait()返回的future)\"] --> 打印时间\n\n  BLOCKON -.实现.-> Context[\"Pin了传入的future\n这里就是SIGNAL.wait()返回的future\n    -----------------------\n组装上下文cx\ncx装入了waker\n干的thread-executor一样事\n设置当前thread的线程标志THREAD_FLAG_WAKE\n\"] --> BlockOnLoop[\"loop\"] --> Poll[\"\nfuture.poll(cx)轮询\n    ----------------------\n在本例子\n每次poll(cx)的时候SIGNAL返回的future都会设置它对应的waker(在SIGINAL的State::Waiting(waker)内)\n\"] --> PollResult[\"\nReady返回结果不然等待THREAD_FLAG_WAKER\n    ----------------------\n在本例子\n等待的过程中当前thread让出\nexecutor所在thread开始dequeue\n然后SIGNAL.signal更新了当前最新值, 并wake(这是main thread，上面那个blockon传入的cx的waker)\n所以这个wake了main thread继续poll\n当前有值了，return了res\n在外部的10次循环中继续下一次再回到这个位置wait\n然后再次让给task\n\"] --> BlockOnLoop\n\nBLOCKON -.中间出让时间片.-> TaskLoop\nend\n\n\n style BLOCKON fill:#bbf,stroke:#333,stroke-width:4px\n style PollResult fill:#bbf,stroke:#333,stroke-width:4px\n",
+  "content_size": 1804,
+  "collected_at": "2026-02-06T01:43:50.391957",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

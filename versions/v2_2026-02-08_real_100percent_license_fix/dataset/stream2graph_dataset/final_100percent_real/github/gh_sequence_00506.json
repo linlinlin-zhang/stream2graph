@@ -1,0 +1,31 @@
+{
+  "id": "gh_sequence_00506",
+  "source": "github",
+  "source_url": "https://github.com/coherosphere/architecture/blob/598bb65467787da38ac4029e35bdead27e7799ee/assets/diagrams/C4_sequences/C4-22_Rubric_Evolution_Manifesto_Versioning.mmd",
+  "github_repo": "coherosphere/architecture",
+  "github_file_path": "assets/diagrams/C4_sequences/C4-22_Rubric_Evolution_Manifesto_Versioning.mmd",
+  "diagram_type": "sequence",
+  "code": "%%{init: {'theme':'base','themeVariables':{ 'sequenceNumberColor':'#334155'}}}%%\nsequenceDiagram\nautonumber\n\nactor R as Ethics Maintainer\n\nbox #8b5cf6 UI\n  participant UI as C2-12 Resonance Board UI\nend\n\nbox #fde68a Control or API\n  participant API as C2-11 Public API Gateway\nend\n\nbox #ff8b00 Core Services\n  participant ETH as C2-08 Manifesto and Ethics Guard\n  participant GOV as C2-03 Governance and DAO\n  participant MET as C2-07 Metrics and Analytics\n  participant ID as C2-05 Identity PoCI\n  participant HUB as C2-06 Local Hub and Federation\nend\n\nbox #e5e7eb Security\n  participant SEC as C2-10 Security and Audit\nend\n\n%% -------- Draft rubric change --------\nR ->> UI: open ethics workspace\nUI ->> API: createRubricDraft payload rationale sources\nAPI ->> ETH: createRubricDraft payload\nETH -->> SEC: log draft created\n\n%% -------- Impact preview and KPI simulation --------\nUI ->> API: requestImpactPreview draftId\nAPI ->> MET: simulate rubric impact draftId window\nMET -->> API: preview kpi deltas sri sensitivity\nAPI -->> UI: show preview and risks\n\n%% -------- Governance proposal for versioning --------\nUI ->> API: submitRubricForVersioning draftId\nAPI ->> GOV: createProposal rubric versioning draftId\nGOV -->> MET: GovernanceProposalCreated DDD EVT 05\nGOV -->> SEC: log proposal created\n\nloop voting window\n  R ->> UI: cast vote\n  UI ->> API: vote proposalId weight\n  API ->> GOV: recordVote proposalId voter weight\n  GOV -->> MET: VoteCast DDD EVT 06\nend\n\nAPI ->> GOV: closeAndTally proposalId\nGOV -->> MET: VoteTallied DDD EVT 07\n\nalt approved\n  GOV ->> ETH: authorizeRubricVersioning draftId\n  ETH ->> ETH: finalize rubric and bump version\n  ETH -->> MET: RubricVersioned DDD EVT 51\n  MET -->> MET: KPIUpdated DDD EVT 26\n  GOV -->> MET: DecisionRecorded DDD EVT 08\nelse rejected\n  GOV -->> SEC: log rejection\n  API -->> UI: rubric versioning rejected\n  UI -->> R: show guidance\nend\n\n%% -------- Manifesto version publication --------\nopt publish manifesto version\n  ETH ->> ID: registerManifestoVersion version hash refs\n  ID -->> ETH: manifesto version registered\n  ETH -->> MET: ManifestoVersionPublished DDD EVT 52\n  MET -->> MET: KPIUpdated DDD EVT 26\nend\n\n%% -------- Rollout to services and hubs --------\nETH ->> HUB: broadcast manifesto version pin\nHUB -->> MET: publish rollout status KPIUpdated DDD EVT 26\nETH ->> GOV: notify policy and guardrails updated\nGOV -->> MET: KPIUpdated DDD EVT 26\nSEC ->> SEC: persist version and hash attestations\n\n%% -------- Completion --------\nAPI -->> UI: show new rubric version and manifesto link\nUI -->> R: display rollout status and impact charts\n\n%% Notes\nNote over ETH,MET: RubricVersioned DDD EVT 51 marks the new rubric version\nNote over ETH,ID: ManifestoVersionPublished DDD EVT 52 records canonical version and hash\nNote over GOV: DecisionRecorded DDD EVT 08 confirms governance approval",
+  "content_size": 2857,
+  "collected_at": "2026-02-06T01:33:13.881999",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License (Assumed)",
+  "license_url": null,
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "repo_owner": "coherosphere",
+  "repo_name": "architecture",
+  "repo_description": "The cohersphere architecture — structural blueprint of the resonance network. Defines the modular layers connecting app, API, and governance protocols. Outlines data flows for Proof-of-Contribution, c",
+  "repo_language": "Mermaid",
+  "repo_topics": [
+    "architecture",
+    "c4",
+    "distributed-systems",
+    "modular-architecture",
+    "system-design"
+  ],
+  "repo_created_at": "2025-10-29T09:30:02Z",
+  "repo_updated_at": "2026-02-06T04:58:50Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

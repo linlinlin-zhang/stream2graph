@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00294",
+  "source": "github",
+  "source_url": "https://github.com/dcdpr/website-btcr2-dev/blob/e7e2fa353eac61840309cde48d79a607eddcf569/docs/public/diagrams/okrs/o1-kr2.1.mmd",
+  "github_repo": "dcdpr/website-btcr2-dev",
+  "github_file_path": "docs/public/diagrams/okrs/o1-kr2.1.mmd",
+  "diagram_type": "sequence",
+  "code": "---\ntitle: SingletonBeacon - Stuart Updates Keys, Satoshi Verifies\n---\n\nsequenceDiagram\n    autonumber\n    actor Stu as Stuart (DID Controller)\n    participant BTC as Bitcoin Network ⛓\n    participant CAS as CAS/IPFS 📦 (optional)\n    actor Sat as Satoshi (Verifier)\n    actor Res as Resolver\n\n    Note over Stu: Prepare btcr2Update (new key material etc.)<br/>Compute updateId = SHA256(JCS(btcr2Update))\n\n    Stu->>BTC: Construct spendTx with OP_RETURN PUSH32 btcr2Update\n    BTC->>BTC: Sign spendTx (private key for serviceEndpoint)\n    BTC->>BTC: Broadcast spendTx (OP_RETURN last output)\n    alt CAS used\n      Stu->>CAS: Publish btcr2Update (under its hash)\n    else Sidecar used\n      Stu->>Stu: Store btcr2Update locally\n    end\n\n    Note right of Sat: Wants to verify Stuart's latest DID\n\n    Sat->>Res: Resolve did:btcr2:... (targetVersion? optional)\n    Res->>BTC: Scan Beacon address from DID.service (SingletonBeacon)\n    BTC-->>Res: Latest tx with OP_RETURN = updateId\n\n    alt CAS path\n      Res->>CAS: Get btcr2Update by updateId\n      CAS-->>Res: btcr2Update\n    else Sidecar path\n      Sat->>Res: Provide sidecarDocuments=[btcr2Update]\n      Res->>Stu: Load sidecarDocuments\n    end\n\n    Res->>Res: Validate btcr2Update hash==updateId<br/>Transform doc, check versionId increments, schema-valid\n    Res-->>Sat: Resolved DID with new keys (verified)\n",
+  "content_size": 1365,
+  "collected_at": "2026-02-06T01:30:19.806091",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 1,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

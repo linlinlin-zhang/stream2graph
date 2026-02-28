@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01474",
+  "source": "github",
+  "source_url": "https://github.com/leanguardia/provider-switcher/blob/dd3f37a5c130c1af2d5d7887db94f5f21d0f276c/diagrams/architecture2-containers.mmd",
+  "github_repo": "leanguardia/provider-switcher",
+  "github_file_path": "diagrams/architecture2-containers.mmd",
+  "diagram_type": "architecture",
+  "code": "---\ntitle: \"C4 - Level 2: Containers\"\n---\ngraph TB    \n    subgraph PaymentSystem[\"Payment Service<br/>[NestJS Application]\"]\n        API[\"PaymentsController<br/>[REST API /payments]<br/>\"]\n        \n        Orchestrator[\"PaymentsService<br/>[Service]<br/>Payment processing\"]\n        \n        Switcher[\"ProviderSwitcherService<br/>[Service]<br/>Manages the chain\"]\n        \n        ChainHandler[\"PaymentHandler<br/>[abstract]<br/><br/>Chain of Responsibility<br/>base class\"]\n        \n        Exception[\"PaymentProvidersUnavailableException<br/>[Custom Exception]<br/>503 Service Unavailable\"]\n        \n        subgraph Handlers[\"Handler Chain\"]\n            HA[\"ProviderHandler<br/>[Concrete Handler]<br/>Wraps ProviderAService\"]\n            HB[\"ProviderHandler<br/>[Concrete Handler]<br/>Wraps ProviderBService\"]\n            HC[\"ProviderHandler<br/>[Concrete Handler]<br/>Wraps ProviderCService\"]\n        end\n    end\n    \n    ExtA[\"Provider A API<br/>[External REST API]\"]\n    ExtB[\"Provider B API<br/>[External REST API]\"]\n    ExtC[\"Provider C API<br/>[External REST API]\"]\n    \n    API --> Orchestrator\n    Orchestrator --> Switcher\n    Switcher --> ChainHandler\n    ChainHandler -.-> HA\n    HA -->|\"on failure\"| HB\n    HB -->|\"on failure\"| HC\n    HC -.->|\"all failed\"| Exception\n    Exception -.->|\"503 response\"| API\n    \n    HA -->|\"HTTP Request\"| ExtA\n    HB -->|\"HTTP Request\"| ExtB\n    HC -->|\"HTTP Request\"| ExtC\n\n",
+  "content_size": 1424,
+  "collected_at": "2026-02-06T01:46:41.843296",
+  "license": "mit",
+  "license_name": "MIT License",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

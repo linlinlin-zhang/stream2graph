@@ -1,0 +1,438 @@
+{
+  "id": "aug_gl_flowchart_00654_Hea_1",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/Yuzu02/TIP1-Hospital/blob/21a37092a9087c66246d15537c5ca8850316550c/docs/diagrams/Topology.mmd",
+  "source_note": "collected_from_github_final",
+  "github_repo": "Yuzu02/TIP1-Hospital",
+  "diagram_type": "flowchart",
+  "code": "---\nconfig:\n  layout: dagre\ntitle: Hospital Salud Integral - Red VoIP\n---\nflowchart TD\n subgraph subGraph0[HealthTech_PatientRecords]\n        PC1[HealthTech_DiagnosticEngine]\n        PC2[HealthTech_PatientRecords]\n        TEL1[HealthTech_LabAnalyzer]\n        TEL2[HealthTech_HIPAA_Vault]\n        TEL3[HealthTech_LabAnalyzer]\n        TEL4[HealthTech_EMR_Sync]\n  end\n subgraph subGraph1[HealthTech_PatientRecords]\n        PC3[HealthTech_DiagnosticEngine]\n        PC4[HealthTech_EMR_Sync]\n        TEL5[HealthTech_LabAnalyzer]\n        TEL6[HealthTech_PatientRecords]\n        TEL7[HealthTech_HIPAA_Vault]\n        TEL8[HealthTech_LabAnalyzer]\n  end\n subgraph subGraph2[HealthTech_PatientRecords]\n        subGraph0\n        subGraph1\n  end\n subgraph subGraph3[HealthTech_EMR_Sync]\n        ROUTER[HealthTech_HIPAA_Vault]\n        SW1[HealthTech_EMR_Sync]\n        SW2[HealthTech_LabAnalyzer]\n  end\n subgraph VLANs[HealthTech_DiagnosticEngine]\n        VLAN10[HealthTech_LabAnalyzer]\n        VLAN20[HealthTech_PatientRecords]\n  end\n    ROUTER -- F0/0 → G0/1<br>📡 TRONCAL PRINCIPAL --- SW1\n    SW1 -- \"G0/2 → G0/2<br>🔗 ENLACE INTER-SWITCH\" --- SW2\n    SW1 -- Fa0/1<br>ACCESO + VOZ --- TEL1\n    TEL1 -- Puerto PC<br>🔌 PASSTHROUGH --- PC1\n    SW1 -- Fa0/2<br>ACCESO + VOZ --- TEL2\n    TEL2 -- Puerto PC<br>🔌 PASSTHROUGH --- PC2\n    SW1 -- Fa0/3<br>ACCESO + VOZ --- TEL3\n    SW1 -- Fa0/4<br>ACCESO + VOZ --- TEL4\n    SW2 -- Fa0/1<br>ACCESO + VOZ --- TEL5\n    TEL5 -- Puerto PC<br>🔌 PASSTHROUGH --- PC3\n    SW2 -- Fa0/2<br>ACCESO + VOZ --- TEL6\n    SW2 -- Fa0/3<br>ACCESO + VOZ --- TEL7\n    TEL7 -- Puerto PC<br>🔌 PASSTHROUGH --- PC4\n    SW2 -- Fa0/4<br>ACCESO + VOZ --- TEL8\n    PC1 -.-> VLAN10\n    PC2 -.-> VLAN10\n    PC3 -.-> VLAN10\n    PC4 -.-> VLAN10\n    TEL1 -.-> VLAN20\n    TEL2 -.-> VLAN20\n    TEL3 -.-> VLAN20\n    TEL4 -.-> VLAN20\n    TEL5 -.-> VLAN20\n    TEL6 -.-> VLAN20\n    TEL7 -.-> VLAN20\n    TEL8 -.-> VLAN20\n     PC1:::pcStyle\n     PC2:::pcStyle\n     TEL1:::telStyle\n     TEL2:::telStyle\n     TEL3:::telStyle\n     TEL4:::telStyle\n     PC3:::pcStyle\n     PC4:::pcStyle\n     TEL5:::telStyle\n     TEL6:::telStyle\n     TEL7:::telStyle\n     TEL8:::telStyle\n     ROUTER:::routerStyle\n     SW1:::switchStyle\n     SW2:::switchStyle\n     VLAN10:::vlanStyle\n     VLAN20:::vlanStyle\n    classDef pcStyle fill:#e1f5fe,stroke:#01579b,stroke-width:2px\n    classDef telStyle fill:#f3e5f5,stroke:#4a148c,stroke-width:2px\n    classDef switchStyle fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px\n    classDef routerStyle fill:#fff3e0,stroke:#ef6c00,stroke-width:3px\n    classDef vlanStyle fill:#fce4ec,stroke:#c2185b,stroke-width:2px\n    classDef changeStyle fill:#e8f5e8,stroke:#ff5722,stroke-width:2px,stroke-dasharray: 5 5\n",
+  "content_size": 2858,
+  "collected_at": "2026-02-06T14:18:30.765532",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 1,
+  "repo_owner": "Yuzu02",
+  "repo_name": "TIP1-Hospital",
+  "repo_description": "Implementacion sobre la solucion de un caso de uso de Telefonia IP",
+  "repo_language": null,
+  "repo_topics": [
+    "cisco-packet-tracer",
+    "voip"
+  ],
+  "repo_created_at": "2025-07-12T23:01:23Z",
+  "repo_updated_at": "2025-07-23T02:11:04Z",
+  "augmentation_domain": "HealthTech",
+  "seed_id": "gl_flowchart_00654",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 HealthTech_PatientRecords 和 HealthTech_DiagnosticEngine 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 HealthTech_PatientRecords处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HealthTech_PatientRecords处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "subGraph0",
+        "PC1"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 HealthTech_PatientRecords 和 HealthTech_LabAnalyzer 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HealthTech_PatientRecords 和 HealthTech_LabAnalyzer'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PC2",
+        "TEL1"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 HealthTech_HIPAA_Vault 和 HealthTech_LabAnalyzer 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HealthTech_HIPAA_Vault 和 HealthTech_LabAnalyzer'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TEL2",
+        "TEL3"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 HealthTech_EMR_Sync 和 HealthTech_PatientRecords 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HealthTech_EMR_Sync 和 HealthTech_PatientRecords'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TEL4",
+        "subGraph1"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 HealthTech_DiagnosticEngine 和 HealthTech_EMR_Sync 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'HealthTech_DiagnosticEngine 和 HealthTech_EMR_Sync'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PC3",
+        "PC4"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 HealthTech_LabAnalyzer 和 HealthTech_PatientRecords 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'HealthTech_LabAnalyzer 和 HealthTech_PatientRecords'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TEL5",
+        "TEL6"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 HealthTech_HIPAA_Vault 和 HealthTech_LabAnalyzer 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 HealthTech_HIPAA_Vault处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'HealthTech_HIPAA_Vault处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TEL7",
+        "TEL8"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 HealthTech_PatientRecords 和 HealthTech_EMR_Sync 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'HealthTech_PatientRecords 和 HealthTech_EMR_Sync'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "subGraph2",
+        "subGraph3"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 HealthTech_HIPAA_Vault 和 HealthTech_EMR_Sync 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HealthTech_HIPAA_Vault 和 HealthTech_EMR_Sync'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ROUTER",
+        "SW1"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 HealthTech_LabAnalyzer 和 HealthTech_DiagnosticEngine 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'HealthTech_LabAnalyzer 和 HealthTech_DiagnosticEngine'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SW2",
+        "VLANs"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 HealthTech_LabAnalyzer 和 HealthTech_PatientRecords 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'HealthTech_LabAnalyzer 和 HealthTech_PatientRecords'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "VLAN10",
+        "VLAN20"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 46,
+    "repair_count": 2,
+    "grounding_acts_count": 22,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

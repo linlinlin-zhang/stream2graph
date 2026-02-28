@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01395",
+  "source": "github",
+  "source_url": "https://github.com/hmaach/01Blog/blob/17f0db5bf794f79c27c496894ff8e5bd4028d5c0/docs/security_flow.mmd",
+  "github_repo": "hmaach/01Blog",
+  "github_file_path": "docs/security_flow.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TD\n    A[HTTP Request] --> B{RateLimitFilter<br/>OncePerRequestFilter}\n    \n    B -->|Rate Limit Exceeded| C[Return 429<br/>TOO_MANY_REQUESTS]\n    B -->|Within Limit| D{JwtFilter<br/>OncePerRequestFilter}\n    \n    D --> D1[Extract Authorization Header]\n    D1 --> D2{Bearer Token<br/>Present?}\n    \n    D2 -->|No| E[Continue Filter Chain]\n    D2 -->|Yes| D3[Extract JWT Token]\n    \n    D3 --> D4{Parse Token<br/>Valid Format?}\n    D4 -->|Invalid/Malformed| D5[Return 401<br/>UNAUTHORIZED]\n    D4 -->|Valid| D6[Extract User ID from Token]\n    \n    D6 --> D7{User ID Present &<br/>No Auth in Context?}\n    D7 -->|No| E\n    D7 -->|Yes| D8[Fetch User from Database]\n    \n    D8 --> D9{User Banned?}\n    D9 -->|Yes| D10[Return 401<br/>User Banned]\n    D9 -->|No| D11[Load UserDetails via<br/>CustomUserDetailsService]\n    \n    D11 --> D12{Validate Token<br/>Against UserDetails?}\n    D12 -->|Invalid| E\n    D12 -->|Valid| D13[Create Authentication Token<br/>UsernamePasswordAuthenticationToken]\n    \n    D13 --> D14[Set Authentication in<br/>SecurityContext]\n    D14 --> E\n    \n    E --> F{UsernamePasswordAuthenticationFilter<br/>Default Spring Security Filter}\n    \n    F --> G{Authorization Rules<br/>HttpSecurity Config}\n    \n    G --> G1{Endpoint Check}\n    G1 -->|/api/auth/**| H[Permit All]\n    G1 -->|GET /| H\n    G1 -->|GET /api/posts| H\n    G1 -->|/api/admin/**| I{Has ROLE_ADMIN?}\n    G1 -->|Other Endpoints| J{Authenticated?}\n    \n    I -->|No| K[JwtAuthenticationEntryPoint<br/>Return 401 UNAUTHORIZED]\n    I -->|Yes| L[Process Request]\n    \n    J -->|No| K\n    J -->|Yes| L\n    \n    H --> L\n    L --> M[Controller/Endpoint]\n    \n    style A fill:#e1f5ff\n    style B fill:#fff3cd\n    style D fill:#fff3cd\n    style F fill:#d4edda\n    style G fill:#d4edda\n    style M fill:#d1ecf1\n    style C fill:#f8d7da\n    style D5 fill:#f8d7da\n    style D10 fill:#f8d7da\n    style K fill:#f8d7da\n    \n    subgraph \"Custom Filters\"\n    B\n    D\n    end\n    \n    subgraph \"Spring Security Default Filters\"\n    F\n    end\n    \n    subgraph \"Security Configuration\"\n    G\n    end\n    \n    subgraph \"Authentication Components\"\n    N[DaoAuthenticationProvider]\n    O[CustomUserDetailsService]\n    P[BCryptPasswordEncoder]\n    Q[UserPrincipal]\n    end\n    \n    subgraph \"JWT Components\"\n    R[JwtService]\n    R1[Generate Token]\n    R2[Validate Token]\n    R3[Extract Claims]\n    R --> R1\n    R --> R2\n    R --> R3\n    end\n    \n    subgraph \"Session Management\"\n    S[SessionCreationPolicy.STATELESS]\n    end",
+  "content_size": 2498,
+  "collected_at": "2026-02-06T01:45:41.839669",
+  "license": "none",
+  "license_name": "No License",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "",
+  "repo_stars": 12,
+  "repo_forks": 0
+}

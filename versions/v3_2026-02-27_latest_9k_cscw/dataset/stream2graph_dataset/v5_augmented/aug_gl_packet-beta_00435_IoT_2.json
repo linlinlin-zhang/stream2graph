@@ -1,0 +1,18 @@
+{
+  "id": "aug_gl_packet-beta_00435_IoT_2",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/sean-galloway/RTLDesignSherpa/blob/47f8a16641658f570a69c3af3c9724b29ea39187/projects/components/stream/docs/stream_mas/assets/mermaid/11_scheduler_group_block.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "sean-galloway/RTLDesignSherpa",
+  "diagram_type": "packet-beta",
+  "code": "graph TB\n    APB[IoT_Industrial_MQTT_Broker] --> DESC_ENG[IoT_Industrial_MQTT_Broker]\n    CFG[IoT_Industrial_ActuatorController] --> DESC_ENG\n    CFG --> SCHED\n\n    subgraph \"Scheduler Group\"\n        subgraph \"Descriptor Engine\"\n            DESC_ENG --> |desc_ar_*| DESC_AXI[IoT_Industrial_ActuatorController]\n            DESC_AXI --> |desc_r_data| DESC_PARSE[IoT_Industrial_EdgeNode]\n            DESC_PARSE --> |descriptor_packet 256-bit| DESC_OUT[IoT_Industrial_TelemetryStream]\n            DESC_ENG --> |mon_valid/packet| DESC_MON[IoT_Industrial_MQTT_Broker]\n        end\n\n        DESC_OUT --> |descriptor_valid/ready| SCHED[IoT_Industrial_ActuatorController]\n\n        subgraph \"Scheduler\"\n            SCHED --> |datard_valid/addr/beats| RD_IF[IoT_Industrial_MQTT_Broker]\n            SCHED --> |datawr_valid/addr/beats| WR_IF[IoT_Industrial_MQTT_Broker]\n            RD_IF --> |datard_done_strobe| SCHED\n            WR_IF --> |datawr_done_strobe| SCHED\n            SCHED --> |mon_valid/packet| SCHED_MON[IoT_Industrial_ActuatorController]\n        end\n\n        DESC_MON --> ARB[IoT_Industrial_MQTT_Broker]\n        SCHED_MON --> ARB\n        ARB --> |mon_valid/ready/packet| MON_OUT[IoT_Industrial_MQTT_Broker]\n    end\n\n    RD_IF --> RD_ENG[IoT_Industrial_PLC_Logic]\n    WR_IF --> WR_ENG[IoT_Industrial_MQTT_Broker]\n    RD_ENG --> |datard_done| RD_IF\n    WR_ENG --> |datawr_done| WR_IF\n    MON_OUT --> SYS_MON[IoT_Industrial_MQTT_Broker]\n\n    style DESC_ENG fill:#bbf,stroke:#333,stroke-width:2px\n    style SCHED fill:#f9f,stroke:#333,stroke-width:3px\n    style ARB fill:#bfb,stroke:#333,stroke-width:2px",
+  "content_size": 1451,
+  "collected_at": "2026-02-06T14:09:38.844299",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "IoT_Industrial",
+  "seed_id": "gl_packet-beta_00435"
+}

@@ -1,0 +1,32 @@
+{
+  "id": "aug_gl_packet-beta_00467_IoT_2",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/sean-galloway/RTLDesignSherpa/blob/47f8a16641658f570a69c3af3c9724b29ea39187/projects/components/stream/docs/stream_mas/assets/mermaid/16_monbus_axil_group_block.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "sean-galloway/RTLDesignSherpa",
+  "diagram_type": "packet-beta",
+  "code": "graph TB\n    subgraph \"monbus_axil_group\"\n        subgraph \"Monitor Bus Input\"\n            MON_IN[IoT_Industrial_MQTT_Broker] --> PARSE[IoT_Industrial_MQTT_Broker]\n        end\n\n        subgraph \"Per-Protocol Filtering\"\n            PARSE --> FILTER[IoT_Industrial_EdgeNode]\n            AXI_MASK[IoT_Industrial_MQTT_Broker] --> FILTER\n            AXIS_MASK[IoT_Industrial_EdgeNode] --> FILTER\n            CORE_MASK[IoT_Industrial_TelemetryStream] --> FILTER\n        end\n\n        subgraph \"Routing Decision\"\n            FILTER --> DROP{IoT_Industrial_EdgeNode}\n            DROP --> |No| ERR_CHK{IoT_Industrial_EdgeNode}\n            DROP --> |Yes| DISCARD[IoT_Industrial_TelemetryStream]\n            ERR_CHK --> |Yes| ERR_PATH[IoT_Industrial_EdgeNode]\n            ERR_CHK --> |No| WR_PATH[IoT_Industrial_ActuatorController]\n        end\n\n        subgraph \"Error/Interrupt Path\"\n            ERR_PATH --> ERR_FIFO[IoT_Industrial_EdgeNode]\n            ERR_FIFO --> AXIL_S[IoT_Industrial_ActuatorController]\n            ERR_FIFO --> IRQ[IoT_Industrial_TelemetryStream]\n        end\n\n        subgraph \"Master Write Path\"\n            WR_PATH --> WR_FIFO[IoT_Industrial_EdgeNode]\n            WR_FIFO --> ADDR_GEN[IoT_Industrial_MQTT_Broker]\n            CFG_BASE[IoT_Industrial_EdgeNode] --> ADDR_GEN\n            ADDR_GEN --> AXIL_M[IoT_Industrial_TelemetryStream]\n        end\n    end\n\n    AXIL_S --> S_AR[IoT_Industrial_ActuatorController]\n    AXIL_S --> S_R[IoT_Industrial_MQTT_Broker]\n    AXIL_M --> M_AW[IoT_Industrial_EdgeNode]\n    AXIL_M --> M_W[IoT_Industrial_TelemetryStream]\n    AXIL_M --> M_B[IoT_Industrial_MQTT_Broker]\n\n    style FILTER fill:#bbf,stroke:#333,stroke-width:2px\n    style ERR_FIFO fill:#fbb,stroke:#333,stroke-width:3px\n    style WR_FIFO fill:#bfb,stroke:#333,stroke-width:3px\n    style ADDR_GEN fill:#ffb,stroke:#333,stroke-width:2px\n    style IRQ fill:#f9f,stroke:#333,stroke-width:3px\n",
+  "content_size": 1801,
+  "collected_at": "2026-02-06T14:10:17.639470",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 8,
+  "repo_forks": 1,
+  "repo_owner": "sean-galloway",
+  "repo_name": "RTLDesignSherpa",
+  "repo_description": "This site is hopefully a springboard for others to learn about coding in System Verilog and experimenting with FPGAs.",
+  "repo_language": "C++",
+  "repo_topics": [
+    "amba-apb",
+    "amba-axi",
+    "cocotb",
+    "crossbar",
+    "dma"
+  ],
+  "repo_created_at": "2023-06-15T21:56:48Z",
+  "repo_updated_at": "2026-02-06T00:19:01Z",
+  "augmentation_domain": "IoT_Industrial",
+  "seed_id": "gl_packet-beta_00467"
+}

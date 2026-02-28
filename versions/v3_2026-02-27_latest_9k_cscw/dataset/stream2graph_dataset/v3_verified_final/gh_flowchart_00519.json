@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00519",
+  "source": "github",
+  "source_url": "https://github.com/latamteks-cmyk/SmartEdify_V0/blob/34fdfc99a3484fc1ed44636443cac359163616ae/docs/design/diagrams/outbox-flow.mmd",
+  "github_repo": "latamteks-cmyk/SmartEdify_V0",
+  "github_file_path": "docs/design/diagrams/outbox-flow.mmd",
+  "diagram_type": "flowchart",
+  "code": "---\nid: outbox-flow\ntitle: \"SmartEdify – Outbox Flow\"\ndescription: \"Flowchart of the transactional outbox pipeline from domain commit to broker acknowledgement and metrics.\"\nupdated: 2025-02-14\ntags: [\"eventing\", \"outbox\", \"flowchart\"]\n---\nflowchart TD\n    subgraph Domain TX\n        A[Domain Aggregate Change]\n        B[Persist Aggregate]\n        C[Insert Outbox Row JSON]\n    end\n\n    A --> B --> C -->|Commit| D[TX Commit]\n    D --> E[Outbox Poller / Publisher Loader]\n    E --> F[Deserialize + Envelope Enrichment]\n    F --> G[Produce to Kafka]\n    G --> H[Broker ACK]\n    H --> I[Mark Outbox Row as SENT]\n    I --> J[Metrics: outbox_sent_total, outbox_latency_seconds]\n\n    E -->|Failure| R1[Retry w/ backoff]\n    R1 --> E\n    E -->|Poison/Max Retries| P[Mark as FAILED + dead_letter=true]\n    P --> J\n\n    classDef ok fill:#dfffdc,stroke:#2d8a2d\n    classDef risk fill:#ffe4e1,stroke:#d33\n    classDef proc fill:#e6f0ff,stroke:#1b75d1\n\n    class A,B,C,D,E,F,G,H,I,J proc\n    class P risk\n",
+  "content_size": 994,
+  "collected_at": "2026-02-06T01:44:38.343146",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

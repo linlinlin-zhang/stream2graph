@@ -1,0 +1,11 @@
+{
+  "id": "gh_architecture_00059",
+  "source": "github",
+  "source_url": "https://github.com/cadet/CADET-HD-chromoo/blob/93a295584204c3ec8ca89fdc21d196d193fffaa2/docs/dataflow.mmd",
+  "github_repo": "cadet/CADET-HD-chromoo",
+  "github_file_path": "docs/dataflow.mmd",
+  "diagram_type": "architecture",
+  "code": "---\ntitle: Chromatography ROM Parameter Estimation\n---\n%%{init: {'theme': 'base', 'flowchart': {'curve': 'basis', 'diagramPadding': 10, \"htmlLabels\": false }}}%%\nflowchart TB\n%%{config: { 'fontFamily': 'Menlo', 'fontSize': 18, 'fontWeight': 400 } }%%\n    column([\"`**Column Model**\n_geometry | flowrate | adsorption model_ ...`\"])\n\n    rom{{\"Reduced-order\n        model template\n        in Cadet\"}}\n\n    subgraph hdsim[HD Workflow]\n    packGen[[Packing generation]] \n    meshGen[[Mesh generation]]\n    sim[[HD Simulation]]\n    post[[Post-processing]]\n    end\n\n    column --> hdsim\n\n    packGen --> meshGen --> sim --> post\n    packGen --> post\n\n    chromoo[[Chromoo]]\n    post2[[Post-processing]]\n    best([\"Best fit(s)\"])\n\n    params([\"`**Model Parameters**\n_velocity | porosity | particle size distribution_`\"])\n\n    refs([\"`**Reference Data**\n            _breakthrough curve | solute mass_`\"])\n\n    inputs([\"`**Optimization Inputs**\n_Parameter bounds | Objectives | Scores_`\"])\n\n    post --> refs --> chromoo\n    inputs --> chromoo\n    post --> params\n    rom --> chromoo\n    params --> rom\n    column --> rom\n\n    chromoo --> post2 --> best\n    classDef data fill:#fff,stroke:#333\n    classDef process fill:#fff,stroke:#333\n    class inputs,params,refs,column,rom,best,vel,por,mass,psd data\n    class packGen,meshGen,sim,post,chromoo,post2 process\n    style hdsim fill:#aec7e8,stroke-dasharray: 5 5,stroke-width:1px,stroke:#333\n\n",
+  "content_size": 1433,
+  "collected_at": "2026-02-06T01:24:56.936457"
+}

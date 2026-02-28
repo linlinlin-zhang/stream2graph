@@ -1,0 +1,30 @@
+{
+  "id": "gh_flowchart_00012",
+  "source": "github",
+  "source_url": "https://github.com/apiiro/PRevent/blob/6cacc2a52d8bf6fb6f66b97575062c50eff048b6/docs/logic_flow.mmd",
+  "github_repo": "apiiro/PRevent",
+  "github_file_path": "docs/logic_flow.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\n    webhook{Webhook} --> sv([GH signature validation])\n    sv --> |handle GH rate-limit| edv([event data validation])\n    edv --> hpre[Handle PR Event]\n        hpre --> ibi{is branch included?}\n        ibi --> |yes| ic@{ shape: procs, label: \"Iterate Additions\"}\n        ic --> ils{is language supported?}\n        ils --> |no| next[next]\n        ils --> |yes| cd{are there code additions?}\n        cd --> |no| next[next]\n        cd --> |yes| size{is size < 1mb?}\n        size --> |no| next[next]\n        size --> |yes| ilo{is file minified or similar?}\n        ilo --> |yes| next[Next]\n        ilo --> |no| gffc[Get Full File Content]\n        gffc --> ifs@{ shape: hex, label: \"is full-scan or only until first-detection?\"}\n        ifs --> fps@{ shape: hex, label: \"is running only ERROR severity rules?\"}\n        fps --> scan((Concurrent-Detectors Addition Scan))\n            scan --> semgrep[Semgrep Malicious-Code Detection Ruleset]\n                semgrep --> dyex@{ shape: procs, label: \"Dynamic Execution\"}\n                semgrep --> obf@{ shape: procs, label: \"Obfuscation\"}\n            scan --> pyd@{ shape: procs, label: \"Python Extra Obfuscation Detectors\"}\n        dyex --> dss{determine scan status}\n        obf --> dss{determine scan status}\n        pyd --> dss{determine scan status}\n        dss --> |not detected| suc[Create Commit Status: 'success']\n        dss --> |detected: failure| fail[Comment Detection]\n        fail --> ccs[Create Commit Status: 'failure']\n        ccs --> tcr{is code-reviews triggering enabled?}\n            tcr --> |yes| cre[Trigger code reviews for reviewers list]\n            tcr --> |no| fin((Finish))\n                cre --> bpr{Is merge-blocking enabled?}\n                    bpr --> |yes| bme[Apply Branch Protection Rule]\n                    bpr --> |no| fin2((finish))\n                    bme --> fin2((finish))\n        ibi --> |no| fin1[Finish]\n    edv --> hre[Handle PR-Review Event]\n    hre --> ra{did review approve the PR?}\n    ra --> |no| fin1((Finish))\n    ra --> |yes| ril{is reviewer in the reviewers list?}\n    ril --> |no| fin1((Finish))\n    ril --> |yes| scc[Update commit status to 'success']\n    scc --> fin1((Finish))\n",
+  "content_size": 2197,
+  "collected_at": "2026-02-06T01:41:20.901956",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 252,
+  "repo_forks": 18,
+  "repo_owner": "apiiro",
+  "repo_name": "PRevent",
+  "repo_description": "Prevent merging of malicious code in pull requests",
+  "repo_language": "Python",
+  "repo_topics": [
+    "block-merging",
+    "cicd-security",
+    "cloud-security",
+    "code-integrity",
+    "code-security"
+  ],
+  "repo_created_at": "2025-01-12T07:13:49Z",
+  "repo_updated_at": "2026-01-26T18:37:52Z"
+}

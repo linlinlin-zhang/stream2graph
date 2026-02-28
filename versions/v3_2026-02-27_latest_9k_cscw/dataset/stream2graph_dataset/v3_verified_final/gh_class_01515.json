@@ -1,0 +1,18 @@
+{
+  "id": "gh_class_01515",
+  "source": "github",
+  "source_url": "https://github.com/nexus-gpu/GPUFabric/blob/fbcd3bcb9c1cdc29847980b5b2cd3dfd1fd0cb4b/docs/svg/gpuf_c_code_map.mmd",
+  "github_repo": "nexus-gpu/GPUFabric",
+  "github_file_path": "docs/svg/gpuf_c_code_map.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n    class Args {\n        +server_addr: String\n        +control_port: u16\n        +local_addr: String\n        +local_port: u16\n        +engine_type: EngineType\n        +load_config() Result<Self>\n    }\n\n    class WorkerHandle {\n        <<trait>>\n        +login() Result<()>\n        +handler() Result<()>\n        +model_task() Result<()>\n        +heartbeat_task() Result<()>\n    }\n\n    class TCPWorker {\n        -reader: Arc<Mutex<ReadHalf<TcpStream>>>\n        -writer: Arc<Mutex<WriteHalf<TcpStream>>>\n        -system_info: Arc<SystemInfo>\n        -devices_info: Arc<Vec<DevicesInfo>>\n        -engine: Arc<Mutex<Option<AnyEngine>>>\n        +login() Result<()>\n        +handler() Result<()>\n    }\n\n    class WSWorker {\n        -reader: Arc<Mutex<SplitStream<...>>>\n        -writer: Arc<Mutex<SplitSink<...>>>\n        -args: Args\n    }\n\n    class AutoWorker {\n        +login() Result<()>\n        +handler() Result<()>\n        +model_task() Result<()>\n        +heartbeat_task() Result<()>\n    }\n\n    class Engine {\n        <<trait>>\n        +init() Result<()>\n        +infer() Result<()>\n    }\n\n    class VLLMEngine {\n        +init() Result<()>\n        +infer() Result<()>\n    }\n\n    class OllamaEngine {\n        +init() Result<()>\n        +infer() Result<()>\n    }\n\n    class SystemInfo {\n        // System information fields\n    }\n\n    class DevicesInfo {\n        // Device information fields\n    }\n\n    AutoWorker --> TCPWorker : contains\n    AutoWorker --> WSWorker : contains\n    TCPWorker ..|> WorkerHandle : implements\n    WSWorker ..|> WorkerHandle : implements\n    VLLMEngine ..|> Engine : implements\n    OllamaEngine ..|> Engine : implements\n    TCPWorker --> Args : uses\n    TCPWorker --> Engine : uses\n    TCPWorker --> SystemInfo : contains\n    TCPWorker --> DevicesInfo : contains",
+  "content_size": 1803,
+  "collected_at": "2026-02-06T01:58:47.902371",
+  "compilation_status": "failed",
+  "license": "bsd-3-clause",
+  "license_name": "BSD 3-Clause \"New\" or \"Revised\" License",
+  "license_url": "https://api.github.com/licenses/bsd-3-clause",
+  "repo_stars": 7,
+  "repo_forks": 5,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

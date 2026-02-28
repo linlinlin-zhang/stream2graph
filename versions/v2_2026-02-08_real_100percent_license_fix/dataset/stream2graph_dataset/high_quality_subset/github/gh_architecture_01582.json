@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01582",
+  "source": "github",
+  "source_url": "https://github.com/rsrini7/Notification-SSE-GLM-Flux/blob/ab393147fcd23792caaf76f36b1047fe061d8a1a/MermaidDiagrams/graph-sse%2B1-intial-call.mmd",
+  "github_repo": "rsrini7/Notification-SSE-GLM-Flux",
+  "github_file_path": "MermaidDiagrams/graph-sse+1-intial-call.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TD\n    subgraph \"✅ Current Architecture: Decoupled Calls (Recommended)\"\n        direction TB\n        A1(User UI Loads) --> A2(Establishes SSE Connection<br/>/sse/connect);\n        A1 --> B1(Fetches Full Inbox<br/>/api/user/messages);\n\n        A2 --> A3(\"<div style='background-color:#dcfce7; padding: 5px; border-radius: 5px;'>SSE Stream Opens Immediately (ms)</div>\");\n        A3 --> A4(Real-time Channel is Ready);\n\n        B1 --> B2{DB Query & Logic};\n        B2 -- Success --> B3(\"<div style='background-color:#dcfce7; padding: 5px; border-radius: 5px;'>Full Inbox State Received</div>\");\n        B2 -- Failure --> B4(\"<div style='background-color:#fee2e2; padding: 5px; border-radius: 5px;'>DB Query Fails</div>\");\n\n        B4 --> B5(UI Shows Error, Can Retry API Call.<br/><b>SSE Connection is Unaffected.</b>);\n\n        A4 & B3 --> C1(<b>Final State:</b><br/>UI is Fully Loaded & Real-time);\n    end\n\n    subgraph \"❌ Alternative: Combined Call(Not Recommended)\"\n        direction TB\n        D1(User UI Loads) --> D2(Connects to /sse/connect with<br/>embedded inbox logic);\n        D2 --> D3{DB Query & Logic};\n        \n        D3 -- Success --> D4(\"<div style='background-color:#ffedd5; padding: 5px; border-radius: 5px;'>⚠️ SSE Stream Opens After Delay (seconds)</div>\");\n        D4 --> E1(<b>Final State:</b><br/>UI is Fully Loaded & Real-time);\n\n        D3 -- Failure --> D5(\"<div style='background-color:#fee2e2; padding: 5px; border-radius: 5px;'>DB Query Fails</div>\");\n        D5 --> D6(\"<b>ENTIRE Connection Fails (500 Error).</b><br/>Must retry the whole process.\");\n    end",
+  "content_size": 1596,
+  "collected_at": "2026-02-06T01:48:10.706970",
+  "license": "none",
+  "license_name": "No License",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 0
+}

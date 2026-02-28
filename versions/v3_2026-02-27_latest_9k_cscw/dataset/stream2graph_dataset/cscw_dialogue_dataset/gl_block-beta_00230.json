@@ -1,0 +1,94 @@
+{
+  "id": "gl_block-beta_00230",
+  "source": "gitlab",
+  "source_url": "https://github.com/HewlettPackard/llmesh/blob/a1a843f3cb0eb11e9964a7425fb99239f450b52b/docs/design/rag/sequence.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "HewlettPackard/llmesh",
+  "diagram_type": "block-beta",
+  "code": "sequenceDiagram\n    participant User\n    participant RAGService\n    participant QueryAugmentor\n    participant Retriever\n    participant Reranker\n    participant Summarizer\n    participant ChunkFormatter\n\n    User->>RAGService: retrieve(query, augmentation, rerank)\n    alt augmentation enabled\n        RAGService->>QueryAugmentor: augment(query)\n        QueryAugmentor-->>RAGService: augmented_query\n    else no augmentation\n        RAGService->>RAGService: use original query\n    end\n    RAGService->>Retriever: retrieve top chunks\n    Retriever-->>RAGService: retrieved_elements\n\n    alt rerank enabled\n        RAGService->>Reranker: rerank(query, retrieved_elements)\n        Reranker-->>RAGService: sorted_elements\n    else no rerank\n        RAGService->>RAGService: use original order\n    end\n\n    RAGService->>Summarizer: summarize(top_chunks)\n    Summarizer-->>RAGService: summary\n\n    RAGService->>ChunkFormatter: format chunks to JSON\n    ChunkFormatter-->>RAGService: json_block\n\n    RAGService-->>User: summary + json_block",
+  "content_size": 1034,
+  "collected_at": "2026-02-06T14:04:59.367783",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 query, augmentation, rerank 和 query 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'query, augmentation, rerank 和 query'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "retrieve",
+        "augment"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 query, retrieved_elements 和 top_chunks 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'query, retrieved_elements 和 top_chunks'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "rerank",
+        "summarize"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 8,
+    "repair_count": 0,
+    "grounding_acts_count": 4,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

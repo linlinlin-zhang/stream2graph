@@ -1,0 +1,255 @@
+{
+  "id": "ot_journey_01124",
+  "source": "other",
+  "source_url": "https://github.com/enzo-supdev/Enzo_Rayane_NAHB/blob/e2a288cee05b099d195e4a1a950045f204001e94/docs/architecture/niveau-18-expert.mmd",
+  "source_type": "github_search",
+  "github_repo": "enzo-supdev/Enzo_Rayane_NAHB",
+  "diagram_type": "journey",
+  "code": "classDiagram\n    %% ========================================\n    %% NIVEAU 18/20 - QUALITÉ LOGICIELLE MAXIMALE\n    %% ========================================\n    %% Ce niveau AJOUTE les fonctionnalités les plus avancées\n    \n    %% MODIFICATIONS des classes existantes\n    class Page {\n        +String id\n        +String storyId\n        +String content\n        +String imageUrl\n        +Map~String, String~ interactiveZones (NOUVEAU - zones cliquables)\n        +Boolean isEnd\n        +String endLabel\n        +Int order\n        +Date createdAt\n    }\n    \n    class Choice {\n        +String id\n        +String pageId\n        +String text\n        +String targetPageId\n        +DiceRoll requiredRoll (NOUVEAU - null si pas de jet)\n        +Int order\n        +String zoneId (NOUVEAU - null si pas interactive)\n    }\n    \n    class GameSession {\n        +String id\n        +String userId\n        +String storyId\n        +String currentPageId\n        +String endPageId\n        +String[] pathTaken\n        +DiceRoll[] diceRolls (NOUVEAU)\n        +String status\n        +Date playedAt\n        +Date lastUpdatedAt\n    }\n    \n    %% NOUVELLES CLASSES\n    \n    %% Classe StoryTree - Représentation de l'arbre de l'histoire\n    class StoryTree {\n        +String id\n        +String storyId\n        +TreeNode rootNode\n        +Date generatedAt\n        +generateTree()\n        +getNodeById()\n        +validateTree()\n        +findDeadEnds()\n        +findOrphanPages()\n    }\n    \n    %% Classe TreeNode - Nœud de l'arbre\n    class TreeNode {\n        +String pageId\n        +String content\n        +Boolean isEnd\n        +String endLabel\n        +TreeNode[] children\n        +Choice[] choices\n        +Int depth\n        +addChild()\n        +removeChild()\n        +isReachable()\n    }\n    \n    %% Classe PlayerJourney - Parcours détaillé du joueur\n    class PlayerJourney {\n        +String id\n        +String userId\n        +String storyId\n        +String gameSessionId\n        +JourneyStep[] steps\n        +Date startedAt\n        +Date completedAt\n        +visualizeJourney()\n        +compareWithOthers()\n        +exportJourney()\n    }\n    \n    %% Classe JourneyStep - Étape du parcours\n    class JourneyStep {\n        +String pageId\n        +String choiceId\n        +DiceRoll diceRoll\n        +Date timestamp\n        +Int order\n    }\n    \n    %% Classe InteractiveZone - Zone cliquable sur image\n    class InteractiveZone {\n        +String id\n        +String pageId\n        +String zoneId\n        +Coordinates coordinates\n        +String shape (rect/circle/polygon)\n        +String targetPageId\n        +String tooltip\n        +create()\n        +update()\n        +delete()\n    }\n    \n    %% Classe Coordinates - Coordonnées d'une zone\n    class Coordinates {\n        +Int x\n        +Int y\n        +Int width\n        +Int height\n        +Int radius\n        +Point[] polygonPoints\n    }\n    \n    %% Classe DiceRoll - Système de jets de dés\n    class DiceRoll {\n        +String id\n        +String type (d6/d20/d100)\n        +Int requiredValue\n        +String condition (>=/<=/==/>/< )\n        +Int rolledValue\n        +Boolean success\n        +Date rolledAt\n        +roll()\n        +checkSuccess()\n    }\n    \n    %% Classe DiceChoice - Choix avec condition de dé\n    class DiceChoice {\n        +String id\n        +String choiceId\n        +DiceRoll requiredRoll\n        +String successPageId\n        +String failurePageId\n        +String description\n        +create()\n        +evaluate()\n    }\n    \n    %% Classe TreeVisualization - Visualisation de l'arbre\n    class TreeVisualization {\n        +String id\n        +String storyId\n        +String svgData\n        +String format (svg/json/mermaid)\n        +Date generatedAt\n        +generate()\n        +export()\n        +highlightPath()\n    }\n    \n    %% Classe PathAnalysis - Analyse des chemins\n    class PathAnalysis {\n        +String id\n        +String storyId\n        +Map~String, Float~ pathPopularity\n        +String[] mostCommonPaths\n        +String[] leastCommonPaths\n        +String[] criticalNodes\n        +analyze()\n        +compareUserPath()\n    }\n    \n    %% Relations existantes (tous les niveaux précédents)\n    User \"1\" --> \"*\" Story : crée\n    Story \"1\" --> \"*\" Page : contient\n    Story \"1\" --> \"1\" Page : startPage\n    Page \"1\" --> \"*\" Choice : propose\n    Choice \"*\" --> \"1\" Page : pointeVers\n    GameSession \"*\" --> \"1\" User : jouéPar\n    GameSession \"*\" --> \"1\" Story : concerne\n    \n    %% Nouvelles relations (niveau 18/20)\n    Story \"1\" --> \"1\" StoryTree : possèdeArbre\n    StoryTree \"1\" --> \"1\" TreeNode : rootNode\n    TreeNode \"1\" --> \"*\" TreeNode : children\n    TreeNode \"1\" --> \"*\" Choice : choices\n    \n    GameSession \"1\" --> \"1\" PlayerJourney : possèdeParcours\n    PlayerJourney \"1\" --> \"*\" JourneyStep : steps\n    JourneyStep \"*\" --> \"1\" Page : visitedPage\n    JourneyStep \"0..1\" --> \"1\" Choice : choiceMade\n    JourneyStep \"0..1\" --> \"1\" DiceRoll : diceRoll\n    \n    Page \"1\" --> \"*\" InteractiveZone : zonesInteractives\n    InteractiveZone \"1\" --> \"1\" Coordinates : coordinates\n    InteractiveZone \"*\" --> \"1\" Page : targetPage\n    Choice \"0..1\" --> \"1\" InteractiveZone : zoneLinked\n    \n    Choice \"0..1\" --> \"1\" DiceChoice : avecDé\n    DiceChoice \"1\" --> \"1\" DiceRoll : requireRoll\n    DiceChoice \"*\" --> \"1\" Page : successPage\n    DiceChoice \"*\" --> \"1\" Page : failurePage\n    \n    Story \"1\" --> \"1\" TreeVisualization : visualization\n    Story \"1\" --> \"1\" PathAnalysis : pathAnalysis\n    PlayerJourney \"*\" --> \"1\" PathAnalysis : analysedBy\n\n    note for StoryTree \"Fichier: models/StoryTree.js\nRoutes: routes/tree.js\nGénéré à la demande ou cached\"\n    note for TreeNode \"Fichier: models/TreeNode.js\nStructure récursive pour\nreprésenter l'arbre\"\n    note for PlayerJourney \"Fichier: models/PlayerJourney.js\nRoutes: routes/journey.js\nVisualisation du parcours\"\n    note for InteractiveZone \"Fichier: models/InteractiveZone.js\nRoutes: routes/interactive.js\nZones cliquables sur images\"\n    note for DiceRoll \"Fichier: models/DiceRoll.js\nRoutes: routes/dice.js\nSystème de hasard\"\n    note for DiceChoice \"Fichier: models/DiceChoice.js\nChoix conditionnels avec dés\"\n    note for TreeVisualization \"Fichier: models/TreeVisualization.js\nExport SVG/JSON de l'arbre\"\n    note for PathAnalysis \"Fichier: models/PathAnalysis.js\nAnalyse des chemins populaires\"\n    note for Page \"MODIFIÉ: ajout de\ninteractiveZones pour zones\ncliquables\"\n    note for Choice \"MODIFIÉ: ajout de requiredRoll\net zoneId pour système de dés\net zones interactives\"\n    note for GameSession \"MODIFIÉ: ajout de diceRolls\npour historique des jets\"",
+  "content_size": 6595,
+  "collected_at": "2026-02-06T11:05:18.761462",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达Page、Choice结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "Page",
+        "Choice",
+        "GameSession"
+      ],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由StoryTree、TreeNode组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，StoryTree、TreeNode是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是StoryTree、TreeNode应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理StoryTree、TreeNode？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "StoryTree",
+        "TreeNode"
+      ],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将PlayerJourney分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "PlayerJourney"
+      ],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将JourneyStep分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，JourneyStep是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，JourneyStep就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "首先，我们需要定义流程的起点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "JourneyStep"
+      ],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将InteractiveZone分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "InteractiveZone负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "InteractiveZone"
+      ],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Coordinates、DiceRoll分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Coordinates、DiceRoll的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Coordinates、DiceRoll组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "Coordinates",
+        "DiceRoll",
+        "DiceChoice"
+      ],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "TreeVisualization、PathAnalysis主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，TreeVisualization、PathAnalysis的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，TreeVisualization、PathAnalysis就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达TreeVisualization、PathAnalysis结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "TreeVisualization",
+        "PathAnalysis"
+      ],
+      "timestamp_offset": 375
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 25,
+    "speaker_distribution": {
+      "Speaker_B": 13,
+      "Speaker_A": 12
+    },
+    "speech_act_distribution": {
+      "sequential": 4,
+      "confirm": 5,
+      "structural": 3,
+      "clarify": 3,
+      "request": 1,
+      "classification": 5,
+      "inform": 4
+    },
+    "avg_turn_length": 25.32,
+    "dialogue_duration": 375
+  }
+}

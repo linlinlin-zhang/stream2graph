@@ -1,0 +1,17 @@
+{
+  "id": "aug_ot_stateDiagram_00219_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/proyectoitsv/2025_EWHRA/blob/3113d1b8de1d958f07e8de918a9b5a65ea12a22f/Dise%C3%B1oSistemas/Diagramadeestado.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "proyectoitsv/2025_EWHRA",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    [Infra_EtcdCluster] --> Inactivo\n\n    Inactivo --> Iniciando : Usuario coloca el casco y enciende el sistema\n\n    Iniciando --> Monitoreando : Señal EEG estable y ADC dentro de rango\n\n    Monitoreando --> Estado_Óptimo : Amplitud beta dentro del umbral\n    Monitoreando --> Relajación_Excesiva : Amplitud beta supera el umbral RMS\n\n    Estado_Óptimo --> Relajación_Excesiva : Se detecta exceso de relajación\n    Relajación_Excesiva --> Estado_Óptimo : Usuario recupera la atención\n\n    Relajación_Excesiva --> Alerta : Sistema envía alerta a la app\n    Alerta --> Estado_Óptimo : Usuario responde a la alerta y corrige atención\n\n    Estado_Óptimo --> Fin_Sesion : Usuario finaliza sesión\n    Relajación_Excesiva --> Fin_Sesion : Usuario finaliza sesión\n    Alerta --> Fin_Sesion : Usuario finaliza sesión\n\n    Fin_Sesion --> [Infra_LoadBalancer]\n\n    %% Manejo de errores\n    Iniciando --> Error : No se detecta señal EEG\n    Monitoreando --> Error : Saturación del ADC o ruido excesivo\n    Error --> Inactivo : Reinicio del sistema\n",
+  "content_size": 1020,
+  "collected_at": "2026-02-06T10:39:20.068246",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "ot_stateDiagram_00219"
+}

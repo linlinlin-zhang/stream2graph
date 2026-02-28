@@ -1,0 +1,181 @@
+{
+  "id": "aug_ot_journey_01121_Edu_4",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/rtyx/project-module-apr2025/blob/dc1d9e46f8d5b5f2e8fe98b37a25825f031df456/docs/diagrams/images/component-interaction-main.mmd",
+  "source_type": "github_search",
+  "github_repo": "rtyx/project-module-apr2025",
+  "diagram_type": "journey",
+  "code": "sequenceDiagram\n    actor User\n    participant Browser\n    participant NextServer as \"Next.js Server\"\n    participant Solr as \"Solr\"\n    participant Mongo as \"MongoDB\"\n    participant ES as \"Elasticsearch\"\n\n    User->>Browser: Enters search query and submits\n    Browser->>+NextServer: GET /api/[Education_ContentCDN]/artworks?q=...\n    NextServer->>+Solr: searchArtworks(Education_StudentDB)\n    Solr-->>-NextServer: Return search results\n    NextServer-->>-Browser: Return JSON with artwork list\n    Browser->>User: Display search results\n\n    User->>Browser: Clicks on an artwork\n    Browser->>+NextServer: GET /[Education_LMS_Portal]/artworks/[Education_LMS_Portal] (Education_GradeSync)\n    NextServer->>+Mongo: getArtworkById(Education_StudentDB)\n    Mongo-->>-NextServer: Return full artwork document\n    NextServer-->>-Browser: Return HTML page with artwork details\n    Browser->>User: Display artwork detail page\n\n    User->>Browser: Asks question about artwork\n    Browser->>+NextServer: POST /api/[Education_StudentDB]/rag/answer/artwork/[Education_ContentCDN]\n    NextServer->>+OpenAI: Generate embedding for query\n    OpenAI-->>-NextServer: Return query embedding\n    NextServer->>+ES: hybridSearch(Education_StudentDB)\n    ES-->>-NextServer: Return relevant chunks\n    NextServer->>+OpenAI: Generate answer with LLM (Education_GradeSync)\n    OpenAI-->>-NextServer: Return generated answer\n    NextServer-->>-Browser: Return answer with citations\n    Browser->>User: Display chatbot response\n\n    %% Notes\n    %% - This diagram shows a typical user journey: searching for an item, viewing its detail page, and asking questions.\n    %% - The initial search is powered by Solr.\n    %% - The detail page view fetches the complete, authoritative data from MongoDB.\n    %% - The RAG chatbot uses OpenAI for both embedding generation and LLM-based answer synthesis.\n    %% - Elasticsearch performs hybrid search (Education_StudentDB) to find relevant information chunks.\n    %% - The Next.js server handles both data fetching via API routes and server-side rendering of pages.",
+  "content_size": 1945,
+  "collected_at": "2026-02-06T11:05:14.489046",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Education",
+  "seed_id": "ot_journey_01121",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "关于\"Next.js Server\"、\"Solr\"，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "NextServer",
+        "Solr"
+      ],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由\"MongoDB\"组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，\"MongoDB\"就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，\"MongoDB\"是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "\"MongoDB\"负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "Mongo"
+      ],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "\"Elasticsearch\"、Enters search query and submits主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是\"Elasticsearch\"、Enters search query and submits应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "ES",
+        "msg_0",
+        "msg_1"
+      ],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有Clicks on an artwork、Display artwork detail page。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Clicks on an artwork、Display artwork detail page的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "最后，流程到达Clicks on an artwork、Display artwork detail page结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_2",
+        "msg_3"
+      ],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下Asks question about artwork、Display chatbot response吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，Asks question about artwork、Display chatbot response有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "最后，流程到达Asks question about artwork、Display chatbot response结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_4",
+        "msg_5"
+      ],
+      "timestamp_offset": 240
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 16,
+    "speaker_distribution": {
+      "Speaker_B": 8,
+      "Speaker_A": 8
+    },
+    "speech_act_distribution": {
+      "sequential": 3,
+      "confirm": 3,
+      "request": 2,
+      "structural": 3,
+      "classification": 1,
+      "clarify": 2,
+      "inform": 1,
+      "contrastive": 1
+    },
+    "avg_turn_length": 39.3125,
+    "dialogue_duration": 240
+  }
+}

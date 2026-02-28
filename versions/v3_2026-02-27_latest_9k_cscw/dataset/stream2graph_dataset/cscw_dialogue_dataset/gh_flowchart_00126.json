@@ -1,0 +1,540 @@
+{
+  "id": "gh_flowchart_00126",
+  "source": "github",
+  "source_url": "https://github.com/raktim-mondol/domain-adapt/blob/bf629f3d8351804edc7ebcc84a6ff89e8beeb2b8/diagrams/03_training_flow.mmd",
+  "github_repo": "raktim-mondol/domain-adapt",
+  "github_file_path": "diagrams/03_training_flow.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\r\n    START([Training Start<br/>Epoch e=0])\r\n\r\n    subgraph DataLoading[\"Data Loading\"]\r\n        SRC_BATCH[Load Source Batch<br/>QLD1: n samples]\r\n        TGT_BATCH[Load Target Batch<br/>QLD2: n samples]\r\n    end\r\n\r\n    subgraph ForwardPass[\"Forward Pass\"]\r\n        FWD_SRC[Forward Source<br/>logits_s, z_s, d_s]\r\n        FWD_TGT[Forward Target<br/>logits_t, z_t, d_t]\r\n    end\r\n\r\n    subgraph LossComputation[\"Loss Computation\"]\r\n        RAMP{Compute Rampup<br/>λ = e/5 if e less than 5<br/>else 1.0}\r\n\r\n        CLS_SRC[L_cls_src = CrossEntropy source]\r\n        CLS_TGT[L_cls_tgt = CrossEntropy target]\r\n        CLS_TOTAL[L_cls = L_cls_src + L_cls_tgt]\r\n\r\n        ADV_SRC[L_adv_src = BCE domain source]\r\n        ADV_TGT[L_adv_tgt = BCE domain target]\r\n        ADV_TOTAL[L_adv = L_adv_src + L_adv_tgt]\r\n\r\n        MMD_CALC[L_mmd = Class-Cond-MMD z_s, z_t]\r\n\r\n        ORTH_CALC[L_orth = Frobenius norm<br/>W_cls · W_dom^T]\r\n\r\n        TOTAL[L_total = L_cls +<br/>λ_adv·L_adv +<br/>λ_mmd·L_mmd +<br/>λ_orth·L_orth]\r\n    end\r\n\r\n    subgraph Optimization\r\n        BACKWARD[Backward Pass<br/>Compute Gradients]\r\n        CLIP[Gradient Clipping<br/>max_norm=5.0]\r\n        STEP[Optimizer Step<br/>Update Weights]\r\n    end\r\n\r\n    subgraph Validation\r\n        VAL_SRC[Validate Source<br/>Pile-level metrics]\r\n        VAL_TGT[Validate Target<br/>Pile-level metrics]\r\n        METRICS[Compute Metrics<br/>Acc, F1 per domain]\r\n    end\r\n\r\n    subgraph Checkpoint\r\n        CHECK{Target F1<br/>improved?}\r\n        SAVE[Save Best Model<br/>+ History]\r\n    end\r\n\r\n    START --> SRC_BATCH & TGT_BATCH\r\n    SRC_BATCH --> FWD_SRC\r\n    TGT_BATCH --> FWD_TGT\r\n\r\n    FWD_SRC & FWD_TGT --> RAMP\r\n\r\n    RAMP --> CLS_SRC & CLS_TGT\r\n    CLS_SRC & CLS_TGT --> CLS_TOTAL\r\n\r\n    RAMP --> ADV_SRC & ADV_TGT\r\n    ADV_SRC & ADV_TGT --> ADV_TOTAL\r\n\r\n    RAMP --> MMD_CALC\r\n    RAMP --> ORTH_CALC\r\n\r\n    CLS_TOTAL & ADV_TOTAL & MMD_CALC & ORTH_CALC --> TOTAL\r\n\r\n    TOTAL --> BACKWARD\r\n    BACKWARD --> CLIP\r\n    CLIP --> STEP\r\n\r\n    STEP --> VAL_SRC & VAL_TGT\r\n    VAL_SRC & VAL_TGT --> METRICS\r\n\r\n    METRICS --> CHECK\r\n    CHECK -->|Yes| SAVE\r\n    CHECK -->|No| NEXT\r\n    SAVE --> NEXT\r\n\r\n    NEXT{More<br/>Epochs?}\r\n    NEXT -->|Yes| START\r\n    NEXT -->|No| END([Training Complete])\r\n\r\n    style TOTAL fill:#ffcccc\r\n    style SAVE fill:#ccffcc\r\n    style RAMP fill:#ffffcc\r\n",
+  "content_size": 2351,
+  "collected_at": "2026-02-06T01:42:06.495415",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 [Training Start<br/>Epoch e=0 和 \"Data Loading\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '[Training Start<br/>Epoch e=0 和 \"Data Loading\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "START",
+        "DataLoading"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Load Source Batch<br/>QLD1: n samples 和 Load Target Batch<br/>QLD2: n samples。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 Load Source Batch<br/>QLD1: n samples处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Load Source Batch<br/>QLD1: n samples处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SRC_BATCH",
+        "TGT_BATCH"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Forward Pass\" 和 Forward Source<br/>logits_s, z_s, d_s 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Forward Pass\" 和 Forward Source<br/>logits_s, z_s, d_s'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ForwardPass",
+        "FWD_SRC"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Forward Target<br/>logits_t, z_t, d_t 和 \"Loss Computation\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 Forward Target<br/>logits_t, z_t, d_t处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Forward Target<br/>logits_t, z_t, d_t处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "FWD_TGT",
+        "LossComputation"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Compute Rampup<br/>λ = e/5 if e less than 5<br/>else 1.0 和 L_cls_src = CrossEntropy source 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Compute Rampup<br/>λ = e/5 if e less than 5<br/>else 1.0 和 L_cls_src = CrossEntropy source'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "RAMP",
+        "CLS_SRC"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 L_cls_tgt = CrossEntropy target 和 L_cls = L_cls_src + L_cls_tgt 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'L_cls_tgt = CrossEntropy target 和 L_cls = L_cls_src + L_cls_tgt'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CLS_TGT",
+        "CLS_TOTAL"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 L_adv_src = BCE domain source 和 L_adv_tgt = BCE domain target 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'L_adv_src = BCE domain source 和 L_adv_tgt = BCE domain target'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ADV_SRC",
+        "ADV_TGT"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 L_adv = L_adv_src + L_adv_tgt 和 L_mmd = Class-Cond-MMD z_s, z_t 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'L_adv = L_adv_src + L_adv_tgt 和 L_mmd = Class-Cond-MMD z_s, z_t'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ADV_TOTAL",
+        "MMD_CALC"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 L_orth = Frobenius norm<br/>W_cls · W_dom^T 和 L_total = L_cls +<br/>λ_adv·L_adv +<br/>λ_mmd·L_mmd +<br/>λ_orth·L_orth 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'L_orth = Frobenius norm<br/>W_cls · W_dom^T 和 L_total = L_cls +<br/>λ_adv·L_adv +<br/>λ_mmd·L_mmd +<br/>λ_orth·L_orth'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ORTH_CALC",
+        "TOTAL"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Backward Pass<br/>Compute Gradients 和 Gradient Clipping<br/>max_norm=5.0 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 Backward Pass<br/>Compute Gradients处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Backward Pass<br/>Compute Gradients处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BACKWARD",
+        "CLIP"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Optimizer Step<br/>Update Weights 和 Validate Source<br/>Pile-level metrics 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Optimizer Step<br/>Update Weights 和 Validate Source<br/>Pile-level metrics'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "STEP",
+        "VAL_SRC"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Validate Target<br/>Pile-level metrics 和 Compute Metrics<br/>Acc, F1 per domain。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Validate Target<br/>Pile-level metrics 和 Compute Metrics<br/>Acc, F1 per domain'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "VAL_TGT",
+        "METRICS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Target F1<br/>improved? 和 Save Best Model<br/>+ History。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Target F1<br/>improved? 和 Save Best Model<br/>+ History'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CHECK",
+        "SAVE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 More<br/>Epochs? 和 [Training Complete 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'More<br/>Epochs? 和 [Training Complete'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "NEXT",
+        "END"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 59,
+    "repair_count": 3,
+    "grounding_acts_count": 28,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

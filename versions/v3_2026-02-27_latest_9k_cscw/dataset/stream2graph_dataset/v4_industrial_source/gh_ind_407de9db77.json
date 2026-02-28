@@ -1,0 +1,9 @@
+{
+  "id": "gh_ind_407de9db77",
+  "source": "github_industrial",
+  "repo": "richfrem/Project_Sanctuary",
+  "license": "other",
+  "code": "---\nconfig:\n  theme: base\n---\nsequenceDiagram\n    autonumber\n    participant U as 👤 Use\n    participant R as 🖥️ React \n    participant N as ⚙️ Node Orchestrator\n    participant M as 🧠 RLM Cache\n    participant S as 🐍 Python Sidecar (Daemon)\n    participant C as 💾 ChromaDB (Vector)\n    participant F as 📁 FileSystem \n\n    %% Initializing\n\n    Note over N,S: System Setup\n    N->>M: Load rlm_summary_cache.json \n    N->>S: Health Check (gRPC)\n    S->>C: Pre-load Embedding Model\n    S->>C: Warm-up Index \n    S-->>N:\n\n    %% Searching\n    U->>R: Type \"bail\"\n    R->>N: GET /api/search?q=\"bail\"\n    par Async Layer Execution\n        %% Layer 1\n        N->>M: Key Lookup (\"bail rules\")\n        M-->>N: RLM Results (Immediate)\n        %% Layer 2 (Vector)\n        N->>S: RPC: semantic_search(\"bail rules\")\n        S->>C: Embed Query -> Cosine Similarity\n        C-->>S: Top-K Chunks\n        S-->>N: Vector Results (JSON)\n        %% Layer 3 (Deep)\n        N->>S: RPC: deep_search(\"bail rules\")\n        S->>F: Ripgrep / Walk (Safe)\n        F-->>S: File Matches\n        S-->>N: Code Snippets (JSON)\n    end\n\n    %% Aggregating\n    Note over N: Unified Ranker (RRF / Bayesian)\n    N->>N: Merge & Sort Results\n    N->>N: Attach \"Why\" Context\n    N-->>R: Unified Response\n    R-->>U: Render Graph &",
+  "diagram_type": "node size:900..1500",
+  "collected_at": "2026-02-27T05:30:29.184586"
+}

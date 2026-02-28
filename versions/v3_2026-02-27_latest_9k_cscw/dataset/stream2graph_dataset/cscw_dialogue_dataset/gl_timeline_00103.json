@@ -1,0 +1,1164 @@
+{
+  "id": "gl_timeline_00103",
+  "source": "gitlab",
+  "source_url": "https://github.com/ultrasoundlabs/untron-v3/blob/0d9744d83e96791fdb8807f12361f5716e21201d/docs/untron-v3.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "ultrasoundlabs/untron-v3",
+  "diagram_type": "timeline",
+  "code": "%% Untron V3 protocol lifecycle (infographic-ready)\n%% Render (local):  npx -y @mermaid-js/mermaid-cli@latest -i docs/untron-v3.mmd -o docs/untron-v3.svg\n%% Render (docker): docker run --rm -v \"$PWD:/data\" ghcr.io/mermaid-js/mermaid-cli/mermaid-cli:latest -i /data/docs/untron-v3.mmd -o /data/docs/untron-v3.svg\n\nflowchart LR\n  %% -------------------------------------------------------------------------\n  %% LANE: ONE-TIME SETUP / CONFIG\n  %% -------------------------------------------------------------------------\n  subgraph SETUP[\"Setup / config (occasionally)\"]\n    direction TB\n    Admin[\"Owner / Admin\"]\n    Realtor[\"Realtor (allowlisted)\"]\n    LP[\"LP (allowlisted for deposits)\"]\n\n    AdminCfg[\"EVM Hub config:\\n- setUsdt\\n- setTronReader\\n- setSwapRate\\n- setBridger\\n- allowlists\\n- pause/unpause\"]\n    Admin --> AdminCfg\n  end\n\n  %% -------------------------------------------------------------------------\n  %% LANE: TRON SIDE (SOURCE CHAIN)\n  %% -------------------------------------------------------------------------\n  subgraph TRON[\"Tron lane (source chain)\"]\n    direction TB\n    Depositor[\"Depositor / end user\"]\n    ReceiverAddr[\"Deterministic receiver address\\n(predictable from controller+salt)\"]\n    TronUSDT[\"Tron USDT (TRC-20 contract)\"]\n\n    TronController[\"UntronController\\n- pullFromReceivers (permissionless)\\n- rebalanceUsdt (permissionless)\\n- emits event hash-chain tip\"]\n    Receiver[\"UntronReceiver (CREATE2)\\n- holds tokens\\n- only controller can pull()\"]\n    EventChainTip[\"Controller eventChainTip (sha256 hash-chain)\\nmaintained by UntronControllerIndex\"]\n\n    Depositor -->|\"TRC-20 transfer(to receiver, amount)\"| TronUSDT\n    TronUSDT -->|\"USDT credited to receiver address\"| ReceiverAddr\n    ReceiverAddr -. \"receiver may not be deployed yet\" .-> Receiver\n\n    TronController -->|\"deploy receiver if missing (CREATE2)\"| Receiver\n    TronController -->|\"pull(token, amount) from receivers\"| Receiver\n    TronController -->|\"emit PulledFromReceiver + other events\\n(advances eventChainTip)\"| EventChainTip\n  end\n\n  %% -------------------------------------------------------------------------\n  %% LANE: EVM HUB (DESTINATION/SETTLEMENT CHAIN)\n  %% -------------------------------------------------------------------------\n  subgraph EVM[\"EVM lane (UntronV3 hub)\"]\n    direction TB\n\n    Hub[\"UntronV3 hub (facets)\\n- LeaseFacet\\n- EntitleFacet\\n- ControllerFacet\\n- FillFacet\\n- LpFacet\\n(+ AdminFacet)\"]\n\n    LeaseTimeline[\"Lease timeline per receiverSalt\\n(active lease by timestamp)\\ncreated by createLease (realtor-only)\"]\n    PayoutCfg[\"Per-lease payout config\\n(targetChainId, targetToken, beneficiary)\\nmutable by lessee\"]\n\n    ClaimQueues[\"Claim queues (FIFO) keyed by targetToken\\nClaim.amountUsdt is always USDT-denominated\"]\n    NextIdx[\"nextIndexByTargetToken[targetToken]\\n(head cursor; filled slots deleted)\"]\n\n    LPVault[\"Fast-fill LP vault (principal-only)\\n- deposit: allowlisted\\n- withdraw: always allowed\\nlpPrincipal[lp] tracks principal\"]\n    HubUSDT[\"Hub-held USDT balance\\n(usdtBalance())\"]\n\n    TronReader[\"tronReader (ITronTxReader)\\nverifies Tron tx:\\n- finalized block headers\\n- inclusion proof\\n- success\\n- parses TriggerSmartContract\"]\n\n    SwapExec[\"SwapExecutor (per-hub)\\nexecutes arbitrary calls\\n+ enforces min output\"]\n\n    Bridger[\"IBridger registry\\nbridgers[targetToken][targetChainId]\"]\n\n    Fill[\"fill(targetToken, maxClaims, calls)\\n- plans batch by available USDT\\n- swaps once per targetToken (optional)\\n- pays locally or via bridger\\n- swap surplus -> filler incentive\"]\n\n    %% Lease creation + payout config\n    Realtor -->|\"createLease(receiverSalt,...)\"| Hub\n    Hub --> LeaseTimeline\n    Hub --> PayoutCfg\n\n    %% LP vault -> available USDT liquidity\n    LP -->|\"deposit(amount USDT)\"| Hub\n    Hub --> LPVault\n    LPVault --> HubUSDT\n\n    %% Claims are created by either fast or slow recognition paths\n    Hub --> ClaimQueues\n    ClaimQueues --> NextIdx\n\n    %% Fill uses USDT liquidity + optional swap + optional bridge\n    HubUSDT -->|\"fill() consumption\"| Hub\n    Hub --> Fill\n    Fill -->|\"if targetToken != USDT:\\nswap once for batch\"| SwapExec\n    Fill -->|\"local transfer OR bridge\"| Bridger\n  end\n\n  %% -------------------------------------------------------------------------\n  %% FAST PATH: PER-DEPOSIT PROOF -> CLAIM (PERMISSIONLESS)\n  %% -------------------------------------------------------------------------\n  subgraph FAST[\"Fast path (permissionless): prove deposit -> claim\"]\n    direction TB\n    PreEntitle[\"preEntitle(receiverSalt, blocks, tx, proof, index)\\n- replay-protected by txId\\n- enforces tx calls tronUsdt\\n- enforces recipient == predicted receiver\\n- attributes to active lease at tx timestamp\\n- recognizedRaw += raw\\n- unbackedRaw += raw\\n- books fees to protocolPnl\\n- enqueues claim(netOut) if > 0\"]\n\n    PreEntitle --> ClaimQueues\n  end\n\n  %% -------------------------------------------------------------------------\n  %% OPTIONAL ACCELERATOR: SUBJECTIVE PRE-ENTITLE (LP-SPONSORED)\n  %% -------------------------------------------------------------------------\n  subgraph SUBJECTIVE[\"Optional accelerator: LP-sponsored subjective pre-entitle\"]\n    direction TB\n    Subj[\"subjectivePreEntitle(txId guess, leaseId guess, raw guess)\\n- debits sponsor lpPrincipal immediately\\n- enqueues normal claim\\n- reimburses sponsor if later preEntitle proves exact match\"]\n    Subj --> ClaimQueues\n  end\n\n  %% -------------------------------------------------------------------------\n  %% SLOW PATH: CONTROLLER EVENT HASH-CHAIN -> BACKING + CLAIMS (PERMISSIONLESS)\n  %% -------------------------------------------------------------------------\n  subgraph SLOW[\"Slow path (permissionless): controller event-chain -> backing + claims\"]\n    direction TB\n    TipTx[\"Tron tx calls isEventChainTip(tipNew)\\n(provable successful tx)\"]\n\n    Relay[\"relayControllerEventChain(blocks, tx, proof, index, events)\\n- proves TipTx\\n- checks to == controller\\n- checks provided events hash-link lastTip->tipNew\\n- enqueues raw events\"]\n    Process[\"processControllerEvents(max)\\n- consumes queued events\\n- PulledFromReceiver:\\n  - updates lastReceiverPullTimestampByToken\\n  - if token==tronUsdt: repays unbackedRaw oldest-first\\n  - leftover becomes profit volume\\n  - profit volume -> claim under lease active at dumpTimestamp\\n- UsdtSet/UsdtRebalanced/ControllerUsdtTransfer update state/PnL\"]\n\n    Relay --> Process\n    Process --> LeaseTimeline\n    Process --> ClaimQueues\n  end\n\n  %% -------------------------------------------------------------------------\n  %% DESTINATION (OPTIONAL): BRIDGE DELIVERY\n  %% -------------------------------------------------------------------------\n  subgraph DEST[\"Destination chain (optional)\"]\n    direction TB\n    Beneficiary[\"Beneficiary receives\\n- local transfer, or\\n- bridged delivery\"]\n  end\n\n  %% -------------------------------------------------------------------------\n  %% CROSS-LANE CONNECTIONS\n  %% -------------------------------------------------------------------------\n  %% Fast path uses tronReader to verify the deposit proof\n  PreEntitle -->|\"uses\"| TronReader\n  TronReader -->|\"verifies included tx\\n+ returns txId,timestamp,to,calldata\"| PreEntitle\n  TronUSDT -->|\"deposit tx is about this contract\"| PreEntitle\n  ReceiverAddr -->|\"recipient must match predicted receiver\"| PreEntitle\n  LeaseTimeline -->|\"active lease at tx timestamp\"| PreEntitle\n\n  %% Subjective reconciliation happens inside preEntitle (if a subjective record exists for txId)\n  Subj -. \"later: preEntitle reimburses sponsor if exact match\" .-> PreEntitle\n\n  %% Slow path uses tronReader to prove the isEventChainTip call happened on Tron\n  TipTx -->|\"proved by\"| TronReader\n  TronReader --> Relay\n  EventChainTip -->|\"tipNew equals controller state\\nat proved block\"| Relay\n\n  %% Filling settles to beneficiary (directly or via bridger)\n  Bridger --> Beneficiary\n  Hub -->|\"if targetChainId == chainid:\\ntransfer(targetToken, beneficiary)\"| Beneficiary\n\n  %% -------------------------------------------------------------------------\n  %% STYLING (lightweight)\n  %% -------------------------------------------------------------------------\n  classDef perm fill:#E8FFF0,stroke:#0E7A39,stroke-width:1px,color:#0E7A39;\n  classDef permOnly fill:#FFF3E0,stroke:#B26A00,stroke-width:1px,color:#7A3F00;\n  classDef core fill:#EEF5FF,stroke:#2B62D6,stroke-width:1px,color:#133B8A;\n  classDef data fill:#F3F4F6,stroke:#6B7280,stroke-width:1px,color:#111827;\n\n  class PreEntitle,Relay,Process perm;\n  class TronController perm;\n  class Fill perm;\n\n  class Realtor,LP,Admin permOnly;\n  class Hub,SwapExec,TronReader core;\n  class LeaseTimeline,PayoutCfg,ClaimQueues,EventChainTip,HubUSDT,LPVault,NextIdx data;\n",
+  "content_size": 8735,
+  "collected_at": "2026-02-06T14:02:45.184165",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "repo_owner": "ultrasoundlabs",
+  "repo_name": "untron-v3",
+  "repo_description": "Horizontally scalable cross-chain liquidity protocol for Tron and EVM with bulletproof security",
+  "repo_language": "Rust",
+  "repo_topics": [],
+  "repo_created_at": "2025-05-11T08:54:43Z",
+  "repo_updated_at": "2026-02-06T09:38:30Z",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 infographic-ready 和 local。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'infographic-ready 和 local'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "lifecycle",
+        "Render"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 docker 和 \"Setup / config (occasionally 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 docker处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'docker处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Render",
+        "SETUP"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Owner / Admin\" 和 \"Realtor (allowlisted 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Owner / Admin\" 和 \"Realtor (allowlisted'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Admin",
+        "Realtor"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"LP (allowlisted for deposits 和 \"EVM Hub config:\\n- setUsdt\\n- setTronReader\\n- setSwapRate\\n- setBridger\\n- allowlists\\n- pause/unpause\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"LP (allowlisted for deposits 和 \"EVM Hub config:\\n- setUsdt\\n- setTronReader\\n- setSwapRate\\n- setBridger\\n- allowlists\\n- pause/unpause\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "LP",
+        "AdminCfg"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 SOURCE CHAIN 和 \"Tron lane (source chain 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 SOURCE CHAIN处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'SOURCE CHAIN处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SIDE",
+        "TRON"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Depositor / end user\" 和 \"Deterministic receiver address\\n(predictable from controller+salt 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Depositor / end user\" 和 \"Deterministic receiver address\\n(predictable from controller+salt'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Depositor",
+        "ReceiverAddr"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Tron USDT (TRC-20 contract 和 \"UntronController\\n- pullFromReceivers (permissionless。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Tron USDT (TRC-20 contract 和 \"UntronController\\n- pullFromReceivers (permissionless'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TronUSDT",
+        "TronController"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 permissionless 和 \"UntronReceiver (CREATE2。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'permissionless 和 \"UntronReceiver (CREATE2'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "rebalanceUsdt",
+        "Receiver"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Controller eventChainTip (sha256 hash-chain 和 to receiver, amount 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Controller eventChainTip (sha256 hash-chain 和 to receiver, amount'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EventChainTip",
+        "transfer"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 CREATE2 和 token, amount 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'CREATE2 和 token, amount'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "missing",
+        "pull"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 advances eventChainTip 和 DESTINATION/SETTLEMENT CHAIN 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'advances eventChainTip 和 DESTINATION/SETTLEMENT CHAIN'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "n",
+        "HUB"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"EVM lane (UntronV3 hub 和 \"UntronV3 hub (facets。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"EVM lane (UntronV3 hub 和 \"UntronV3 hub (facets'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EVM",
+        "Hub"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 + AdminFacet 和 \"Lease timeline per receiverSalt\\n(active lease by timestamp 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '+ AdminFacet 和 \"Lease timeline per receiverSalt\\n(active lease by timestamp'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "n",
+        "LeaseTimeline"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 realtor-only 和 \"Per-lease payout config\\n(targetChainId, targetToken, beneficiary 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'realtor-only 和 \"Per-lease payout config\\n(targetChainId, targetToken, beneficiary'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "createLease",
+        "PayoutCfg"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Claim queues (FIFO 和 \"nextIndexByTargetToken[targetToken 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Claim queues (FIFO 和 \"nextIndexByTargetToken[targetToken'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ClaimQueues",
+        "NextIdx"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 head cursor; filled slots deleted 和 \"Fast-fill LP vault (principal-only 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'head cursor; filled slots deleted 和 \"Fast-fill LP vault (principal-only'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "n",
+        "LPVault"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 lp 和 \"Hub-held USDT balance\\n(usdtBalance( 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'lp 和 \"Hub-held USDT balance\\n(usdtBalance('？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "nlpPrincipal",
+        "HubUSDT"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"tronReader (ITronTxReader 和 \"SwapExecutor (per-hub 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"tronReader (ITronTxReader 和 \"SwapExecutor (per-hub'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 73,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 74,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TronReader",
+        "SwapExec"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 75,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"IBridger registry\\nbridgers[targetToken 和 \"fill(targetToken, maxClaims, calls 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 76,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"IBridger registry\\nbridgers[targetToken处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 77,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"IBridger registry\\nbridgers[targetToken处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 78,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 79,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Bridger",
+        "Fill"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 80,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 optional 和 receiverSalt,... 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 81,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'optional 和 receiverSalt,...'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 82,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 83,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "targetToken",
+        "createLease"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 84,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 amount USDT 和 PERMISSIONLESS 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 85,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 amount USDT处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 86,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'amount USDT处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 87,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 88,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "deposit",
+        "CLAIM"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 89,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Fast path (permissionless 和 \"preEntitle(receiverSalt, blocks, tx, proof, index 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 90,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"Fast path (permissionless处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 91,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Fast path (permissionless处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 92,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 93,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "FAST",
+        "PreEntitle"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 94,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 netOut 和 LP-SPONSORED 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 95,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'netOut 和 LP-SPONSORED'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 96,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 97,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "claim",
+        "ENTITLE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 98,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Optional accelerator: LP-sponsored subjective pre-entitle\" 和 \"subjectivePreEntitle(txId guess, leaseId guess, raw guess 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 99,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Optional accelerator: LP-sponsored subjective pre-entitle\" 和 \"subjectivePreEntitle(txId guess, leaseId guess, raw guess'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 100,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 101,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SUBJECTIVE",
+        "Subj"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 102,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 PERMISSIONLESS 和 \"Slow path (permissionless 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 103,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'PERMISSIONLESS 和 \"Slow path (permissionless'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 104,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 105,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CLAIMS",
+        "SLOW"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 106,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Tron tx calls isEventChainTip(tipNew 和 provable successful tx 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 107,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 \"Tron tx calls isEventChainTip(tipNew处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 108,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Tron tx calls isEventChainTip(tipNew处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 109,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 110,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TipTx",
+        "n"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 111,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"relayControllerEventChain(blocks, tx, proof, index, events 和 \"processControllerEvents(max 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 112,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"relayControllerEventChain(blocks, tx, proof, index, events 和 \"processControllerEvents(max'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 113,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 114,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Relay",
+        "Process"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 115,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 OPTIONAL 和 \"Destination chain (optional 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 116,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'OPTIONAL 和 \"Destination chain (optional'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 117,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 118,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DESTINATION",
+        "DEST"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 119,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Beneficiary receives\\n- local transfer, or\\n- bridged delivery\" 和 if a subjective record exists for txId 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 120,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Beneficiary receives\\n- local transfer, or\\n- bridged delivery\" 和 if a subjective record exists for txId'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 121,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 122,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Beneficiary",
+        "preEntitle"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 123,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 directly or via bridger 和 targetToken, beneficiary 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 124,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'directly or via bridger 和 targetToken, beneficiary'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 125,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 126,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "beneficiary",
+        "ntransfer"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 127,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 lightweight 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 128,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'lightweight'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 129,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 130,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "STYLING"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 130,
+    "repair_count": 6,
+    "grounding_acts_count": 62,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

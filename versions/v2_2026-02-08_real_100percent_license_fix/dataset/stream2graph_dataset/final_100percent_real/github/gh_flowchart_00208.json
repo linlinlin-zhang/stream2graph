@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00208",
+  "source": "github",
+  "source_url": "https://github.com/xinli19/-app/blob/5c0e5360301ae64a451301f7796ecd8a86823d3a/%E6%B5%81%E7%A8%8B%E5%9B%BE/O-4-%E8%BF%90%E8%90%A5%E6%8F%90%E9%86%92%E4%BA%8B%E9%A1%B9%E7%AE%A1%E7%90%86.mmd",
+  "github_repo": "xinli19/-app",
+  "github_file_path": "流程图/O-4-运营提醒事项管理.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\n  subgraph Create[\"创建提醒事项（可从弹窗场景进入）\"]\n    EntryPopup[\"从学员弹窗进入（可选）\"] --> UI_New[/\"运营前端 /o/reminders/new\"/]\n    UI_New --> FillForm[\"选择接收人(多选)/分类/内容/紧急度/时效(默认一周)\"]\n    FillForm --> Submit[\"提交\"]\n    Submit --> API_POST[\"POST /api/v1/reminders\"]\n    API_POST --> Auth{{\"鉴权: 运营?\"}}\n    Auth -- 否 --> E403[\"403\"]\n    Auth -- 是 --> Enrich{{\"若来自学员弹窗 → 自动关联 student_id；自动填充端到端类别\"}}\n    Enrich --> Validate{{\"字段校验/接收人≥1\"}}\n    Validate -- 失败 --> E422[\"422\"]\n    Validate -- 通过 --> DB_Save[(\"DB: Reminder + Recipient 批量写入\")]\n    DB_Save --> Resp201[\"201 Created\"]\n  end\n\n  subgraph ListAll[\"查看全部提醒事项记录列表\"]\n    UI_All[/\"运营前端 /o/reminders/all\"/] --> API_GET[\"GET /api/v1/reminders?sender_me=true|false&recipient_me=true|false&category?&urgency?&ordering=-created_at&q=:student\"]\n    API_GET --> Auth2{{\"鉴权: 运营?\"}}\n    Auth2 -- 否 --> E403b[\"403\"]\n    Auth2 -- 是 --> DB_Query[(\"DB: 过滤 我发送的 ∪ 我收到的；支持分类/紧急度/时间排序/按学员检索\")]\n    DB_Query --> Resp200[\"200 items\"]\n    Resp200 --> Render[\"前端渲染 列表+分页\"]\n  end\n\n  subgraph Delete[\"删除我发送的提醒事项\"]\n    ClickDelete[\"在列表中选择一条我发送的提醒\"] --> API_DELETE[\"DELETE /api/v1/reminders/:id\"]\n    API_DELETE --> Auth3{{\"鉴权: 运营?\"}}\n    Auth3 -- 否 --> E403c[\"403\"]\n    Auth3 -- 是 --> CheckOwner{{\"校验: sender=当前运营\"}}\n    CheckOwner -- 否 --> E403d[\"403 无权限删除他人创建\"]\n    CheckOwner -- 是 --> DB_SoftDel[(\"DB: 软删 Reminder\")]\n    DB_SoftDel --> Resp204[\"204 No Content\"]\n  end\n\n  Resp201 --> UI_All",
+  "content_size": 1409,
+  "collected_at": "2026-02-06T01:42:39.762734",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

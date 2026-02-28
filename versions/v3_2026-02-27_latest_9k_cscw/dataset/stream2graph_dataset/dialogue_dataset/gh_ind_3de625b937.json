@@ -1,0 +1,59 @@
+{
+  "id": "gh_ind_3de625b937",
+  "source": "github_industrial",
+  "repo": "FabioHAraujo/ShardBox",
+  "license": "gpl-3.0",
+  "code": "stateDiagram-v2\n    [*] --> Inicializando: Nodo inicia\n    \n    Inicializando --> AguardandoSync: Servidor TCP pronto\n    AguardandoSync --> Ativo: Aguarda 10s<br/>Servidor HTTP pronto\n    \n    note right of AguardandoSync\n        Período de graça de 10s\n        para sincronização inicial\n    end note\n    \n    Ativo --> Monitorando: Inicia heartbeat\n    \n    Monitorando --> Monitorando: Heartbeat OK<br/>Todos vivos\n    Monitorando --> DetectandoFalha: Sem resposta\n    \n    DetectandoFalha --> Monitorando: Timeout < 30s<br/>Aguarda\n    DetectandoFalha --> ConfirmandoMorte: Timeout > 30s\n    \n    ConfirmandoMorte --> AguardandoCooldown: Em período de<br/>inicialização (<15s)\n    ConfirmandoMorte --> AguardandoCooldown: Cooldown ativo<br/>(última tentativa <60s)\n    ConfirmandoMorte --> Recuperando: Condições OK<br/>para recuperação\n    \n    note right of ConfirmandoMorte\n        Proteções contra\n        recuperação prematura\n    end note\n    \n    AguardandoCooldown --> Monitorando: Volta ao monitoramento\n    \n    Recuperando --> IniciaProcesso: subprocess.Popen<br/>python node.py N\n    IniciaProcesso --> RegistraTentativa: Armazena timestamp\n    RegistraTentativa --> Monitorando: Continua monitorando\n    \n    IniciaProcesso --> [*]: Novo processo<br/>do nodo\n    \n    note left of Recuperando\n        Inicia novo processo\n        em background, desacoplado\n        do processo pai\n    end note\n",
+  "diagram_type": "node size:900..1500",
+  "collected_at": "2026-02-27T05:29:52.167147",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "Generic Diagram和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在Generic Diagram完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "root"
+      ],
+      "timestamp_offset": 60
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 4,
+    "speaker_distribution": {
+      "Speaker_B": 2,
+      "Speaker_A": 2
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "inform": 1,
+      "contrastive": 1
+    },
+    "avg_turn_length": 22.5,
+    "dialogue_duration": 60
+  }
+}

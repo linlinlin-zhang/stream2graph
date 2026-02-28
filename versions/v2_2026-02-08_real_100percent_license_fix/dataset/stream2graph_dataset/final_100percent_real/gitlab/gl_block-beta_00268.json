@@ -1,0 +1,16 @@
+{
+  "id": "gl_block-beta_00268",
+  "source": "gitlab",
+  "source_url": "https://github.com/zone17/sovren/blob/d3da3358e52da6ae6b2365e89401eca50f337a0c/docs/architecture/diagrams/nip04/decryption-flow.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "zone17/sovren",
+  "diagram_type": "block-beta",
+  "code": "```mermaid\nsequenceDiagram\n    participant Bob\n    participant NIP04Service\n    participant KeyMgmt\n    participant SpamCheck\n    participant ECDH\n    participant AES256\n    participant Cache\n\n    Note over Bob,Cache: Encrypted DM Decryption Flow\n\n    Bob->>NIP04Service: Receive DM event (kind 4)\n\n    NIP04Service->>SpamCheck: checkSpamProtection(senderPubkey, event)\n\n    alt Blocked or Rate Limited\n        SpamCheck-->>NIP04Service: REJECTED\n        NIP04Service-->>Bob: Message blocked\n    else Allowed\n        SpamCheck-->>NIP04Service: ALLOWED\n\n        NIP04Service->>NIP04Service: Validate encrypted format\n        Note over NIP04Service: Check for ?iv= separator\n\n        NIP04Service->>NIP04Service: Parse encrypted content\n        Note over NIP04Service: Split ciphertext and IV\n\n        NIP04Service->>NIP04Service: Base64 decode ciphertext and IV\n\n        NIP04Service->>KeyMgmt: getPrivateKey()\n        KeyMgmt-->>NIP04Service: privateKey\n\n        NIP04Service->>ECDH: deriveSharedSecret(privateKey, senderPubkey)\n        Note over ECDH: secp256k1 ECDH\n        ECDH-->>NIP04Service: sharedSecret (32 bytes)\n\n        NIP04Service->>AES256: decrypt(ciphertext, sharedSecret, IV)\n        Note over AES256: AES-256-CBC\n        AES256-->>NIP04Service: plaintext\n\n        NIP04Service->>Cache: cacheDecryptedMessage(messageId, message, plaintext)\n        Cache-->>NIP04Service: Cached\n\n        NIP04Service->>NIP04Service: addMessageToThread(message)\n        NIP04Service->>NIP04Service: Update unread count\n\n        NIP04Service-->>Bob: Decrypted message\n\n        Bob->>NIP04Service: createReadReceipt(messageId, senderPubkey)\n        NIP04Service-->>Bob: readReceiptEvent (kind 1515)\n    end\n\n    Note over Bob,Cache: Security: Rate limit + Spam + Validation\n",
+  "content_size": 1770,
+  "collected_at": "2026-02-06T14:05:56.448001",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com"
+}

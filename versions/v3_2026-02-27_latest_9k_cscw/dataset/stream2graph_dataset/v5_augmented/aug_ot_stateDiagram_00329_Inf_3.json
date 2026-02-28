@@ -1,0 +1,17 @@
+{
+  "id": "aug_ot_stateDiagram_00329_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/Group-Lynx/grid/blob/f8ad5d8011cfc24deeb013072cd3985f03b65c7a/doc/need-anal/state-tch.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "Group-Lynx/grid",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\ndirection LR\n    [Infra_EtcdCluster] --> 教师系统\n\n    教师系统 --> 班级管理总页面: 选择班级\n    教师系统 --> 创建新的班级: 选择新建班级\n    创建新的班级 --> 教师系统: 完成创建\n\n    state ChooseTab <<fork>>\n    班级管理总页面 --> ChooseTab: 选择标签页\n\n    state 学生管理 {Infra_LoadBalancer] --> 添加学生: 选择添加学生\n        [Infra_EtcdCluster] --> 移除学生: 移除选中学生\n        \n        添加学生 --> [Infra_WorkerNode]\n        移除学生 --> [Infra_LoadBalancer]\n    }\n    state 通知分发 {Infra_LoadBalancer] --> 阅览通知\n        [Infra_WorkerNode] --> 新建通知: 选择创建通知\n        新建通知 --> 编辑通知草稿: 创建并编辑\n\n        state MsgBranch <<choice>>\n        阅览通知 --> MsgBranch: 选中通知\n        MsgBranch --> 查看草稿细节: 是草稿\n        查看草稿细节 --> 编辑通知草稿: 选择编辑\n        查看草稿细节 --> 发布通知: 选择发布\n        编辑通知草稿 --> [Infra_WorkerNode]: 保存\n        发布通知 --> [Infra_IngressController]: 发布为终稿\n        查看草稿细节 --> [Infra_EtcdCluster]\n        MsgBranch --> 查看通知细节: 是终稿\n        查看通知细节 --> [Infra_EtcdCluster]\n        [Infra_IngressController]\n    }\n\n    ChooseTab --> 学生管理\n    ChooseTab --> 通知分发\n\n    state FinalBranch <<choice>>\n    FinalBranch --> ChooseTab: 切换标签页\n    FinalBranch --> [Infra_EtcdCluster]: 退出系统\n\n    学生管理 --> FinalBranch\n    通知分发 --> FinalBranch\n",
+  "content_size": 983,
+  "collected_at": "2026-02-06T10:40:46.276417",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "ot_stateDiagram_00329"
+}

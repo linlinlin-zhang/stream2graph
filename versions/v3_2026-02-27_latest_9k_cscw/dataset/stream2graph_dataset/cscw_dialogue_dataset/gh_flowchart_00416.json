@@ -1,0 +1,1313 @@
+{
+  "id": "gh_flowchart_00416",
+  "source": "github",
+  "source_url": "https://github.com/SecretLab-com/locoman-expo/blob/64fcd5fa1808b42d0596355cfafa63ec4047a40c/docs/navigation-chart.mmd",
+  "github_repo": "SecretLab-com/locoman-expo",
+  "github_file_path": "docs/navigation-chart.mmd",
+  "diagram_type": "flowchart",
+  "code": "%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#0a7ea4', 'primaryTextColor': '#fff', 'primaryBorderColor': '#0a7ea4', 'lineColor': '#9BA1A6', 'secondaryColor': '#1e2022', 'tertiaryColor': '#151718'}}}%%\nflowchart TB\n    subgraph Entry[\"Entry Points\"]\n        START((App Start))\n        LOGIN[Login Screen]\n        REGISTER[Register Screen]\n        OAUTH[OAuth Callback]\n    end\n\n    subgraph Auth[\"Authentication\"]\n        START --> |Unauthenticated| LOGIN\n        LOGIN --> |Sign Up| REGISTER\n        REGISTER --> |Back| LOGIN\n        LOGIN --> |OAuth| OAUTH\n        OAUTH --> |Success| ROLE_CHECK{Check User Role}\n        LOGIN --> |Success| ROLE_CHECK\n        REGISTER --> |Success| ROLE_CHECK\n    end\n\n    subgraph RoleRouting[\"Role-Based Routing\"]\n        ROLE_CHECK --> |Shopper| SHOPPER_TABS\n        ROLE_CHECK --> |Client| CLIENT_TABS\n        ROLE_CHECK --> |Trainer| TRAINER_TABS\n        ROLE_CHECK --> |Manager| MANAGER_TABS\n        ROLE_CHECK --> |Coordinator| COORD_TABS\n    end\n\n    subgraph ShopperFlow[\"Shopper Experience\"]\n        subgraph SHOPPER_TABS[\"Bottom Tabs\"]\n            S_BUNDLES[Bundles]\n            S_PRODUCTS[Products]\n            S_TRAINERS[Trainers]\n            S_CART[Cart]\n        end\n        \n        S_PROFILE[Profile]\n        S_BUNDLES --> |FAB| S_PROFILE\n        S_PRODUCTS --> |FAB| S_PROFILE\n        S_TRAINERS --> |FAB| S_PROFILE\n        S_CART --> |FAB| S_PROFILE\n        \n        S_BUNDLES --> |Tap Bundle| BUNDLE_DETAIL\n        S_PRODUCTS --> |Tap Product| PRODUCT_SHEET\n        S_TRAINERS --> |Tap Trainer| TRAINER_PROFILE\n        S_CART --> |Checkout| CHECKOUT\n        \n        CHECKOUT --> |Place Order| CONFIRMATION\n        CONFIRMATION --> |Continue| S_BUNDLES\n        \n        S_PROFILE --> |Logout| LOGIN\n        S_PROFILE --> |Messages| MESSAGES\n    end\n\n    subgraph ClientFlow[\"Client Experience\"]\n        subgraph CLIENT_TABS[\"Bottom Tabs\"]\n            C_HOME[Home]\n            C_PROGRAMS[Programs]\n            C_DELIVERIES[Deliveries]\n            C_SPENDING[Spending]\n        end\n        \n        C_HOME --> |View Orders| C_ORDERS\n        C_HOME --> |View Program| BUNDLE_DETAIL\n        C_PROGRAMS --> |Tap Subscription| BUNDLE_DETAIL\n        C_ORDERS[Orders]\n        C_ORDERS --> |Tap Order| BUNDLE_DETAIL\n    end\n\n    subgraph TrainerFlow[\"Trainer Experience\"]\n        subgraph TRAINER_TABS[\"Bottom Tabs\"]\n            T_DASH[Dashboard]\n            T_CALENDAR[Calendar]\n            T_CLIENTS[Clients]\n            T_DELIVERIES[Deliveries]\n            T_EARNINGS[Earnings]\n        end\n        \n        T_DASH --> |My Bundles| T_BUNDLES\n        T_DASH --> |Orders| T_ORDERS\n        T_DASH --> |Settings| T_SETTINGS\n        T_DASH --> |Points| T_POINTS\n        T_DASH --> |Partnerships| T_PARTNERSHIPS\n        T_DASH --> |Join Requests| T_JOIN_REQ\n        \n        T_BUNDLES[My Bundles]\n        T_ORDERS[Orders]\n        T_SETTINGS[Settings]\n        T_POINTS[Points and Status]\n        T_PARTNERSHIPS[Partnerships]\n        T_JOIN_REQ[Join Requests]\n        T_INVITE[Invite Client]\n        \n        T_BUNDLES --> |Create or Edit| BUNDLE_EDITOR\n        T_BUNDLES --> |View| BUNDLE_DETAIL\n        T_CLIENTS --> |Tap Client| CLIENT_DETAIL\n        T_CLIENTS --> |Invite| T_INVITE\n        \n        CLIENT_DETAIL[Client Detail]\n        CLIENT_DETAIL --> |Message| MESSAGES\n    end\n\n    subgraph ManagerFlow[\"Manager Experience\"]\n        subgraph MANAGER_TABS[\"Bottom Tabs\"]\n            M_DASH[Dashboard]\n            M_APPROVALS[Approvals]\n            M_USERS[Users]\n            M_ANALYTICS[Analytics]\n        end\n        \n        M_DASH --> |Trainers| M_TRAINERS\n        M_DASH --> |Templates| M_TEMPLATES\n        M_DASH --> |Invitations| M_INVITATIONS\n        M_DASH --> |Deliveries| M_DELIVERIES\n        M_DASH --> |Products| M_PRODUCTS\n        \n        M_TRAINERS[Trainers]\n        M_TEMPLATES[Templates]\n        M_INVITATIONS[Invitations]\n        M_DELIVERIES[Manager Deliveries]\n        M_PRODUCTS[Manager Products]\n        \n        M_TEMPLATES --> |Edit| TEMPLATE_EDITOR\n        M_APPROVALS --> |View Bundle| BUNDLE_DETAIL\n    end\n\n    subgraph CoordFlow[\"Coordinator Experience\"]\n        subgraph COORD_TABS[\"Bottom Tabs\"]\n            CO_CATALOG[Catalog]\n            CO_IMPERSONATE[Impersonate]\n            CO_LOGS[Logs]\n        end\n        \n        CO_IMPERSONATE --> |Select User| ROLE_CHECK\n        CO_CATALOG --> |View Bundle| BUNDLE_DETAIL\n    end\n\n    subgraph SharedScreens[\"Shared Screens\"]\n        BUNDLE_DETAIL[Bundle Detail]\n        BUNDLE_EDITOR[Bundle Editor]\n        TEMPLATE_EDITOR[Template Editor]\n        TRAINER_PROFILE[Trainer Profile]\n        MESSAGES[Messages]\n        MSG_THREAD[Message Thread]\n        CHECKOUT[Checkout]\n        CONFIRMATION[Order Confirmed]\n        PRODUCT_SHEET[Product Sheet]\n        INVITE_PAGE[Invitation Page]\n        BROWSE[Browse All]\n        \n        MESSAGES --> |Tap Conversation| MSG_THREAD\n        TRAINER_PROFILE --> |Request to Join| TRAINER_PROFILE\n        TRAINER_PROFILE --> |View Bundle| BUNDLE_DETAIL\n        BUNDLE_DETAIL --> |Add to Cart| S_CART\n        BUNDLE_DETAIL --> |Message Trainer| MESSAGES\n    end\n\n    subgraph DeepLinks[\"Deep Links\"]\n        DL_INVITE[\"invite/token\"]\n        DL_BUNDLE[\"bundle/id\"]\n        DL_TRAINER[\"trainer/id\"]\n        \n        DL_INVITE --> INVITE_PAGE\n        DL_BUNDLE --> BUNDLE_DETAIL\n        DL_TRAINER --> TRAINER_PROFILE\n    end\n\n    %% Styling\n    classDef entry fill:#22C55E,stroke:#22C55E,color:#000\n    classDef auth fill:#F59E0B,stroke:#F59E0B,color:#000\n    classDef tabs fill:#0a7ea4,stroke:#0a7ea4,color:#fff\n    classDef screen fill:#1e2022,stroke:#334155,color:#ECEDEE\n    classDef shared fill:#8B5CF6,stroke:#8B5CF6,color:#fff\n    classDef deeplink fill:#EF4444,stroke:#EF4444,color:#fff\n    \n    class START entry\n    class LOGIN,REGISTER,OAUTH,ROLE_CHECK auth\n    class S_BUNDLES,S_PRODUCTS,S_TRAINERS,S_CART,C_HOME,C_PROGRAMS,C_DELIVERIES,C_SPENDING,T_DASH,T_CALENDAR,T_CLIENTS,T_DELIVERIES,T_EARNINGS,M_DASH,M_APPROVALS,M_USERS,M_ANALYTICS,CO_CATALOG,CO_IMPERSONATE,CO_LOGS tabs\n    class BUNDLE_DETAIL,BUNDLE_EDITOR,TEMPLATE_EDITOR,TRAINER_PROFILE,MESSAGES,MSG_THREAD,CHECKOUT,CONFIRMATION,PRODUCT_SHEET,INVITE_PAGE,BROWSE shared\n    class DL_INVITE,DL_BUNDLE,DL_TRAINER deeplink\n",
+  "content_size": 6266,
+  "collected_at": "2026-02-06T01:43:56.845393",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "repo_owner": "SecretLab-com",
+  "repo_name": "locoman-expo",
+  "repo_description": "A fitness and wellness platform connecting trainers with clients. Features include catalog browsing, bundle management, order tracking, trainer dashboards, and client management with multi-platform su",
+  "repo_language": "TypeScript",
+  "repo_topics": [],
+  "repo_created_at": "2026-01-25T18:06:26Z",
+  "repo_updated_at": "2026-02-05T18:59:09Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Entry Points\" 和 (App Start 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Entry Points\" 和 (App Start'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Entry",
+        "START"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Login Screen 和 Register Screen 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Login Screen 和 Register Screen'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "LOGIN",
+        "REGISTER"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 OAuth Callback 和 \"Authentication\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 OAuth Callback处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'OAuth Callback处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OAUTH",
+        "Auth"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Check User Role 和 \"Role-Based Routing\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Check User Role 和 \"Role-Based Routing\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ROLE_CHECK",
+        "RoleRouting"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Shopper Experience\" 和 \"Bottom Tabs\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Shopper Experience\" 和 \"Bottom Tabs\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ShopperFlow",
+        "SHOPPER_TABS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Bundles 和 Products 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Bundles 和 Products'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "S_BUNDLES",
+        "S_PRODUCTS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Trainers 和 Cart。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Trainers 和 Cart'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "S_TRAINERS",
+        "S_CART"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Profile 和 \"Client Experience\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Profile 和 \"Client Experience\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "S_PROFILE",
+        "ClientFlow"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Bottom Tabs\" 和 Home 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Bottom Tabs\" 和 Home'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CLIENT_TABS",
+        "C_HOME"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Programs 和 Deliveries 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Programs 和 Deliveries'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "C_PROGRAMS",
+        "C_DELIVERIES"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Spending 和 Orders 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Spending 和 Orders'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "C_SPENDING",
+        "C_ORDERS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Trainer Experience\" 和 \"Bottom Tabs\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"Trainer Experience\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Trainer Experience\"处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TrainerFlow",
+        "TRAINER_TABS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Dashboard 和 Calendar 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Dashboard 和 Calendar'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "T_DASH",
+        "T_CALENDAR"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Clients 和 Deliveries 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Clients 和 Deliveries'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "T_CLIENTS",
+        "T_DELIVERIES"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Earnings 和 My Bundles 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 Earnings处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 61,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Earnings处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "T_EARNINGS",
+        "T_BUNDLES"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Orders 和 Settings。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Orders 和 Settings'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "T_ORDERS",
+        "T_SETTINGS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Points and Status 和 Partnerships。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Points and Status 和 Partnerships'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "T_POINTS",
+        "T_PARTNERSHIPS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Join Requests 和 Invite Client 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 73,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Join Requests 和 Invite Client'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 74,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 75,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "T_JOIN_REQ",
+        "T_INVITE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 76,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Client Detail 和 \"Manager Experience\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 77,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 Client Detail处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 78,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Client Detail处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 79,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 80,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CLIENT_DETAIL",
+        "ManagerFlow"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 81,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Bottom Tabs\" 和 Dashboard 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 82,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Bottom Tabs\" 和 Dashboard'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 83,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 84,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MANAGER_TABS",
+        "M_DASH"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 85,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Approvals 和 Users 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 86,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 Approvals处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 87,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Approvals处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 88,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 89,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "M_APPROVALS",
+        "M_USERS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 90,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Analytics 和 Trainers 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 91,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Analytics 和 Trainers'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 92,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 93,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "M_ANALYTICS",
+        "M_TRAINERS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 94,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Templates 和 Invitations 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 95,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Templates 和 Invitations'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 96,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 97,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "M_TEMPLATES",
+        "M_INVITATIONS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 98,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Manager Deliveries 和 Manager Products。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 99,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Manager Deliveries 和 Manager Products'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 100,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 101,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "M_DELIVERIES",
+        "M_PRODUCTS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 102,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Coordinator Experience\" 和 \"Bottom Tabs\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 103,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Coordinator Experience\" 和 \"Bottom Tabs\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 104,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 105,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CoordFlow",
+        "COORD_TABS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 106,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Catalog 和 Impersonate。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 107,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Catalog 和 Impersonate'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 108,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 109,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CO_CATALOG",
+        "CO_IMPERSONATE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 110,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Logs 和 \"Shared Screens\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 111,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Logs 和 \"Shared Screens\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 112,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 113,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CO_LOGS",
+        "SharedScreens"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 114,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Bundle Detail 和 Bundle Editor 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 115,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Bundle Detail 和 Bundle Editor'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 116,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 117,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BUNDLE_DETAIL",
+        "BUNDLE_EDITOR"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 118,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Template Editor 和 Trainer Profile。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 119,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 Template Editor处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 120,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Template Editor处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 121,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 122,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TEMPLATE_EDITOR",
+        "TRAINER_PROFILE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 123,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Messages 和 Message Thread 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 124,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Messages 和 Message Thread'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 125,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 126,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MESSAGES",
+        "MSG_THREAD"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 127,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Checkout 和 Order Confirmed 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 128,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Checkout 和 Order Confirmed'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 129,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 130,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CHECKOUT",
+        "CONFIRMATION"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 131,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Product Sheet 和 Invitation Page 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 132,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Product Sheet 和 Invitation Page'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 133,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 134,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PRODUCT_SHEET",
+        "INVITE_PAGE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 135,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Browse All 和 \"Deep Links\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 136,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 Browse All处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 137,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Browse All处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 138,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 139,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BROWSE",
+        "DeepLinks"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 140,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"invite/token\" 和 \"bundle/id\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 141,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"invite/token\" 和 \"bundle/id\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 142,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 143,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DL_INVITE",
+        "DL_BUNDLE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 144,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"trainer/id\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 145,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"trainer/id\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 146,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 147,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DL_TRAINER"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 147,
+    "repair_count": 7,
+    "grounding_acts_count": 70,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

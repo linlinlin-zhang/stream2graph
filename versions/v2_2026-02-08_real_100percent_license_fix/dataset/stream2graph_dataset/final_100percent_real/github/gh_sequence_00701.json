@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00701",
+  "source": "github",
+  "source_url": "https://github.com/linhh011202/fyp-report/blob/02e94338c04bfbc3eb6bb6a19c19f907aa8358c3/diagrams/google_sso_oauth_flow.mmd",
+  "github_repo": "linhh011202/fyp-report",
+  "github_file_path": "diagrams/google_sso_oauth_flow.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Guard as GoogleAuthGuard\n    participant Strategy as GoogleStrategy\n    participant OAuth as passport-google-oauth20\n    participant Google as Google OAuth Server\n    participant Config as AuthConfig\n\n    Note over Guard: Request to /auth/google/login\n    Guard->>Guard: getAuthenticateOptions(context)\n    Guard->>Guard: Extract query params (redirect, appId, appSecret, prompt)\n    Guard->>Guard: Encode state = base64(JSON.stringify({redirect, appId, appSecret}))\n    \n    Guard->>Strategy: Initiate authentication\n    Strategy->>Config: Get credentials\n    Config-->>Strategy: {clientID, clientSecret, callbackURL}\n    \n    Strategy->>OAuth: Configure OAuth client\n    OAuth->>Google: Redirect to consent screen\n    Note over OAuth,Google: URL includes: scope=[email, profile], state, prompt, access_type=offline\n    \n    rect rgb(200, 230, 200)\n        Note over Google: User Authentication\n        Google->>Google: Display consent screen\n        Google->>Google: User approves access\n    end\n    \n    Google-->>OAuth: Authorization code\n    OAuth->>Google: Exchange code for tokens\n    Google-->>OAuth: access_token, refresh_token, id_token\n    \n    OAuth->>Strategy: Callback with profile\n    Strategy->>Strategy: validate(req, accessToken, refreshToken, profile)\n    Strategy->>Strategy: Extract {email, firstName, lastName, picture}\n    Strategy-->>Guard: User object\n    \n    Guard-->>Guard: Attach user to request.user\n    Note over Guard: Proceed to callback handler\n",
+  "content_size": 1511,
+  "collected_at": "2026-02-06T01:35:51.897735",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

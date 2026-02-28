@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00064",
+  "source": "github",
+  "source_url": "https://github.com/leonwooster/MermaidDiagram/blob/08f01a99871239f3cf911af6074882242ad65129/SampleDiagram3.mmd",
+  "github_repo": "leonwooster/MermaidDiagram",
+  "github_file_path": "SampleDiagram3.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart LR\n  %% ===== GROUP: Step 1 - Load models =====\n  subgraph G1[Step 1 - Load models]\n\tA1[UnetLoaderGGUF<br/>Qwen-Image-Edit-2509 GGUF]\n\tA2[LoraLoaderModelOnly<br/>Qwen-Image-Lightning LoRA]\n\tA3[ModelSamplingAuraFlow]\n\tA4[CFGNorm]\n\tA1 --> A2 --> A3 --> A4\n  end\n\n  subgraph G1b[Text Encoder & VAE]\n\tB1[CLIPLoader<br/>qwen_2.5_vl_7b_fp8_scaled]\n\tB2[VAELoader<br/>qwen_image_vae]\n  end\n\n  %% ===== GROUP: Step 2 - Upload image(s) =====\n  subgraph G2[Step 2 - Upload image for editing]\n\tC1[LoadImage #1<br/>dark portrait]\n\tC2[LoadImage #2<br/>optional ref]\n\tC3[LoadImage #3<br/>optional ref]\n  end\n\n  %% ===== GROUP: Step 3 - Size control / Latent prep =====\n  subgraph G3[Step 3 - Image Size / Latent]\n\tD1[ImageScaleToTotalPixels<br/>avoid oversized inputs]\n\tD2[VAEEncode<br/>encode scaled image to latent]\n\tD3[EmptySD3LatentImage<br/>optional: replace VAEEncode]\n  end\n\n  %% ===== GROUP: Step 4 - Prompting =====\n  subgraph G4[Step 4 - Prompt / Conditioning]\n\tE1[TextEncodeQwenImageEditPlus<br/>POSITIVE prompt + images]\n\tE2[TextEncodeQwenImageEditPlus<br/>ALT prompt branch]\n  end\n\n  %% ===== GROUP: Sampler / Decode / Save =====\n  subgraph G5[Sampling to Decode to Save]\n\tF1[KSampler<br/>steps / cfg / sampler / scheduler / denoise]\n\tF2[VAEDecode<br/>latent to image]\n\tF3[SaveImage]\n  end\n\n  %% ===== Connections across groups =====\n  %% Encoders & VAE\n  B1 --> E1\n  B2 --> E1\n  B1 --> E2\n  B2 --> E2\n\n  %% Images into scaler\n  C1 --> D1\n  C2 --> E1\n  C2 --> E2\n  C3 --> E1\n  C3 --> E2\n  D1 --> D2\n\n  %% Scaled image also into Text Encoder (image1)\n  D1 --> E1\n  D1 --> E2\n\n  %% Model path into sampler\n  A4 --> F1\n\n  %% Conditioning into sampler\n  E1 -- positive/negative --> F1\n  E2 -- (alternative prompt branch) --> F1\n\n  %% Latent into sampler (choose one)\n  D2 --> F1\n  D3 -. optional .-> F1\n\n  %% Decode & save\n  F1 --> F2 --> F3\n",
+  "content_size": 1846,
+  "collected_at": "2026-02-06T01:41:41.510477",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

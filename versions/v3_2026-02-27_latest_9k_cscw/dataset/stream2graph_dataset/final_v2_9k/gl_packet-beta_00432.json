@@ -1,0 +1,16 @@
+{
+  "id": "gl_packet-beta_00432",
+  "source": "gitlab",
+  "source_url": "https://github.com/sean-galloway/RTLDesignSherpa/blob/47f8a16641658f570a69c3af3c9724b29ea39187/docs/markdown/assets/RTLAmba/axi_monitor_reporter.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "sean-galloway/RTLDesignSherpa",
+  "diagram_type": "packet-beta",
+  "code": "%%{init: {'theme': 'neutral', 'themeVariables': { 'fontSize': '14px'}}}%%\nflowchart LR\n    subgraph Events[\"Event Inputs\"]\n        COMPL[\"event_complete\"]\n        ERR[\"event_error\"]\n        TMO[\"event_timeout\"]\n        THRESH[\"event_threshold\"]\n        PERF[\"event_perf\"]\n    end\n\n    subgraph Config[\"Configuration\"]\n        CFG[\"cfg_*_enable\\nUNIT_ID, AGENT_ID\"]\n    end\n\n    subgraph axi_monitor_reporter[\"axi_monitor_reporter\"]\n        subgraph Priority[\"Event Priority\"]\n            PRI[\"Error > Timeout >\\nThreshold > Compl > Perf\"]\n        end\n\n        subgraph Format[\"Packet Formatter\"]\n            FMT[\"64-bit packet:\\n[63:60] type\\n[59:56] unit_id\\n[55:48] agent_id\\n[47:0] payload\"]\n        end\n\n        subgraph Queue[\"Output Queue\"]\n            QUE[\"Event FIFO\\nBackpressure handling\"]\n        end\n    end\n\n    subgraph Output[\"Monitor Bus\"]\n        MONBUS[\"monbus_packet[63:0]\\nmonbus_valid\\nmonbus_ready\"]\n    end\n\n    Events --> Priority\n    Config --> Format\n    Priority --> Format\n    Format --> Queue\n    Queue --> MONBUS\n",
+  "content_size": 1043,
+  "collected_at": "2026-02-06T14:09:36.490826",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

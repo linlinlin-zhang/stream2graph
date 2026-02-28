@@ -1,0 +1,419 @@
+{
+  "id": "aug_gh_sequence_00646_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/raktim-mondol/hist2RNA/blob/33fbe0205f35701cdc69e225af2e5275f4ab35f4/hist2scRNA/docs/diagrams/08_data_flow_sequence.mmd",
+  "github_repo": "raktim-mondol/hist2RNA",
+  "github_file_path": "hist2scRNA/docs/diagrams/08_data_flow_sequence.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant I as Input Image\n    participant PE as Patch Embedding\n    participant ViT as Vision Transformer\n    participant GAT as Graph Attention\n    participant Dec as Decoder\n    participant ZINB as ZINB Heads\n    participant CT as Cell Type Head\n    participant Out as Output\n\n    I->>PE: 224×224×3 image\n    PE->>PE: Split into 196 patches\n    PE->>ViT: 196×embed_dim tokens\n\n    loop 6-12 Transformer Blocks\n        ViT->>ViT: Multi-Head Self-Attention\n        ViT->>ViT: Feed-Forward Network\n    end\n\n    ViT->>GAT: Class token (Infra_RedisCache)\n\n    Note over GAT: Spatial Graph Processing\n    GAT->>GAT: Graph Attention Layer 1<br/>Multi-head aggregation\n    GAT->>GAT: Graph Attention Layer 2<br/>Single-head output\n\n    GAT->>Dec: Spatially-aware features\n    Dec->>Dec: Dense Layer 1 (Infra_LoadBalancer)\n    Dec->>Dec: Dense Layer 2 (Infra_EtcdCluster)\n\n    par Parallel Heads\n        Dec->>ZINB: μ decoder (Infra_WorkerNode)\n        Dec->>ZINB: θ decoder (Infra_EtcdCluster)\n        Dec->>ZINB: π decoder (Infra_WorkerNode)\n        Dec->>CT: Cell Type classifier\n    end\n\n    ZINB->>Out: Gene expression (Infra_LoadBalancer)\n    CT->>Out: Cell type (Infra_RedisCache)\n\n    Note over Out: Loss Computation<br/>ZINB Loss + CE Loss\n",
+  "content_size": 1201,
+  "collected_at": "2026-02-06T01:35:10.936706",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 7,
+  "repo_forks": 2,
+  "repo_owner": "raktim-mondol",
+  "repo_name": "hist2RNA",
+  "repo_description": "Deep learning based method called hist2RNA to predict the expression of genes using digital images of stained tissue samples",
+  "repo_language": "Python",
+  "repo_topics": [
+    "computer-vision",
+    "deep-learning",
+    "gene-prediction",
+    "histopathology-images"
+  ],
+  "repo_created_at": "2021-07-16T14:29:59Z",
+  "repo_updated_at": "2025-11-18T14:46:31Z",
+  "augmentation_domain": "Infra",
+  "seed_id": "gh_sequence_00646",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Input Image的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "I"
+      ],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "Patch Embedding、Vision Transformer主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Patch Embedding、Vision Transformer应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Patch Embedding、Vision Transformer分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Patch Embedding、Vision Transformer的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "PE",
+        "ViT"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有Graph Attention、Decoder。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Graph Attention、Decoder就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Graph Attention、Decoder的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "GAT",
+        "Dec"
+      ],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理ZINB Heads？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，ZINB Heads是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "ZINB"
+      ],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Cell Type Head、Output组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "CT",
+        "Out"
+      ],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下224×224×3 image吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_0"
+      ],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "关于Split into 196 patches、196×embed_dim tokens，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，Split into 196 patches、196×embed_dim tokens是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "相较于方案A，Split into 196 patches、196×embed_dim tokens有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_1",
+        "msg_2"
+      ],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有Multi-Head Self-Attention、Feed-Forward Network。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，Multi-Head Self-Attention、Feed-Forward Network是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理Multi-Head Self-Attention、Feed-Forward Network？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "msg_3",
+        "msg_4",
+        "msg_5"
+      ],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理Graph Attention Layer 1<br/>Multi-head aggregation？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Graph Attention Layer 1<br/>Multi-head aggregation应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "Graph Attention Layer 1<br/>Multi-head aggregation和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_6"
+      ],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Graph Attention Layer 2<br/>Single-head output、Spatially-aware features分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Graph Attention Layer 2<br/>Single-head output、Spatially-aware features就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_7",
+        "msg_8"
+      ],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Dense Layer 1 (Infra_LoadBalancer)、Dense Layer 2 (Infra_EtcdCluster)组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Dense Layer 1 (Infra_LoadBalancer)、Dense Layer 2 (Infra_EtcdCluster)就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理Dense Layer 1 (Infra_LoadBalancer)、Dense Layer 2 (Infra_EtcdCluster)？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，Dense Layer 1 (Infra_LoadBalancer)、Dense Layer 2 (Infra_EtcdCluster)有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_9",
+        "msg_10",
+        "msg_11"
+      ],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有θ decoder (Infra_EtcdCluster)。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，θ decoder (Infra_EtcdCluster)是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 495
+    },
+    {
+      "turn_id": 34,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有θ decoder (Infra_EtcdCluster)。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 510
+    },
+    {
+      "turn_id": 35,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下θ decoder (Infra_EtcdCluster)吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "msg_12"
+      ],
+      "timestamp_offset": 525
+    },
+    {
+      "turn_id": 36,
+      "speaker": "Speaker_A",
+      "utterance": "关于π decoder (Infra_WorkerNode)、Cell Type classifier，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 540
+    },
+    {
+      "turn_id": 37,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_13",
+        "msg_14"
+      ],
+      "timestamp_offset": 555
+    },
+    {
+      "turn_id": 38,
+      "speaker": "Speaker_A",
+      "utterance": "Gene expression (Infra_LoadBalancer)、Cell type (Infra_RedisCache)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 570
+    },
+    {
+      "turn_id": 39,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，Gene expression (Infra_LoadBalancer)、Cell type (Infra_RedisCache)是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 585
+    },
+    {
+      "turn_id": 40,
+      "speaker": "Speaker_A",
+      "utterance": "Gene expression (Infra_LoadBalancer)、Cell type (Infra_RedisCache)和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 600
+    },
+    {
+      "turn_id": 41,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达Gene expression (Infra_LoadBalancer)、Cell type (Infra_RedisCache)结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_15",
+        "msg_16"
+      ],
+      "timestamp_offset": 615
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 41,
+    "speaker_distribution": {
+      "Speaker_B": 21,
+      "Speaker_A": 20
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "clarify": 5,
+      "classification": 4,
+      "structural": 6,
+      "confirm": 10,
+      "request": 8,
+      "inform": 2,
+      "contrastive": 4
+    },
+    "avg_turn_length": 48.63414634146341,
+    "dialogue_duration": 615
+  }
+}

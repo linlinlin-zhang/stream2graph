@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00508",
+  "source": "github",
+  "source_url": "https://github.com/lproux/Azure-AI-Gateway-Easy-Deploy/blob/a351bd809960ae4197643886fee51c0b118a9b21/AI-Gateway/labs/mcp-client-authorization/diagrams/mcp_client_auth.mmd",
+  "github_repo": "lproux/Azure-AI-Gateway-Easy-Deploy",
+  "github_file_path": "AI-Gateway/labs/mcp-client-authorization/diagrams/mcp_client_auth.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\r\n    participant UserAgent as User agent (browser)\r\n    participant MCPClient as MCP Client (MCP Inspector)\r\n    participant MCPGateway as MCP/AI Gateway (APIM)\r\n    participant UpstreamServices as Entra (third-party IDP)\r\n    participant MCPServer as MCP Server (Resource Server)\r\n\r\n    UserAgent->>MCPClient: Open browser\r\n    MCPClient->>MCPServer: Connect to MCP server with /sse protocol\r\n    MCPServer->>MCPClient: Returns 401 Unauthorized\r\n    MCPClient->>MCPGateway: GET /.well-known/oauth-authorization-server\r\n    alt Server supports discovery endpoint\r\n        MCPGateway->>MCPClient: Authorization server Metadata\r\n    else No discovery\r\n        MCPGateway->>MCPClient: 404 (use default endpoints)\r\n    end\r\n    MCPClient->>MCPGateway: POST /register endpoint\r\n    Note over MCPGateway: Does dynamic client registration\r\n    MCPGateway-->>MCPClient: Return client_credentials (client identifier and client_secret(if supported))\r\n    Note over MCPClient: Generate PKCE parameters (Code_Verifier, Code Challenge) and constructs the authorization URL\r\n    MCPClient->>UserAgent: Open browser with authorization URL + code_challenge\r\n    Note over UserAgent: Initiate authorization code flow using PKCE (Proof Key for Code Exchange)\r\n    UserAgent->>MCPGateway: GET /authorize?response_type=code&client_id=client_id&redirect_uri=client_callback_url&code_challenge=code_challenge&code_challenge_method=S256\r\n    Note over MCPGateway: Works as confidential client and<br> 1. Generate an mcpServerAuthCode for client<br> 2. generates the authorization URL for Entra with:<br> scope and redirect_uri=mcpServer_callback_url\r\n    MCPGateway-->>UpstreamServices: Redirect to upstream (Entra) authorization endpoint\r\n    Note over UpstreamServices: User logs in and authorizes on upstream\r\n    UpstreamServices-->>MCPGateway: Redirect with upstream (Entra) auth_code to mcpServer_callback_url (APIM /callback endpoint)\r\n    MCPGateway-->>UpstreamServices: Exchange auth_code for upstream (Entra) access token<br><br> POST /token\r\n    UpstreamServices-->>MCPGateway: Upstream (Entra) access token\r\n    Note over MCPGateway: Generate MCP specific token\r\n    MCPGateway->>MCPClient: Redirect to mcpClient_callback URL with mcpServerAuthCode\r\n    Note over MCPClient: Exchange mcpServerAuthCode + code_verifier for mcpServerAccessToken\r\n    MCPClient->>MCPGateway: POST /token endpoint with mcpServerAuthCode + code_verifier\r\n    Note over MCPGateway: Validate code_verifier and code_challenge\r\n    MCPGateway->>MCPClient: Return Access Token if validation is successful\r\n    Note over MCPClient: Caches mcpServerAccessToken\r\n    MCPClient ->>MCPGateway: /sse endpoint with mcpServerAccessToken\r\n    MCPGateway->>MCPServer: Forward request to MCP server with session ID\r\n    MCPServer->>MCPClient: Return 200 OK with session ID\r\n    Note over MCPClient,MCPServer: Begin standard MCP message exchange using session ID\r\n\r\n",
+  "content_size": 2932,
+  "collected_at": "2026-02-06T01:33:15.608649",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

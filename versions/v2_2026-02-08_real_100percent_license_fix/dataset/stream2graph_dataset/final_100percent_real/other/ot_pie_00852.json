@@ -1,0 +1,15 @@
+{
+  "id": "ot_pie_00852",
+  "source": "other",
+  "source_url": "https://github.com/reyabsaluja/launchit/blob/f46fe41f221c4e72da5827fca62fbe658811b41e/docs/diagrams/tech-architecture.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "reyabsaluja/launchit",
+  "diagram_type": "pie",
+  "code": "%% Tech Architecture (Mermaid) – how pieces work together\nflowchart TB\n\n  %% Layers\n  subgraph Browser\n    BUI[Session Dashboard (React)]\n    BUI -->|Buttons| BTN1[Open /landing/:id]\n    BUI -->|Buttons| BTN2[Open /marketing/:id]\n    BUI -.SSE.->|/api/agentic-session?stream=true| SSE[(EventStream)]\n  end\n\n  subgraph Next.js App (App Router)\n    direction TB\n    subgraph UI Components\n      CW[ChatWindow]\n      ACW[AgenticChatWindow]\n      AT[ArtifactTabs]\n      EXP[ExportButton]\n    end\n\n    subgraph Route Handlers (Server)\n      API1[/api/start-session\\n(legacy)]\n      API2[/api/agentic-session\\n(agentic + SSE)]\n      GENW[/landing/:id\\n(HTML website)]\n      GENM[/marketing/:id\\n(HTML pack)]\n    end\n  end\n\n  subgraph Orchestration\n    OR1[orchestrator.ts\\n(runConversation)]\n    OR2[agenticOrchestrator.ts\\n(runAgenticConversation)]\n    AF[agentFactory.ts + agents.json]\n  end\n\n  subgraph LLM Layer\n    LC[LangChain ChatCohere]\n    CO[(Cohere API)]\n  end\n\n  FS[(.sessions JSON store)]\n  ENV[(.env.local: COHERE_API_KEY)]\n\n  %% Flows\n  BUI -->|fetch POST| API1\n  BUI -->|fetch POST| API2\n  API1 --> OR1 --> AF\n  API2 --> OR2 --> AF\n  OR1 --> LC --> CO\n  OR2 --> LC --> CO\n  OR1 --> FS\n  OR2 --> FS\n  API2 -.broadcast SSE.-> BUI\n\n  BTN1 --> GENW --> FS\n  GENW --> LC --> CO\n  GENW --> BUI\n\n  BTN2 --> GENM --> FS\n  GENM --> LC --> CO\n  GENM --> BUI\n\n  ENV -.provides key.-> LC\n\n  classDef node fill:#fff,stroke:#888,stroke-width:1,color:#111;\n  classDef store fill:#eef6ff,stroke:#5b9bd5,color:#0b3d60;\n  class BUI,CW,ACW,AT,EXP,API1,API2,GENW,GENM,OR1,OR2,AF,LC,CO node;\n  class FS,ENV store;\n\n",
+  "content_size": 1604,
+  "collected_at": "2026-02-06T10:47:56.683233",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)"
+}

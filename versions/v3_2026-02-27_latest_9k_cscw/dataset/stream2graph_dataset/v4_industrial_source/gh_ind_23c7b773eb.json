@@ -1,0 +1,9 @@
+{
+  "id": "gh_ind_23c7b773eb",
+  "source": "github_industrial",
+  "repo": "cicorias/jwtproxy",
+  "license": "apache-2.0",
+  "code": "sequenceDiagram\n  participant User\n  participant App\n  participant Module\n  participant KeyHelper\n  participant JwksHost\n  App->>+Module: Options?\n  Note left of Module: optional and if present <br/> than NO env variables are used. \n  User->>+App: api(h:jwt)\n  App->>+Module: verify(jwt)\n  Module->>Module: decode(kid,claims)\n  Note Right of Module: decode but not verify <br/>\n  Module->>+KeyHelper: getKey(decoded token, kid)\n  alt Local or Remote\n    KeyHelper->>+JwksHost: getKeys()\n  else\n    KeyHelper->>KeyHelper: getKey(kid, filePath)\n    Note right of KeyHelper: developer and test experience <br/> without relying on <br/>external Jwks Host [A]\n  end\n  KeyHelper-->>-Module: key for kid\n  Module-->>-App: done\n  App-->>-User: ok/not ok\n\n\n",
+  "diagram_type": "size:600..800",
+  "collected_at": "2026-02-27T03:25:12.494289"
+}

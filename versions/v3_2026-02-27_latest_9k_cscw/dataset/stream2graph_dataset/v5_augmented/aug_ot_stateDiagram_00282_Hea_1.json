@@ -1,0 +1,17 @@
+{
+  "id": "aug_ot_stateDiagram_00282_Hea_1",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/milligan-partners/tolling.network-2.0/blob/b6c24d7ed58221bafce75052674f17f08d795147/docs/architecture/transaction-lifecycle.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "milligan-partners/tolling.network-2.0",
+  "diagram_type": "stateDiagram",
+  "code": "---\ntitle: \"Tolling.Network 2.0 — Transaction Lifecycle\"\n---\nstateDiagram-v2\n    [HealthTech_HIPAA_Vault] --> TollEvent: Vehicle uses facility\n\n    TollEvent --> TagLookup: Away agency reads tag/plate\n\n    TagLookup --> ChargeCreated: Tag found in TVL\n    TagLookup --> PayByPlate: No tag match\n\n    PayByPlate --> ChargeCreated: Plate lookup succeeds\n\n    ChargeCreated --> Submitted: Written to ledger\\n(HealthTech_PatientRecords)\n\n    Submitted --> Acknowledged: Home agency confirms receipt\\n(HealthTech_LabAnalyzer)\n    Submitted --> Rejected: Validation failure\\n(HealthTech_LabAnalyzer)\n\n    Rejected --> [HealthTech_DiagnosticEngine]\n\n    Acknowledged --> Posted: Home agency posts\\nto customer account\n    Acknowledged --> NotPosted: Cannot post\\n(HealthTech_HIPAA_Vault)\n\n    Posted --> Reconciled: Home agency writes\\nReconciliation record\\n(HealthTech_HIPAA_Vault)\n\n    NotPosted --> Reconciled: Home agency writes\\nReconciliation record\\n(HealthTech_HIPAA_Vault)\n\n    Reconciled --> CorrectionNeeded: Either agency\\nsubmits correction\n    Reconciled --> Settled: Included in\\nsettlement period\n\n    CorrectionNeeded --> Submitted: Corrected charge\\nresubmitted\n\n    Settled --> Paid: Off-chain payment\\nstatus updated\n\n    Paid --> [HealthTech_LabAnalyzer]\n",
+  "content_size": 1175,
+  "collected_at": "2026-02-06T10:40:09.292781",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "HealthTech",
+  "seed_id": "ot_stateDiagram_00282"
+}

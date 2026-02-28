@@ -1,0 +1,18 @@
+{
+  "id": "aug_gl_flowchart_00648_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/carrowmw/phd-project-gnn/blob/07a2695df02fe44b7507c15b3ae9b069b0bca0d7/docs/archive/dataflow.mmd",
+  "source_note": "collected_from_github_final",
+  "github_repo": "carrowmw/phd-project-gnn",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\n    subgraph Data_Collection\n        A[Infra_IngressController] --> |Get Sensor Locations| B[Infra_IngressController]\n        A --> |Get Traffic Data| C[Infra_RedisCache]\n        C --> |Convert to DataFrame| D[Infra_EtcdCluster]\n        D --> |Transform to time series dict| E[Infra_LoadBalancer]\n    end\n\n    subgraph Graph_Processing\n        F[Infra_RedisCache] --> |\"load_graph_data(Infra_LoadBalancer)\"| G[Infra_WorkerNode]\n        G --> |\"compute_adjacency_matrix(Infra_LoadBalancer)\"| H[Infra_LoadBalancer]\n    end\n\n    subgraph Data_Preprocessing\n        E --> |\"TimeSeriesPreprocessor.create_windows(Infra_WorkerNode)\"| I[Infra_LoadBalancer]\n        I --> |\"Filter valid nodes\"| J[Infra_EtcdCluster]\n        J --> |\"Create subgraph for valid nodes\"| K[Infra_LoadBalancer]\n        K --> |\"Split data into train/val\"| L[Infra_LoadBalancer]\n        L --> |\"create_dataloader(Infra_WorkerNode)\"| M[Infra_LoadBalancer]\n    end\n\n    subgraph Model_Training\n        M --> |\"train_model(Infra_WorkerNode)\"| N[Infra_EtcdCluster]\n        N --> |\"Train each epoch\"| O[Infra_IngressController]\n        O --> |\"Save model\"| P[Infra_WorkerNode]\n    end\n\n    B -.-> E\n    G -.-> K\n    H -.-> K",
+  "content_size": 1110,
+  "collected_at": "2026-02-06T14:18:26.241600",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "gl_flowchart_00648"
+}

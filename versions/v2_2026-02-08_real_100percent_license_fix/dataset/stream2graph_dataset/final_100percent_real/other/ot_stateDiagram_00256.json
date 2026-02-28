@@ -1,0 +1,15 @@
+{
+  "id": "ot_stateDiagram_00256",
+  "source": "other",
+  "source_url": "https://github.com/andersonm30/teste-tl/blob/bb763b045aa1c3212b21a8cabf5127d331b97b26/docs/workflow.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "andersonm30/teste-tl",
+  "diagram_type": "stateDiagram",
+  "code": "```mermaid\nstateDiagram-v2\n    [*] --> Received: API recebe requisição\n\n    Received --> Processing: Worker consome evento da fila\n    Received --> Failed: Timeout (mensagem não processada em 24h)\n\n    Processing --> WaitingExternal: Validação de payload OK\n    Processing --> Failed: Validação de payload falha\n    Processing --> Failed: Exceção não tratada\n\n    WaitingExternal --> Completed: Sistema externo retorna 2xx\n    WaitingExternal --> Failed: Sistema externo retorna 4xx/5xx após retries\n    WaitingExternal --> Failed: Timeout da chamada externa (> 60s)\n\n    Completed --> [*]: Estado final\n    Failed --> [*]: Estado final (Move para DLQ)\n\n    note right of Received\n        Status inicial após persistência\n        Duração típica: < 100ms\n    end note\n\n    note right of Processing\n        Validações de negócio\n        Transformações de payload\n        Duração típica: 200-500ms\n    end note\n\n    note right of WaitingExternal\n        HTTP request em trânsito\n        Retry com backoff exponencial\n        Duração típica: 1-5s\n    end note\n\n    note right of Completed\n        Sucesso: Response armazenado\n        Mensagem removida da fila\n        SLA alcançado\n    end note\n\n    note right of Failed\n        Falha irrecuperável\n        ErrorMessage armazenado\n        Mensagem movida para DLQ\n        Alert disparado\n    end note\n```\n",
+  "content_size": 1351,
+  "collected_at": "2026-02-06T10:39:46.003177",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)"
+}

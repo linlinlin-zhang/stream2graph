@@ -1,0 +1,143 @@
+{
+  "id": "gh_sequence_00590",
+  "source": "github",
+  "source_url": "https://github.com/lewiswlker/KengU/blob/7a0c8091eb737b1a5823499ce7050f1a30d05565/docs/alt_generate_monthly_plan.mmd",
+  "github_repo": "lewiswlker/KengU",
+  "github_file_path": "docs/alt_generate_monthly_plan.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant PlannerAgent\n    participant DB\n    participant StudyDB as StudySessionDB\n    participant LLM\n    participant ConvStore as ConvStore\n    participant User\n\n    PlannerAgent->>DB: get_assignments_by_date_range(user_id, start_date, end_date)\n    DB-->>PlannerAgent: assignments\n    PlannerAgent->>StudyDB: get_study_sessions_by_date_range(user_id, start_date, end_date)\n    StudyDB-->>PlannerAgent: study_sessions\n    PlannerAgent->>LLM: call_llm(plan_sys, plan_user_with_assignments_and_sessions)\n    alt LLM success\n        LLM-->>PlannerAgent: plan_text (Gantt-like + schedule)\n        PlannerAgent->>ConvStore: _append_conversation(user_id,'assistant', plan_text)\n        PlannerAgent-->>User: ChatResult(plan_text)\n    else LLM fails\n        PlannerAgent->>ConvStore: _append_conversation(user_id,'assistant', fallback_reply)\n        PlannerAgent-->>User: ChatResult(fallback_reply)\n    end\n\n",
+  "content_size": 926,
+  "collected_at": "2026-02-06T01:34:23.723442",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "repo_owner": "lewiswlker",
+  "repo_name": "KengU",
+  "repo_description": "Your study partner at the University of Hong Kong",
+  "repo_language": "Python",
+  "repo_topics": [],
+  "repo_created_at": "2025-11-05T09:20:04Z",
+  "repo_updated_at": "2025-12-06T06:41:08Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "首先，我们需要定义流程的起点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "StudyDB"
+      ],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "关于ConvStore、get_assignments_by_date_range(user_id, start_date, end_date)，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "ConvStore",
+        "msg_0"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "get_study_sessions_by_date_range(user_id, start_date, end_date)、call_llm(plan_sys, plan_user_with_assignments_and_sessions)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，get_study_sessions_by_date_range(user_id, start_date, end_date)、call_llm(plan_sys, plan_user_with_assignments_and_sessions)就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含get_study_sessions_by_date_range(user_id, start_date, end_date)、call_llm(plan_sys, plan_user_with_assignments_and_sessions)这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_1",
+        "msg_2",
+        "msg_3"
+      ],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理_append_conversation(user_id,'assistant', fallback_reply)？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在_append_conversation(user_id,'assistant', fallback_reply)完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_4"
+      ],
+      "timestamp_offset": 165
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 11,
+    "speaker_distribution": {
+      "Speaker_B": 6,
+      "Speaker_A": 5
+    },
+    "speech_act_distribution": {
+      "sequential": 3,
+      "inform": 2,
+      "request": 2,
+      "confirm": 2,
+      "classification": 1,
+      "structural": 1
+    },
+    "avg_turn_length": 62.54545454545455,
+    "dialogue_duration": 165
+  }
+}

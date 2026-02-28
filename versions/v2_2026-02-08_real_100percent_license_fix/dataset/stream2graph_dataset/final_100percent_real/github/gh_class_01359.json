@@ -1,0 +1,18 @@
+{
+  "id": "gh_class_01359",
+  "source": "github",
+  "source_url": "https://github.com/cimpa2004/financeTracker/blob/738564d496ab1b59c3e7beb2903adab04e6d8fe5/docs/diagrams/models_class_diagrams_1.mmd",
+  "github_repo": "cimpa2004/financeTracker",
+  "github_file_path": "docs/diagrams/models_class_diagrams_1.mmd",
+  "diagram_type": "class",
+  "code": "﻿classDiagram\n    %% core domain models\n    class User {\n      +Guid UserId\n      +string Username\n      +string Email\n      +string PasswordHash\n      +string Salt\n      +DateTime? CreatedAt\n      +DateTime? ModifiedAt\n    }\n\n    class Category {\n      +Guid CategoryId\n      +string Name\n      +string? Icon\n      +string? Color\n      +Guid? UserId\n      +string Type\n    }\n\n    class Budget {\n      +Guid BudgetId\n      +Guid UserId\n      +Guid? CategoryId\n      +string? Name\n      +DateTime? StartDate\n      +DateTime? EndDate\n      +DateTime? CreatedAt\n      +decimal Amount\n    }\n\n    class Transaction {\n      +Guid TransactionId\n      +Guid UserId\n      +Guid CategoryId\n      +decimal Amount\n      +string? Description\n      +DateTime? Date\n      +DateTime? CreatedAt\n      +string? Name\n      +Guid? SubscriptionId\n    }\n\n    class Subscription {\n      +Guid SubscriptionId\n      +Guid UserId\n      +Guid? CategoryId\n      +decimal? Amount\n      +string? Name\n      +string? Interval\n      +DateTime? PaymentDate\n      +bool IsActive\n      +DateTime? CreatedAt\n    }\n\n    class ExternalAccount {\n      +Guid AccountId\n      +Guid UserId\n      +string Platform\n      +string? AccessToken\n      +DateTime? ExpiresAt\n    }\n\n    class Household {\n      +Guid HouseholdId\n      +string Name\n    }\n\n    class HouseholdMember {\n      +Guid HouseholdId\n      +Guid UserId\n      +bool IsAdmin\n    }\n\n    class Notification {\n      +Guid NotificationId\n      +Guid? BudgetId\n      +Guid? TransactionId\n      +int Level\n      +DateTime? SentAt\n      +DateTime? PeriodStart\n      +DateTime? PeriodEnd\n    }\n\n    class FinancetrackerContext {\n      +DbSet<Budget> Budgets\n      +DbSet<Category> Categories\n      +DbSet<ExternalAccount> ExternalAccounts\n      +DbSet<Household> Households\n      +DbSet<HouseholdMember> HouseholdMembers\n      +DbSet<Transaction> Transactions\n      +DbSet<User> Users\n      +DbSet<Notification> Notifications\n      +DbSet<Subscription> Subscriptions\n    }\n\n    %% relationships\n    User \"1\" --> \"0..*\" Budget : budgets\n    User \"1\" --> \"0..*\" Category : categories\n    User \"1\" --> \"0..*\" Transaction : transactions\n    User \"1\" --> \"0..*\" ExternalAccount : externalAccounts\n    User \"1\" --> \"0..*\" HouseholdMember : householdMembers\n    User \"1\" --> \"0..*\" Subscription : subscriptions\n\n    Category \"1\" --> \"0..*\" Budget : budgets\n    Category \"1\" --> \"0..*\" Transaction : transactions\n    Category \"1\" --> \"0..*\" Subscription : subscriptions\n\n    Budget \"*\" --> \"0..1\" Category : category\n    Budget \"*\" --> \"1\" User : user\n\n    Transaction \"*\" --> \"1\" Category : category\n    Transaction \"*\" --> \"1\" User : user\n    Transaction \"0..1\" --> \"1\" Subscription : subscription\n\n    Subscription \"1\" --> \"0..*\" Transaction : transactions\n\n    FinancetrackerContext ..> User : uses\n    FinancetrackerContext ..> Transaction : uses\n    FinancetrackerContext ..> Category : uses\n    FinancetrackerContext ..> Subscription : uses\n",
+  "content_size": 2952,
+  "collected_at": "2026-02-06T01:56:44.371270",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

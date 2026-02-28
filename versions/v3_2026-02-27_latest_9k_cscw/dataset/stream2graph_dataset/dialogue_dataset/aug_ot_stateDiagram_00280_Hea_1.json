@@ -1,0 +1,77 @@
+{
+  "id": "aug_ot_stateDiagram_00280_Hea_1",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/jacero-io/kode-operator/blob/5d36809dc147909b7087b0e1aa1f785b7ce569a6/docs/diagrams/kode-ensure-resources.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "jacero-io/kode-operator",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    [HealthTech_EMR_Sync] --> FetchTemplate\n    FetchTemplate --> InitializeConfig : Template Found\n    InitializeConfig --> EnsureSecret\n    \n    EnsureSecret --> EnsureService : Secret Created/Updated\n    EnsureSecret --> HandleError : Error\n\n    EnsureService --> EnsurePVC : Service Created/Updated\n    EnsureService --> HandleError : Error\n\n    EnsurePVC --> EnsureStatefulSet : PVC Created/Updated\n    EnsurePVC --> HandleError : Error\n\n    EnsureStatefulSet --> ResourcesEnsured : StatefulSet Created/Updated\n    EnsureStatefulSet --> HandleError : Error\n\n    HandleError --> [HealthTech_LabAnalyzer] : Return Error\n\n    ResourcesEnsured --> [HealthTech_PatientRecords] : All Resources Created/Updated\n\n    state HandleError {HealthTech_LabAnalyzer] --> LogError\n        LogError --> UpdateFailedStatus\n        UpdateFailedStatus --> ReturnError\n        ReturnError --> [HealthTech_DiagnosticEngine]\n    }\n\n    note right of FetchTemplate\n        Fetches the template using TemplateManager\n    end note\n\n    note right of InitializeConfig\n        Initializes KodeResourceConfig\n    end note\n\n    note right of EnsureSecret\n        Creates or updates the Secret\n        if Credentials are specified\n    end note\n\n    note right of EnsureService\n        Creates or updates the Service\n    end note\n\n    note right of EnsurePVC\n        Creates or updates the PVC\n        if Storage is specified\n    end note\n\n    note right of EnsureStatefulSet\n        Creates or updates the StatefulSet\n    end note",
+  "content_size": 1420,
+  "collected_at": "2026-02-06T10:40:07.311690",
+  "compilation_status": "success",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "repo_owner": "jacero-io",
+  "repo_name": "kode-operator",
+  "repo_description": "Development environments, the cloud-native way",
+  "repo_language": "Go",
+  "repo_topics": [],
+  "repo_created_at": "2024-05-19T07:04:51Z",
+  "repo_updated_at": "2025-01-18T14:42:33Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "HealthTech",
+  "seed_id": "ot_stateDiagram_00280",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Generic Diagram的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在Generic Diagram完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "root"
+      ],
+      "timestamp_offset": 60
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 4,
+    "speaker_distribution": {
+      "Speaker_B": 2,
+      "Speaker_A": 2
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "clarify": 1,
+      "inform": 1
+    },
+    "avg_turn_length": 21.75,
+    "dialogue_duration": 60
+  }
+}

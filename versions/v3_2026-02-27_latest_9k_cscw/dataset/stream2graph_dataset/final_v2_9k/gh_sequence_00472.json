@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00472",
+  "source": "github",
+  "source_url": "https://github.com/luth9r/FitTracker/blob/c81958bfbd32229654cff70c18fdc0d6e0541f71/docs/register-flow.mmd",
+  "github_repo": "luth9r/FitTracker",
+  "github_file_path": "docs/register-flow.mmd",
+  "diagram_type": "sequence",
+  "code": "%%{init: {'look':'neo', 'theme':'redux-color'}}%%\nsequenceDiagram\n    autonumber\n    \n    box \"Client & Application\"\n        participant C as Client\n        participant AC as Auth Controller\n        participant H as Register Handler\n        participant PH as Password Hasher\n        participant U as User (Domain)\n    end\n\n    box \"Persistence\"\n        participant WR as Repository / DbContext\n        participant DB as PostgreSQL\n    end\n\n    box \"Background Infrastructure\"\n        participant OS as Signal (Channel)\n        participant OP as Outbox Processor\n        participant RMQ as RabbitMQ\n    end\n\n    box \"Email Delivery\"\n        participant EC as Email Consumer\n        participant JTG as Jwt Generator\n        participant SMTP as SMTP Server\n    end\n\n    Note over C, SMTP: == STAGE 1: Registration (Synchronous) ==\n\n    C->>AC: POST /register {email, password...}\n    AC->>H: Handle Command\n    \n    H->>WR: Check if Email Unique\n    WR->>DB: SELECT Count(*) WHERE Email = ?\n    DB-->>H: 0 (Unique)\n    \n    H->>PH: HashPassword(password)\n    PH-->>H: \"hashed_secret\"\n    \n    H->>U: User.Create(email, hashed...)\n    Note over U: 1. Creates User Entity<br/>(IsEmailVerified = false)<br/>2. Adds UserRegisteredEvent\n    \n    Note over H, DB: ATOMIC TRANSACTION\n    H->>WR: SaveChangesAsync()\n    \n    rect rgb(255, 245, 245)\n        Note right of WR: Inside DbContext\n        WR->>DB: BEGIN TRANSACTION\n        WR->>DB: INSERT INTO Users\n        WR->>DB: INSERT INTO OutboxMessages\n        WR->>DB: COMMIT\n    end\n    \n    WR-)OS: TryWrite(true) (Wake up signal)\n    \n    H-->>C: 200 OK { \"Success\" }\n    \n    Note over C, SMTP: == STAGE 2: Outbox Processing ==\n\n    OS-)OP: Signal Received\n    OP->>DB: SELECT * FROM OutboxMessages\n    DB-->>OP: [UserRegisteredEvent]\n    \n    OP->>RMQ: Publish(UserRegisteredEvent)\n    RMQ-->>OP: ACK\n    \n    OP->>DB: UPDATE OutboxMessages (Mark Processed)\n    \n    Note over C, SMTP: == STAGE 3: Verification Email ==\n    \n    RMQ->>EC: Consume(UserRegisteredEvent)\n    \n    Note right of EC: Token generated exclusively<br/>for the email\n    EC->>JTG: GenerateVerificationToken(userId)\n    JTG-->>EC: \"eyJ...\" (1 hour)\n    \n    EC->>SMTP: Send Email (link + token)\n    SMTP->>C: Email in Inbox\n    EC->>RMQ: ACK Message",
+  "content_size": 2270,
+  "collected_at": "2026-02-06T01:32:48.141822",
+  "compilation_status": "failed",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 2,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

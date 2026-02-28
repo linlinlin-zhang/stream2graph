@@ -1,0 +1,9 @@
+{
+  "id": "gh_ind_4395fb21db",
+  "source": "github_industrial",
+  "repo": "ceramicnetwork/rust-ceramic",
+  "license": "other",
+  "code": "stateDiagram-v2\n  [*] --> Initiator: app(intiate=true)\n  state Initiator {\n    [*] --> InterestsSent: send(InterestRequest)\n    InterestsSent --> RangeSent: recv(InterestResponse)\n    RangeSent --> RangeRecv: recv(RangeResponse)\n    RangeRecv --> RangeSent: send(RangeRequest)\n    RangeRecv --> [*]: app(no more pending range requests)\n  }\n  [*] --> Responder: app(initiate=false)\n  state Responder {\n    [*] --> InterestsRecvd: recv(InterestRequest)\n    InterestsRecvd --> RangeWait: send(InterestResponse)\n    RangeWait --> RangeReply: recv(RangeRequest)\n    RangeReply --> RangeWait: send(RangeResponse)\n    RangeWait --> [*]: recv(HangUp)\n  }\n  Initiator --> SyncingValues\n  Responder --> SyncingValues\n  SynchingValues --> Synchronized: app(no more value or range wants), send(HangUp)\n  Synchronized --> [*]: recv(HangUp)\n",
+  "diagram_type": "size:800..1000",
+  "collected_at": "2026-02-27T03:25:36.344538"
+}

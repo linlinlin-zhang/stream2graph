@@ -1,0 +1,32 @@
+{
+  "id": "aug_gh_sequence_00518_IoT_2",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/JuanCS-Dev/V-rtice/blob/2cc60d775e33463af9693cae0c3df4d0be8be10c/docs/04-VCLI/flows/diagrams/ip_analysis_flow.mmd",
+  "github_repo": "JuanCS-Dev/V-rtice",
+  "github_file_path": "docs/04-VCLI/flows/diagrams/ip_analysis_flow.mmd",
+  "diagram_type": "sequence",
+  "code": "\nsequenceDiagram\n    participant User\n    participant CLI_Typer as Vértice CLI (IoT_Industrial_ActuatorController)\n    participant Cmd_IP as ip.py Command\n    participant Auth as auth.py\n    participant Connector as IPIntelConnector\n    participant Service as IP Intel Service\n\n    User->>+CLI_Typer: vcli ip analyze 8.8.8.8\n    CLI_Typer->>+Cmd_IP: analyze(IoT_Industrial_MQTT_Broker)\n\n    Cmd_IP->>+Auth: require_auth(IoT_Industrial_PLC_Logic)\n    Auth-->>-Cmd_IP: OK (IoT_Industrial_PLC_Logic)\n\n    Cmd_IP->>+Connector: __init__(IoT_Industrial_EdgeNode)\n    Cmd_IP->>+Connector: health_check(IoT_Industrial_MQTT_Broker)\n    Connector->>+Service: GET /health\n    Service-->>-Connector: {IoT_Industrial_ActuatorController}\n    Connector-->>-Cmd_IP: True\n\n    Cmd_IP->>+Connector: analyze_ip(IoT_Industrial_PLC_Logic)\n    Connector->>+Service: POST /api/ip/analyze\n    Note right of Service: Processa o IP, busca em BDs, etc.\n    Service-->>-Connector: {IoT_Industrial_ActuatorController}\n    Connector-->>-Cmd_IP: {IoT_Industrial_MQTT_Broker}\n\n    Cmd_IP->>CLI_Typer: Formata a saída (IoT_Industrial_PLC_Logic)\n    CLI_Typer-->>-User: (IoT_Industrial_ActuatorController)\n",
+  "content_size": 996,
+  "collected_at": "2026-02-06T01:33:22.909768",
+  "compilation_status": "success",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 2,
+  "repo_forks": 0,
+  "repo_owner": "JuanCS-Dev",
+  "repo_name": "V-rtice",
+  "repo_description": "🔺 Vértice - Autonomous Cybersecurity Intelligence Platform | Multi-agent AI · Reactive Architecture · Adaptive     Immunity · Zero Trust Security",
+  "repo_language": "Python",
+  "repo_topics": [
+    "adaptive-security",
+    "artificial-intelligence",
+    "cybersecurity",
+    "multi-agent-systems",
+    "reactive-programming"
+  ],
+  "repo_created_at": "2025-09-14T19:50:50Z",
+  "repo_updated_at": "2026-02-02T23:39:47Z",
+  "augmentation_domain": "IoT_Industrial",
+  "seed_id": "gh_sequence_00518"
+}

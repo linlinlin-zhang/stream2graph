@@ -1,0 +1,277 @@
+{
+  "id": "gl_packet-beta_00454",
+  "source": "gitlab",
+  "source_url": "https://github.com/Ghenghis/SvonyBrowser/blob/b02803cf7b47e7d54ef3c45466f973948f5a47d4/docs/v2.0.6/diagrams/IPC_COMMUNICATION.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "Ghenghis/SvonyBrowser",
+  "diagram_type": "packet-beta",
+  "code": "%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#10b981'}}}%%\nsequenceDiagram\n    autonumber\n    participant R as 🖼️ Renderer<br/>(renderer.js)\n    participant P as 📡 Preload<br/>(preload.js)\n    participant M as 🖥️ Main<br/>(index.js)\n    participant S as ⚙️ Services\n    participant MCP as 🤖 MCP Servers\n    participant LM as 🧠 LM Studio\n    \n    Note over R,LM: Application Initialization\n    \n    R->>P: DOMContentLoaded\n    P->>M: ipcRenderer.invoke('get-version')\n    M-->>P: { version: '2.0.6' }\n    P-->>R: version\n    \n    R->>P: Initialize LM Studio\n    P->>M: ipcRenderer.invoke('lm-studio-connect', url)\n    M->>S: lmStudioClient.connect(url)\n    S->>LM: HTTP GET /v1/models\n    LM-->>S: { models: [...] }\n    S-->>M: { connected: true, models }\n    M-->>P: status\n    P-->>R: Update UI\n    \n    Note over R,LM: Chat Message Flow\n    \n    R->>P: User sends chat message\n    P->>M: ipcRenderer.invoke('chatbot-message', msg)\n    M->>S: chatbotService.processMessage(msg)\n    \n    alt Intent: Knowledge Query\n        S->>MCP: evony_search(query)\n        MCP-->>S: { results: [...] }\n    else Intent: Calculation\n        S->>MCP: calc_training(params)\n        MCP-->>S: { result: {...} }\n    else Intent: Protocol\n        S->>MCP: protocol_lookup(id)\n        MCP-->>S: { action: {...} }\n    end\n    \n    S->>S: Build context from MCP results\n    S->>LM: POST /v1/chat/completions\n    LM-->>S: { response: '...' }\n    S-->>M: formatted response\n    M-->>P: response\n    P-->>R: Display in chat\n    \n    Note over R,LM: Traffic Capture Flow\n    \n    R->>P: Webview traffic detected\n    P->>M: ipcRenderer.send('traffic-captured', packet)\n    M->>S: proxyMonitor.processPacket(packet)\n    S->>S: Decode AMF3\n    S->>S: Identify action\n    S->>S: Update game state\n    M->>P: mainWindow.webContents.send('traffic-update', entry)\n    P->>R: Update traffic list\n    \n    Note over R,LM: Settings Flow\n    \n    R->>P: User saves settings\n    P->>M: ipcRenderer.invoke('save-settings', settings)\n    M->>S: store.set(settings)\n    M->>S: lmStudioClient.updateSettings(settings.lmStudio)\n    S->>LM: Reconnect if URL changed\n    M-->>P: { success: true }\n    P-->>R: Show confirmation\n",
+  "content_size": 2201,
+  "collected_at": "2026-02-06T14:10:02.606566",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 'get-version' 和 'lm-studio-connect', url 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 ''get-version' 和 'lm-studio-connect', url'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "invoke",
+        "invoke"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 url 和 'chatbot-message', msg 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 url处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'url处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "connect",
+        "invoke"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 msg 和 query 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'msg 和 query'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "processMessage",
+        "evony_search"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 params 和 id。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'params 和 id'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "calc_training",
+        "protocol_lookup"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 'traffic-captured', packet 和 packet 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 ''traffic-captured', packet 和 packet'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "send",
+        "processPacket"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 'traffic-update', entry 和 'save-settings', settings。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 ''traffic-update', entry 和 'save-settings', settings'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "send",
+        "invoke"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 settings 和 settings.lmStudio 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'settings 和 settings.lmStudio'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "set",
+        "updateSettings"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 29,
+    "repair_count": 1,
+    "grounding_acts_count": 14,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

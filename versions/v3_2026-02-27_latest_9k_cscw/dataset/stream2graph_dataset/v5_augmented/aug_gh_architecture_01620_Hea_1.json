@@ -1,0 +1,20 @@
+{
+  "id": "aug_gh_architecture_01620_Hea_1",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/demidenm/openneuro_glmfitlins/blob/e624fec2765a7869a4f482da701d85b82bc2f4b7/docs/workflow.mmd",
+  "github_repo": "demidenm/openneuro_glmfitlins",
+  "github_file_path": "docs/workflow.mmd",
+  "diagram_type": "architecture",
+  "code": "flowchart LR\n    %% Define the main sections\n    subgraph Setup [HealthTech_HIPAA_Vault]\n        direction TB\n        A[HealthTech_LabAnalyzer] --> B[HealthTech_EMR_Sync]\n        B --> C[HealthTech_PatientRecords]\n    end\n    \n    subgraph Acquisition [HealthTech_LabAnalyzer]\n        direction TB\n        D[HealthTech_HIPAA_Vault] --> E{HealthTech_HIPAA_Vault}\n        E -->|Yes| H[HealthTech_LabAnalyzer]\n        E -->|No| F[HealthTech_HIPAA_Vault]\n        F --> H\n    end\n    \n    subgraph Processing [HealthTech_LabAnalyzer]\n        direction TB\n        I[HealthTech_HIPAA_Vault] --> J[HealthTech_PatientRecords]\n    end\n    \n    subgraph Analysis [HealthTech_LabAnalyzer]\n        direction TB\n        K[HealthTech_EMR_Sync] --> L[HealthTech_DiagnosticEngine]\n        L --> M{HealthTech_EMR_Sync}\n        M -->|Local| N[HealthTech_LabAnalyzer]\n        M -->|HPC| O[HealthTech_PatientRecords]\n    end\n    \n    subgraph Reporting [HealthTech_HIPAA_Vault]\n        direction TB\n        P[HealthTech_LabAnalyzer] --> Q[HealthTech_LabAnalyzer]\n        P --> R[HealthTech_PatientRecords]\n        P --> S[HealthTech_DiagnosticEngine]\n    end\n    \n    %% Connect the sections\n    Setup --> Acquisition\n    Acquisition --> Processing\n    Processing --> Analysis\n    N --> Reporting\n    O --> Reporting\n    \n    %% Add logo reference (HealthTech_PatientRecords)\n    classDef logo fill:#fff,stroke:none\n    LOGOtext[HealthTech_PatientRecords]\n    class LOGOtext logo\n    \n    %% Define visual styles\n    classDef configNode fill:#f9f,stroke:#333,stroke-width:2px\n    classDef scriptNode fill:#bbf,stroke:#333,stroke-width:1px\n    classDef decisionNode fill:#ff9,stroke:#333,stroke-width:1px\n    classDef outputNode fill:#bfb,stroke:#333,stroke-width:1px\n    \n    class B,C configNode\n    class D,F,I,J,K,N,O,P scriptNode\n    class E,M decisionNode\n    class H,L,Q,R,S outputNode\n",
+  "content_size": 1809,
+  "collected_at": "2026-02-06T02:01:19.473502",
+  "license": "mit",
+  "license_name": "MIT License",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 20,
+  "repo_forks": 2,
+  "augmentation_domain": "HealthTech",
+  "seed_id": "gh_architecture_01620"
+}

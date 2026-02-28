@@ -1,0 +1,1135 @@
+{
+  "id": "gh_flowchart_00377",
+  "source": "github",
+  "source_url": "https://github.com/mpro775/tagdod-project/blob/559959d1da7616a664535f2d108100d8e7bbd888/docs/requirements/flows/payment/webhook.mmd",
+  "github_repo": "mpro775/tagdod-project",
+  "github_file_path": "docs/requirements/flows/payment/webhook.mmd",
+  "diagram_type": "flowchart",
+  "code": "%% Payment Webhook Processing Flow\n%% View at https://mermaid.live\nflowchart TD\n  A[استقبال Webhook من Payment Provider] --> B[استخراج البيانات من الطلب]\n  B --> C{التحقق من التوقيع?}\n  C -->|توقيع غير صحيح| D[إرجاع خطأ 401 - توقيع غير صحيح]\n  \n  %% Note: BANK_TRANSFER لا يستخدم webhooks\n  AA[ملاحظة: الدفع المحلي BANK_TRANSFER] --> AB[لا يستخدم webhooks]\n  AB --> AC[يتم المطابقة يدوياً من لوحة التحكم]\n  AC --> AD[انظر: Local Payment Verification Flow]\n\n  C -->|توقيع صحيح| E[البحث عن الطلب بـ paymentIntentId]\n  E --> F{وجد الطلب?}\n  F -->|لا| G[إرجاع خطأ - طلب غير موجود]\n\n  F -->|نعم| H{حالة الدفع في Webhook?}\n  H -->|SUCCESS| I[تحديث حالة الدفع إلى PAID]\n  H -->|FAILED| J[تحديث حالة الدفع إلى FAILED]\n\n  I --> K[تحديث حالة الطلب إلى CONFIRMED]\n  K --> L[تحديث confirmedAt إلى الآن]\n  L --> M[إرسال إشعار تأكيد الطلب]\n\n  J --> N[تحديث حالة الطلب إلى PAYMENT_FAILED]\n  N --> O[إرسال إشعار فشل الدفع]\n\n  M --> P[تحديث المخزون - تقليل الكميات]\n  O --> Q[لا تغيير في المخزون - الكميات محجوزة]\n\n  P --> R[إرسال إشعارات مخزون إذا لزم الأمر]\n  Q --> R\n\n  R --> S[حفظ تفاصيل Webhook في السجل]\n  S --> T[إرجاع استجابة نجاح 200]\n\n  %% Error Cases\n  D --> U[نهاية - خطأ]\n  G --> U\n\n  T --> V[نهاية - نجاح]\n\n  %% Webhook Data Structure\n  W[بيانات Webhook المتوقعة] --> W1[intentId: معرف نية الدفع]\n  W1 --> W2[status: SUCCESS أو FAILED]\n  W2 --> W3[amount: المبلغ المدفوع]\n  W3 --> W4[signature: توقيع HMAC]\n\n  %% Signature Verification\n  X[التحقق من التوقيع] --> X1[استخراج signature من headers]\n  X1 --> X2[إنشاء HMAC من البيانات]\n  X2 --> X3[مقارنة التوقيعين]\n\n  X3 -->|متطابق| Y[التوقيع صحيح]\n  X3 -->|غير متطابق| Z[التوقيع غير صحيح]\n\n  Y --> C\n  Z --> D\n",
+  "content_size": 1655,
+  "collected_at": "2026-02-06T01:43:43.808049",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，استقبال Webhook من Payment Provider就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将استقبال Webhook من Payment Provider分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "A"
+      ],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有استخراج البيانات من الطلب。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，استخراج البيانات من الطلب的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理استخراج البيانات من الطلب？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "B"
+      ],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "关于التحقق من التوقيع?，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，التحقق من التوقيع?的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在التحقق من التوقيع?完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，التحقق من التوقيع?就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "C"
+      ],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "إرجاع خطأ 401 - توقيع غير صحيح、ملاحظة: الدفع المحلي BANK_TRANSFER主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是إرجاع خطأ 401 - توقيع غير صحيح、ملاحظة: الدفع المحلي BANK_TRANSFER应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "D",
+        "AA"
+      ],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有لا يستخدم webhooks、يتم المطابقة يدوياً من لوحة التحكم。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，لا يستخدم webhooks、يتم المطابقة يدوياً من لوحة التحكم就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "AB",
+        "AC",
+        "AD"
+      ],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有البحث عن الطلب بـ paymentIntentId。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，البحث عن الطلب بـ paymentIntentId的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "E"
+      ],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理وجد الطلب?？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是وجد الطلب?应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，وجد الطلب?就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "F"
+      ],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由إرجاع خطأ - طلب غير موجود组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "G"
+      ],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下حالة الدفع في Webhook?吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "H"
+      ],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "تحديث حالة الدفع إلى PAID、تحديث حالة الدفع إلى FAILED主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，تحديث حالة الدفع إلى PAID、تحديث حالة الدفع إلى FAILED是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "关于تحديث حالة الدفع إلى PAID、تحديث حالة الدفع إلى FAILED，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "I",
+        "J",
+        "K"
+      ],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将تحديث confirmedAt إلى الآن、إرسال إشعار تأكيد الطلب分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "L",
+        "M"
+      ],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下تحديث حالة الطلب إلى PAYMENT_FAILED、إرسال إشعار فشل الدفع吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "N",
+        "O"
+      ],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理تحديث المخزون - تقليل الكميات、لا تغيير في المخزون - الكميات محجوزة？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 495
+    },
+    {
+      "turn_id": 34,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 510
+    },
+    {
+      "turn_id": 35,
+      "speaker": "Speaker_B",
+      "utterance": "تحديث المخزون - تقليل الكميات、لا تغيير في المخزون - الكميات محجوزة和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "P",
+        "Q"
+      ],
+      "timestamp_offset": 525
+    },
+    {
+      "turn_id": 36,
+      "speaker": "Speaker_A",
+      "utterance": "关于إرسال إشعارات مخزون إذا لزم الأمر，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 540
+    },
+    {
+      "turn_id": 37,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，إرسال إشعارات مخزون إذا لزم الأمر就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 555
+    },
+    {
+      "turn_id": 38,
+      "speaker": "Speaker_A",
+      "utterance": "إرسال إشعارات مخزون إذا لزم الأمر和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "R"
+      ],
+      "timestamp_offset": 570
+    },
+    {
+      "turn_id": 39,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将حفظ تفاصيل Webhook في السجل、إرجاع استجابة نجاح 200分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 585
+    },
+    {
+      "turn_id": 40,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 600
+    },
+    {
+      "turn_id": 41,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达حفظ تفاصيل Webhook في السجل、إرجاع استجابة نجاح 200结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "S",
+        "T"
+      ],
+      "timestamp_offset": 615
+    },
+    {
+      "turn_id": 42,
+      "speaker": "Speaker_A",
+      "utterance": "نهاية - خطأ、نهاية - نجاح主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 630
+    },
+    {
+      "turn_id": 43,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，نهاية - خطأ、نهاية - نجاح的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 645
+    },
+    {
+      "turn_id": 44,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在نهاية - خطأ、نهاية - نجاح完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "U",
+        "V"
+      ],
+      "timestamp_offset": 660
+    },
+    {
+      "turn_id": 45,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将بيانات Webhook المتوقعة、intentId: معرف نية الدفع分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 675
+    },
+    {
+      "turn_id": 46,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，بيانات Webhook المتوقعة、intentId: معرف نية الدفع的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 690
+    },
+    {
+      "turn_id": 47,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含بيانات Webhook المتوقعة、intentId: معرف نية الدفع这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 705
+    },
+    {
+      "turn_id": 48,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "W",
+        "W1"
+      ],
+      "timestamp_offset": 720
+    },
+    {
+      "turn_id": 49,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下status: SUCCESS أو FAILED、amount: المبلغ المدفوع吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 735
+    },
+    {
+      "turn_id": 50,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 750
+    },
+    {
+      "turn_id": 51,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有status: SUCCESS أو FAILED、amount: المبلغ المدفوع。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 765
+    },
+    {
+      "turn_id": 52,
+      "speaker": "Speaker_A",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "W2",
+        "W3",
+        "W4"
+      ],
+      "timestamp_offset": 780
+    },
+    {
+      "turn_id": 53,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含التحقق من التوقيع这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 795
+    },
+    {
+      "turn_id": 54,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "X"
+      ],
+      "timestamp_offset": 810
+    },
+    {
+      "turn_id": 55,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有استخراج signature من headers、إنشاء HMAC من البيانات。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 825
+    },
+    {
+      "turn_id": 56,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是استخراج signature من headers、إنشاء HMAC من البيانات应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 840
+    },
+    {
+      "turn_id": 57,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 855
+    },
+    {
+      "turn_id": 58,
+      "speaker": "Speaker_A",
+      "utterance": "استخراج signature من headers、إنشاء HMAC من البيانات负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "X1",
+        "X2"
+      ],
+      "timestamp_offset": 870
+    },
+    {
+      "turn_id": 59,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下مقارنة التوقيعين吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 885
+    },
+    {
+      "turn_id": 60,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，مقارنة التوقيعين是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 900
+    },
+    {
+      "turn_id": 61,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，مقارنة التوقيعين就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "X3"
+      ],
+      "timestamp_offset": 915
+    },
+    {
+      "turn_id": 62,
+      "speaker": "Speaker_A",
+      "utterance": "关于التوقيع صحيح、التوقيع غير صحيح，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 930
+    },
+    {
+      "turn_id": 63,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，التوقيع صحيح、التوقيع غير صحيح就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 945
+    },
+    {
+      "turn_id": 64,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "Y",
+        "Z"
+      ],
+      "timestamp_offset": 960
+    },
+    {
+      "turn_id": 65,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理、توقيع غير صحيح？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 975
+    },
+    {
+      "turn_id": 66,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_0",
+        "edge_1"
+      ],
+      "timestamp_offset": 990
+    },
+    {
+      "turn_id": 67,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1005
+    },
+    {
+      "turn_id": 68,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_2"
+      ],
+      "timestamp_offset": 1020
+    },
+    {
+      "turn_id": 69,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1035
+    },
+    {
+      "turn_id": 70,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_3"
+      ],
+      "timestamp_offset": 1050
+    },
+    {
+      "turn_id": 71,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有توقيع صحيح。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1065
+    },
+    {
+      "turn_id": 72,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1080
+    },
+    {
+      "turn_id": 73,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1095
+    },
+    {
+      "turn_id": 74,
+      "speaker": "Speaker_A",
+      "utterance": "توقيع صحيح主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "edge_4"
+      ],
+      "timestamp_offset": 1110
+    },
+    {
+      "turn_id": 75,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下、لا吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1125
+    },
+    {
+      "turn_id": 76,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，、لا的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1140
+    },
+    {
+      "turn_id": 77,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由、لا组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "edge_5",
+        "edge_6",
+        "edge_7"
+      ],
+      "timestamp_offset": 1155
+    },
+    {
+      "turn_id": 78,
+      "speaker": "Speaker_A",
+      "utterance": "SUCCESS、FAILED主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1170
+    },
+    {
+      "turn_id": 79,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，SUCCESS、FAILED是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1185
+    },
+    {
+      "turn_id": 80,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，SUCCESS、FAILED的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_8",
+        "edge_9"
+      ],
+      "timestamp_offset": 1200
+    },
+    {
+      "turn_id": 81,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下、吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1215
+    },
+    {
+      "turn_id": 82,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1230
+    },
+    {
+      "turn_id": 83,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1245
+    },
+    {
+      "turn_id": 84,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理、？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "edge_10",
+        "edge_11"
+      ],
+      "timestamp_offset": 1260
+    },
+    {
+      "turn_id": 85,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理、？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1275
+    },
+    {
+      "turn_id": 86,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，、的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_12",
+        "edge_13"
+      ],
+      "timestamp_offset": 1290
+    },
+    {
+      "turn_id": 87,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1305
+    },
+    {
+      "turn_id": 88,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_14"
+      ],
+      "timestamp_offset": 1320
+    },
+    {
+      "turn_id": 89,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1335
+    },
+    {
+      "turn_id": 90,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1350
+    },
+    {
+      "turn_id": 91,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1365
+    },
+    {
+      "turn_id": 92,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_15"
+      ],
+      "timestamp_offset": 1380
+    },
+    {
+      "turn_id": 93,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理、？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1395
+    },
+    {
+      "turn_id": 94,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1410
+    },
+    {
+      "turn_id": 95,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1425
+    },
+    {
+      "turn_id": 96,
+      "speaker": "Speaker_A",
+      "utterance": "、主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "edge_16",
+        "edge_17",
+        "edge_18"
+      ],
+      "timestamp_offset": 1440
+    },
+    {
+      "turn_id": 97,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由、组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1455
+    },
+    {
+      "turn_id": 98,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，、的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1470
+    },
+    {
+      "turn_id": 99,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1485
+    },
+    {
+      "turn_id": 100,
+      "speaker": "Speaker_A",
+      "utterance": "、和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "edge_19",
+        "edge_20"
+      ],
+      "timestamp_offset": 1500
+    },
+    {
+      "turn_id": 101,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1515
+    },
+    {
+      "turn_id": 102,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_21"
+      ],
+      "timestamp_offset": 1530
+    },
+    {
+      "turn_id": 103,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1545
+    },
+    {
+      "turn_id": 104,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1560
+    },
+    {
+      "turn_id": 105,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1575
+    },
+    {
+      "turn_id": 106,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_22"
+      ],
+      "timestamp_offset": 1590
+    },
+    {
+      "turn_id": 107,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由、组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1605
+    },
+    {
+      "turn_id": 108,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_23",
+        "edge_24"
+      ],
+      "timestamp_offset": 1620
+    },
+    {
+      "turn_id": 109,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理、？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1635
+    },
+    {
+      "turn_id": 110,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，、就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1650
+    },
+    {
+      "turn_id": 111,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将、分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "edge_25",
+        "edge_26"
+      ],
+      "timestamp_offset": 1665
+    },
+    {
+      "turn_id": 112,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1680
+    },
+    {
+      "turn_id": 113,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1695
+    },
+    {
+      "turn_id": 114,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1710
+    },
+    {
+      "turn_id": 115,
+      "speaker": "Speaker_B",
+      "utterance": "和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "edge_27"
+      ],
+      "timestamp_offset": 1725
+    },
+    {
+      "turn_id": 116,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1740
+    },
+    {
+      "turn_id": 117,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1755
+    },
+    {
+      "turn_id": 118,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "edge_28"
+      ],
+      "timestamp_offset": 1770
+    },
+    {
+      "turn_id": 119,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将متطابق分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1785
+    },
+    {
+      "turn_id": 120,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，متطابق就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1800
+    },
+    {
+      "turn_id": 121,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有متطابق。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "edge_29"
+      ],
+      "timestamp_offset": 1815
+    },
+    {
+      "turn_id": 122,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由غير متطابق、组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1830
+    },
+    {
+      "turn_id": 123,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达غير متطابق、结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "edge_30",
+        "edge_31",
+        "edge_32"
+      ],
+      "timestamp_offset": 1845
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 123,
+    "speaker_distribution": {
+      "Speaker_B": 62,
+      "Speaker_A": 61
+    },
+    "speech_act_distribution": {
+      "sequential": 9,
+      "confirm": 17,
+      "classification": 15,
+      "structural": 18,
+      "clarify": 18,
+      "request": 21,
+      "inform": 21,
+      "contrastive": 4
+    },
+    "avg_turn_length": 27.333333333333332,
+    "dialogue_duration": 1845
+  }
+}

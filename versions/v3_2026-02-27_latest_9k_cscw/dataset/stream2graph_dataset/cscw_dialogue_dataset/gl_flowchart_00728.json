@@ -1,0 +1,773 @@
+{
+  "id": "gl_flowchart_00728",
+  "source": "gitlab",
+  "source_url": "https://github.com/davenel621/argon_test/blob/5b98b2dc87b5e4fd02c6c19be9700175d33132ec/docs/mermaid/workflow-steps-flowchart.mmd",
+  "source_note": "collected_from_github_final",
+  "github_repo": "davenel621/argon_test",
+  "diagram_type": "flowchart",
+  "code": "---\nconfig:\n  flowchart:\n    htmlLabels: true\n    curve: basis\n  themeVariables:\n    primaryColor: \"#f9f9f9\"\n    primaryTextColor: \"#333333\"\n    primaryBorderColor: \"#cccccc\"\n    lineColor: \"#666666\"\n    secondaryColor: \"#e8f4f8\"\n    tertiaryColor: \"#fff2cc\"\n---\nflowchart TD\n    %% Initial Development\n    Dev[Developer] --> |1. Publish Feature Branch| Repo[Application Repo]\n    Repo --> |2. GitHub Advanced Security runs Dependabot, CodeQL, and Secret Scanning| Dev\n    Dev --> |3. Submit PR| Repo\n    Repo --> |4. Request Review| Owner[Code Owner]\n    \n    %% Pre-Merge Checks\n    Repo --> PreCheck{Pre-Merge Checks<br/>Branch Rules, Protection Rules}\n    PreCheck --> |Pass| WorkflowTrigger[Trigger Reusable Workflow]\n    PreCheck --> |Fail| RejectPR[❌ Reject PR]\n    \n    %% Workflow Execution\n    WorkflowTrigger --> AutoRepo[Centralized Automation Repo]\n    AutoRepo --> ReusableWF[Reusable Workflow]\n    ReusableWF --> BuildComp[Build Composite]\n    \n    %% Build Process (Clickable Reference)\n    BuildComp --> BuildProcess[🔧 Build Process<br/>15 Steps<br/>📄 Click Here to See Details]\n    BuildProcess --> BuildCheck{Build Success?<br/>Security Scans, Tests, Artifacts}\n    BuildCheck --> |Pass| DeployComp[Deploy Composite]\n    BuildCheck --> |Fail| RejectPR[❌ Reject PR]\n    \n    %% Dev Environment\n    DeployComp --> DevDeploy[🔄 Dev Deployment<br/>11 Steps<br/>📄 Click Here to See Details]\n    DevDeploy --> DeployCheck{Deployment Success?<br/>Health Checks, Smoke Tests}\n    DeployCheck --> |Pass| DevEnv[Dev Environment]\n    DeployCheck --> |Fail| RejectPR[❌ Reject PR]\n    DevEnv --> DevComplete[✅ Dev Complete]\n    \n    %% PR Approval Process\n    DevComplete --> PRApproval{PR Approval}\n    Owner --> |Approve| PRApproval\n    PRApproval --> |Approved| MergePR[Merge to Main]\n    PRApproval --> |Rejected| RejectPR\n    \n    %% Artifact Reuse Note\n    PRApproval -.-> ArtifactNote[Note: Build artifacts from Dev workflow<br/>are saved to workflow run and reused<br/>for all subsequent environment deployments]\n    \n    %% Test Environment (Automatic)\n    MergePR --> TestDeploy[🧪 Test Deployment<br/>11 Steps<br/>📄 Click Here to See Details]\n    TestDeploy --> TestEnv[Test Environment]\n    TestEnv --> TestComplete[✅ Test Complete]\n    \n    %% Staging Environment (Manual Approval)\n    TestComplete --> StagingGate{Staging Approval Gate<br/>Manual Review}\n    StagingGate --> |Approved| StagingDeploy[🎭 Staging Deployment<br/>11 Steps<br/>📄 Click Here to See Details]\n    StagingGate --> |Rejected| RejectStaging[❌ Reject Staging]\n    StagingDeploy --> StagingEnv[Staging Environment]\n    StagingEnv --> StagingComplete[✅ Staging Complete]\n    \n    %% Production Environment (Manual Approval)\n    StagingComplete --> ProdGate{Production Approval Gate<br/>Manual Review + Pre-Deploy Checks}\n    ProdGate --> |Approved| ProdDeploy[🚀 Production Deployment<br/>11 Steps<br/>📄 Click Here to See Details]\n    ProdGate --> |Rejected| RejectProd[❌ Reject Production]\n    ProdDeploy --> ProdEnv[Production Environment]\n    ProdEnv --> ProdComplete[✅ Production Complete]\n    \n    %% Final Steps\n    ProdComplete --> NotifyStakeholders[📧 Notify Stakeholders]\n    DevComplete --> NotifyStakeholders\n    TestComplete --> NotifyStakeholders\n    StagingComplete --> NotifyStakeholders\n    \n    %% Styling - Blue/Purple/Teal/Orange palette (colorblind-friendly, no red/green)\n    classDef processBox fill:#e3f2fd,stroke:#1976d2,stroke-width:2px,color:#000\n    classDef approvalBox fill:#fff8e1,stroke:#f57c00,stroke-width:2px,color:#000\n    classDef environmentBox fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000\n    classDef errorBox fill:#fff3e0,stroke:#ff8f00,stroke-width:2px,color:#000\n    classDef successBox fill:#e0f7fa,stroke:#00838f,stroke-width:3px,color:#000\n    classDef noteBox fill:#f5f5f5,stroke:#757575,stroke-width:1px,color:#000\n    \n    class Dev,Owner,Repo,AutoRepo,ReusableWF processBox\n    class PreCheck,BuildCheck,DeployCheck,PRApproval,StagingGate,ProdGate approvalBox\n    class DevEnv,TestEnv,StagingEnv,ProdEnv environmentBox\n    class RejectPR,RejectStaging,RejectProd errorBox\n    class DevComplete,TestComplete,StagingComplete,ProdComplete,NotifyStakeholders successBox\n    class BuildComp,DeployComp,BuildProcess,DevDeploy,TestDeploy,StagingDeploy,ProdDeploy processBox\n    class ArtifactNote noteBox\n    \n    %% Clickable Links\n    click BuildProcess \"https://github.com/ava-client-ussouth-scg-argon/argon-automation/blob/main/docs/mermaid/build-process-flowchart.mmd\" \"View detailed build sequence diagram\"\n    click DevDeploy \"https://github.com/ava-client-ussouth-scg-argon/argon-automation/blob/main/docs/mermaid/deployment-process-flowchart.mmd\" \"View detailed deployment sequence diagram\"\n    click TestDeploy \"https://github.com/ava-client-ussouth-scg-argon/argon-automation/blob/main/docs/mermaid/deployment-process-flowchart.mmd\" \"View detailed deployment sequence diagram\"\n    click StagingDeploy \"https://github.com/ava-client-ussouth-scg-argon/argon-automation/blob/main/docs/mermaid/deployment-process-flowchart.mmd\" \"View detailed deployment sequence diagram\"\n    click ProdDeploy \"https://github.com/ava-client-ussouth-scg-argon/argon-automation/blob/main/docs/mermaid/deployment-process-flowchart.mmd\" \"View detailed deployment sequence diagram\"",
+  "content_size": 5304,
+  "collected_at": "2026-02-06T14:19:31.486502",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "repo_owner": "davenel621",
+  "repo_name": "argon_test",
+  "repo_description": "testing with old argon repo in local",
+  "repo_language": "PowerShell",
+  "repo_topics": [],
+  "repo_created_at": "2026-01-26T18:24:33Z",
+  "repo_updated_at": "2026-01-26T21:00:16Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Developer 和 Application Repo 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Developer 和 Application Repo'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Dev",
+        "Repo"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Code Owner 和 Pre-Merge Checks<br/>Branch Rules, Protection Rules。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Code Owner 和 Pre-Merge Checks<br/>Branch Rules, Protection Rules'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Owner",
+        "PreCheck"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Trigger Reusable Workflow 和 ❌ Reject PR。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Trigger Reusable Workflow 和 ❌ Reject PR'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "WorkflowTrigger",
+        "RejectPR"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Centralized Automation Repo 和 Reusable Workflow 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Centralized Automation Repo 和 Reusable Workflow'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AutoRepo",
+        "ReusableWF"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Build Composite 和 Clickable Reference 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Build Composite 和 Clickable Reference'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BuildComp",
+        "Process"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 🔧 Build Process<br/>15 Steps<br/>📄 Click Here to See Details 和 Build Success?<br/>Security Scans, Tests, Artifacts 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 🔧 Build Process<br/>15 Steps<br/>📄 Click Here to See Details处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '🔧 Build Process<br/>15 Steps<br/>📄 Click Here to See Details处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BuildProcess",
+        "BuildCheck"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Deploy Composite 和 ❌ Reject PR。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 Deploy Composite处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Deploy Composite处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DeployComp",
+        "RejectPR"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 🔄 Dev Deployment<br/>11 Steps<br/>📄 Click Here to See Details 和 Deployment Success?<br/>Health Checks, Smoke Tests 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '🔄 Dev Deployment<br/>11 Steps<br/>📄 Click Here to See Details 和 Deployment Success?<br/>Health Checks, Smoke Tests'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DevDeploy",
+        "DeployCheck"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Dev Environment 和 ❌ Reject PR 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 Dev Environment处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Dev Environment处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DevEnv",
+        "RejectPR"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 ✅ Dev Complete 和 PR Approval 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '✅ Dev Complete 和 PR Approval'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DevComplete",
+        "PRApproval"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Merge to Main 和 Note: Build artifacts from Dev workflow<br/>are saved to workflow run and reused<br/>for all subsequent environment deployments。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Merge to Main 和 Note: Build artifacts from Dev workflow<br/>are saved to workflow run and reused<br/>for all subsequent environment deployments'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MergePR",
+        "ArtifactNote"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Automatic 和 🧪 Test Deployment<br/>11 Steps<br/>📄 Click Here to See Details 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Automatic 和 🧪 Test Deployment<br/>11 Steps<br/>📄 Click Here to See Details'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Environment",
+        "TestDeploy"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Test Environment 和 ✅ Test Complete。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Test Environment 和 ✅ Test Complete'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TestEnv",
+        "TestComplete"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Manual Approval 和 Staging Approval Gate<br/>Manual Review。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Manual Approval 和 Staging Approval Gate<br/>Manual Review'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Environment",
+        "StagingGate"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 🎭 Staging Deployment<br/>11 Steps<br/>📄 Click Here to See Details 和 ❌ Reject Staging 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 🎭 Staging Deployment<br/>11 Steps<br/>📄 Click Here to See Details处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 62,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '🎭 Staging Deployment<br/>11 Steps<br/>📄 Click Here to See Details处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "StagingDeploy",
+        "RejectStaging"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Staging Environment 和 ✅ Staging Complete 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Staging Environment 和 ✅ Staging Complete'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "StagingEnv",
+        "StagingComplete"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Manual Approval 和 Production Approval Gate<br/>Manual Review + Pre-Deploy Checks 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Manual Approval 和 Production Approval Gate<br/>Manual Review + Pre-Deploy Checks'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Environment",
+        "ProdGate"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 73,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 🚀 Production Deployment<br/>11 Steps<br/>📄 Click Here to See Details 和 ❌ Reject Production 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 74,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 🚀 Production Deployment<br/>11 Steps<br/>📄 Click Here to See Details处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 75,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '🚀 Production Deployment<br/>11 Steps<br/>📄 Click Here to See Details处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 76,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 77,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ProdDeploy",
+        "RejectProd"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 78,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Production Environment 和 ✅ Production Complete 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 79,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Production Environment 和 ✅ Production Complete'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 80,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 81,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ProdEnv",
+        "ProdComplete"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 82,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 📧 Notify Stakeholders 和 colorblind-friendly, no red/green 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 83,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '📧 Notify Stakeholders 和 colorblind-friendly, no red/green'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 84,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 85,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "NotifyStakeholders",
+        "palette"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 85,
+    "repair_count": 5,
+    "grounding_acts_count": 40,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

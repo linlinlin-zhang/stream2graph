@@ -1,0 +1,16 @@
+{
+  "id": "gl_block-beta_00256",
+  "source": "gitlab",
+  "source_url": "https://github.com/sn-ravance/Ollama_Docker/blob/3f2dd7761e30b51c2206a8b7e7938cf783b2c200/docs/Ollama_ZTA.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "sn-ravance/Ollama_Docker",
+  "diagram_type": "block-beta",
+  "code": "sequenceDiagram\n    actor C as Client (Browser/CLI)\n    actor N as NGINX (Policy Enforcement Point / Reverse Proxy)\n    actor P as oauth2-proxy (OIDC/OAuth2)\n    actor I as Identity Provider (Entra ID / Okta / Auth0)\n    actor F as Prompt/Policy Filter (optional microservice)\n    actor O as Ollama (LLM runtime, internal-only)\n    actor L as SIEM / Local Logs\n\n    C ->> N : HTTPS request to /api/generate\n    N ->> N : Verify TLS handshake + client cert (mTLS), apply WAF/rate-limit/CORS\n    alt mTLS missing/invalid\n        N ->> C : 401/403 (blocked by TLS policy)\n        N ->> L : Log TLS/authn failure + client info (no PII)\n    else mTLS valid\n        N ->> L : Log access (TLS OK, proceeding to OIDC gate)\n    end\n\n    N ->> P : subrequest /oauth2/auth (check session)\n    alt No valid session cookie\n        P ->> N : 401 Unauthorized (needs sign‑in)\n        N ->> C : 302 Redirect → /oauth2/start\n        C ->> P : GET /oauth2/start\n        P ->> C : 302 Redirect → I /authorize (PKCE)\n        C ->> I : User login + MFA (per policy)\n        I ->> C : 302 Redirect → P /oauth2/callback?code=...\n        C ->> P : GET /oauth2/callback (code exchange for tokens)\n        P ->> C : Set secure session cookie, 302 back to original URL\n        C ->> N : Retry original /api/* request (now with session)\n        N ->> P : subrequest /oauth2/auth\n        P ->> N : 200 OK + X-Auth headers (user, groups, email)\n    else Valid session present\n        P ->> N : 200 OK + X-Auth headers (user, groups, email)\n    end\n    N ->> L : Log auth decision + user/group claims (minimized)\n\n    N ->> F : POST /filter (prompt, caller, app metadata)\n    alt Policy violation (e.g., PII, jailbreak, over-size, blocked tenant)\n        F ->> N : 406/422 with reason code\n        N ->> C : 4xx safe error (masked)\n    else Allowed\n        F ->> N : 200 Allowed\n    end\n\n    N ->> O : POST /api/generate (add X-User/X-Groups, strip cookies, set timeouts)\n    O ->> N : Streamed tokens / chunked response\n    loop while streaming tokens\n        N ->> C : Forward token chunks (SSE/HTTP streaming)\n    end\n\n    N ->> L : Access + security events (JSON)\n    P ->> L : Auth events (login/refresh/logout)\n    F ->> L : Policy evaluation results (allow/block, rule id)\n    O ->> L : Inference metrics (durations, model id, token counts)\n\n    N ->> C : 200 OK (final chunk) OR controlled 4xx with safe message\n",
+  "content_size": 2389,
+  "collected_at": "2026-02-06T14:05:29.968003",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

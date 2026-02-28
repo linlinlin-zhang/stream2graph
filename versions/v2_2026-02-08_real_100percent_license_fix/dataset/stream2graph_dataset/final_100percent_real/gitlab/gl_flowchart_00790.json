@@ -1,0 +1,16 @@
+{
+  "id": "gl_flowchart_00790",
+  "source": "gitlab",
+  "source_url": "https://github.com/kanchankapila/stock-mcp-suite/blob/8a9007d3dc62f1b52b8006eb903ed0f01aab42cc/docs/architecture.mmd",
+  "source_note": "collected_from_github_final",
+  "github_repo": "kanchankapila/stock-mcp-suite",
+  "diagram_type": "flowchart",
+  "code": "flowchart LR\n  user[User/Browser]\n\n  subgraph FE [Frontend]\n    FE_APP[App + UI]\n    FE_API[frontend/src/app/services/api.service.ts]\n  end\n\n  subgraph SRV [Server]\n    subgraph API [REST API]\n      STK[server/src/routes/stocks.ts]\n      RAG[server/src/routes/rag.ts]\n      AGT[server/src/agent/agent.ts]\n      MCP[server/src/mcp/mcp-server.ts]\n    end\n    subgraph LIVE [Live + Background]\n      WS[server/src/ws/live.ts]\n      PREF[server/src/providers/prefetch.ts]\n    end\n    subgraph RAGC [RAG Engine]\n      LC[server/src/rag/langchain.ts]\n      RET[server/src/rag/retriever.ts]\n      IDX[server/src/rag/indexer.ts]\n    end\n    DB[server/src/db.ts - SQLite]\n    SIDX[Tables: stocks, prices, news, docs, rag_embeddings, analyses]\n  end\n\n  subgraph EXT [External Providers]\n    YF[Yahoo Finance]\n    STQ[Stooq]\n    NEWS[NewsAPI]\n    MC[Moneycontrol]\n    AV[Alpha Vantage]\n    LLM[(OpenAI/HF Embeddings + LLM)]\n  end\n\n  user --> FE_APP\n  FE_APP --> FE_API\n\n  FE_API -- REST --> STK\n  FE_API -- REST --> RAG\n  FE_API -- REST --> AGT\n  FE_APP -- SSE --> RAG\n  FE_APP -- SSE --> AGT\n  FE_APP -- WS (/ws) --> WS\n\n  STK <--> DB\n  AGT <--> DB\n  RAG <--> LC\n  LC <-- embeds/query --> LLM\n  LC <--> DB\n  RET <--> DB\n  IDX --> DB\n\n  STK -- ingest/fetch --> YF\n  STK -- fallback --> STQ\n  STK -- news --> NEWS\n  STK -- insights --> MC\n  STK -- optional --> AV\n\n  WS -- poll quotes --> YF\n  PREF -- batch quotes --> YF\n  PREF -- fallback --> STQ\n  PREF -- news batch --> NEWS\n  PREF -- insights batch --> MC\n\n  WS --> DB\n  PREF --> DB\n\n  click DB href \"server/src/db.ts\"\n  click STK href \"server/src/routes/stocks.ts\"\n  click RAG href \"server/src/routes/rag.ts\"\n  click AGT href \"server/src/agent/agent.ts\"\n  click WS href \"server/src/ws/live.ts\"\n  click PREF href \"server/src/providers/prefetch.ts\"\n  click LC href \"server/src/rag/langchain.ts\"\n  click RET href \"server/src/rag/retriever.ts\"\n  click IDX href \"server/src/rag/indexer.ts\"\n  click FE_API href \"frontend/src/app/services/api.service.ts\"\n",
+  "content_size": 1992,
+  "collected_at": "2026-02-06T14:20:23.636145",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "gh_class_01376",
+  "source": "github",
+  "source_url": "https://github.com/Dera301/projet_stage/blob/3ff0a1769dda7d9425e28b8bee7835e0dc5879b4/diagramme/DC01_Inscription_ClasseConception.mmd",
+  "github_repo": "Dera301/projet_stage",
+  "github_file_path": "diagramme/DC01_Inscription_ClasseConception.mmd",
+  "diagram_type": "class",
+  "code": "---\nconfig:\n  layout: elk\n  theme: base\n---\nclassDiagram\n    %% Diagramme de Classe de Conception - Inscription\n    \n    class User {\n        <<entity>>\n        -id: Int\n        -email: String\n        -password: String\n        -firstName: String\n        -lastName: String\n        -phone: String\n        -userType: UserType\n        -university: String?\n        -studyLevel: String?\n        -budget: Decimal?\n        -avatar: String?\n        -isVerified: Boolean\n        -status: UserStatus\n        -accountActivationDeadline: DateTime?\n        -createdAt: DateTime\n        -updatedAt: DateTime\n        --\n        +register(userData: Object): User\n        +hashPassword(password: String): String\n        +validateEmail(email: String): Boolean\n        +validatePhone(phone: String): Boolean\n        +generateVerificationCode(): String\n    }\n    \n    class PendingRegistration {\n        <<entity>>\n        -id: Int\n        -email: String\n        -passwordHash: String\n        -firstName: String\n        -lastName: String\n        -phone: String\n        -userType: UserType\n        -university: String?\n        -studyLevel: String?\n        -budget: Decimal?\n        -avatar: String?\n        -verificationCode: String\n        -verificationExpires: DateTime\n        -attempts: Int\n        -createdAt: DateTime\n        -updatedAt: DateTime\n        --\n        +save(): PendingRegistration\n        +validateCode(code: String): Boolean\n        +isExpired(): Boolean\n    }\n    \n    class VerificationCode {\n        <<entity>>\n        -id: Int\n        -userId: Int\n        -code: String\n        -type: String\n        -expiresAt: DateTime\n        -used: Boolean\n        -createdAt: DateTime\n        --\n        +generate(): String\n        +validate(code: String): Boolean\n        +markAsUsed(): void\n    }\n    \n    class Invite {\n        <<actor>>\n        --\n        +fillRegistrationForm(): void\n        +submitRegistration(data: Object): void\n        +verifyEmail(code: String): void\n    }\n    \n    class UserType {\n        <<enumeration>>\n        STUDENT\n        OWNER\n        ADMIN\n    }\n    \n    class UserStatus {\n        <<enumeration>>\n        PENDING_VERIFICATION\n        PENDING_APPROVAL\n        ACTIVE\n        SUSPENDED\n    }\n    \n    %% Relations\n    User \"1\" --> \"1\" UserType : posséder\n    User \"1\" --> \"1\" UserStatus : posséder\n    User \"1\" --> \"0..*\" VerificationCode : générer\n    PendingRegistration \"1\" --> \"1\" UserType : posséder\n    \n    Invite ..> User : créer\n    Invite ..> PendingRegistration : créer\n    User ..> VerificationCode : générer\n\n",
+  "content_size": 2551,
+  "collected_at": "2026-02-06T01:57:01.297755",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

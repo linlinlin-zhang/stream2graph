@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00804",
+  "source": "github",
+  "source_url": "https://github.com/ajeet214/elastic_semantic_search/blob/9d16fef2e3ecc609f6441f0b8a849edb48690841/diagrams/smart%20semantic%20search.mmd",
+  "github_repo": "ajeet214/elastic_semantic_search",
+  "github_file_path": "diagrams/smart semantic search.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    %% Title\n    title 🔄 Smart-Elastic-Search: Full Workflow (Ingestion → Query)\n\n    %% Data Ingestion Pipeline\n    participant CSV_File as 🗂️ CSV File\n    participant Pandas as 🐼 Pandas\n    participant BulkLoader as 🛠️ Ingest Script\n    participant ES as 📦 Elasticsearch\n\n    CSV_File->>Pandas: read_csv()\n    Pandas->>Pandas: Clean, Normalize, Validate\n    Pandas->>BulkLoader: yield bulk actions\n    BulkLoader->>ES: Bulk insert via helpers.bulk()\n\n    Note over CSV_File,ES: 🔁 Repeatable data loading with\\nstable `_id` generation for deduplication\n\n    %% Separator\n    Note over ES,ES: 💡 Index is now ready with n-gram search\\nand custom pipeline (split locations)\n\n    %% Inference Pipeline\n    participant User as 🧑 User\n    participant FastAPI as ⚡ FastAPI Server\n    participant LLM as 🧠 Azure OpenAI\n    participant Validator as 🔍 DSL Validator\n    participant ES as 📦 Elasticsearch\n    participant Summarizer as 🧾 Summarizer\n\n    User->>FastAPI: POST /search { query, size, summarize }\n    FastAPI->>LLM: 🔁 prompt(query) → DSL\n    LLM-->>FastAPI: JSON DSL\n    FastAPI->>Validator: validate DSL\n    Validator-->>FastAPI: ✅ OK / ❌ Error\n    FastAPI->>ES: execute_search(dsl)\n    ES-->>FastAPI: hits + aggs\n    alt summarize == True\n        FastAPI->>Summarizer: summarize(query, es_response)\n        Summarizer-->>FastAPI: summary text\n    end\n    FastAPI-->>User: JSON response with hits, aggs, summary\n",
+  "content_size": 1431,
+  "collected_at": "2026-02-06T01:37:18.579548",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 3,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

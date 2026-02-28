@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00461",
+  "source": "github",
+  "source_url": "https://github.com/sadikmahmudadive/Hyperlocal-Skillsweep/blob/01607c6236b6c96b80c857f77d1c7c2ec543f8de/docs/architecture.mmd",
+  "github_repo": "sadikmahmudadive/Hyperlocal-Skillsweep",
+  "github_file_path": "docs/architecture.mmd",
+  "diagram_type": "sequence",
+  "code": "%% Hyperlocal SkillSwap — Architecture (Mermaid)\n\nflowchart TD\n  U[Browser\\nNext.js + React] -->|HTTPS| N[Next.js App\\n(Pages + Components)]\n  N -->|API calls| A[API Routes\\nNext.js]\n  A -->|JWT verify / CRUD| M[(MongoDB)]\n  N -->|Optimized images| IMG[Next Image / CDN]\n  A -->|Media upload| C[Cloudinary]\n  A -->|Email (reset)| SG[SendGrid]\n  N -->|SSE subscribe| SSE[/ /api/events/stream \\n SSE /]\n  SSE <-->|publish/subscribe| R[(Redis - optional)]\n  N -->|Hosted| V[Vercel]\n\n  classDef svc fill:#eef,stroke:#66c,stroke-width:1px;\n  classDef ext fill:#efe,stroke:#6c6,stroke-width:1px;\n  classDef db fill:#fee,stroke:#c66,stroke-width:1px;\n  class N,A,SSE,V svc;\n  class C,SG,IMG ext;\n  class M,R db;\n\n%% Key flows\n%% 1) Auth: U -> N -> A -> M -> (JWT) -> U\n%% 2) Password reset: U -> A -> SG -> (Email) -> U -> A -> M\n%% 3) Upload: U -> N -> A -> C (returns URL) -> A -> M\n%% 4) Realtime chat: U -> SSE (subscribe), A -> R (publish), SSE -> U (event)\n\n---\n%% Optional: Sequence diagram for Password Reset\nsequenceDiagram\n  participant User as User (Browser)\n  participant API as Next API\n  participant Mail as SendGrid\n  participant DB as MongoDB\n\n  User->>API: POST /api/auth/request-reset { email }\n  API->>DB: find user by email\n  API->>Mail: send reset link (JWT, 1h)\n  Mail-->>User: Reset email with link\n  User->>API: POST /api/auth/reset { token, password }\n  API->>API: verify JWT\n  API->>DB: update password hash\n  API-->>User: 200 OK (set auth cookie)\n",
+  "content_size": 1467,
+  "collected_at": "2026-02-06T01:32:33.768446",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License (Assumed)",
+  "license_url": null,
+  "repo_stars": 1,
+  "repo_forks": 0
+}

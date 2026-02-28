@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01485",
+  "source": "github",
+  "source_url": "https://github.com/matthewntsiful/saleor-k8s-deployment/blob/c45503ed7fc601bd6895fd364ee49d1cc8e9313d/assets/architecture-diagram.mmd",
+  "github_repo": "matthewntsiful/saleor-k8s-deployment",
+  "github_file_path": "assets/architecture-diagram.mmd",
+  "diagram_type": "architecture",
+  "code": "%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#1a1a2e', 'primaryTextColor': '#e6e6e6', 'primaryBorderColor': '#16213e', 'lineColor': '#0f3460', 'secondaryColor': '#16213e', 'tertiaryColor': '#16213e'}}}%%\n\ngraph TD\n    subgraph \"Kubernetes Cluster\"\n        subgraph \"Ingress Controller\"\n            Nginx[NGINX Ingress]\n        end\n        \n        subgraph \"Application Layer\"\n            API[Saleor API\\n<small>GraphQL Backend</small>]\n            Dashboard[Saleor Dashboard\\n<small>Admin Interface</small>]\n        end\n        \n        subgraph \"Data Layer\"\n            PostgreSQL[(PostgreSQL\\n<small>Primary Database</small>)]\n            Redis[(Redis\\n<small>Cache & Task Queue</small>)]\n        end\n        \n        subgraph \"Monitoring\"\n            Prometheus[Prometheus\\n<small>Metrics</small>]\n            Grafana[Grafana\\n<small>Visualization</small>]\n        end\n    end\n    \n    subgraph \"External Services\"\n        CDN[CDN\\n<small>Static Assets</small>]\n        Email[Email Service\\n<small>e.g., SendGrid</small>]\n        Storage[Object Storage\\n<small>e.g., AWS S3</small>]\n    end\n    \n    %% Connections\n    Nginx -->|HTTPS| API\n    Nginx -->|HTTPS| Dashboard\n    \n    API -->|Read/Write| PostgreSQL\n    API -->|Cache & Tasks| Redis\n    \n    %% External Services\n    API -.->|Store Files| Storage\n    API -.->|Send Emails| Email\n    API -.->|Serve Media| CDN\n    \n    %% Monitoring\n    Prometheus -->|Scrape Metrics| API\n    Prometheus -->|Scrape Metrics| PostgreSQL\n    Prometheus -->|Scrape Metrics| Redis\n    Grafana -->|Query| Prometheus\n    \n    %% Styling\n    classDef k8s fill:#2a4d8f,stroke:#1a365d,color:white,stroke-width:2px\n    classDef external fill:#4a6da7,stroke:#2a4d8f,color:white,stroke-width:2px\n    classDef storage fill:#4f8a8b,stroke:#2c3e50,color:white,stroke-width:2px\n    \n    class Nginx,API,Dashboard,Prometheus,Grafana k8s\n    class PostgreSQL,Redis storage\n    class CDN,Email,Storage external\n",
+  "content_size": 1957,
+  "collected_at": "2026-02-06T01:46:51.594593",
+  "license": "none",
+  "license_name": "No License",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "",
+  "repo_stars": 2,
+  "repo_forks": 1
+}

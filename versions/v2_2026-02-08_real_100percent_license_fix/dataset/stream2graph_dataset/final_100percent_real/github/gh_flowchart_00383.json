@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00383",
+  "source": "github",
+  "source_url": "https://github.com/kiwiiosaru-jp/shinkijigyou_AI_Agent_demo/blob/f005b2025a4e41684f47386d542910c2fde04f24/phase1.mmd",
+  "github_repo": "kiwiiosaru-jp/shinkijigyou_AI_Agent_demo",
+  "github_file_path": "phase1.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart LR\n  %% ===== LAYER 1: Client / Edge (左端) =====\n  subgraph Client[\"Client / Edge Layer\"]\n    direction TB\n    GenUWeb[\"GenU Web UI<br/>(Browser + CloudFront + S3)\"]\n  end\n\n  %% ===== LAYER 2: Public RAG API =====\n  subgraph Api[\"Public RAG API (API Gateway + WAF)\"]\n    direction TB\n    WAF[\"WAF WebACL\"]\n    APIGW[\"API Gateway (REST)<br/>POST /rag/query\"]\n    WAF -. \"protects\" .-> APIGW\n  end\n\n  GenUWeb -->|\"HTTPS / JSON<br/>RAG request\"| APIGW\n\n  %% ===== LAYER 3: LLM Gateway & Retrieval Backend =====\n  subgraph Core[\"LLM Gateway & Retrieval Backend (Lambda)\"]\n    direction TB\n    LLMGW[\"Lambda: LLM gateway<br/>(Guardrails + RAG orchestration + LLM invoke)\"]\n    Router[\"Lambda: retrieval router\"]\n    RetrieverKB[\"Lambda: RAG Retriever (KB)\"]\n    RetrieverKendra[\"Lambda: RAG Retriever (Kendra)\"]\n\n    APIGW -->|\"invoke /rag/query\"| LLMGW\n    LLMGW -->|\"1. decide purpose<br/>2. build retrieval request\"| Router\n    Router -->|\"routing info (KB)\"| RetrieverKB\n    Router -->|\"routing info (Kendra)\"| RetrieverKendra\n  end\n\n  %% ===== LAYER 4: Data Plane (RAG) =====\n  subgraph Data[\"Data Plane (RAG)\"]\n    direction TB\n    DDB[\"DynamoDB router table\"]\n    S3Docs[\"S3 doc bucket\"]\n    KB[\"Bedrock Knowledge Base\"]\n    Kendra[\"Amazon Kendra Index\"]\n    AOSS[\"AOSS Vector Collection\"]\n\n    Router -->|\"read routing\"| DDB\n    RetrieverKB -->|\"vector search\"| KB --> AOSS\n    RetrieverKendra -->|\"full-text search\"| Kendra\n  end\n\n  %% Retrieval results → LLM Gateway\n  RetrieverKB -->|\"retrieved chunks (KB)\"| LLMGW\n  RetrieverKendra -->|\"retrieved chunks (Kendra)\"| LLMGW\n\n  %% LLM Gateway does guardrail + LLM call\n  LLMGW -->|\"question + retrieved context\"| Guardrails[\"Guardrails + LLM invoke<br/>(Bedrock etc.)\"]\n  Guardrails -->|\"final answer\"| LLMGW\n  LLMGW -->|\"HTTP response\"| APIGW --> GenUWeb\n\n  %% ===== LAYER 5: Audit / Observability（なるべく下側に） =====\n  subgraph Audit[\"Audit / Observability\"]\n    direction TB\n    FH_LLM[\"Firehose: llm gateway logs\"]\n    FH_RET[\"Firehose: retrieval logs\"]\n    S3Audit[\"S3 audit bucket\"]\n    Glue[\"Glue tables\"]\n    Athena[\"Athena WorkGroup\"]\n    CWDash[\"CloudWatch Dashboard\"]\n\n    FH_LLM --> S3Audit\n    FH_RET --> S3Audit\n    S3Audit --> Glue --> Athena\n  end\n\n  %% 監査レイヤへの接続（下方向を意図）\n  LLMGW --> FH_LLM\n  Router --> FH_RET\n  CWDash --- APIGW\n  CWDash --- LLMGW\n",
+  "content_size": 2322,
+  "collected_at": "2026-02-06T01:43:45.822145",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License (Assumed)",
+  "license_url": null,
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

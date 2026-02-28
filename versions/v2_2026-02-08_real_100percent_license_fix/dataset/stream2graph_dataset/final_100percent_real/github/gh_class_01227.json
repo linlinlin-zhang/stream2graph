@@ -1,0 +1,18 @@
+{
+  "id": "gh_class_01227",
+  "source": "github",
+  "source_url": "https://github.com/tanliang2/GithubWork/blob/de486df2a3b6f70fe824bca7e3b7affd90c4ef34/resources/design/Class-Diagram.mmd",
+  "github_repo": "tanliang2/GithubWork",
+  "github_file_path": "resources/design/Class-Diagram.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n    direction LR\n\n    class MainActivity {\n        <<Activity>>\n        +onCreate()\n    }\n    MainActivity --> UILayer : displays\n\n    class AppViewModel {\n        <<ViewModel>>\n        +githubRepository: GithubRepository\n        +dataStoreHelper: DataStoreHelper\n    }\n    AppViewModel o-- GithubRepository\n    AppViewModel o-- DataStoreHelper\n\n    class NetworkModule {\n        <<HiltModule>>\n        +provideGithubApiService()\n        +provideAuthorizationInterceptor()\n    }\n    NetworkModule --> GithubApiService : provides\n    NetworkModule --> AuthorizationInterceptor : provides\n    NetworkModule --> DataStoreHelper : needs\n\n    class GithubRepository {\n        <<Repository>>\n        -apiService: GithubApiService\n        -dataStoreHelper: DataStoreHelper\n        +performDataOperations()\n    }\n    GithubRepository o-- GithubApiService\n    GithubRepository o-- DataStoreHelper\n    GithubRepository --> DataModels : uses\n\n    class DataStoreHelper {\n        <<Data Persistence>>\n        +saveToken()\n        +getToken()\n    }\n\n    class GithubApiService {\n        <<Retrofit Service>>\n        +networkCalls()\n    }\n    GithubApiService --> DataModels : uses\n\n    class AuthorizationInterceptor {\n        <<OkHttp Interceptor>>\n        -dataStoreHelper: DataStoreHelper\n        +intercept()\n    }\n    AuthorizationInterceptor o-- DataStoreHelper\n\n    class UILayer {\n        <<Compose UI>>\n        Screens, Navigation, ViewModels\n    }\n    UILayer --> AppViewModel : uses\n\n    class DataModels {\n        <<Data Transfer Objects>>\n        User, Repo, Issue, etc.\n    }\n\n    MainActivity ..> AppViewModel : injects/uses\n    NetworkModule ..> AuthorizationInterceptor : configures\n    AppViewModel ..> GithubRepository : depends on\n    UILayer ..> DataModels : displays\n\n",
+  "content_size": 1790,
+  "collected_at": "2026-02-06T01:54:48.681506",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

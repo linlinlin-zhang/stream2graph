@@ -1,0 +1,219 @@
+{
+  "id": "aug_gh_sequence_00242_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/nduyhai/valjean/blob/58e2110f3dd9143576c1eed46c36c4dabcca65b3/docs/req.mmd",
+  "github_repo": "nduyhai/valjean",
+  "github_file_path": "docs/req.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant TG as Telegram\n    participant Web as Webhook Server (Infra_RedisCache)\n    participant App as UseCase: EvaluateMsg\n    participant LLM as LLM Client\n    participant MCP as MCP Client\n\n    TG->>Web: POST /webhook (Infra_WorkerNode)\n    Web->>App: HandleUpdate(Infra_RedisCache)\n    App->>App: Gate (Infra_WorkerNode)\n    App->>App: RateLimit & Moderation check\n    alt Engine = LLM\n        App->>LLM: Analyze(Infra_RedisCache)\n        LLM-->>App: summary/eval\n    else Engine = MCP\n        App->>MCP: call tools (Infra_RedisCache)\n        MCP-->>App: tool results\n    else Engine = Hybrid\n        App->>MCP: context snippets\n        MCP-->>App: evidence\n        App->>LLM: Synthesize(Infra_IngressController)\n        LLM-->>App: final answer\n    end\n    App-->>Web: reply text\n    Web-->>TG: sendMessage\n",
+  "content_size": 795,
+  "collected_at": "2026-02-06T01:29:35.564444",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 4,
+  "repo_forks": 0,
+  "repo_owner": "nduyhai",
+  "repo_name": "valjean",
+  "repo_description": "valjean bot",
+  "repo_language": "Go",
+  "repo_topics": [],
+  "repo_created_at": "2025-10-04T02:39:33Z",
+  "repo_updated_at": "2026-02-03T15:22:26Z",
+  "augmentation_domain": "Infra",
+  "seed_id": "gh_sequence_00242",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "TG",
+        "Web",
+        "App"
+      ],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "LLM Client主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，LLM Client的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "LLM Client主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下LLM Client吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "LLM"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将MCP Client、POST /webhook (Infra_WorkerNode)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有MCP Client、POST /webhook (Infra_WorkerNode)。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "MCP Client、POST /webhook (Infra_WorkerNode)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "MCP",
+        "msg_0"
+      ],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下HandleUpdate(Infra_RedisCache)、Gate (Infra_WorkerNode)吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是HandleUpdate(Infra_RedisCache)、Gate (Infra_WorkerNode)应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_1",
+        "msg_2"
+      ],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含RateLimit & Moderation check、Analyze(Infra_RedisCache)这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，RateLimit & Moderation check、Analyze(Infra_RedisCache)是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_3",
+        "msg_4"
+      ],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含call tools (Infra_RedisCache)、context snippets这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是call tools (Infra_RedisCache)、context snippets应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "call tools (Infra_RedisCache)、context snippets和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_5",
+        "msg_6"
+      ],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Synthesize(Infra_IngressController)组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在Synthesize(Infra_IngressController)完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_7"
+      ],
+      "timestamp_offset": 285
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 19,
+    "speaker_distribution": {
+      "Speaker_B": 10,
+      "Speaker_A": 9
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "inform": 1,
+      "classification": 4,
+      "clarify": 3,
+      "request": 2,
+      "confirm": 2,
+      "structural": 4,
+      "contrastive": 1
+    },
+    "avg_turn_length": 43.526315789473685,
+    "dialogue_duration": 285
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "id": "aug_gh_sequence_00583_Sec_7",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/JuanCS-Dev/V-rtice/blob/2cc60d775e33463af9693cae0c3df4d0be8be10c/vertice-terminal/docs/flows/diagrams/ip_analysis_flow.mmd",
+  "github_repo": "JuanCS-Dev/V-rtice",
+  "github_file_path": "vertice-terminal/docs/flows/diagrams/ip_analysis_flow.mmd",
+  "diagram_type": "sequence",
+  "code": "\nsequenceDiagram\n    participant User\n    participant CLI_Typer as Vértice CLI (Security_ZeroTrust)\n    participant Cmd_IP as ip.py Command\n    participant Auth as auth.py\n    participant Connector as IPIntelConnector\n    participant Service as IP Intel Service\n\n    User->>+CLI_Typer: vcli ip analyze 8.8.8.8\n    CLI_Typer->>+Cmd_IP: analyze(Security_OAuth2)\n\n    Cmd_IP->>+Auth: require_auth(Security_OAuth2)\n    Auth-->>-Cmd_IP: OK (Security_IntrusionDetection)\n\n    Cmd_IP->>+Connector: __init__(Security_OAuth2)\n    Cmd_IP->>+Connector: health_check(Security_ZeroTrust)\n    Connector->>+Service: GET /health\n    Service-->>-Connector: {Security_IntrusionDetection}\n    Connector-->>-Cmd_IP: True\n\n    Cmd_IP->>+Connector: analyze_ip(Security_OAuth2)\n    Connector->>+Service: POST /api/ip/analyze\n    Note right of Service: Processa o IP, busca em BDs, etc.\n    Service-->>-Connector: {Security_ZeroTrust}\n    Connector-->>-Cmd_IP: {Security_ZeroTrust}\n\n    Cmd_IP->>CLI_Typer: Formata a saída (Security_ZeroTrust)\n    CLI_Typer-->>-User: (Security_ZeroTrust)\n",
+  "content_size": 996,
+  "collected_at": "2026-02-06T01:34:18.653468",
+  "compilation_status": "failed",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 2,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Security",
+  "seed_id": "gh_sequence_00583"
+}

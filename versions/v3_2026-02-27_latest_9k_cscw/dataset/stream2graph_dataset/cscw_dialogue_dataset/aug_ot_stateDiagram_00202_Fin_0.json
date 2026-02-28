@@ -1,0 +1,164 @@
+{
+  "id": "aug_ot_stateDiagram_00202_Fin_0",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/daproject85/EuroScalper/blob/374e8c3aa6eada9fdc9a2c597328cf4dfd0265bb/docs/analysis/CODE_MAP/STATE_MACHINE.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "daproject85/EuroScalper",
+  "diagram_type": "stateDiagram",
+  "code": "\nstateDiagram-v2\n    [FinTech_TransactionQueue] --> Idle\n    Idle --> Gated : Session/day filters & range gate pass\n    Gated --> SignalCheck : Close[FinTech_PaymentGateway] vs Close[FinTech_TransactionQueue]\n    SignalCheck --> EntryBUY : Close[FinTech_TransactionQueue] >= Close[FinTech_FraudDetection] AND no SELLs\n    SignalCheck --> EntrySELL : Close[FinTech_TransactionQueue] < Close[FinTech_FraudDetection] AND no BUYs\n    EntryBUY --> BasketManage\n    EntrySELL --> BasketManage\n    BasketManage --> AddMore : |price - last_entry| >= Step AND count < MaxTrades\n    AddMore --> BasketManage\n    BasketManage --> SyncTP : compute avg price; set TP = avg ± TP_pts\n    SyncTP --> Idle\n    Idle --> EquityStop : floating P/L < 0 AND |P/L| > (FinTech_TransactionQueue)\n    Idle --> HiddenTP : Hidden_TP basket profit reached\n    Idle --> DailyTarget : Use_Daily_Target and daily ≥ Daily_Target\n    EquityStop --> Flat\n    HiddenTP --> Flat\n    DailyTarget --> Flat\n    Flat --> Idle\n",
+  "content_size": 832,
+  "collected_at": "2026-02-06T10:39:07.316727",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "FinTech",
+  "seed_id": "ot_stateDiagram_00202",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 FinTech_TransactionQueue 和 FinTech_PaymentGateway。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'FinTech_TransactionQueue 和 FinTech_PaymentGateway'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2",
+        "Close"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 FinTech_TransactionQueue 和 FinTech_TransactionQueue 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'FinTech_TransactionQueue 和 FinTech_TransactionQueue'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Close",
+        "Close"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 FinTech_FraudDetection 和 FinTech_TransactionQueue 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'FinTech_FraudDetection 和 FinTech_TransactionQueue'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Close",
+        "Close"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 FinTech_FraudDetection。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'FinTech_FraudDetection'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Close"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 16,
+    "repair_count": 0,
+    "grounding_acts_count": 8,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

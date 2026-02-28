@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00970",
+  "source": "github",
+  "source_url": "https://github.com/Hell0Manu/sultscopy/blob/dfdeec3edec8d82c1b052af550f0ed0aeb595983/docs/architecture.mmd",
+  "github_repo": "Hell0Manu/sultscopy",
+  "github_file_path": "docs/architecture.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Admin as Usuário (Admin)\n    participant Exporter as Sults_Copy_Exporter\n    participant Extractor as Sults_Copy_Extractor\n    participant ImgProc as Processador de Imagens\n    participant JSP as Extractor_JSP\n    participant Zip as ZipArchive (PHP)\n\n    Admin->>Exporter: Clica em \"Gerar JSP (Exportar)\"\n    Exporter->>Extractor: get_clean_html($post_id)\n    \n    rect rgb(240, 240, 240)\n        note right of Extractor: Pipeline de Limpeza\n        Extractor->>Extractor: Raw -> Cleaner -> Improver\n    end\n    \n    Extractor-->>Exporter: Retorna HTML Limpo\n    \n    Exporter->>ImgProc: process_images_in_html($html)\n    note right of ImgProc: Renomeia src para relativo e<br/>gera lista de arquivos físicos\n    ImgProc-->>Exporter: Retorna HTML Ajustado + Lista de Arquivos\n    \n    Exporter->>JSP: convert_to_jsp($html_ajustado)\n    JSP-->>Exporter: Retorna String JSP Completa\n    \n    Exporter->>Zip: Cria .zip temporário\n    Zip->>Zip: Adiciona .jsp\n    Zip->>Zip: Adiciona imagens da Lista\n    \n    Exporter-->>Admin: Download do Arquivo .zip\n    Exporter->>Exporter: Deleta arquivo temporário (unlink)\n\n\n    ",
+  "content_size": 1148,
+  "collected_at": "2026-02-06T01:51:22.226014",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

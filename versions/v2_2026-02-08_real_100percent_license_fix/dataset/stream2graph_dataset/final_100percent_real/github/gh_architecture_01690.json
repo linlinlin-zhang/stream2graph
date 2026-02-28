@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01690",
+  "source": "github",
+  "source_url": "https://github.com/cdot65/paloaltonetworks-automation-examples/blob/81203f54d542b4295e14fcbfe7f0ece37f3161f3/python/threatvault-hash-lookup/threatvault.mmd",
+  "github_repo": "cdot65/paloaltonetworks-automation-examples",
+  "github_file_path": "python/threatvault-hash-lookup/threatvault.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TD\n    A[Start] --> B[Define directory path]\n    B --> C{Get SHA256 hashes of files in directory}\n    C -->|FileNotFoundError| D[Return]\n    C --> E{Check if any SHA256 hashes were found}\n    E -->|No| F[Print message: No files found in directory]\n    F --> D\n    E -->|Yes| G[Call threat_vault_lookup with SHA256 hashes]\n    G --> H{Check if threat data is retrieved}\n    H -->|Yes| I[Print retrieved data as formatted JSON]\n    H -->|No| J[Print error message: Failed to retrieve threat data]\n    I --> K[Call threat_vault_lookup again with the same SHA256 hashes]\n    K --> L{Check if threat data is retrieved}\n    L -->|Yes| M[Print retrieved data as formatted JSON]\n    L -->|No| N[Print error message: Failed to retrieve threat data]\n    M --> O[End]\n    N --> O\n\n    subgraph threat_vault_lookup\n        G1[Start] --> G2[Prepare API request]\n        G2 --> G3{Send POST request to ThreatVault API}\n        G3 -->|Success| G4[Parse JSON response]\n        G3 -->|Error| G5[Print error message and return None]\n        G4 -->|Success| G6[Return threat data]\n        G4 -->|Error| G7[Print error message and return None]\n    end\n\n    subgraph get_file_hashes\n        C1[Start] --> C2{Directory exists?}\n        C2 -->|Yes| C3[Initialize empty list for hashes]\n        C3 --> C4{Iterate over files in directory}\n        C4 -->|File| C5[Calculate SHA-256 hash of file]\n        C5 --> C6[Append hash value to list]\n        C6 --> C4\n        C4 -->|No more files| C7[Return list of hashes]\n        C2 -->|No| C8[Raise FileNotFoundError]\n        C8 --> C9[Print error message]\n        C9 --> C10[End]\n    end\n\n    subgraph calculate_sha256\n        A1[Start] --> B1[Initialize SHA-256 hash object]\n        B1 --> C1[Open file at file_path]\n        C1 --> D1{Read chunk of 4096 bytes}\n        D1 -->|Chunk read| E1[Update SHA-256 hash object with chunk]\n        E1 --> D1\n        D1 -->|End of file| F1[Close file]\n        F1 --> G1[Get hexadecimal representation of SHA-256 hash]\n        G1 --> H1[Return hexadecimal representation]\n    end",
+  "content_size": 2043,
+  "collected_at": "2026-02-06T02:02:10.982037",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 18,
+  "repo_forks": 11
+}

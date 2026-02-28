@@ -1,0 +1,30 @@
+{
+  "id": "ot_stateDiagram_00013",
+  "source": "other",
+  "source_url": "https://github.com/ubuntu/adsys/blob/5d1baaca274504377b7f77f3be1c0ebe6737e6fc/docs/diagrams/arch-state.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "ubuntu/adsys",
+  "diagram_type": "stateDiagram",
+  "code": "%%{init: {\"theme\": \"base\", \"themeVariables\": {\n      'background': '#DDC9D4',\n      'primaryColor': '#FFF',\n      'primaryTextColor': '#E95420',\n      'primaryBorderColor': '#7C0000',\n      'lineColor': '#E95420',\n      'secondaryColor': '#CECAC5'\n}}}%%\nstateDiagram-v2\n    um: Ubuntu machine\n    client: client.domain.com enrolled\n    user: user authenticated\n    fetch: fetch GPOs\n    parse: parse GPOs\n    update: update cached GPOs\n    GPOs: check GPOs are up-to-date\n    GPOs_applied_check: check GPOs are applied\n    GPOs_enforced_check: check GPOs are enforced\n    GPOs_apply: authenticate user and apply GPOs\n    auth_deny: don't authenticate user\n\n    state SSSD {\n        \n        um --> client: enroll to domain.com\n        client --> um: unenroll from domain.com\n        client --> user: authenticate user\n    }\n\n    SSSD --> ADSys: if ADSys installed\n    SSSD --> End : if ADSys not installed\n\n    state ADSys{\n        start --> GPOs\n        GPOs --> fetch: if no\n        GPOs --> parse : if yes\n        fetch --> update\n        update --> GPOs\n        parse --> GPOs_applied_check\n        GPOs_applied_check --> GPOs_enforced_check: if no\n        GPOs_applied_check --> GPOs_apply: if yes\n        GPOs_enforced_check --> GPOs_apply: if no\n        GPOs_enforced_check --> auth_deny: if yes\n\n    }\n",
+  "content_size": 1310,
+  "collected_at": "2026-02-06T10:36:45.878676",
+  "compilation_status": "failed",
+  "license": "gpl-3.0",
+  "license_name": "GNU General Public License v3.0",
+  "license_url": "https://api.github.com/licenses/gpl-3.0",
+  "repo_stars": 234,
+  "repo_forks": 57,
+  "repo_owner": "ubuntu",
+  "repo_name": "adsys",
+  "repo_description": "Active Directory bridging tool suite",
+  "repo_language": "Go",
+  "repo_topics": [
+    "active-directory",
+    "group-policy",
+    "ubuntu",
+    "ubuntu-desktop"
+  ],
+  "repo_created_at": "2020-10-02T10:33:20Z",
+  "repo_updated_at": "2026-02-06T11:52:22Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

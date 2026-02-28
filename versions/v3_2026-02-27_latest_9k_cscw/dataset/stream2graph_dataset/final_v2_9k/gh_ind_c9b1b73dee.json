@@ -1,0 +1,9 @@
+{
+  "id": "gh_ind_c9b1b73dee",
+  "source": "github_industrial",
+  "repo": "hoprnet/hoprnet",
+  "license": "gpl-3.0",
+  "code": "stateDiagram-v2\n    direction TB\n\n    init_db: Initialize or Load Logs DB\n    start_rpc_log_fetch: Use RPC to fetch Logs\n    start_fast_log_fetch: Use P2P network to fetch batch logs\n\n    state if_close_to_head <<choice>>\n\n    [*] --> init_db: startup\n\n    init_db --> if_close_to_head: Calculate Logs Diff\n    if_close_to_head --> start_rpc_log_fetch: close to chain head (configurable) or fast sync disabled (configurable)\n    if_close_to_head --> start_fast_log_fetch: not close to chain head (configurable)\n    start_fast_log_fetch --> start_rpc_log_fetch: get logs batch\n\n    start_rpc_log_fetch --> [*]: system shutdown\n    start_fast_log_fetch --> [*]: system shutdown\n\n",
+  "diagram_type": "state size:600..900",
+  "collected_at": "2026-02-27T04:32:49.474055"
+}

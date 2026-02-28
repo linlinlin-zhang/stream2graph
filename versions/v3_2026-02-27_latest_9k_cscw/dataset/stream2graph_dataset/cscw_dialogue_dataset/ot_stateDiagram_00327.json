@@ -1,0 +1,101 @@
+{
+  "id": "ot_stateDiagram_00327",
+  "source": "other",
+  "source_url": "https://github.com/DariQuintero/neuroanatomy/blob/bd2e06459c39da5dbda84d3ec961360b3d9bc022/docs/diagrams/state-machines-cubits.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "DariQuintero/neuroanatomy",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    [*] --> AuthInitial\n\n    state \"AuthCubit States\" as AuthFlow {\n        AuthInitial --> AuthLoading: login()\n        AuthLoading --> AuthSuccess: loginSuccess()\n        AuthLoading --> AuthFailure: loginError()\n        AuthSuccess --> AuthLoading: logout()\n        AuthSuccess --> ProfileUpdating: updateProfile()\n        ProfileUpdating --> AuthSuccess: updateSuccess()\n        ProfileUpdating --> AuthFailure: updateError()\n        AuthFailure --> AuthLoading: retry()\n        AuthLoading --> [*]: dispose()\n    }\n\n    [*] --> CortesInitial\n\n    state \"CortesCubit States\" as CortesFlow {\n        CortesInitial --> CortesLoading: loadCortes()\n        CortesLoading --> CortesLoaded: loadSuccess()\n        CortesLoading --> CortesError: loadError()\n        CortesLoaded --> CortesLoaded: selectSegmento()\n        CortesLoaded --> CortesLoading: refreshCortes()\n        CortesError --> CortesLoading: retry()\n        CortesLoading --> [*]: dispose()\n    }\n\n    [*] --> QuizInitial\n\n    state \"QuizCubit States\" as QuizFlow {\n        QuizInitial --> QuizLoading: generateQuiz()\n        QuizLoading --> QuizLoaded: quizGenerated()\n        QuizLoading --> QuizError: generationError()\n        QuizLoaded --> QuizLoaded: submitAnswer()\n        QuizLoaded --> QuizFinished: completeQuiz()\n        QuizError --> QuizLoading: retry()\n        QuizFinished --> QuizInitial: reset()\n        QuizLoading --> [*]: dispose()\n    }\n",
+  "content_size": 1438,
+  "collected_at": "2026-02-06T10:40:44.328882",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 * 和 AuthInitial --> AuthLoading: login( 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '* 和 AuthInitial --> AuthLoading: login('？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2",
+        "AuthFlow"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 CortesInitial --> CortesLoading: loadCortes( 和 QuizInitial --> QuizLoading: generateQuiz( 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 CortesInitial --> CortesLoading: loadCortes(处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'CortesInitial --> CortesLoading: loadCortes(处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CortesFlow",
+        "QuizFlow"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 9,
+    "repair_count": 1,
+    "grounding_acts_count": 4,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

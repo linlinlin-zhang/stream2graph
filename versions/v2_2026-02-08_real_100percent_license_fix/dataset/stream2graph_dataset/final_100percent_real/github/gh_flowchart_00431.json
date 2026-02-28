@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00431",
+  "source": "github",
+  "source_url": "https://github.com/AiBunty/fitness-club-telegram-bot/blob/45db24387e77a19abddf6aa2fe129953e3770d6a/diagrams/payment_flow.mmd",
+  "github_repo": "AiBunty/fitness-club-telegram-bot",
+  "github_file_path": "diagrams/payment_flow.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\n  U[User] --> Browse[Browse Store / Add to Cart]\n  Browse --> Checkout[Checkout → Select Payment Method]\n  Checkout --> CreateOrder[create_order() in `src/database/store_operations.py`]\n  CreateOrder --> DB[store_orders row created (payment_method, balance)]\n  DB --> NotifyAdmins[Notify admins (get_moderator_chat_ids) \\n`src/handlers/store_user_handlers.py`]\n  \n  subgraph AdminPanel [Admin Actions]\n    direction TB\n    NotifyAdmins --> AdminOpen[Admin: Open Order (store_order_detail)]\n    AdminOpen -->|Record Payment| AdminRecord[Record payment UI\\n`src/handlers/store_admin_handlers.py`]\n    AdminOpen -->|Set Credit Terms / Approve| AdminCredit[Mark as CREDIT TERMS / Approve Order]\n    AdminRecord --> ApplyPayment[apply_order_payment(order_id, amount)]\n    ApplyPayment --> CheckBalance{balance <= 0?}\n    CheckBalance -->|Yes| MarkPaid[Set payment_status = PAID]\n    CheckBalance -->|No| MarkPartial[Set payment_status = PARTIAL / CREDIT]\n    MarkPaid --> NotifyUserPaid[Notify user (payment recorded)]\n    MarkPartial --> NotifyUserPartial[Notify user (partial recorded / remaining)]\n    AdminCredit --> SetDue[Set payment_due_date, overdue_reminder_count=0]\n    AdminCredit --> NotifyUserCredit[Notify user (credit approved + terms)]\n  end\n\n  subgraph Scheduled [Scheduled Jobs / Reminders]\n    direction TB\n    ScheduledCheck[send_receivables_reminders / send_shake_credit_reminders\\n`src/utils/scheduled_jobs.py`] --> FindOverdue[Query pending/overdue credit orders]\n    FindOverdue --> SendReminder[Send reminder to user with \"Mark as Paid\" button]\n    SendReminder -->|User clicks Mark as Paid| UserPaidCb[user_paid_shake_{id} callback → apply_order_payment()]\n    SendReminder --> IncrementCount[UPDATE overdue_reminder_count]\n    IncrementCount --> SkipIfMax{overdue_reminder_count >= MAX?}\n  end\n\n  %% final flows back to DB / admin closure\n  NotifyUserPaid --> DBUpdate1[order.balance updated; log payment]\n  NotifyUserPartial --> DBUpdate2[order.balance updated; log partial]\n  MarkPaid --> CloseOrder[Optionally Close Order (close_order) by admin]\n  CloseOrder --> Archive[Archive / reduce_stock / audit logs]\n",
+  "content_size": 2146,
+  "collected_at": "2026-02-06T01:44:02.849975",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 0
+}

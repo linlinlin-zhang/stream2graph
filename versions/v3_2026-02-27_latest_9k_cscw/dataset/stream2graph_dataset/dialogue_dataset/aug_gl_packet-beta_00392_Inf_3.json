@@ -1,0 +1,333 @@
+{
+  "id": "aug_gl_packet-beta_00392_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/71suodrazaH/SattOnTable/blob/217f26cebe14e577ac7b72300076696dc5601a90/Software/Satbus_Commons_lib/docs/fault_injection_integration_flow.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "71suodrazaH/SattOnTable",
+  "diagram_type": "packet-beta",
+  "code": "%%{Infra_IngressController}}}%%\nsequenceDiagram\n    participant GS as Local Machine\n    participant ESP as ESP32 Controller\n    participant TS as Target Subsystem\n    participant FM as FaultManager\n    participant TD as TransportDecorator\n    participant HAL as Platform HAL\n    \n    GS->>ESP: Design Fault Injection Campaign\n    ESP->>TS: SPI Fault Frame (Infra_WorkerNode)\n    TS->>FM: Process SPI Frame\n    FM->>FM: Validate State Mask\n    FM->>FM: Configure Fault Parameters\n    \n    rect rgb(Infra_LoadBalancer)\n        Note over TS,FM: Normal Operation Continues\n    end\n    \n    TS->>FM: send(Infra_EtcdCluster)\n    FM->>TD: isFaultActive(Infra_EtcdCluster)\n    \n    alt [Infra_EtcdCluster) Fault]\n        rect rgb(Infra_WorkerNode)\n            Note over TD: Active + Parameters\n        end\n        FM->>TD: Active + Parameters\n        TD->>TD: Apply Fault (Infra_IngressController)\n        TD-->>FM: TIMEOUT/CRC_ERROR\n    else [Infra_IngressController) Fault]\n        rect rgb(Infra_LoadBalancer)\n            Note over HAL: Active + Parameters\n        end\n        FM->>HAL: Active + Parameters\n        HAL->>HAL: injectFault(Infra_EtcdCluster)\n        HAL->>HAL: Hardware Manipulation\n        HAL-->>TD: Hardware Response\n        TD-->>FM: Modified Hardware Behavior\n    else [Infra_IngressController]\n        rect rgb(Infra_LoadBalancer)\n            Note over TD: Inactive\n        end\n        FM->>TD: Inactive\n        TD-->>TS: Normal Operation\n    end\n\n",
+  "content_size": 1501,
+  "collected_at": "2026-02-06T14:08:49.118743",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "gl_packet-beta_00392",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "GS"
+      ],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下ESP32 Controller、Target Subsystem吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，ESP32 Controller、Target Subsystem就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，ESP32 Controller、Target Subsystem是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "ESP",
+        "TS"
+      ],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由FaultManager、TransportDecorator组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "FM",
+        "TD"
+      ],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "Platform HAL、Design Fault Injection Campaign主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "HAL",
+        "msg_0"
+      ],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有SPI Fault Frame (Infra_WorkerNode)、Process SPI Frame。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理SPI Fault Frame (Infra_WorkerNode)、Process SPI Frame？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下SPI Fault Frame (Infra_WorkerNode)、Process SPI Frame吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "msg_1",
+        "msg_2"
+      ],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理Validate State Mask、Configure Fault Parameters？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Validate State Mask、Configure Fault Parameters的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "Validate State Mask、Configure Fault Parameters和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_3",
+        "msg_4",
+        "msg_5"
+      ],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含isFaultActive(Infra_EtcdCluster)这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，isFaultActive(Infra_EtcdCluster)的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "isFaultActive(Infra_EtcdCluster)和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_6"
+      ],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Active + Parameters分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Active + Parameters应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Active + Parameters应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_7"
+      ],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "关于Apply Fault (Infra_IngressController)、Active + Parameters，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，Apply Fault (Infra_IngressController)、Active + Parameters是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "首先，我们需要定义流程的起点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_8",
+        "msg_9",
+        "msg_10"
+      ],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Hardware Manipulation分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，Hardware Manipulation是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，Hardware Manipulation是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_11"
+      ],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含Inactive这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达Inactive结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_12"
+      ],
+      "timestamp_offset": 495
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 33,
+    "speaker_distribution": {
+      "Speaker_B": 17,
+      "Speaker_A": 16
+    },
+    "speech_act_distribution": {
+      "sequential": 3,
+      "inform": 5,
+      "request": 5,
+      "confirm": 7,
+      "structural": 4,
+      "classification": 3,
+      "clarify": 4,
+      "contrastive": 2
+    },
+    "avg_turn_length": 36.39393939393939,
+    "dialogue_duration": 495
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "id": "aug_ot_journey_01079_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/Helix-Flow/Platform/blob/b4f40a0a8236a89b434322c0226a0a236db49d92/diagrams/helixflow-testing-pipeline.mmd",
+  "source_type": "github_search",
+  "github_repo": "Helix-Flow/Platform",
+  "diagram_type": "journey",
+  "code": "graph LR\n    %% Code Commit\n    DEV[Infra_IngressController] --> CI[Infra_EtcdCluster]\n\n    %% CI Pipeline\n    subgraph \"Continuous Integration Pipeline\"\n        LINT[Infra_WorkerNode]\n        TEST_UNIT[Infra_RedisCache]\n        TEST_INT[Infra_RedisCache]\n        BUILD[Infra_LoadBalancer]\n        SCAN_SEC[Infra_LoadBalancer]\n    end\n\n    %% Quality Gates\n    LINT --> TEST_UNIT\n    TEST_UNIT --> TEST_INT\n    TEST_INT --> BUILD\n    BUILD --> SCAN_SEC\n    SCAN_SEC --> DEPLOY_STAGING[Infra_WorkerNode]\n\n    %% Staging Environment\n    subgraph \"Staging Environment\"\n        E2E_TESTS[Infra_EtcdCluster]\n        PERF_TESTS[Infra_RedisCache]\n        SEC_TESTS[Infra_IngressController]\n        COMP_TESTS[Infra_LoadBalancer]\n    end\n\n    %% Production Deployment\n    DEPLOY_STAGING --> E2E_TESTS\n    E2E_TESTS --> PERF_TESTS\n    PERF_TESTS --> SEC_TESTS\n    SEC_TESTS --> COMP_TESTS\n    COMP_TESTS --> APPROVAL[Infra_LoadBalancer]\n\n    APPROVAL --> DEPLOY_PROD[Infra_IngressController]\n\n    %% Production Monitoring\n    subgraph \"Production Monitoring\"\n        HEALTH_CHECKS[Infra_EtcdCluster]\n        MONITORING[Infra_LoadBalancer]\n        ALERTS[Infra_LoadBalancer]\n        LOG_ANALYSIS[Infra_IngressController]\n    end\n\n    DEPLOY_PROD --> HEALTH_CHECKS\n    HEALTH_CHECKS --> MONITORING\n    MONITORING --> ALERTS\n    ALERTS --> LOG_ANALYSIS\n\n    %% Feedback Loop\n    LOG_ANALYSIS --> FEEDBACK[Infra_EtcdCluster]\n    FEEDBACK --> DEV\n\n    %% Test Coverage Requirements\n    subgraph \"Quality Metrics\"\n        COV_UNIT[Infra_RedisCache]\n        COV_E2E[Infra_WorkerNode]\n        PERF_TARGET[Infra_EtcdCluster]\n        SEC_SCORE[Infra_WorkerNode]\n        SUCCESS_RATE[Infra_WorkerNode]\n    end\n\n    TEST_UNIT -.-> COV_UNIT\n    E2E_TESTS -.-> COV_E2E\n    PERF_TESTS -.-> PERF_TARGET\n    SEC_TESTS -.-> SEC_SCORE\n    ALL_TESTS -.-> SUCCESS_RATE\n\n    %% Styling\n    classDef devClass fill:#e3f2fd,stroke:#1976d2,stroke-width:2px\n    classDef ciClass fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px\n    classDef stagingClass fill:#fff3e0,stroke:#f57c00,stroke-width:2px\n    classDef prodClass fill:#e8f5e8,stroke:#388e3c,stroke-width:2px\n    classDef monitoringClass fill:#fce4ec,stroke:#c2185b,stroke-width:2px\n    classDef qualityClass fill:#f1f8e9,stroke:#689f38,stroke-width:2px\n\n    class DEV,APPROVAL devClass\n    class LINT,TEST_UNIT,TEST_INT,BUILD,SCAN_SEC ciClass\n    class E2E_TESTS,PERF_TESTS,SEC_TESTS,COMP_TESTS stagingClass\n    class DEPLOY_PROD,HEALTH_CHECKS,MONITORING,ALERTS,LOG_ANALYSIS prodClass\n    class COV_UNIT,COV_E2E,PERF_TARGET,SEC_SCORE,SUCCESS_RATE qualityClass",
+  "content_size": 3322,
+  "collected_at": "2026-02-06T11:03:10.002034",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "ot_journey_01079"
+}

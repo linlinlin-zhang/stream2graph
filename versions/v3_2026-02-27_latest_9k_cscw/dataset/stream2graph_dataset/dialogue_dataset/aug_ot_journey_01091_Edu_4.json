@@ -1,0 +1,918 @@
+{
+  "id": "aug_ot_journey_01091_Edu_4",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/sethmcknight/quantic-msse-easy-park-plus/blob/039c5204b7b2c68b7ff94688985eb9bc26fba23c/project-submission/proposed-ddd-microservices-architecture/diagrams/_system-high-level/mermaid/proposed-system-sequence-overview.mmd",
+  "source_type": "github_search",
+  "github_repo": "sethmcknight/quantic-msse-easy-park-plus",
+  "diagram_type": "journey",
+  "code": "---\ntitle Easy Park Plus - System Sequence Overview (Education_StudentDB)\n---\nsequenceDiagram\n    actor Customer\n    participant FL as FrontendLayer\n    participant GW as APIGateway\n    participant CCSvc as CustomerContextSvc\n    participant RSSvc as ReservationsSvc\n    participant PSvc as PricingSvc\n    participant BSvc as BillingSvc\n    participant POSvc as ParkingOperationsSvc\n    participant VCSvc as VehicleContextSvc\n    participant ECSvc as ElectricVehicleChargingSvc\n    participant EISvc as ExternalIntegrationsSvc\n    participant PolMSvc as PolicyManagementSvc\n    participant IAETSvc as InternalAudit&EventTraceSvc\n    participant MB as MessageBroker\n\n    %% User Authentication and Dashboard Load\n    rect rgb(Education_GradeSync)\n    Note over Customer, IAETSvc: User Authentication & Session Management\n    Customer->>FL: Start session / Login\n    FL->>GW: Authenticate User\n    GW->>CCSvc: Validate Credentials\n    CCSvc-->>GW: User Authenticated\n    GW-->>FL: Session Established\n    GW-->>IAETSvc: Log(Education_LMS_Portal)\n    \n    FL->>GW: Load Dashboard\n    GW->>RSSvc: Get Reservations\n    GW->>POSvc: Get Lot Status\n    RSSvc-->>GW: Reservations Data\n    POSvc-->>GW: Lot Status Data\n    GW-->>FL: Dashboard Data\n    end\n\n    %% Make Reservation (Education_ClassroomService)\n    rect rgb(Education_GradeSync)\n    Note over Customer, MB: Reservation Creation & Payment Processing\n    Customer->>FL: Make Reservation\n    FL->>GW: Request Reservation(Education_ContentCDN)\n    GW->>RSSvc: CreateReservation(Education_ClassroomService)\n    RSSvc->>PolMSvc: GetReservationPolicies(Education_StudentDB)\n    PolMSvc-->>RSSvc: ReservationPolicies\n    RSSvc->>RSSvc: CreateSlotHold(Education_GradeSync)\n    RSSvc-->>IAETSvc: Publish(Education_ContentCDN)\n    RSSvc->>PSvc: GetFeeQuote(Education_ClassroomService)\n    PSvc-->>RSSvc: FeeQuote\n    RSSvc->>BSvc: PreAuthPayment(Education_GradeSync)\n    BSvc-->>RSSvc: PreAuth OK\n    RSSvc->>RSSvc: ConvertHoldToReservation(Education_StudentDB)\n    RSSvc-->>GW: ReservationConfirmed\n    GW-->>FL: Show Confirmation\n    RSSvc->>MB: publish ReservationConfirmedEvent\n    IAETSvc->>MB: consume ReservationConfirmedEvent\n    end\n\n    %% Vehicle Entry (Education_StudentDB)\n    rect rgb(Education_ContentCDN)\n    Note over EISvc, IAETSvc: Vehicle Entry & Visit Initiation\n    EISvc->>GW: VehicleDetectedAtEntry(Education_ClassroomService)\n    GW->>POSvc: RegisterVehicleEntry(Education_StudentDB)\n    POSvc->>VCSvc: GetVehicleDetails(Education_LMS_Portal)\n    VCSvc-->>POSvc: VehicleDetails\n    POSvc->>PolMSvc: GetEntryPolicies(Education_LMS_Portal)\n    PolMSvc-->>POSvc: EntryPolicies (Education_GradeSync)\n    POSvc->>RSSvc: CheckReservation(Education_ContentCDN)\n    RSSvc-->>POSvc: ReservationMatch / NoMatch\n    POSvc->>POSvc: VisitLifecycleStateMachine.StartVisit(Education_GradeSync)\n    POSvc->>BSvc: InitiateBillingForVisit(Education_ClassroomService)\n    POSvc-->>GW: EntryProcessed, OpenGate\n    GW->>EISvc: Command: OpenEntryGate\n    POSvc->>MB: publish VehicleEnteredEvent\n    IAETSvc->>MB: consume VehicleEnteredEvent\n    end\n\n    %% Start EV Charging (Education_LMS_Portal)\n    rect rgb(Education_GradeSync)\n    Note over Customer, IAETSvc: EV Charging Session Management\n    Customer->>FL: Start EV Charging\n    FL->>GW: RequestStartCharging(Education_StudentDB)\n    GW->>ECSvc: StartChargingSession(Education_GradeSync)\n    ECSvc->>PolMSvc: GetChargingPolicies(Education_ContentCDN)\n    PolMSvc-->>ECSvc: ChargingPolicies (Education_GradeSync)\n    ECSvc->>EISvc: Command: StartChargerHardware\n    EISvc-->>ECSvc: Event: ChargerSessionActive (Education_ContentCDN)\n    ECSvc->>BSvc: NotifyChargingStarted(Education_GradeSync)\n    ECSvc-->>GW: ChargingSessionStarted\n    GW-->>FL: Show Charging Status\n    ECSvc->>MB: publish EVChargingStartedEvent\n    IAETSvc->>MB: consume EVChargingStartedEvent\n    end\n\n    %% Vehicle Exit (Education_StudentDB)\n    rect rgb(Education_ContentCDN)\n    Note over EISvc, MB: Vehicle Exit & Billing Finalization\n    EISvc->>GW: VehicleDetectedAtExit(Education_ClassroomService)\n    GW->>POSvc: RegisterVehicleExit(Education_LMS_Portal)\n    POSvc->>PSvc: CalculateParkingFee(Education_ClassroomService)\n    PSvc-->>POSvc: ParkingFee\n    alt EV Charging was active\n        POSvc->>ECSvc: NotifyVehicleExiting(Education_StudentDB)\n        ECSvc->>EISvc: Command: StopChargerHardware\n        EISvc-->>ECSvc: Event: ChargerSessionEnded (Education_LMS_Portal)\n        ECSvc->>PSvc: CalculateChargingFee(Education_GradeSync)\n        PSvc-->>ECSvc: ChargingFee\n        ECSvc->>BSvc: AddChargingFeeToBill(Education_ContentCDN)\n    end\n    POSvc->>BSvc: AddParkingFeeToBill(Education_GradeSync)\n    BSvc-->>GW: BillReady(Education_ClassroomService)\n    GW-->>FL: Show Payment Due\n    POSvc->>MB: publish VehicleExitedEvent\n    GW->>EISvc: Command: OpenExitGate\n    end\n\n    %% Pay Bill\n    rect rgb(Education_StudentDB)\n    Note over Customer, MB: Payment Processing & Completion\n    Customer->>FL: Pay Bill\n    FL->>GW: ProcessPayment(Education_LMS_Portal)\n    GW->>BSvc: SettlePayment(Education_LMS_Portal)\n    BSvc->>EISvc: Command: ProcessPaymentGateway\n    EISvc-->>BSvc: Event: PaymentProcessed (Education_StudentDB)\n    BSvc-->>GW: PaymentConfirmed\n    GW-->>FL: Show Receipt\n    BSvc->>MB: publish PaymentCompletedEvent\n    end\n\n    Note over Customer, MB: This sequence shows a typical user journey: Reservation, Entry, EV Charging, Exit, and Payment, highlighting key service interactions.\n",
+  "content_size": 5095,
+  "collected_at": "2026-02-06T11:03:57.774208",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Education",
+  "seed_id": "ot_journey_01091",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是FrontendLayer应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "FL"
+      ],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将APIGateway、CustomerContextSvc分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是APIGateway、CustomerContextSvc应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达APIGateway、CustomerContextSvc结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "GW",
+        "CCSvc"
+      ],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含ReservationsSvc、PricingSvc这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "RSSvc",
+        "PSvc"
+      ],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含BillingSvc这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，BillingSvc是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "BSvc"
+      ],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将ParkingOperationsSvc分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，ParkingOperationsSvc就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "ParkingOperationsSvc和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "POSvc"
+      ],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由VehicleContextSvc、ElectricVehicleChargingSvc组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "VCSvc",
+        "ECSvc"
+      ],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有ExternalIntegrationsSvc、PolicyManagementSvc。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是ExternalIntegrationsSvc、PolicyManagementSvc应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，ExternalIntegrationsSvc、PolicyManagementSvc就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "EISvc",
+        "PolMSvc"
+      ],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含InternalAudit&EventTraceSvc、MessageBroker这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "IAETSvc",
+        "MB"
+      ],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理Start session / Login？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Start session / Login应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_0"
+      ],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由Authenticate User组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Authenticate User的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_1"
+      ],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "Validate Credentials、Load Dashboard主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "Validate Credentials、Load Dashboard主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_2",
+        "msg_3"
+      ],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下Get Reservations、Get Lot Status吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Get Reservations、Get Lot Status就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 495
+    },
+    {
+      "turn_id": 34,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Get Reservations、Get Lot Status应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 510
+    },
+    {
+      "turn_id": 35,
+      "speaker": "Speaker_B",
+      "utterance": "Get Reservations、Get Lot Status负责具体的功能实现。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_4",
+        "msg_5"
+      ],
+      "timestamp_offset": 525
+    },
+    {
+      "turn_id": 36,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Make Reservation、Request Reservation(Education_ContentCDN)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 540
+    },
+    {
+      "turn_id": 37,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 555
+    },
+    {
+      "turn_id": 38,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Make Reservation、Request Reservation(Education_ContentCDN)的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_6",
+        "msg_7",
+        "msg_8"
+      ],
+      "timestamp_offset": 570
+    },
+    {
+      "turn_id": 39,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理GetReservationPolicies(Education_StudentDB)、CreateSlotHold(Education_GradeSync)？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 585
+    },
+    {
+      "turn_id": 40,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_9",
+        "msg_10"
+      ],
+      "timestamp_offset": 600
+    },
+    {
+      "turn_id": 41,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理GetFeeQuote(Education_ClassroomService)、PreAuthPayment(Education_GradeSync)？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 615
+    },
+    {
+      "turn_id": 42,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 630
+    },
+    {
+      "turn_id": 43,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下GetFeeQuote(Education_ClassroomService)、PreAuthPayment(Education_GradeSync)吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "msg_11",
+        "msg_12"
+      ],
+      "timestamp_offset": 645
+    },
+    {
+      "turn_id": 44,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理ConvertHoldToReservation(Education_StudentDB)、publish ReservationConfirmedEvent？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 660
+    },
+    {
+      "turn_id": 45,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 675
+    },
+    {
+      "turn_id": 46,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理ConvertHoldToReservation(Education_StudentDB)、publish ReservationConfirmedEvent？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "msg_13",
+        "msg_14"
+      ],
+      "timestamp_offset": 690
+    },
+    {
+      "turn_id": 47,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理consume ReservationConfirmedEvent？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 705
+    },
+    {
+      "turn_id": 48,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 720
+    },
+    {
+      "turn_id": 49,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有consume ReservationConfirmedEvent。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_15"
+      ],
+      "timestamp_offset": 735
+    },
+    {
+      "turn_id": 50,
+      "speaker": "Speaker_A",
+      "utterance": "VehicleDetectedAtEntry(Education_ClassroomService)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 750
+    },
+    {
+      "turn_id": 51,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，VehicleDetectedAtEntry(Education_ClassroomService)的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_16"
+      ],
+      "timestamp_offset": 765
+    },
+    {
+      "turn_id": 52,
+      "speaker": "Speaker_A",
+      "utterance": "关于RegisterVehicleEntry(Education_StudentDB)、GetVehicleDetails(Education_LMS_Portal)，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 780
+    },
+    {
+      "turn_id": 53,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，RegisterVehicleEntry(Education_StudentDB)、GetVehicleDetails(Education_LMS_Portal)的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 795
+    },
+    {
+      "turn_id": 54,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有RegisterVehicleEntry(Education_StudentDB)、GetVehicleDetails(Education_LMS_Portal)。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 810
+    },
+    {
+      "turn_id": 55,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_17",
+        "msg_18"
+      ],
+      "timestamp_offset": 825
+    },
+    {
+      "turn_id": 56,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有GetEntryPolicies(Education_LMS_Portal)、CheckReservation(Education_ContentCDN)。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 840
+    },
+    {
+      "turn_id": 57,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 855
+    },
+    {
+      "turn_id": 58,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下GetEntryPolicies(Education_LMS_Portal)、CheckReservation(Education_ContentCDN)吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 870
+    },
+    {
+      "turn_id": 59,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下GetEntryPolicies(Education_LMS_Portal)、CheckReservation(Education_ContentCDN)吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "msg_19",
+        "msg_20"
+      ],
+      "timestamp_offset": 885
+    },
+    {
+      "turn_id": 60,
+      "speaker": "Speaker_A",
+      "utterance": "VisitLifecycleStateMachine.StartVisit(Education_GradeSync)、InitiateBillingForVisit(Education_ClassroomService)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 900
+    },
+    {
+      "turn_id": 61,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 915
+    },
+    {
+      "turn_id": 62,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由VisitLifecycleStateMachine.StartVisit(Education_GradeSync)、InitiateBillingForVisit(Education_ClassroomService)组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_21",
+        "msg_22",
+        "msg_23"
+      ],
+      "timestamp_offset": 930
+    },
+    {
+      "turn_id": 63,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下publish VehicleEnteredEvent吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 945
+    },
+    {
+      "turn_id": 64,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_24"
+      ],
+      "timestamp_offset": 960
+    },
+    {
+      "turn_id": 65,
+      "speaker": "Speaker_B",
+      "utterance": "consume VehicleEnteredEvent、Start EV Charging主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 975
+    },
+    {
+      "turn_id": 66,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_25",
+        "msg_26",
+        "msg_27"
+      ],
+      "timestamp_offset": 990
+    },
+    {
+      "turn_id": 67,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下StartChargingSession(Education_GradeSync)、GetChargingPolicies(Education_ContentCDN)吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1005
+    },
+    {
+      "turn_id": 68,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1020
+    },
+    {
+      "turn_id": 69,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含StartChargingSession(Education_GradeSync)、GetChargingPolicies(Education_ContentCDN)这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_28",
+        "msg_29"
+      ],
+      "timestamp_offset": 1035
+    },
+    {
+      "turn_id": 70,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Command: StartChargerHardware、NotifyChargingStarted(Education_GradeSync)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1050
+    },
+    {
+      "turn_id": 71,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，Command: StartChargerHardware、NotifyChargingStarted(Education_GradeSync)是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1065
+    },
+    {
+      "turn_id": 72,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Command: StartChargerHardware、NotifyChargingStarted(Education_GradeSync)应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1080
+    },
+    {
+      "turn_id": 73,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Command: StartChargerHardware、NotifyChargingStarted(Education_GradeSync)就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_30",
+        "msg_31",
+        "msg_32"
+      ],
+      "timestamp_offset": 1095
+    },
+    {
+      "turn_id": 74,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理consume EVChargingStartedEvent、VehicleDetectedAtExit(Education_ClassroomService)？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1110
+    },
+    {
+      "turn_id": 75,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1125
+    },
+    {
+      "turn_id": 76,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在consume EVChargingStartedEvent、VehicleDetectedAtExit(Education_ClassroomService)完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_33",
+        "msg_34"
+      ],
+      "timestamp_offset": 1140
+    },
+    {
+      "turn_id": 77,
+      "speaker": "Speaker_B",
+      "utterance": "RegisterVehicleExit(Education_LMS_Portal)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1155
+    },
+    {
+      "turn_id": 78,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1170
+    },
+    {
+      "turn_id": 79,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，RegisterVehicleExit(Education_LMS_Portal)有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1185
+    },
+    {
+      "turn_id": 80,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将RegisterVehicleExit(Education_LMS_Portal)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "msg_35"
+      ],
+      "timestamp_offset": 1200
+    },
+    {
+      "turn_id": 81,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有CalculateParkingFee(Education_ClassroomService)、NotifyVehicleExiting(Education_StudentDB)。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1215
+    },
+    {
+      "turn_id": 82,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1230
+    },
+    {
+      "turn_id": 83,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将CalculateParkingFee(Education_ClassroomService)、NotifyVehicleExiting(Education_StudentDB)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "msg_36",
+        "msg_37"
+      ],
+      "timestamp_offset": 1245
+    },
+    {
+      "turn_id": 84,
+      "speaker": "Speaker_A",
+      "utterance": "关于Command: StopChargerHardware，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1260
+    },
+    {
+      "turn_id": 85,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Command: StopChargerHardware就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_38"
+      ],
+      "timestamp_offset": 1275
+    },
+    {
+      "turn_id": 86,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有CalculateChargingFee(Education_GradeSync)、AddChargingFeeToBill(Education_ContentCDN)。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1290
+    },
+    {
+      "turn_id": 87,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是CalculateChargingFee(Education_GradeSync)、AddChargingFeeToBill(Education_ContentCDN)应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1305
+    },
+    {
+      "turn_id": 88,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_39",
+        "msg_40"
+      ],
+      "timestamp_offset": 1320
+    },
+    {
+      "turn_id": 89,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由AddParkingFeeToBill(Education_GradeSync)、publish VehicleExitedEvent组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1335
+    },
+    {
+      "turn_id": 90,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，AddParkingFeeToBill(Education_GradeSync)、publish VehicleExitedEvent就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1350
+    },
+    {
+      "turn_id": 91,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_41",
+        "msg_42",
+        "msg_43"
+      ],
+      "timestamp_offset": 1365
+    },
+    {
+      "turn_id": 92,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Pay Bill、ProcessPayment(Education_LMS_Portal)组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1380
+    },
+    {
+      "turn_id": 93,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Pay Bill、ProcessPayment(Education_LMS_Portal)的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_44",
+        "msg_45"
+      ],
+      "timestamp_offset": 1395
+    },
+    {
+      "turn_id": 94,
+      "speaker": "Speaker_A",
+      "utterance": "关于SettlePayment(Education_LMS_Portal)，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1410
+    },
+    {
+      "turn_id": 95,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_46"
+      ],
+      "timestamp_offset": 1425
+    },
+    {
+      "turn_id": 96,
+      "speaker": "Speaker_A",
+      "utterance": "Command: ProcessPaymentGateway、publish PaymentCompletedEvent主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1440
+    },
+    {
+      "turn_id": 97,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Command: ProcessPaymentGateway、publish PaymentCompletedEvent就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1455
+    },
+    {
+      "turn_id": 98,
+      "speaker": "Speaker_A",
+      "utterance": "最后，流程到达Command: ProcessPaymentGateway、publish PaymentCompletedEvent结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_47",
+        "msg_48"
+      ],
+      "timestamp_offset": 1470
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 98,
+    "speaker_distribution": {
+      "Speaker_B": 49,
+      "Speaker_A": 49
+    },
+    "speech_act_distribution": {
+      "sequential": 6,
+      "clarify": 12,
+      "classification": 13,
+      "structural": 16,
+      "confirm": 19,
+      "contrastive": 2,
+      "inform": 14,
+      "request": 16
+    },
+    "avg_turn_length": 49.234693877551024,
+    "dialogue_duration": 1470
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01472",
+  "source": "github",
+  "source_url": "https://github.com/Itsskell/improved-palm-tree/blob/f5b8605970aa2c75b2799185a696fb0ccb8ed23c/docs/diagrams/workflow.mmd",
+  "github_repo": "Itsskell/improved-palm-tree",
+  "github_file_path": "docs/diagrams/workflow.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TB\n    Start([Client Request]) --> Trigger[HTTP Trigger<br/>Receive Business Data]\n    \n    Trigger --> Validate{Validate<br/>Request Schema}\n    Validate -->|Invalid| Error1[Return Error Response]\n    Validate -->|Valid| Parse[Parse Business Data<br/>Extract Metrics]\n    \n    Parse --> AnalysisType{Analysis Type?}\n    \n    AnalysisType -->|Trend| PromptTrend[Construct Trend<br/>Analysis Prompt]\n    AnalysisType -->|Forecast| PromptForecast[Construct Forecast<br/>Prompt]\n    AnalysisType -->|Summary| PromptSummary[Construct Executive<br/>Summary Prompt]\n    AnalysisType -->|Recommendation| PromptRec[Construct Strategic<br/>Recommendations Prompt]\n    \n    PromptTrend --> CallAI[Call OpenAI API<br/>GPT-4 Model]\n    PromptForecast --> CallAI\n    PromptSummary --> CallAI\n    PromptRec --> CallAI\n    \n    CallAI --> AIProcess{API Call<br/>Success?}\n    AIProcess -->|No| Retry[Retry Logic<br/>Max 3 Attempts]\n    Retry --> AIProcess\n    AIProcess -->|Failed| Error2[Return Error Response]\n    AIProcess -->|Yes| ParseResponse[Parse AI Response<br/>Extract Insights]\n    \n    ParseResponse --> Format[Format Response<br/>JSON Structure]\n    Format --> Log[Log Analytics<br/>Record Execution]\n    Log --> Response[Return Success Response<br/>with Insights]\n    \n    Response --> End([End])\n    Error1 --> End\n    Error2 --> End\n    \n    subgraph Azure Logic App\n        Trigger\n        Validate\n        Parse\n        AnalysisType\n        PromptTrend\n        PromptForecast\n        PromptSummary\n        PromptRec\n        CallAI\n        AIProcess\n        Retry\n        ParseResponse\n        Format\n        Log\n        Response\n        Error1\n        Error2\n    end\n    \n    subgraph External Services\n        OpenAI[OpenAI GPT-4 API]\n        CallAI -.->|HTTPS Request| OpenAI\n        OpenAI -.->|JSON Response| CallAI\n    end\n    \n    subgraph Monitoring\n        Monitor[Azure Monitor]\n        Insights[Application Insights]\n        Log -.->|Telemetry| Monitor\n        Log -.->|Metrics| Insights\n    end\n    \n    style Start fill:#e1f5e1\n    style End fill:#ffe1e1\n    style CallAI fill:#e1e5ff\n    style OpenAI fill:#fff4e1\n    style Error1 fill:#ffcccc\n    style Error2 fill:#ffcccc\n    style Response fill:#ccffcc\n",
+  "content_size": 2228,
+  "collected_at": "2026-02-06T01:46:40.148071",
+  "license": "mit",
+  "license_name": "MIT License",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

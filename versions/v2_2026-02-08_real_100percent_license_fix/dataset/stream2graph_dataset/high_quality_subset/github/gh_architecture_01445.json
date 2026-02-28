@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01445",
+  "source": "github",
+  "source_url": "https://github.com/michaelraylloyd/gulf-to-bay-analytics-modernization/blob/e3f3031063457cb34adb173c611217760189b2cb/docs/data-dictionary/architecture/q-exception-flow.mmd",
+  "github_repo": "michaelraylloyd/gulf-to-bay-analytics-modernization",
+  "github_file_path": "docs/data-dictionary/architecture/q-exception-flow.mmd",
+  "diagram_type": "architecture",
+  "code": "flowchart TD\n\n    %% ============================================\n    %%   FABRIC SALES ANALYTICS — DQ EXCEPTION FLOW\n    %% ============================================\n\n    subgraph Bronze[\"Bronze Layer — Raw Ingestion\"]\n        B1[\"Raw Sales\"]\n        B2[\"Raw Products\"]\n        B3[\"Raw Customers\"]\n    end\n\n    subgraph DQ[\"Data Quality Validation\"]\n        DQ1[\"DQ Runner Notebook<br/>• Load Silver inputs<br/>• Apply expectations JSON<br/>• Validate rows\"]\n        DQ2[\"Expectation Rules<br/>expectations.json\"]\n        DQ3[\"Row-Level Validation<br/>• Null checks<br/>• Type checks<br/>• Domain checks<br/>• FK checks\"]\n    end\n\n    subgraph Routes[\"Routing Logic\"]\n        R1[\"PASS<br/>Row meets all expectations\"]\n        R2[\"FAIL<br/>Row violates ≥1 expectation\"]\n    end\n\n    subgraph Outputs[\"DQ Outputs\"]\n        O1[\"Clean Output Tables<br/>(Silver → Gold-ready)\"]\n        O2[\"Exception Tables<br/>Permanent, queryable<br/>• dq_sales_exceptions<br/>• dq_products_exceptions<br/>• dq_customers_exceptions\"]\n        O3[\"DQ Summary Table<br/>• Rule counts<br/>• Pass/fail stats<br/>• Timestamp\"]\n    end\n\n    subgraph Gold[\"Gold Layer\"]\n        G1[\"fact_sales\"]\n        G2[\"dim_product\"]\n        G3[\"dim_customer\"]\n    end\n\n    %% FLOWS\n    B1 --> DQ1\n    B2 --> DQ1\n    B3 --> DQ1\n\n    DQ2 --> DQ1\n    DQ1 --> DQ3\n\n    DQ3 --> R1\n    DQ3 --> R2\n\n    R1 --> O1\n    R2 --> O2\n    DQ1 --> O3\n\n    O1 --> G1\n    O1 --> G2\n    O1 --> G3",
+  "content_size": 1441,
+  "collected_at": "2026-02-06T01:46:19.003938",
+  "license": "none",
+  "license_name": "No License",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 0
+}

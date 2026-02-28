@@ -1,0 +1,341 @@
+{
+  "id": "gh_sequence_00638",
+  "source": "github",
+  "source_url": "https://github.com/lakkantha/IOT/blob/de6c5c7e8bdbd041c3d000beb50026056c31208b/docs/dataflow.mmd",
+  "github_repo": "lakkantha/IOT",
+  "github_file_path": "docs/dataflow.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Device as IoT Device\n    participant API as REST API<br/>(Controller)\n    participant Facade as IoTFacade<br/>(Facade Pattern)\n    participant AsyncSvc as AsyncNotificationService<br/>@Async\n    participant Producer as KafkaProducer\n    participant Kafka as Kafka Cluster\n    participant Consumer as KafkaConsumer\n    participant Service as Processing Service\n    participant Config as ApplicationConfig<br/>(Singleton)\n    participant Builder as Device Builder<br/>(Builder Pattern)\n    participant Repo as Repository\n    participant DB as Database\n\n    Note over Device,DB: Device Registration Flow\n    Device->>API: POST /api/devices<br/>{deviceId, type, location}\n    API->>Facade: registerNewDevice(dto)\n    Facade->>Builder: Device.builder()...build()\n    Builder-->>Facade: validated Device\n    Facade->>Service: registerDevice(dto)\n    Service->>Repo: save(device)\n    Repo->>DB: INSERT device\n    DB-->>Repo: device saved\n    Repo-->>Service: Device entity\n    Service-->>Facade: Device\n    Facade->>AsyncSvc: publishDeviceRegistration(dto)\n    Note right of Facade: returns immediately (async)\n    AsyncSvc->>Producer: sendDeviceRegistration(dto)\n    Producer->>Kafka: publish to device-registration topic\n    Facade-->>API: Device\n    API-->>Device: 200 OK {device}\n\n    Note over Device,DB: Sensor Data Processing Flow\n    Device->>API: POST /api/data<br/>{deviceId, measurements}\n    API->>Facade: processSensorData(dto)\n    Facade->>Service: validateSensorData(dto)\n    Service-->>Facade: validated\n    Facade->>Service: getDeviceById(deviceId)\n    Service->>Repo: findByDeviceId(deviceId)\n    Repo->>DB: SELECT device\n    DB-->>Repo: device data\n    Repo-->>Service: Device\n    Service-->>Facade: Device\n    Facade->>Service: processSensorData(dto, device)\n    Service->>Config: getDeviceBatchSize()\n    Config-->>Service: batch size\n    Service->>Service: assessDataQuality(dto)\n    Service-->>Facade: SensorData\n    Facade->>AsyncSvc: publishSensorData(dto)\n    Note right of Facade: returns immediately (async)\n    AsyncSvc->>Producer: sendSensorData(dto)\n    Producer->>Kafka: publish to sensor-data topic\n    Facade-->>API: success\n    API-->>Device: 202 Accepted\n\n    Note over Device,DB: Async Kafka Consumer Processing\n    Kafka->>Consumer: consume sensor-data batch\n    Consumer->>Service: processSensorData(batch)\n    Service->>Repo: saveAll(sensorData)\n    Repo->>DB: BATCH INSERT\n    DB-->>Repo: saved\n    Repo-->>Service: success\n    Service-->>Consumer: processed\n",
+  "content_size": 2525,
+  "collected_at": "2026-02-06T01:35:05.001350",
+  "compilation_status": "failed",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 dto 和 dto。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'dto 和 dto'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "registerNewDevice",
+        "registerDevice"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 device 和 dto 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'device 和 dto'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "save",
+        "publishDeviceRegistration"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 async 和 dto 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'async 和 dto'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "immediately",
+        "sendDeviceRegistration"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 device 和 dto 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'device 和 dto'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OK",
+        "processSensorData"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 dto 和 deviceId 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'dto 和 deviceId'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "validateSensorData",
+        "getDeviceById"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 deviceId 和 dto, device 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'deviceId 和 dto, device'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "findByDeviceId",
+        "processSensorData"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 dto 和 dto 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'dto 和 dto'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "assessDataQuality",
+        "publishSensorData"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 async 和 dto 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'async 和 dto'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "immediately",
+        "sendSensorData"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 batch 和 sensorData。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'batch 和 sensorData'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "processSensorData",
+        "saveAll"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 36,
+    "repair_count": 0,
+    "grounding_acts_count": 18,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

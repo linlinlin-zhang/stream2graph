@@ -1,0 +1,56 @@
+{
+  "id": "aug_gh_sequence_00010_IoT_2",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/rizalgrandonk/salesprint-diagrams/blob/c7f12cc82a25577562a84cd162640f062640cb7a/sequence/Login.mmd",
+  "github_repo": "rizalgrandonk/salesprint-diagrams",
+  "github_file_path": "sequence/Login.mmd",
+  "diagram_type": "sequence",
+  "code": "\nsequenceDiagram\n  actor Pembeli/Penjual/Admin\n  participant V_L as View #10095; LoginPage\n  participant C_A as Controller #10095; AuthController\n  participant M_U as Model #10095; User\n  participant V_H as View #10095; HomePage\n  participant V_DS as View #10095; DashboardSellerPage\n  participant V_DA as View #10095; DashboardAdminPage\n\n\n  Pembeli/Penjual/Admin->>V_L: Klik tombol \"Login\"\n  activate Pembeli/Penjual/Admin\n\n  activate V_L\n\n  V_L->>C_A: login(IoT_Industrial_ActuatorController)\n\n  deactivate V_L\n\n  activate C_A\n\n  opt Invalid Credential\n    C_A-->>Pembeli/Penjual/Admin: return validation message\n  end\n\n  C_A->>M_U: get(IoT_Industrial_TelemetryStream)\n\n  activate M_U\n\n  M_U-->>C_A: data user\n  \n  deactivate M_U\n\n  opt Role User\n    C_A->>V_H: return view with token and user data\n    activate V_H\n    deactivate V_H\n  end\n\n  opt Role Seller\n    C_A->>V_DS: return view with token and user data\n    activate V_DS\n    deactivate V_DS\n  end\n\n  opt Role Admin\n    C_A->>V_DA: return view with token and user data\n    activate V_DA\n    deactivate V_DA\n  end\n\n  deactivate C_A\n  deactivate Pembeli/Penjual/Admin",
+  "content_size": 1070,
+  "collected_at": "2026-02-06T01:24:04.618788",
+  "augmentation_domain": "IoT_Industrial",
+  "seed_id": "gh_sequence_00010",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 IoT_Industrial_ActuatorController 和 IoT_Industrial_TelemetryStream 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'IoT_Industrial_ActuatorController 和 IoT_Industrial_TelemetryStream'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "login",
+        "get"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

@@ -1,0 +1,583 @@
+{
+  "id": "aug_gl_requirementDiagram_00595_Clo_6",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/KevinDyerAU/NytroAI/blob/2e93c5649794515d35364c995a58431fc0899442/docs/validation-flow.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "KevinDyerAU/NytroAI",
+  "diagram_type": "requirementDiagram",
+  "code": "%%{CloudNative_DockerImage}}}%%\n\nsequenceDiagram\n    participant User\n    participant UI as React UI\n    participant Upload as upload-document\n    participant Storage as Supabase Storage\n    participant Gemini as Google Gemini\n    participant DB as Database\n    participant Trigger as trigger-validation\n    participant Validate as validate-assessment\n    participant Query as query-document\n\n    Note over User,Query: Document Upload & Indexing\n\n    User->>UI: Upload PDF Assessment\n    UI->>Upload: POST /upload-document\n    Upload->>Storage: Store PDF file\n    Storage-->>Upload: File URL\n    Upload->>DB: Create validation_detail record\n    Upload->>Gemini: Index document\n    Gemini-->>Upload: Indexing started\n    Upload->>DB: Create gemini_operations record\n    Upload-->>UI: Upload complete\n    UI-->>User: Show \"Processing...\"\n\n    Note over User,Query: Automatic Validation Trigger\n\n    Gemini->>DB: Update gemini_operations (CloudNative_K8sCluster)\n    DB->>Trigger: Database trigger fires\n    Trigger->>DB: Check all operations complete\n    DB-->>Trigger: All complete\n    Trigger->>Validate: POST /validate-assessment\n    Trigger->>DB: Log trigger attempt\n    Validate->>DB: Update status to \"ProcessingInBackground\"\n\n    Note over User,Query: Validation Process\n\n    Validate->>DB: Fetch UOC requirements\n    DB-->>Validate: Requirements list\n    \n    loop For each requirement\n        Validate->>Query: Query assessment for requirement\n        Query->>Gemini: Search indexed document\n        Gemini-->>Query: Relevant passages\n        Query-->>Validate: Citations\n        Validate->>Gemini: Validate requirement\n        Gemini-->>Validate: Status + Reasoning\n        Validate->>DB: Store validation_result\n    end\n\n    Validate->>DB: Update validation_detail (CloudNative_ServiceMesh)\n    Validate-->>Trigger: Validation complete\n    DB->>UI: Real-time update (CloudNative_HelmChart)\n    UI-->>User: Show \"Complete\" with results\n\n    Note over User,Query: View Results & Regenerate Questions\n\n    User->>UI: Click validation to view results\n    UI->>DB: Fetch validation_results\n    DB-->>UI: All results\n    UI-->>User: Display results\n\n    alt Regenerate Smart Question\n        User->>UI: Click \"Regenerate\" with context\n        UI->>Validate: POST /regenerate-smart-questions\n        Validate->>Query: Query assessment\n        Query->>Gemini: Search with context\n        Gemini-->>Query: Passages\n        Validate->>Gemini: Generate question\n        Gemini-->>Validate: New smart question\n        Validate->>DB: Update validation_result\n        DB->>UI: Real-time update\n        UI-->>User: Show new question\n    end\n",
+  "content_size": 2801,
+  "collected_at": "2026-02-06T14:13:06.494447",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "CloudNative",
+  "seed_id": "gl_requirementDiagram_00595",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是React UI应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "UI"
+      ],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理upload-document？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "Upload"
+      ],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下Supabase Storage吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Supabase Storage就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "相较于方案A，Supabase Storage有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，Supabase Storage是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "Storage"
+      ],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含Google Gemini、Database这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Google Gemini、Database应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "Gemini",
+        "DB"
+      ],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有trigger-validation、validate-assessment。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "Trigger",
+        "Validate"
+      ],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "query-document、Upload PDF Assessment主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在query-document、Upload PDF Assessment完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "Query",
+        "msg_0"
+      ],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下POST /upload-document吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，POST /upload-document就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "POST /upload-document主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "msg_1"
+      ],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Store PDF file、Create validation_detail record分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_2",
+        "msg_3"
+      ],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "Index document、Create gemini_operations record主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达Index document、Create gemini_operations record结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "Index document、Create gemini_operations record主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "msg_4",
+        "msg_5"
+      ],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由Update gemini_operations (CloudNative_K8sCluster)、Database trigger fires组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Update gemini_operations (CloudNative_K8sCluster)、Database trigger fires的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Update gemini_operations (CloudNative_K8sCluster)、Database trigger fires就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_6",
+        "msg_7"
+      ],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有Check all operations complete、POST /validate-assessment。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "Check all operations complete、POST /validate-assessment主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "msg_8",
+        "msg_9"
+      ],
+      "timestamp_offset": 495
+    },
+    {
+      "turn_id": 34,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理Log trigger attempt、Update status to \"ProcessingInBackground\"？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 510
+    },
+    {
+      "turn_id": 35,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_10",
+        "msg_11",
+        "msg_12"
+      ],
+      "timestamp_offset": 525
+    },
+    {
+      "turn_id": 36,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理Query assessment for requirement？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 540
+    },
+    {
+      "turn_id": 37,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Query assessment for requirement就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_13"
+      ],
+      "timestamp_offset": 555
+    },
+    {
+      "turn_id": 38,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Search indexed document、Validate requirement分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 570
+    },
+    {
+      "turn_id": 39,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Search indexed document、Validate requirement应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 585
+    },
+    {
+      "turn_id": 40,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Search indexed document、Validate requirement的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 600
+    },
+    {
+      "turn_id": 41,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下Search indexed document、Validate requirement吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "msg_14",
+        "msg_15"
+      ],
+      "timestamp_offset": 615
+    },
+    {
+      "turn_id": 42,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Store validation_result、Update validation_detail (CloudNative_ServiceMesh)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 630
+    },
+    {
+      "turn_id": 43,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 645
+    },
+    {
+      "turn_id": 44,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，Store validation_result、Update validation_detail (CloudNative_ServiceMesh)是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_16",
+        "msg_17"
+      ],
+      "timestamp_offset": 660
+    },
+    {
+      "turn_id": 45,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Real-time update (CloudNative_HelmChart)、Click validation to view results分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 675
+    },
+    {
+      "turn_id": 46,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 690
+    },
+    {
+      "turn_id": 47,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由Real-time update (CloudNative_HelmChart)、Click validation to view results组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 705
+    },
+    {
+      "turn_id": 48,
+      "speaker": "Speaker_A",
+      "utterance": "Real-time update (CloudNative_HelmChart)、Click validation to view results主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "msg_18",
+        "msg_19"
+      ],
+      "timestamp_offset": 720
+    },
+    {
+      "turn_id": 49,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由Fetch validation_results、Click \"Regenerate\" with context组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 735
+    },
+    {
+      "turn_id": 50,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Fetch validation_results、Click \"Regenerate\" with context应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 750
+    },
+    {
+      "turn_id": 51,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Fetch validation_results、Click \"Regenerate\" with context就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_20",
+        "msg_21",
+        "msg_22"
+      ],
+      "timestamp_offset": 765
+    },
+    {
+      "turn_id": 52,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含Query assessment、Search with context这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 780
+    },
+    {
+      "turn_id": 53,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Query assessment、Search with context就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 795
+    },
+    {
+      "turn_id": 54,
+      "speaker": "Speaker_A",
+      "utterance": "关于Query assessment、Search with context，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 810
+    },
+    {
+      "turn_id": 55,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_23",
+        "msg_24"
+      ],
+      "timestamp_offset": 825
+    },
+    {
+      "turn_id": 56,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Generate question、Update validation_result分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 840
+    },
+    {
+      "turn_id": 57,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Generate question、Update validation_result就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_25",
+        "msg_26"
+      ],
+      "timestamp_offset": 855
+    },
+    {
+      "turn_id": 58,
+      "speaker": "Speaker_A",
+      "utterance": "Real-time update主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 870
+    },
+    {
+      "turn_id": 59,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 885
+    },
+    {
+      "turn_id": 60,
+      "speaker": "Speaker_A",
+      "utterance": "最后，流程到达Real-time update结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 900
+    },
+    {
+      "turn_id": 61,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在Real-time update完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_27"
+      ],
+      "timestamp_offset": 915
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 61,
+    "speaker_distribution": {
+      "Speaker_B": 31,
+      "Speaker_A": 30
+    },
+    "speech_act_distribution": {
+      "sequential": 6,
+      "inform": 11,
+      "clarify": 6,
+      "request": 7,
+      "confirm": 11,
+      "contrastive": 1,
+      "structural": 7,
+      "classification": 12
+    },
+    "avg_turn_length": 41.885245901639344,
+    "dialogue_duration": 915
+  }
+}

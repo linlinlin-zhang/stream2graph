@@ -1,0 +1,823 @@
+{
+  "id": "gh_architecture_01898",
+  "source": "github",
+  "source_url": "https://github.com/raktim-mondol/hist2RNA/blob/33fbe0205f35701cdc69e225af2e5275f4ab35f4/hist2scRNA/docs/diagrams/12_input_preprocessing_workflow.mmd",
+  "github_repo": "raktim-mondol/hist2RNA",
+  "github_file_path": "hist2scRNA/docs/diagrams/12_input_preprocessing_workflow.mmd",
+  "diagram_type": "architecture",
+  "code": "flowchart TD\n    subgraph \"Input Data\"\n        A1[Whole Slide Image<br/>WSI file .svs, .tiff]\n        A2[Spatial Transcriptomics<br/>10X Visium / Slide-seq]\n        A3[Gene Expression<br/>Count Matrix]\n    end\n\n    subgraph \"Step 1: Load Data\"\n        B1[Load WSI<br/>OpenSlide]\n        B2[Load Spot Coordinates<br/>tissue_positions_list.csv]\n        B3[Load Gene Expression<br/>filtered_feature_bc_matrix]\n\n        A1 --> B1\n        A2 --> B2\n        A3 --> B3\n    end\n\n    subgraph \"Step 2: Coordinate Alignment\"\n        C1[Read Scale Factors<br/>scalefactors_json.json]\n        C2{Coordinates<br/>Aligned?}\n        C3[Transform Coordinates<br/>Visium space → WSI space]\n        C4[Manual Alignment<br/>QuPath or fiducial markers]\n\n        B2 --> C1\n        C1 --> C2\n        C2 -->|Yes| D1\n        C2 -->|No| C3\n        C3 --> C4\n        C4 --> D1\n    end\n\n    subgraph \"Step 3: Quality Control\"\n        D1[Filter In-Tissue Spots<br/>in_tissue == 1]\n        D2[Check Spot Coverage<br/>% tissue in patch]\n        D3[Remove Low Quality<br/>Blank or folded tissue]\n\n        D1 --> D2\n        D2 --> D3\n    end\n\n    subgraph \"Step 4: Patch Extraction\"\n        E1[For Each Spot<br/>Get x, y coordinates]\n        E2[Calculate Patch Bounds<br/>center ± 112 pixels]\n        E3[Extract 224×224 Patch<br/>slide.read_region]\n        E4[Convert to RGB<br/>Remove alpha channel]\n        E5[Color Normalization<br/>Macenko method]\n\n        D3 --> E1\n        E1 --> E2\n        E2 --> E3\n        E3 --> E4\n        E4 --> E5\n    end\n\n    subgraph \"Step 5: Spatial Graph\"\n        F1[Build KDTree<br/>from coordinates]\n        F2[For Each Spot<br/>Find k=6 neighbors]\n        F3[Create Edge List<br/>source, target]\n        F4[Save Edges<br/>spatial_edges.csv]\n\n        E5 --> F1\n        F1 --> F2\n        F2 --> F3\n        F3 --> F4\n    end\n\n    subgraph \"Step 6: Save Dataset\"\n        G1[Save Patches<br/>patches/spot_*.png]\n        G2[Save Coordinates<br/>spatial_coordinates.csv]\n        G3[Save Expression<br/>gene_expression.csv]\n        G4[Save Metadata<br/>dataset_info.json]\n\n        E5 --> G1\n        F4 --> G2\n        B3 --> G3\n        G1 --> G4\n        G2 --> G4\n        G3 --> G4\n    end\n\n    subgraph \"Output: Ready for Training\"\n        H1[Complete Dataset<br/>patches/ + CSV files]\n        H2[Load in DataLoader<br/>SpatialTranscriptomicsDataset]\n        H3[Train hist2scRNA<br/>Model]\n\n        G4 --> H1\n        H1 --> H2\n        H2 --> H3\n    end\n\n    style A1 fill:#ffe1e1\n    style A2 fill:#ffe1e1\n    style B1 fill:#e1f5ff\n    style E5 fill:#fff4e1\n    style F4 fill:#ffe1f5\n    style H3 fill:#e1ffe1\n",
+  "content_size": 2606,
+  "collected_at": "2026-02-06T02:04:43.404658",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 7,
+  "repo_forks": 2,
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Whole Slide Image<br/>WSI file .svs, .tiff、Spatial Transcriptomics<br/>10X Visium / Slide-seq的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "Whole Slide Image<br/>WSI file .svs, .tiff、Spatial Transcriptomics<br/>10X Visium / Slide-seq和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Whole Slide Image<br/>WSI file .svs, .tiff、Spatial Transcriptomics<br/>10X Visium / Slide-seq的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "A1",
+        "A2"
+      ],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "Gene Expression<br/>Count Matrix、Load WSI<br/>OpenSlide主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Gene Expression<br/>Count Matrix、Load WSI<br/>OpenSlide应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，Gene Expression<br/>Count Matrix、Load WSI<br/>OpenSlide有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "A3",
+        "B1",
+        "B2"
+      ],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将Load Gene Expression<br/>filtered_feature_bc_matrix分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Load Gene Expression<br/>filtered_feature_bc_matrix应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "B3"
+      ],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理Read Scale Factors<br/>scalefactors_json.json、Coordinates<br/>Aligned?？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "C1",
+        "C2",
+        "C3"
+      ],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Manual Alignment<br/>QuPath or fiducial markers、Filter In-Tissue Spots<br/>in_tissue == 1组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Manual Alignment<br/>QuPath or fiducial markers、Filter In-Tissue Spots<br/>in_tissue == 1就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Manual Alignment<br/>QuPath or fiducial markers、Filter In-Tissue Spots<br/>in_tissue == 1应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "C4",
+        "D1"
+      ],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理Check Spot Coverage<br/>% tissue in patch？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "D2"
+      ],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Remove Low Quality<br/>Blank or folded tissue、For Each Spot<br/>Get x, y coordinates组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Remove Low Quality<br/>Blank or folded tissue、For Each Spot<br/>Get x, y coordinates的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由Remove Low Quality<br/>Blank or folded tissue、For Each Spot<br/>Get x, y coordinates组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "D3",
+        "E1"
+      ],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理Calculate Patch Bounds<br/>center ± 112 pixels、Extract 224×224 Patch<br/>slide.read_region？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "E2",
+        "E3"
+      ],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理Convert to RGB<br/>Remove alpha channel、Color Normalization<br/>Macenko method？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "E4",
+        "E5",
+        "F1"
+      ],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下For Each Spot<br/>Find k=6 neighbors、Create Edge List<br/>source, target吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，For Each Spot<br/>Find k=6 neighbors、Create Edge List<br/>source, target是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含For Each Spot<br/>Find k=6 neighbors、Create Edge List<br/>source, target这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "相较于方案A，For Each Spot<br/>Find k=6 neighbors、Create Edge List<br/>source, target有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "F2",
+        "F3"
+      ],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理Save Edges<br/>spatial_edges.csv？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Save Edges<br/>spatial_edges.csv就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "F4"
+      ],
+      "timestamp_offset": 495
+    },
+    {
+      "turn_id": 34,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理Save Patches<br/>patches/spot_*.png、Save Coordinates<br/>spatial_coordinates.csv？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 510
+    },
+    {
+      "turn_id": 35,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Save Patches<br/>patches/spot_*.png、Save Coordinates<br/>spatial_coordinates.csv的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 525
+    },
+    {
+      "turn_id": 36,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，Save Patches<br/>patches/spot_*.png、Save Coordinates<br/>spatial_coordinates.csv就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 540
+    },
+    {
+      "turn_id": 37,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "G1",
+        "G2"
+      ],
+      "timestamp_offset": 555
+    },
+    {
+      "turn_id": 38,
+      "speaker": "Speaker_A",
+      "utterance": "关于Save Expression<br/>gene_expression.csv，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 570
+    },
+    {
+      "turn_id": 39,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Save Expression<br/>gene_expression.csv的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 585
+    },
+    {
+      "turn_id": 40,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Save Expression<br/>gene_expression.csv应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "G3"
+      ],
+      "timestamp_offset": 600
+    },
+    {
+      "turn_id": 41,
+      "speaker": "Speaker_B",
+      "utterance": "Save Metadata<br/>dataset_info.json、Complete Dataset<br/>patches/ + CSV files主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 615
+    },
+    {
+      "turn_id": 42,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "G4",
+        "H1",
+        "H2"
+      ],
+      "timestamp_offset": 630
+    },
+    {
+      "turn_id": 43,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理Train hist2scRNA<br/>Model、？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 645
+    },
+    {
+      "turn_id": 44,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "H3",
+        "edge_0",
+        "edge_1"
+      ],
+      "timestamp_offset": 660
+    },
+    {
+      "turn_id": 45,
+      "speaker": "Speaker_B",
+      "utterance": "关于，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 675
+    },
+    {
+      "turn_id": 46,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 690
+    },
+    {
+      "turn_id": 47,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "edge_2"
+      ],
+      "timestamp_offset": 705
+    },
+    {
+      "turn_id": 48,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下、吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 720
+    },
+    {
+      "turn_id": 49,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，、的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 735
+    },
+    {
+      "turn_id": 50,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下、吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 750
+    },
+    {
+      "turn_id": 51,
+      "speaker": "Speaker_B",
+      "utterance": "、主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "edge_3",
+        "edge_4"
+      ],
+      "timestamp_offset": 765
+    },
+    {
+      "turn_id": 52,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含Yes、No这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 780
+    },
+    {
+      "turn_id": 53,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_5",
+        "edge_6"
+      ],
+      "timestamp_offset": 795
+    },
+    {
+      "turn_id": 54,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将、分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 810
+    },
+    {
+      "turn_id": 55,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，、就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_7",
+        "edge_8"
+      ],
+      "timestamp_offset": 825
+    },
+    {
+      "turn_id": 56,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下、吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 840
+    },
+    {
+      "turn_id": 57,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是、应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_9",
+        "edge_10"
+      ],
+      "timestamp_offset": 855
+    },
+    {
+      "turn_id": 58,
+      "speaker": "Speaker_A",
+      "utterance": "主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 870
+    },
+    {
+      "turn_id": 59,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 885
+    },
+    {
+      "turn_id": 60,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "edge_11"
+      ],
+      "timestamp_offset": 900
+    },
+    {
+      "turn_id": 61,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 915
+    },
+    {
+      "turn_id": 62,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 930
+    },
+    {
+      "turn_id": 63,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 945
+    },
+    {
+      "turn_id": 64,
+      "speaker": "Speaker_A",
+      "utterance": "在中，我们需要定义核心逻辑。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "edge_12"
+      ],
+      "timestamp_offset": 960
+    },
+    {
+      "turn_id": 65,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有、。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 975
+    },
+    {
+      "turn_id": 66,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，、是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 990
+    },
+    {
+      "turn_id": 67,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，、是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_13",
+        "edge_14",
+        "edge_15"
+      ],
+      "timestamp_offset": 1005
+    },
+    {
+      "turn_id": 68,
+      "speaker": "Speaker_A",
+      "utterance": "、主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1020
+    },
+    {
+      "turn_id": 69,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1035
+    },
+    {
+      "turn_id": 70,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有、。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1050
+    },
+    {
+      "turn_id": 71,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_16",
+        "edge_17"
+      ],
+      "timestamp_offset": 1065
+    },
+    {
+      "turn_id": 72,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1080
+    },
+    {
+      "turn_id": 73,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_18"
+      ],
+      "timestamp_offset": 1095
+    },
+    {
+      "turn_id": 74,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1110
+    },
+    {
+      "turn_id": 75,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1125
+    },
+    {
+      "turn_id": 76,
+      "speaker": "Speaker_A",
+      "utterance": "主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1140
+    },
+    {
+      "turn_id": 77,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_19"
+      ],
+      "timestamp_offset": 1155
+    },
+    {
+      "turn_id": 78,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由、组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1170
+    },
+    {
+      "turn_id": 79,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "edge_20",
+        "edge_21",
+        "edge_22"
+      ],
+      "timestamp_offset": 1185
+    },
+    {
+      "turn_id": 80,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有、。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1200
+    },
+    {
+      "turn_id": 81,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是、应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1215
+    },
+    {
+      "turn_id": 82,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，、是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "edge_23",
+        "edge_24"
+      ],
+      "timestamp_offset": 1230
+    },
+    {
+      "turn_id": 83,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含、这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1245
+    },
+    {
+      "turn_id": 84,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是、应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1260
+    },
+    {
+      "turn_id": 85,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是、应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "edge_25",
+        "edge_26",
+        "edge_27"
+      ],
+      "timestamp_offset": 1275
+    },
+    {
+      "turn_id": 86,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1290
+    },
+    {
+      "turn_id": 87,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "edge_28"
+      ],
+      "timestamp_offset": 1305
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 87,
+    "speaker_distribution": {
+      "Speaker_B": 44,
+      "Speaker_A": 43
+    },
+    "speech_act_distribution": {
+      "sequential": 3,
+      "clarify": 17,
+      "contrastive": 3,
+      "classification": 8,
+      "request": 14,
+      "confirm": 15,
+      "structural": 16,
+      "inform": 11
+    },
+    "avg_turn_length": 36.37931034482759,
+    "dialogue_duration": 1305
+  }
+}

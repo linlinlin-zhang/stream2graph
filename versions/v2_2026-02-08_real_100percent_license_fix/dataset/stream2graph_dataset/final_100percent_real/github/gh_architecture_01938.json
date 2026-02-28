@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01938",
+  "source": "github",
+  "source_url": "https://github.com/konflux-ci/konflux-devlake-mcp/blob/8c9ea02b253c604b7bc618ce0e422f4e80e4c548/docs/security-architecture.mmd",
+  "github_repo": "konflux-ci/konflux-devlake-mcp",
+  "github_file_path": "docs/security-architecture.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TB\n    subgraph \"Request Flow\"\n        REQ[Incoming Request]\n    end\n\n    subgraph \"Authentication Layer\"\n        AUTH[OIDC Middleware]\n        TTYPE{Token Type?}\n        ACCESS[Access Token]\n        OFFLINE[Offline Token]\n        EXCHANGE[Exchange via SSO]\n        JWKS[Fetch JWKS]\n        JWT{Valid JWT?}\n    end\n\n    subgraph \"External Services\"\n        SSO[Red Hat SSO<br/>Keycloak]\n    end\n\n    subgraph \"Security Layers\"\n        L1[Input Validation]\n        L2[SQL Injection Detection]\n        L3[Query Validation]\n        L4[Resource Limits]\n    end\n\n    subgraph \"Security Checks\"\n        CHECK1{SQL Keywords}\n        CHECK2{Pattern Match}\n        CHECK3{Query Type}\n        CHECK4{Length Valid}\n    end\n\n    subgraph \"Execution\"\n        EXEC[Execute Query]\n        MASK[Data Masking]\n        RETURN[Return Results]\n    end\n\n    REQ --> AUTH\n    AUTH --> TTYPE\n    TTYPE -->|Access Token| ACCESS\n    TTYPE -->|Offline Token| OFFLINE\n    OFFLINE --> EXCHANGE\n    EXCHANGE -->|Get Access Token| SSO\n    SSO -->|Access Token| EXCHANGE\n    EXCHANGE --> ACCESS\n    ACCESS --> JWKS\n    JWKS -->|Fetch Keys| SSO\n    SSO -->|JWKS| JWKS\n    JWKS --> JWT\n    JWT -->|Valid| L1\n    JWT -->|Invalid| BLOCK0[401 Unauthorized]\n    L1 --> L2\n    L2 --> CHECK1\n    CHECK1 -->|SELECT| CHECK2\n    CHECK1 -->|Dangerous| BLOCK1[Block Request]\n    CHECK2 -->|No Injection| CHECK3\n    CHECK2 -->|Injection| BLOCK2[SQL Injection Detected]\n    CHECK3 -->|SELECT Only| CHECK4\n    CHECK3 -->|Other Types| BLOCK3[Only SELECT Allowed]\n    CHECK4 -->|Under Limit| EXEC\n    CHECK4 -->|Too Long| BLOCK4[Query Too Long]\n    EXEC --> MASK\n    MASK --> RETURN\n\n    style BLOCK0 fill:#ffcdd2\n    style BLOCK1 fill:#ffcdd2\n    style BLOCK2 fill:#ffcdd2\n    style BLOCK3 fill:#ffcdd2\n    style BLOCK4 fill:#ffcdd2\n    style EXEC fill:#c8e6c9\n    style AUTH fill:#e3f2fd\n    style SSO fill:#fff3e0\n    style EXCHANGE fill:#e8eaf6\n",
+  "content_size": 1906,
+  "collected_at": "2026-02-06T02:05:01.487065",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 4,
+  "repo_forks": 6
+}

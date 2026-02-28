@@ -1,0 +1,18 @@
+{
+  "id": "gh_class_01113",
+  "source": "github",
+  "source_url": "https://github.com/Antoniohuaman/ProyectoFacturaFacil/blob/c46319eca9aff287ea07ac9716245596809ec7a2/docs/comprobantes.mmd",
+  "github_repo": "Antoniohuaman/ProyectoFacturaFacil",
+  "github_file_path": "docs/comprobantes.mmd",
+  "diagram_type": "class",
+  "code": "%% Diagrama de clases Mermaid para ComprobantesElectronicosBC.Domain\nclassDiagram\n\nclass ComprobanteElectronico {\n  +ComprobanteId Id\n  +Tipo Tipo\n  +string SerieNumero\n  +DateTime Emision\n  +DateTime? Vencimiento\n  +Moneda Moneda\n  +TipoCambio TipoCambio\n  +Dinero Total\n  +AgregarLinea(ComprobanteLinea linea)\n  +EditarLinea(Guid lineaId, ...)\n  +EliminarLinea(Guid lineaId)\n  +CambiarMoneda(Moneda nueva)\n  +RecalcularTotales()\n  +Emitir()\n}\n\nclass ComprobanteLinea {\n  +LineaId Id\n  +ProductoId ProductoId\n  +UnidadDeMedida UM\n  +decimal Cantidad\n  +Dinero PrecioUnitario\n  +DescuentoLinea Descuento\n  +AfectacionImpuesto Afectacion\n  +TasaImpuesto Tasa\n  +Dinero BaseImponible\n  +Dinero Igv\n  +Dinero ImporteTotal\n  +Recalcular()\n  +CambiarPrecio(Dinero precio)\n  +CambiarCantidad(decimal cantidad)\n}\n\nclass Dinero {\n  +decimal Monto\n  +Moneda Moneda\n  +Round()\n  +Sumar(Dinero)\n  +Restar(Dinero)\n}\n\nclass Moneda {\n  +string Codigo\n  +string Simbolo\n  +int Decimales\n  +static PEN()\n  +static USD()\n}\n\nclass TipoCambio {\n  +Moneda Origen\n  +Moneda Destino\n  +decimal Valor\n  +Convertir(Dinero):Dinero\n  +Invertir():TipoCambio\n}\n\nclass DocumentoIdentidad {\n  +TipoDocumento Tipo\n  +string Numero\n}\n\nclass AfectacionImpuesto {\n  +string Codigo\n  +string Descripcion\n}\n\nclass TasaImpuesto {\n  +decimal Porcentaje\n}\n\nclass UnidadDeMedida {\n  +string Codigo\n  +int Decimales\n}\n\nclass DescuentoLinea {\n  +decimal Porcentaje\n  +Dinero Aplicar(Dinero base)\n}\n\nclass ComprobanteTotalesService {\n  +Calcular(ComprobanteElectronico): object\n}\n\nclass MonedaConversionService {\n  +Convertir(Dinero, Moneda): Dinero\n}\n\n%% Relaciones\nComprobanteElectronico \"1\" --> \"*\" ComprobanteLinea : \"lineas\"\nComprobanteElectronico ..> TipoCambio : \"tipoCambio\"\nComprobanteElectronico ..> Moneda : \"moneda\"\nComprobanteElectronico ..> DocumentoIdentidad : \"cliente\"\nComprobanteElectronico ..> ComprobanteTotalesService : \"usa\"\nComprobanteElectronico ..> MonedaConversionService : \"usa\"\n\nComprobanteLinea ..> Dinero : \"precio/base/total\"\nComprobanteLinea ..> UnidadDeMedida : \"um\"\nComprobanteLinea ..> AfectacionImpuesto : \"afectacion\"\nComprobanteLinea ..> TasaImpuesto : \"tasa\"\nComprobanteLinea ..> DescuentoLinea : \"descuento\"\n\nDinero ..> Moneda : \"tiene\"\n\n%% Nota\nnote for ComprobanteElectronico \"Reglas relevantes:\\n- Boleta > 700 PEN requiere DNI cliente.\\n- Moneda extranjera requiere TipoCambio.\\n- Emitir genera eventos de dominio (Emitido, Aceptado, Rechazado, Anulado).\"\n",
+  "content_size": 2457,
+  "collected_at": "2026-02-06T01:53:08.806417",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

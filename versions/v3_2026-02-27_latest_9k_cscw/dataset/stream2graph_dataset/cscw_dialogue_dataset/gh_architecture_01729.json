@@ -1,0 +1,443 @@
+{
+  "id": "gh_architecture_01729",
+  "source": "github",
+  "source_url": "https://github.com/Afetorisaac/Field-Trip-Report/blob/de4526118ee5caf32d12195b4ce74b1957851a54/diagrams/report1_ella_system_architecture.mmd",
+  "github_repo": "Afetorisaac/Field-Trip-Report",
+  "github_file_path": "diagrams/report1_ella_system_architecture.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TB\n    subgraph \"Client Layer\"\n        WebApp[Web Application<br/>React/Vue.js<br/>Responsive UI]\n        MobileApp[Mobile Browser<br/>Touch-Optimized]\n    end\n    \n    subgraph \"API Gateway & Load Balancer\"\n        LB[Nginx Load Balancer<br/>SSL Termination]\n    end\n    \n    subgraph \"Application Layer\"\n        API1[API Server 1<br/>Node.js + Express]\n        API2[API Server 2<br/>Node.js + Express]\n        Auth[Authentication Service<br/>JWT + RBAC]\n        Workflow[Workflow Engine<br/>Approval Routing]\n        Notification[Notification Service<br/>Email + SMS]\n    end\n    \n    subgraph \"Business Logic\"\n        ReqMgmt[Request Management<br/>Validation & Processing]\n        POMgmt[Purchase Order<br/>Generation & Tracking]\n        SupplierMgmt[Supplier Management<br/>Performance Tracking]\n        BudgetMgmt[Budget Integration<br/>Real-time Checking]\n        AuditLog[Audit Logging<br/>Compliance Trail]\n    end\n    \n    subgraph \"Data Layer\"\n        MainDB[(Primary Database<br/>MongoDB/PostgreSQL<br/>Procurement Data)]\n        CacheDB[(Redis Cache<br/>Session & Performance)]\n        FileStore[File Storage<br/>S3/MinIO<br/>Documents & Attachments]\n    end\n    \n    subgraph \"Integration Layer\"\n        FMIS[Financial System<br/>Budget Data]\n        HRMS[HR System<br/>User Directory]\n        Inventory[Inventory System<br/>Stock Levels]\n    end\n    \n    subgraph \"Monitoring & Security\"\n        Monitor[Application Monitoring<br/>Prometheus + Grafana]\n        Logger[Centralized Logging<br/>ELK Stack]\n        Security[Security Scanner<br/>Vulnerability Detection]\n    end\n    \n    WebApp --> LB\n    MobileApp --> LB\n    LB --> API1\n    LB --> API2\n    \n    API1 --> Auth\n    API2 --> Auth\n    API1 --> Workflow\n    API2 --> Workflow\n    Workflow --> Notification\n    \n    API1 --> ReqMgmt\n    API2 --> ReqMgmt\n    ReqMgmt --> POMgmt\n    POMgmt --> SupplierMgmt\n    ReqMgmt --> BudgetMgmt\n    API1 --> AuditLog\n    API2 --> AuditLog\n    \n    ReqMgmt --> MainDB\n    POMgmt --> MainDB\n    SupplierMgmt --> MainDB\n    BudgetMgmt --> MainDB\n    AuditLog --> MainDB\n    \n    Auth --> CacheDB\n    API1 --> CacheDB\n    API2 --> CacheDB\n    \n    ReqMgmt --> FileStore\n    POMgmt --> FileStore\n    \n    BudgetMgmt --> FMIS\n    Auth --> HRMS\n    ReqMgmt --> Inventory\n    \n    API1 --> Monitor\n    API2 --> Monitor\n    API1 --> Logger\n    API2 --> Logger\n    Security -.->|Scans| API1\n    Security -.->|Scans| API2\n    \n    classDef clientStyle fill:#e1f5ff,stroke:#0066cc,stroke-width:2px\n    classDef appStyle fill:#fff4e6,stroke:#ff9800,stroke-width:2px\n    classDef dataStyle fill:#e8f5e9,stroke:#4caf50,stroke-width:2px\n    classDef integrationStyle fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px\n    classDef securityStyle fill:#ffebee,stroke:#f44336,stroke-width:2px\n    \n    class WebApp,MobileApp clientStyle\n    class API1,API2,Auth,Workflow,Notification,ReqMgmt,POMgmt,SupplierMgmt,BudgetMgmt,AuditLog appStyle\n    class MainDB,CacheDB,FileStore dataStyle\n    class FMIS,HRMS,Inventory integrationStyle\n    class Monitor,Logger,Security securityStyle\n",
+  "content_size": 3072,
+  "collected_at": "2026-02-06T02:02:37.507506",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Web Application<br/>React/Vue.js<br/>Responsive UI 和 Mobile Browser<br/>Touch-Optimized 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Web Application<br/>React/Vue.js<br/>Responsive UI 和 Mobile Browser<br/>Touch-Optimized'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "WebApp",
+        "MobileApp"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Nginx Load Balancer<br/>SSL Termination 和 API Server 1<br/>Node.js + Express 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 Nginx Load Balancer<br/>SSL Termination处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Nginx Load Balancer<br/>SSL Termination处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "LB",
+        "API1"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 API Server 2<br/>Node.js + Express 和 Authentication Service<br/>JWT + RBAC。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'API Server 2<br/>Node.js + Express 和 Authentication Service<br/>JWT + RBAC'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "API2",
+        "Auth"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Workflow Engine<br/>Approval Routing 和 Notification Service<br/>Email + SMS。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 Workflow Engine<br/>Approval Routing处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Workflow Engine<br/>Approval Routing处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Workflow",
+        "Notification"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Request Management<br/>Validation & Processing 和 Purchase Order<br/>Generation & Tracking 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 Request Management<br/>Validation & Processing处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Request Management<br/>Validation & Processing处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ReqMgmt",
+        "POMgmt"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Supplier Management<br/>Performance Tracking 和 Budget Integration<br/>Real-time Checking 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Supplier Management<br/>Performance Tracking 和 Budget Integration<br/>Real-time Checking'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SupplierMgmt",
+        "BudgetMgmt"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Audit Logging<br/>Compliance Trail 和 (Primary Database<br/>MongoDB/PostgreSQL<br/>Procurement Data 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Audit Logging<br/>Compliance Trail 和 (Primary Database<br/>MongoDB/PostgreSQL<br/>Procurement Data'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AuditLog",
+        "MainDB"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 (Redis Cache<br/>Session & Performance 和 File Storage<br/>S3/MinIO<br/>Documents & Attachments。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '(Redis Cache<br/>Session & Performance 和 File Storage<br/>S3/MinIO<br/>Documents & Attachments'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CacheDB",
+        "FileStore"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Financial System<br/>Budget Data 和 HR System<br/>User Directory 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Financial System<br/>Budget Data 和 HR System<br/>User Directory'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "FMIS",
+        "HRMS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Inventory System<br/>Stock Levels 和 Application Monitoring<br/>Prometheus + Grafana 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Inventory System<br/>Stock Levels 和 Application Monitoring<br/>Prometheus + Grafana'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Inventory",
+        "Monitor"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Centralized Logging<br/>ELK Stack 和 Security Scanner<br/>Vulnerability Detection。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 Centralized Logging<br/>ELK Stack处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Centralized Logging<br/>ELK Stack处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Logger",
+        "Security"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 48,
+    "repair_count": 4,
+    "grounding_acts_count": 22,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

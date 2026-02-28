@@ -1,0 +1,18 @@
+{
+  "id": "gh_class_01438",
+  "source": "github",
+  "source_url": "https://github.com/michaelberrios-ntid/swen755-fault-recovery/blob/c165803430816060a1f5dba70be3e21b0d68221f/Documents/ClassDiagram.mmd",
+  "github_repo": "michaelberrios-ntid/swen755-fault-recovery",
+  "github_file_path": "Documents/ClassDiagram.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n    namespace Shared {\n        class SensorMessages {\n            <<static>>\n            + PING: const string\n            + RESTART: const string\n            + RELOAD: const string\n        }\n\n        class SensorRegistry {\n            <<static>>\n            + All: List~SensorInfo~\n        }\n\n        class SensorInfo {\n            + Id: string\n            + Name: string\n            + Port: int\n            + IsBackup: bool\n            + LastStatus: string\n        }\n    }\n    namespace SensorService {\n        class Program {\n            + Main(args: string[])\n            + StartSensorServer(sensor: Sensor)\n        }\n    \n        class Sensor {\n            <<abstract>>\n            + Id: string\n            + Name: string\n            + Port: int\n            + IsBackup: bool\n            + Health: double\n            + FallbackMode: bool\n            - random: Random\n            - HEALTHY_CAP: double = 0.9\n            - WARN_CAP: double = 0.8\n            - fallbackRecover: int\n            + CheckHealth(): string\n            + RestartAndReport(): string\n            - Format(health: double, status: string): string\n            + SaveCheckpoint(): void\n            + LoadCheckpoint(): void\n        }\n\n        class LIDARSensor {\n            + LIDARSensor(id: string, name: string, port: int, isBackup: bool)\n        }\n\n        class CameraSensor {\n            + CameraSensor(id: string, name: string, port: int, isBackup: bool)\n        }\n\n        class RadarSensor {\n            + RadarSensor(id: string, name: string, port: int, isBackup: bool)\n        }\n\n        class CheckpointState {\n            + Health: double\n            + FallbackMode: bool\n            + FallbackRecover: int\n        }\n    }\n    note for Program \"This class is the entry point for the sensor service application.\\n It initializes and starts a TCP listener thread for each sensor in the cluster based on the cluster configuration and SensorRegistry.\"\n    Program --> SensorRegistry : uses\n    Program \"1\" --> \"many\" Sensor : creates\n    Sensor <|-- LIDARSensor\n    Sensor <|-- CameraSensor\n    Sensor <|-- RadarSensor\n\n    namespace MonitorApp {\n        class SensorMonitor {\n            - _sleepTime: int\n            - _activeSensors: ConcurrentDictionary~string,SensorInfo~\n            - _backupLookup: Dictionary~string,SensorInfo~\n            - _primaryLookup: Dictionary~string,SensorInfo~\n            - _isRunning: bool\n            + StartMonitoring()\n            + StopMonitoring()\n            + GetActiveSensors(): Dictionary~string,SensorInfo~\n            + PingSensor(host: string, port: int, message: string): string\n        }\n    }\n\n    SensorInfo \"1\" *-- \"many\" SensorRegistry : contains\n    SensorMonitor --> Sensor : monitors\n    SensorMonitor --> SensorMessages : uses\n    SensorMonitor --> SensorRegistry : uses\n    SensorMonitor --> SensorInfo : uses\n    Sensor --> CheckpointState : uses",
+  "content_size": 2899,
+  "collected_at": "2026-02-06T01:57:48.219897",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

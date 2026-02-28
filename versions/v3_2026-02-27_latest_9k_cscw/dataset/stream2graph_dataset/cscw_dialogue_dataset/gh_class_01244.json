@@ -1,0 +1,434 @@
+{
+  "id": "gh_class_01244",
+  "source": "github",
+  "source_url": "https://github.com/Kind-Wyllie-lab/saviour/blob/aa888732ff6e580762dba0cb5d7d26cd73d5df24/docs/module_class_diagram.mmd",
+  "github_repo": "Kind-Wyllie-lab/saviour",
+  "github_file_path": "docs/module_class_diagram.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n    class Module {\n        - module_id: str\n        - module_type: str\n        - config_path: str\n        - recording_folder: str\n        - logger: logging.Logger\n        - config_manager: ModuleConfigManager\n        - export_manager: ExportManager\n        - communication_manager: ModuleCommunicationManager\n        - health_manager: ModuleHealthManager\n        - ptp_manager: PTPManager\n        - command_handler: ModuleCommandHandler\n        - service_manager: ModuleServiceManager\n        - session_manager: SessionManager\n        - callbacks: dict\n        - recording_session_id: str\n        - current_filename: str\n        - samplerate: Any\n        - recording_filetype: Any\n        - is_running: bool\n        - is_recording: bool\n        - is_streaming: bool\n        - start_time: Any\n        + __init__(module_type: str, config: dict = None, config_path: str = None)\n        + when_controller_discovered(controller_ip: str, controller_port: int)\n        + controller_disconnected()\n        + start_recording(experiment_name: str = None, duration: str = None) -> Optional[str]\n        + stop_recording() -> bool\n        + list_recordings()\n        + clear_recordings(filename: str = None, filenames: list = None, older_than: int = None, keep_latest: int = 0)\n        + export_recordings(filename: str, length: int = 0, destination, experiment_name: str = None)\n        + list_commands()\n        + start() -> bool\n        + stop() -> bool\n        + set_config(new_config: dict, persist: bool = False) -> bool\n        + generate_module_id(module_type: str) -> str\n    }\n    class ModuleConfigManager {\n        - config: dict\n        - logger: logging.Logger\n        + get(key: str, default=None)\n        + get_all() -> dict\n        + save_config() -> bool\n        + _merge_configs(base: dict, new: dict)\n    }\n    class ExportManager {\n        - module_id: str\n        - recording_folder: str\n        - config: dict\n        - logger: logging.Logger\n        + export_file(filename: str, destination, experiment_name: str = None) -> bool\n        + export_all_files(destination, experiment_name: str = None) -> bool\n        + unmount()\n    }\n    class ModuleCommunicationManager {\n        - logger: logging.Logger\n        - module_id: str\n        - config_manager: ModuleConfigManager\n        + connect(controller_ip: str, controller_port: int) -> bool\n        + start_command_listener() -> bool\n        + send_status(status: dict)\n        + cleanup()\n        + set_callbacks(callbacks: dict)\n    }\n    class ModuleHealthManager {\n        - logger: logging.Logger\n        - config_manager: ModuleConfigManager\n        - communication_manager: ModuleCommunicationManager\n        + get_health() -> dict\n        + start_heartbeats()\n        + stop_heartbeats()\n        + set_callbacks(callbacks: dict)\n    }\n    class PTPManager {\n        - logger: logging.Logger\n        - role: PTPRole\n        - running: bool\n        + start()\n        + stop()\n        + get_status() -> dict\n    }\n    class ModuleCommandHandler {\n        - logger: logging.Logger\n        - module_id: str\n        - module_type: str\n        - config_manager: ModuleConfigManager\n        - start_time: Any\n        + handle_command(command: dict)\n        + set_callbacks(callbacks: dict)\n        + cleanup()\n    }\n    class ModuleServiceManager {\n        - logger: logging.Logger\n        - module: Module\n        - controller_ip: str\n        - controller_port: int\n        + register_service() -> bool\n        + cleanup()\n    }\n    Module *-- ModuleConfigManager\n    Module *-- ExportManager\n    Module *-- ModuleCommunicationManager\n    Module *-- ModuleHealthManager\n    Module *-- PTPManager\n    Module *-- ModuleCommandHandler\n    Module *-- ModuleServiceManager",
+  "content_size": 3745,
+  "collected_at": "2026-02-06T01:55:02.078547",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 1,
+  "repo_forks": 1,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 - module_id: str\n        - module_type: str\n        - config_path: str\n        - recording_folder: str\n        - logger: logging.Logger\n        - config_manager: ModuleConfigManager\n        - export_manager: ExportManager\n        - communication_manager: ModuleCommunicationManager\n        - health_manager: ModuleHealthManager\n        - ptp_manager: PTPManager\n        - command_handler: ModuleCommandHandler\n        - service_manager: ModuleServiceManager\n        - session_manager: SessionManager\n        - callbacks: dict\n        - recording_session_id: str\n        - current_filename: str\n        - samplerate: Any\n        - recording_filetype: Any\n        - is_running: bool\n        - is_recording: bool\n        - is_streaming: bool\n        - start_time: Any\n        + __init__(module_type: str, config: dict = None, config_path: str = None 和 controller_ip: str, controller_port: int。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '- module_id: str\n        - module_type: str\n        - config_path: str\n        - recording_folder: str\n        - logger: logging.Logger\n        - config_manager: ModuleConfigManager\n        - export_manager: ExportManager\n        - communication_manager: ModuleCommunicationManager\n        - health_manager: ModuleHealthManager\n        - ptp_manager: PTPManager\n        - command_handler: ModuleCommandHandler\n        - service_manager: ModuleServiceManager\n        - session_manager: SessionManager\n        - callbacks: dict\n        - recording_session_id: str\n        - current_filename: str\n        - samplerate: Any\n        - recording_filetype: Any\n        - is_running: bool\n        - is_recording: bool\n        - is_streaming: bool\n        - start_time: Any\n        + __init__(module_type: str, config: dict = None, config_path: str = None 和 controller_ip: str, controller_port: int'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Module",
+        "when_controller_discovered"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 experiment_name: str = None, duration: str = None 和 str 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'experiment_name: str = None, duration: str = None 和 str'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "start_recording",
+        "Optional"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 filename: str = None, filenames: list = None, older_than: int = None, keep_latest: int = 0 和 filename: str, length: int = 0, destination, experiment_name: str = None 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 filename: str = None, filenames: list = None, older_than: int = None, keep_latest: int = 0处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'filename: str = None, filenames: list = None, older_than: int = None, keep_latest: int = 0处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "clear_recordings",
+        "export_recordings"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 new_config: dict, persist: bool = False 和 module_type: str 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 new_config: dict, persist: bool = False处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'new_config: dict, persist: bool = False处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "set_config",
+        "generate_module_id"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 - config: dict\n        - logger: logging.Logger\n        + get(key: str, default=None 和 base: dict, new: dict。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 - config: dict\n        - logger: logging.Logger\n        + get(key: str, default=None处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '- config: dict\n        - logger: logging.Logger\n        + get(key: str, default=None处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ModuleConfigManager",
+        "_merge_configs"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 - module_id: str\n        - recording_folder: str\n        - config: dict\n        - logger: logging.Logger\n        + export_file(filename: str, destination, experiment_name: str = None 和 destination, experiment_name: str = None 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '- module_id: str\n        - recording_folder: str\n        - config: dict\n        - logger: logging.Logger\n        + export_file(filename: str, destination, experiment_name: str = None 和 destination, experiment_name: str = None'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ExportManager",
+        "export_all_files"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 - logger: logging.Logger\n        - module_id: str\n        - config_manager: ModuleConfigManager\n        + connect(controller_ip: str, controller_port: int 和 status: dict 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '- logger: logging.Logger\n        - module_id: str\n        - config_manager: ModuleConfigManager\n        + connect(controller_ip: str, controller_port: int 和 status: dict'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ModuleCommunicationManager",
+        "send_status"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 callbacks: dict 和 - logger: logging.Logger\n        - config_manager: ModuleConfigManager\n        - communication_manager: ModuleCommunicationManager\n        + get_health( 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'callbacks: dict 和 - logger: logging.Logger\n        - config_manager: ModuleConfigManager\n        - communication_manager: ModuleCommunicationManager\n        + get_health('。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "set_callbacks",
+        "ModuleHealthManager"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 callbacks: dict 和 - logger: logging.Logger\n        - role: PTPRole\n        - running: bool\n        + start( 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'callbacks: dict 和 - logger: logging.Logger\n        - role: PTPRole\n        - running: bool\n        + start('？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "set_callbacks",
+        "PTPManager"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 - logger: logging.Logger\n        - module_id: str\n        - module_type: str\n        - config_manager: ModuleConfigManager\n        - start_time: Any\n        + handle_command(command: dict 和 callbacks: dict 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '- logger: logging.Logger\n        - module_id: str\n        - module_type: str\n        - config_manager: ModuleConfigManager\n        - start_time: Any\n        + handle_command(command: dict 和 callbacks: dict'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ModuleCommandHandler",
+        "set_callbacks"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 - logger: logging.Logger\n        - module: Module\n        - controller_ip: str\n        - controller_port: int\n        + register_service( 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '- logger: logging.Logger\n        - module: Module\n        - controller_ip: str\n        - controller_port: int\n        + register_service('？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ModuleServiceManager"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 47,
+    "repair_count": 3,
+    "grounding_acts_count": 22,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00387",
+  "source": "github",
+  "source_url": "https://github.com/csysp/rocktop/blob/820a1ad93a908139b5960e6af71f2f8eb95dc301/docs/diagrams/stack.mmd",
+  "github_repo": "csysp/rocktop",
+  "github_file_path": "docs/diagrams/stack.mmd",
+  "diagram_type": "flowchart",
+  "code": "---\nconfig:\n  layout: elk\n---\nflowchart LR\n subgraph Core[\"Core Stack\"]\n        PyTorch[\"PyTorch 2.3+ ROCm or CUDA\"]\n        AudioLibs[\"torchaudio, librosa, soundfile\"]\n        Hydra[\"Hydra\"]\n        TrainRuntimes[\"Lightning or Accelerate\"]\n        Serve[\"TorchServe or FastAPI\"]\n  end\n subgraph Services[\"K8s Services\"]\n        Preproc[\"K8s Job: Preprocessing\"]\n        Train[\"K8s Job: Training\"]\n        Infer[\"K8s Deployment: Inference\"]\n        Track[\"MLflow Server\"]\n        ObjStore[\"MinIO or S3\"]\n        Monitor[\"Prometheus and Grafana\"]\n  end\n subgraph Models[\"Models and Features\"]\n        Units[\"HuBERT or ContentVec units\"]\n        F0[\"RMVPE F0\"]\n        VC[\"RVC 48kHz\"]\n        Singer[\"DiffSinger or SoVITS\"]\n        Vocoder[\"BigVGAN or Vocos\"]\n  end\n subgraph GPU[\"GPU Targets\"]\n        AMD[\"ROCm test\"]\n        NVIDIA[\"CUDA prod\"]\n        AMDPlugin[\"AMD K8s Device Plugin\"]\n        NVPlugin[\"NVIDIA K8s Device Plugin\"]\n  end\n    PyTorch --> TrainRuntimes\n    TrainRuntimes --> Train\n    AudioLibs --> Preproc\n    Serve --> Infer & VC\n    Hydra --> Train\n    Preproc --> Units & F0 & ObjStore\n    Units --> VC\n    F0 --> VC\n    VC --> Vocoder & Vocoder\n    Train --> Track & ObjStore\n    Track --> ObjStore\n    Infer --> ObjStore\n    Vocoder --> Infer\n    AMDPlugin --> AMD\n    NVPlugin --> NVIDIA\n    AMD --> Train & Infer\n    NVIDIA --> Train & Infer\n    style Core fill:#eef,stroke:#88a\n    style Services fill:#efe,stroke:#8a8\n    style Models fill:#ffe,stroke:#aa8\n    style GPU fill:#fef,stroke:#a8a\n",
+  "content_size": 1520,
+  "collected_at": "2026-02-06T01:43:47.113843",
+  "compilation_status": "failed",
+  "license": "gpl-3.0",
+  "license_name": "GNU General Public License v3.0",
+  "license_url": "https://api.github.com/licenses/gpl-3.0",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

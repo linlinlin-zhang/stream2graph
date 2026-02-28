@@ -1,0 +1,18 @@
+{
+  "id": "gh_class_01193",
+  "source": "github",
+  "source_url": "https://github.com/vicky22291/VinayLLDPractise/blob/099f4f45bf04b67d08242182e67cb9a6a2ed4e70/src/main/java/TransactionReconciliationSystem.mmd",
+  "github_repo": "vicky22291/VinayLLDPractise",
+  "github_file_path": "src/main/java/TransactionReconciliationSystem.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n%% Core Models\n    class Transaction {\n        - id: String\n        - amount: BigDecimal\n        - status: TransactionStatus\n        - timestamp: LocalDateTime\n        - providerRefId: String\n        - type: TransactionType\n    }\n\n    class ExternalTransaction {\n        - externalId: String\n        - amount: BigDecimal\n        - status: String\n        - timestamp: LocalDateTime\n        - source: ProviderType\n    }\n\n%% Reconciliation Engine\n    class ReconciliationResult {\n        - internalTransactionId: String\n        - externalTransactionId: String\n        - status: ReconciliationStatus\n        - notes: String\n    }\n\n    class ReconciliationEngine {\n        + reconcile(provider: ProviderType): void\n        + registerStrategy(provider: ProviderType, strategy: ReconciliationStrategy): void\n    }\n\n    class ReconciliationStrategy {\n        <<interface>>\n        + match(internal: List~Transaction~, external: List~ExternalTransaction~): List~ReconciliationResult~\n    }\n\n    class StripeReconciliationStrategy\n    class PaypalReconciliationStrategy\n    class BankStatementReconciliationStrategy\n\n%% Notification / Observer\n    class ReconciliationListener {\n        <<interface>>\n        + onMismatch(result: ReconciliationResult): void\n    }\n\n    class AlertService\n    class AuditLogger\n\n%% Relationships\n    ReconciliationEngine --> ReconciliationStrategy : uses\n    ReconciliationStrategy <|.. StripeReconciliationStrategy\n    ReconciliationStrategy <|.. PaypalReconciliationStrategy\n    ReconciliationStrategy <|.. BankStatementReconciliationStrategy\n    ReconciliationEngine --> ReconciliationListener : notifies\n    ReconciliationListener <|.. AlertService\n    ReconciliationListener <|.. AuditLogger\n",
+  "content_size": 1732,
+  "collected_at": "2026-02-06T01:54:16.568456",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

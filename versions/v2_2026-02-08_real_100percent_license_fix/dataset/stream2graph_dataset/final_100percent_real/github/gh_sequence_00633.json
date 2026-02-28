@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00633",
+  "source": "github",
+  "source_url": "https://github.com/MinePing/Final/blob/34ffe143ab7d0ba2f2fdd1e7c861b0884d2c4916/Mermaid/%ED%9A%8C%EC%9B%90%EA%B0%80%EC%9E%85.mmd",
+  "github_repo": "MinePing/Final",
+  "github_file_path": "Mermaid/회원가입.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    autonumber\n    actor 사용자\n    participant 클라이언트\n    participant 서버\n    participant 국세청API\n    actor 회사관리자\n\n    %% 1. 회원 유형 선택 및 정보 입력\n    사용자->>클라이언트: 회원가입 유형 선택 (master/employee/worcation)\n    사용자->>클라이언트: 회원 정보 입력 (user_id, user_pwd, name,email, gender, birthday, address, phone)\n\n    %% 2. 기업/사업장 등록 (master, manager, worcation)\n    alt 기업/숙박 사업자 등록 필요\n        사용자->>클라이언트: 사업자 등록번호 등 입력\n        클라이언트->>국세청API: 사업자등록번호 진위 조회\n        국세청API-->>클라이언트: 사업자 유효 응답\n        클라이언트->>서버: 사업장 정보 등록 요청\n        서버-->>클라이언트: 등록 완료\n    end\n\n    %% 3. 일반 사원 가입 (employee)\n    alt 일반 사원(employee)\n        사용자->>클라이언트: 회사명 검색어 입력\n        클라이언트->>서버: 회사명 검색 API 호출\n        서버-->>클라이언트: 회사 목록 응답 (company_name, address, company_no)\n        사용자->>클라이언트: 회사 선택\n        클라이언트->>서버: company_no 포함하여 사원 정보 제출\n        서버-->>클라이언트: 가입 완료(대기 상태)\n\n        note right of 사용자: 사원은 승인 전까지 제한된 기능만 사용 가능\n\n        서버->>회사관리자: 사원 승인 요청 알림\n        회사관리자->>서버: 사원 승인 처리\n        서버-->>사용자: 승인 완료 알림\n    end\n\n    %% 4. 최종 완료\n    클라이언트-->>사용자: 회원가입 완료 메시지\n",
+  "content_size": 1042,
+  "collected_at": "2026-02-06T01:35:01.066783",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 1,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

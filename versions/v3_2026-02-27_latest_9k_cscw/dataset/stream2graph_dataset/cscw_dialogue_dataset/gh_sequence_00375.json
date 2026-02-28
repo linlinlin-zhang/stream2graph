@@ -1,0 +1,61 @@
+{
+  "id": "gh_sequence_00375",
+  "source": "github",
+  "source_url": "https://github.com/hmrc/agent-client-relationships/blob/a371649ba48b4a3f171ef881758141379c20ea30/service-dependency-map/agent-client-relationships/diagrams/ItsaPostSignupController.POST.create-relationship.mmd",
+  "github_repo": "hmrc/agent-client-relationships",
+  "github_file_path": "service-dependency-map/agent-client-relationships/diagrams/ItsaPostSignupController.POST.create-relationship.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    autonumber\n    participant Upstream\n    participant agent-client-relationships\n    participant if-or-hip\n    participant Database\n    participant des\n    participant enrolment-store-proxy\n\n    Upstream->>+agent-client-relationships: POST /itsa-post-signup/create-relationship/:nino\n    agent-client-relationships->>+if-or-hip: GET /registration/individual/nino/:nino\n    if-or-hip-->>-agent-client-relationships: Response (MTDITID)\n    \n    alt Partial Auth Exists\n        agent-client-relationships->>Database: Read/Update: Check for and use partial-auth record.\n        Database-->>agent-client-relationships: Response\n    else Legacy SA Relationship Exists\n        agent-client-relationships->>+des: GET /registration/relationship/nino/:nino\n        des-->>-agent-client-relationships: Response (Legacy SA Agents)\n        agent-client-relationships->>+enrolment-store-proxy: POST /enrolment-store-proxy/enrolment-store/groups/:groupId/enrolments/:enrolmentKey\n        enrolment-store-proxy-->>-agent-client-relationships: Response\n    end\n\n    agent-client-relationships-->>-Upstream: Final Response\n",
+  "content_size": 1123,
+  "collected_at": "2026-02-06T01:31:23.959822",
+  "compilation_status": "failed",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 1,
+  "repo_forks": 1,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 MTDITID 和 Legacy SA Agents 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'MTDITID 和 Legacy SA Agents'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Response",
+        "Response"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

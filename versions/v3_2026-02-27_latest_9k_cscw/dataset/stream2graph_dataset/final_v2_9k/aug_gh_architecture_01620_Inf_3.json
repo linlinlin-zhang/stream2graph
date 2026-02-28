@@ -1,0 +1,20 @@
+{
+  "id": "aug_gh_architecture_01620_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/demidenm/openneuro_glmfitlins/blob/e624fec2765a7869a4f482da701d85b82bc2f4b7/docs/workflow.mmd",
+  "github_repo": "demidenm/openneuro_glmfitlins",
+  "github_file_path": "docs/workflow.mmd",
+  "diagram_type": "architecture",
+  "code": "flowchart LR\n    %% Define the main sections\n    subgraph Setup [Infra_RedisCache]\n        direction TB\n        A[Infra_WorkerNode] --> B[Infra_WorkerNode]\n        B --> C[Infra_EtcdCluster]\n    end\n    \n    subgraph Acquisition [Infra_EtcdCluster]\n        direction TB\n        D[Infra_IngressController] --> E{Infra_LoadBalancer}\n        E -->|Yes| H[Infra_EtcdCluster]\n        E -->|No| F[Infra_EtcdCluster]\n        F --> H\n    end\n    \n    subgraph Processing [Infra_LoadBalancer]\n        direction TB\n        I[Infra_RedisCache] --> J[Infra_IngressController]\n    end\n    \n    subgraph Analysis [Infra_RedisCache]\n        direction TB\n        K[Infra_IngressController] --> L[Infra_WorkerNode]\n        L --> M{Infra_LoadBalancer}\n        M -->|Local| N[Infra_RedisCache]\n        M -->|HPC| O[Infra_IngressController]\n    end\n    \n    subgraph Reporting [Infra_LoadBalancer]\n        direction TB\n        P[Infra_LoadBalancer] --> Q[Infra_IngressController]\n        P --> R[Infra_EtcdCluster]\n        P --> S[Infra_RedisCache]\n    end\n    \n    %% Connect the sections\n    Setup --> Acquisition\n    Acquisition --> Processing\n    Processing --> Analysis\n    N --> Reporting\n    O --> Reporting\n    \n    %% Add logo reference (Infra_IngressController)\n    classDef logo fill:#fff,stroke:none\n    LOGOtext[Infra_IngressController]\n    class LOGOtext logo\n    \n    %% Define visual styles\n    classDef configNode fill:#f9f,stroke:#333,stroke-width:2px\n    classDef scriptNode fill:#bbf,stroke:#333,stroke-width:1px\n    classDef decisionNode fill:#ff9,stroke:#333,stroke-width:1px\n    classDef outputNode fill:#bfb,stroke:#333,stroke-width:1px\n    \n    class B,C configNode\n    class D,F,I,J,K,N,O,P scriptNode\n    class E,M decisionNode\n    class H,L,Q,R,S outputNode\n",
+  "content_size": 1809,
+  "collected_at": "2026-02-06T02:01:19.473502",
+  "license": "mit",
+  "license_name": "MIT License",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 20,
+  "repo_forks": 2,
+  "augmentation_domain": "Infra",
+  "seed_id": "gh_architecture_01620"
+}

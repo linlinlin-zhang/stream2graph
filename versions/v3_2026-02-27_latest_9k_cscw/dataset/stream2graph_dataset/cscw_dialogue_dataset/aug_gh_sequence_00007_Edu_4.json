@@ -1,0 +1,92 @@
+{
+  "id": "aug_gh_sequence_00007_Edu_4",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/arkavo-org/devsecops/blob/4c95037737adc8812e9d08fe07fe67f87a652853/flow.mmd",
+  "github_repo": "arkavo-org/devsecops",
+  "github_file_path": "flow.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant W as Web Client (Education_LMS_Portal)\n    participant K as Keycloak\n    participant S as Synapse Server\n\n    Note over W,S: Initial Setup\n    S->>K: Register with client_id & client_secret\n    W->>K: Register with client_id (Education_LMS_Portal)\n\n    Note over W,S: Authentication Flow\n    W->>K: 1. Authorization Code Request\n    K->>W: 2. Redirect with Auth Code\n    W->>K: 3. Token Request (Education_GradeSync)\n    K->>W: 4. Access & Refresh Tokens\n\n    Note over S,K: Server Authentication\n    S->>K: 5. Token Request (Education_ContentCDN)\n    K->>S: 6. Access Token\n\n    Note over W,S: API Communication\n    W->>S: 7. API Request + Access Token\n    S->>K: 8. Token Introspection\n    K->>S: 9. Token Validation Response\n    S->>W: 10. API Response\n\n    Note over W,K: Token Refresh\n    W->>K: 11. Refresh Token Request\n    K->>W: 12. New Access & Refresh Tokens\n\n    Note right of K: Keycloak serves as the<br/>Authorization Server<br/>and Identity Provider\n    Note right of S: Synapse uses confidential<br/>client credentials flow\n    Note right of W: Web Client uses<br/>Authorization Code flow<br/>with PKCE",
+  "content_size": 1118,
+  "collected_at": "2026-02-06T01:24:01.587711",
+  "compilation_status": "success",
+  "augmentation_domain": "Education",
+  "seed_id": "gh_sequence_00007",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Education_LMS_Portal 和 Education_LMS_Portal 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Education_LMS_Portal 和 Education_LMS_Portal'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Client",
+        "client_id"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Education_GradeSync 和 Education_ContentCDN。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Education_GradeSync 和 Education_ContentCDN'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Request",
+        "Request"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 8,
+    "repair_count": 0,
+    "grounding_acts_count": 4,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

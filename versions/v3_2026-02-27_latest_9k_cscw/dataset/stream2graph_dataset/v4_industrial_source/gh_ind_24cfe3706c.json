@@ -1,0 +1,9 @@
+{
+  "id": "gh_ind_24cfe3706c",
+  "source": "github_industrial",
+  "repo": "canonical/maas",
+  "license": "other",
+  "code": "---\ntitle: Deploy Workflow (Bulk DB Operations)\n---\nflowchart TD\n    A[1 or more ready machines] -->|User selects machines for deployment| B(Input deploy parameters)\n    B--> C{Validate inputs and permissions}\n    C-->|Invalid| D[error end]\n    C-->|Valid| E{Set Deploy Parameters}\n    E-->|Conflict| F[error end]\n    E-->|Success| G(DeployMany Workflow Starts)\n    G-->H(Fetch all power parameters)\n    H--> I(Deploy Workflow execution starts for each machine)\n    I-->J(Power on/cycle)\n    J-->K{Wait for DHCP Lease}\n    K-->|Timeout| J\n    K-->|Success| L{Wait for boot assets}\n    L-->|Timeout| J\n    L-->|Success| M{Is Ephemeral Deployment?}\n    M-->|Yes| U\n    M-->|No| N{Wait for curtin start}\n    N-->|Timeout| J\n    N-->|Success| O{Wait for curtin finish}\n    O-->|Timeout| J\n    O-->|Success| P{Can set boot order?}\n    P-->|Yes| Q(Set Boot Order to disk)\n    P-->|No| R(Power Cycle)\n    Q-->U\n    R-->S{Wait for DHCP Lease}\n    S-->|Timeout| R\n    S-->|Success| T{Wait for TFTP ACK}\n    T-->|Timeout| R\n    T-->|Success| U{Wait for cloud-init start}\n    U-->|Timeout| R\n    U-->|Success| V{Wait for cloud-init finish}\n    V-->|Timeout| R\n    V-->|Success| W{Deploy Workflow finishes}\n    W-->|Error| X(Set Node status 'deployment failed')\n    W-->|Success| Y(Set Node status 'deployed')\n    X-->Z[end]\n    Y-->Z\n",
+  "diagram_type": "node size:900..1500",
+  "collected_at": "2026-02-27T05:29:42.759675"
+}

@@ -1,0 +1,191 @@
+{
+  "id": "gh_ind_f1d979dd08",
+  "source": "github_industrial",
+  "repo": "microsoft/DirectStorage",
+  "license": "mit",
+  "code": "%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#ffffff', 'nodeBorder':'#000000', 'clusterBorder':'#000000'}}}%%\n\nflowchart LR\n\nsubgraph SSD\n%%SSDSourceUncompressed[(\"Source\\n(uncompressed)\")]\n%%SSDSourceCustomCompressed[(\"Source\\n(custom compressed)\")]\nSSDSourceCompressed[(\"Source\\n(compressed)\")]\nend\n\nsubgraph SystemMemory\n StagingBuffer[Staging Buffer]\n SysMemDestination[[Destination]]\n UploadHeap[Upload Heap]\nend\n\nsubgraph VRAM\n VRAMDestination[[Destination]]\n InputStaging[Input Staging Buffer]\n OutputStaging[Output Staging Buffer]\nend\n\n%% Uncompressed\n%%SSDSourceUncompressed --IOP--> StagingBuffer -- memcpy --> SysMemDestination\n%%SSDSourceUncompressed --IOP--> UploadHeap -- GPUCopy ---> VRAMDestination\n\n%% Custom Compressed\n%%SSDSourceCustomCompressed --IOP--> StagingBuffer -- Decompress --> SysMemDestination\n%%StagingBuffer -- Decompress --> UploadHeap -- GPUCopy ---> VRAMDestination\n\n%% Compressed\nStagingBuffer -- \"Decompress\" --> SysMemDestination\nSSDSourceCompressed --IOP--> StagingBuffer\nSSDSourceCompressed --IOP--> UploadHeap -- GPUCopy ---> InputStaging -- Decompress --> OutputStaging -- GPUCopy --> VRAMDestination\n",
+  "diagram_type": "size:1000..1500",
+  "collected_at": "2026-02-27T03:26:01.097771",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 (\"Source\\n(uncompressed 和 (\"Source\\n(custom compressed 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '(\"Source\\n(uncompressed 和 (\"Source\\n(custom compressed'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SSDSourceUncompressed",
+        "SSDSourceCustomCompressed"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 (\"Source\\n(compressed 和 Staging Buffer。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '(\"Source\\n(compressed 和 Staging Buffer'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SSDSourceCompressed",
+        "StagingBuffer"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 [Destination 和 Upload Heap 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '[Destination 和 Upload Heap'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SysMemDestination",
+        "UploadHeap"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 [Destination 和 Input Staging Buffer 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '[Destination 和 Input Staging Buffer'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "VRAMDestination",
+        "InputStaging"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Output Staging Buffer 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Output Staging Buffer'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OutputStaging"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 20,
+    "repair_count": 0,
+    "grounding_acts_count": 10,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00355",
+  "source": "github",
+  "source_url": "https://github.com/danao0623/-Graduation-AI-Project/blob/318a0120760c3804ccbb71fdaf2cbfd44b4ffc32/.home/3/%E5%A4%A7%E5%AD%B8%E9%81%B8%E8%AA%B2%E7%B3%BB%E7%B5%B1/MMD/%E6%9F%A5%E8%A9%A2%E8%AA%B2%E8%A1%A8_sequence.mmd",
+  "github_repo": "danao0623/-Graduation-AI-Project",
+  "github_file_path": ".home/3/大學選課系統/MMD/查詢課表_sequence.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    actor User\n    participant LoginUI\n    participant AuthenticationController\n    participant CourseTableUI\n    participant CourseTableController\n    participant Student\n\n    User->>LoginUI: input username, password\n    LoginUI->>AuthenticationController: getUsername(), getPassword()\n    AuthenticationController->>Student: authenticate(username, password)\n    alt Authentication successful\n        Student-->>AuthenticationController: authentication successful\n        AuthenticationController->>LoginUI: displaySuccess()\n        User->>CourseTableUI: request course table\n        CourseTableUI->>CourseTableController: requestCourseTable(studentId)\n        alt Student has enrolled courses\n            CourseTableController->>Student: checkStudentCourseSelection(studentId)\n            Student-->>CourseTableController: true, enrolledCourses\n            CourseTableController->>CourseTableController: getCourseTable(enrolledCourses)\n            CourseTableController-->>CourseTableUI: displayCourseTable(courseTable)\n            CourseTableUI-->>User: display course table\n        else Student has no enrolled courses\n            CourseTableController-->>CourseTableUI: displayNoCourseMessage()\n            CourseTableUI-->>User: display no course message\n        end\n        \n        \n    else Authentication failed\n        Student-->>AuthenticationController: authentication failed\n        AuthenticationController->>LoginUI: displayLoginFailure()\n    end\n\n    alt Network error during course table retrieval\n        User->>CourseTableUI: request course table\n        CourseTableUI->>CourseTableController: requestCourseTable(studentId)\n        CourseTableController->>CourseTableController: checkNetworkConnection()\n        CourseTableController-->>CourseTableUI: displayNetworkErrorMessage()\n        CourseTableUI-->>User: display network error message\n    end\n\n    alt Error during course table retrieval\n        User->>CourseTableUI: request course table\n        CourseTableUI->>CourseTableController: requestCourseTable(studentId)\n        CourseTableController->>CourseTableController: handleCourseTableRetrievalFailure()\n        CourseTableController-->>CourseTableUI: displayErrorMessage(message)\n        CourseTableUI-->>User: display error message\n    end\n",
+  "content_size": 2288,
+  "collected_at": "2026-02-06T01:31:09.429573",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

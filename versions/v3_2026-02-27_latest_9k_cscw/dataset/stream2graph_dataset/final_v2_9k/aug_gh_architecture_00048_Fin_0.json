@@ -1,0 +1,14 @@
+{
+  "id": "aug_gh_architecture_00048_Fin_0",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/demidenm/openneuro_glmfitlins/blob/e624fec2765a7869a4f482da701d85b82bc2f4b7/docs/workflow.mmd",
+  "github_repo": "demidenm/openneuro_glmfitlins",
+  "github_file_path": "docs/workflow.mmd",
+  "diagram_type": "architecture",
+  "code": "flowchart LR\n    %% Define the main sections\n    subgraph Setup [FinTech_AuthVault]\n        direction TB\n        A[FinTech_LedgerService] --> B[FinTech_LedgerService]\n        B --> C[FinTech_AuthVault]\n    end\n    \n    subgraph Acquisition [FinTech_AuthVault]\n        direction TB\n        D[FinTech_AuthVault] --> E{FinTech_LedgerService}\n        E -->|Yes| H[FinTech_AuthVault]\n        E -->|No| F[FinTech_LedgerService]\n        F --> H\n    end\n    \n    subgraph Processing [FinTech_TransactionQueue]\n        direction TB\n        I[FinTech_AuthVault] --> J[FinTech_FraudDetection]\n    end\n    \n    subgraph Analysis [FinTech_LedgerService]\n        direction TB\n        K[FinTech_AuthVault] --> L[FinTech_AuthVault]\n        L --> M{FinTech_TransactionQueue}\n        M -->|Local| N[FinTech_AuthVault]\n        M -->|HPC| O[FinTech_PaymentGateway]\n    end\n    \n    subgraph Reporting [FinTech_PaymentGateway]\n        direction TB\n        P[FinTech_PaymentGateway] --> Q[FinTech_AuthVault]\n        P --> R[FinTech_TransactionQueue]\n        P --> S[FinTech_LedgerService]\n    end\n    \n    %% Connect the sections\n    Setup --> Acquisition\n    Acquisition --> Processing\n    Processing --> Analysis\n    N --> Reporting\n    O --> Reporting\n    \n    %% Add logo reference (FinTech_TransactionQueue)\n    classDef logo fill:#fff,stroke:none\n    LOGOtext[FinTech_PaymentGateway]\n    class LOGOtext logo\n    \n    %% Define visual styles\n    classDef configNode fill:#f9f,stroke:#333,stroke-width:2px\n    classDef scriptNode fill:#bbf,stroke:#333,stroke-width:1px\n    classDef decisionNode fill:#ff9,stroke:#333,stroke-width:1px\n    classDef outputNode fill:#bfb,stroke:#333,stroke-width:1px\n    \n    class B,C configNode\n    class D,F,I,J,K,N,O,P scriptNode\n    class E,M decisionNode\n    class H,L,Q,R,S outputNode\n",
+  "content_size": 1809,
+  "collected_at": "2026-02-06T01:24:44.610626",
+  "compilation_status": "success",
+  "augmentation_domain": "FinTech",
+  "seed_id": "gh_architecture_00048"
+}

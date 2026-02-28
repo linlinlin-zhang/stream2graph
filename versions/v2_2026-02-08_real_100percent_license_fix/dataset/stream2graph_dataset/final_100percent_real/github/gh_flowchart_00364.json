@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00364",
+  "source": "github",
+  "source_url": "https://github.com/linhh011202/fyp-report/blob/02e94338c04bfbc3eb6bb6a19c19f907aa8358c3/diagrams/auth_module_architecture.mmd",
+  "github_repo": "linhh011202/fyp-report",
+  "github_file_path": "diagrams/auth_module_architecture.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TB\n    subgraph Controller[\"AuthController\"]\n        L[\"/auth/login\"]\n        LO[\"/auth/logout\"]\n        VT[\"/auth/verify-token\"]\n        RT[\"/auth/refresh-token\"]\n    end\n\n    subgraph Guards[\"Passport Guards\"]\n        LAG[LocalAuthGuard]\n        JAG[JwtAuthGuard]\n    end\n\n    subgraph Strategies[\"Passport Strategies\"]\n        LS[LocalStrategy]\n        JS[JwtStrategy]\n    end\n\n    subgraph Service[\"AuthService\"]\n        LOGIN[\"login()\"]\n        LOGOUT[\"logout()\"]\n        VERIFY[\"verifyAccessToken()\"]\n        REFRESH[\"refreshAccessToken()\"]\n        REVOKE[\"revokeAllUserTokens()\"]\n    end\n\n    subgraph JWT[\"JwtModule\"]\n        SIGN[\"jwtService.sign()\"]\n        DECODE[\"jwtService.decode()\"]\n        VERIFYJWT[\"jwtService.verify()\"]\n    end\n\n    subgraph Storage[\"MongoDB Collections\"]\n        UT[(UserTokens)]\n        TB[(TokenBlacklist)]\n        US[(Users)]\n    end\n\n    L --> LAG --> LS\n    LS --> US\n    L --> LOGIN\n    LOGIN --> REVOKE --> TB\n    LOGIN --> SIGN --> UT\n\n    LO --> JAG --> JS\n    JS --> US\n    LO --> LOGOUT --> TB\n\n    VT --> VERIFY\n    VERIFY --> TB\n    VERIFY --> VERIFYJWT\n    VERIFY --> UT\n\n    RT --> REFRESH\n    REFRESH --> DECODE\n    REFRESH --> TB\n    REFRESH --> SIGN --> UT\n",
+  "content_size": 1222,
+  "collected_at": "2026-02-06T01:43:39.641298",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

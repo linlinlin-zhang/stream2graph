@@ -1,0 +1,18 @@
+{
+  "id": "gh_class_01591",
+  "source": "github",
+  "source_url": "https://github.com/datamonsterr/vdt-ai-dashboard/blob/667341506a5da0b8a1cc13906e9e061f8ac5f87c/docs/system-design/docs/diagrams/class_diagram.mmd",
+  "github_repo": "datamonsterr/vdt-ai-dashboard",
+  "github_file_path": "docs/system-design/docs/diagrams/class_diagram.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n    direction TD\n\n    %% API Server Core Models\n    class User {\n        +String userId\n        +String email\n        +String name\n        +login(email, password) boolean\n        +logout() void\n    }\n    class Organization {\n        +String organizationId\n        +String name\n        +inviteMember(email, role) Invitation\n        +createProject(name, desc) Project\n    }\n    class Project {\n        +String projectId\n        +String name\n        +addMember(userId, role) boolean\n        +createApiKey(name) APIKey\n        +proposeAlertRule() AlertRule\n    }\n    class APIKey {\n        +String keyId\n        +String keyName\n        +String keyValueHash\n        +revoke() boolean\n    }\n    class AlertRule {\n        +String ruleId\n        +String metricType\n        +String condition\n        +approve(approver) boolean\n        +reject(rejecter) boolean\n    }\n    class MonitoringEvent {\n        <<Message>>\n        +String eventId\n        +EventType eventType\n        +Date timestamp\n        +String modelVersion\n        +JSON payload\n    }\n    class AuditLogEntry {\n        +String logId\n        +Date timestamp\n        +String action\n    }\n\n    %% API Server Controllers\n    class EventController {\n        +handleEventPush(req) Response\n    }\n    class ProjectController {\n        +createProject(req) Response\n        +addMember(req) Response\n    }\n\n    %% API Server Services\n    class EventProducerService {\n        -KafkaProducer producer\n        +publishEvent(event) error\n    }\n    class AuthService {\n        +validateApiKey(key) boolean\n    }\n    class ReportService {\n        +generateReport(filters) File\n    }\n\n    %% Kafka Consumer Components\n    class EventProcessor {\n        -KafkaConsumer consumer\n        +run() void\n        +processMessage(msg) void\n    }\n    class DataAggregator {\n        +aggregate(event) AggregatedMetric\n    }\n    class AlertEvaluator {\n        -AlertRuleRepository alertRuleRepo\n        +evaluate(event) void\n    }\n    class AggregatedMetric {\n        <<DataStore>>\n        +String metricId\n        +String projectId\n        +String metricType\n        +Float value\n        +Date timestamp\n    }\n    class NotificationService {\n         +sendAlert(rule, event) void\n    }\n\n    %% Relationships\n    EventController --> AuthService\n    EventController --> EventProducerService\n    EventProducerService --> MonitoringEvent : produces\n\n    EventProcessor --> DataAggregator\n    EventProcessor --> AlertEvaluator\n    DataAggregator --> AggregatedMetric : creates\n    AlertEvaluator --> NotificationService : triggers\n\n    %% Cross-Server Interaction via Kafka\n    EventProcessor ..> MonitoringEvent : consumes\n",
+  "content_size": 2659,
+  "collected_at": "2026-02-06T01:59:51.637260",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

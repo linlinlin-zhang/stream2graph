@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00178",
+  "source": "github",
+  "source_url": "https://github.com/fikriaf/UPJ-Parking-Detection/blob/9410b507b47815c84e0a9c403577a60a590fc170/docs/system-architecture.mmd",
+  "github_repo": "fikriaf/UPJ-Parking-Detection",
+  "github_file_path": "docs/system-architecture.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TB\n    subgraph User[\"👤 User\"]\n        Browser[Web Browser]\n        Camera[DroidCam/IP Camera]\n    end\n    \n    subgraph Frontend[\"🖥️ Frontend SPA\"]\n        Router[Router]\n        UploadUI[Upload Page]\n        ResultsUI[Results Page]\n        CalibUI[Calibration Page]\n        APIClient[API Client]\n    end\n    \n    subgraph Backend[\"⚙️ Backend API\"]\n        FastAPI[FastAPI Server]\n        UploadEndpoint[Upload Endpoint]\n        CompleteEndpoint[Complete Endpoint]\n        ResultsEndpoint[Results Endpoint]\n        CalibEndpoint[Calibration Endpoint]\n    end\n    \n    subgraph Processing[\"🔬 Processing Engine\"]\n        YOLO[YOLO Detection Model]\n        CalibEngine[Calibration Engine]\n        ImageProc[Image Processing]\n    end\n    \n    subgraph Storage[\"💾 Storage\"]\n        FrameStore[(Frame Storage)]\n        ResultStore[(Result Storage)]\n        CalibStore[(Calibration Data)]\n        SessionDB[(Session Database)]\n    end\n    \n    %% User Interactions\n    Browser -->|Navigate| Router\n    Camera -->|Stream| UploadUI\n    \n    %% Frontend Internal\n    Router -->|Route| UploadUI\n    Router -->|Route| ResultsUI\n    Router -->|Route| CalibUI\n    \n    UploadUI -->|API Call| APIClient\n    ResultsUI -->|API Call| APIClient\n    CalibUI -->|API Call| APIClient\n    \n    %% Frontend to Backend\n    APIClient -->|POST /upload| UploadEndpoint\n    APIClient -->|POST /complete| CompleteEndpoint\n    APIClient -->|GET /results/*| ResultsEndpoint\n    APIClient -->|POST /calibration| CalibEndpoint\n    \n    %% Backend Processing\n    UploadEndpoint -->|Save| FrameStore\n    UploadEndpoint -->|Update| SessionDB\n    \n    CompleteEndpoint -->|Load Frames| FrameStore\n    CompleteEndpoint -->|Detect| YOLO\n    CompleteEndpoint -->|Load Calibration| CalibStore\n    \n    YOLO -->|Detections| CalibEngine\n    CalibEngine -->|Calculate Spaces| ImageProc\n    ImageProc -->|Annotate| ResultStore\n    \n    CompleteEndpoint -->|Update| SessionDB\n    \n    ResultsEndpoint -->|Query| SessionDB\n    ResultsEndpoint -->|Load| ResultStore\n    \n    CalibEndpoint -->|Save/Load| CalibStore\n    \n    %% Response Flow\n    ResultsEndpoint -->|JSON Response| APIClient\n    CompleteEndpoint -->|JSON Response| APIClient\n    UploadEndpoint -->|JSON Response| APIClient\n    CalibEndpoint -->|JSON Response| APIClient\n    \n    APIClient -->|Update UI| ResultsUI\n    APIClient -->|Update UI| UploadUI\n    APIClient -->|Update UI| CalibUI\n    \n    style Browser fill:#87CEEB\n    style FastAPI fill:#98FB98\n    style YOLO fill:#FFD700\n    style SessionDB fill:#DDA0DD\n",
+  "content_size": 2544,
+  "collected_at": "2026-02-06T01:42:27.836578",
+  "compilation_status": "failed",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

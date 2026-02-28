@@ -1,0 +1,383 @@
+{
+  "id": "gh_class_01081",
+  "source": "github",
+  "source_url": "https://github.com/githubBella2/Bella_Bootcamp/blob/8e75b54ecb2f70c873501858cd7984aada3808ed/ProjekGameTes/GameCheckker/UML%20Checkker.mmd",
+  "github_repo": "githubBella2/Bella_Bootcamp",
+  "github_file_path": "ProjekGameTes/GameCheckker/UML Checkker.mmd",
+  "diagram_type": "class",
+  "code": "---\ntitle: Animal example\n---\nclassDiagram\n    GameController <|-- IBoard\n    IBoard  <|-- Board\n    Board  <|-- IPiece\n    IPiece  <|-- Piece\n    IPlayer  <|-- Player\n    IPlayer  <|-- PieceType\n    Piece  <|-- PieceState\n    Board  <|-- PieceType\n    GameController <|-- IPlayer\n    GameController <|-- Coordinate\n    \n    class GameController{\n        +IBoard board\n        -IPlayer _player1\n        -IPlayer _player2\n        +IPlayer currentPlayer\n        List~IPlayer~ players\n        +List~Coordinate~ listCoordinateMove\n        +Dictionary ~IPlayer, List<Coordinate>~ movePlayerDict\n        -bool isRunning = false\n        -int maxScoreToWin=3\n\n        +GameController()\n        +void StartGame()\n        -void SwitchPlayer()\n        +void SetPlayerData(IPlayer user1, IPlayer user2)\n        +List~IPlayer~ GetPlayerData()\n        +void PrintScore()\n        +void CheckWinner()\n        +void SaveListCoordinate(Coordinate x,Coordinate y)\n        +List~Coordinate~ GetListCoordinate()\n        +void SaveDataPlayerMove(IPlayer player, List<Coordinate> coordinate)\n        +Dictionary ~IPlayer, List<Coordinate>~ GetPlayerMove()\n        +void SaveNewCoordinateToDict(IPlayer player, Coordinate coordinate)\n\n        \n    }\n    class IBoard{\n        <<interface>>\n        +void DisplayBoard()\n        bool MovePiece(Coordinate start, Coordinate end, PieceType pieceType, Player username)\n    }\n    class Board{\n        -const int _size\n        -IPiece[,] grid;\n        +List<Coordinate> listCoordinateMove;\n        + Dictionary<IPlayer, List<Coordinate>> movePlayer;\n        - void InitBoard()\n        + void DisplayBoard()\n        + bool MovePiece(Coordinate start, Coordinate end, PieceType pieceType, Player username)\n    }\n    class IPiece{\n        <<interface>>\n        PieceType Type ~get;set;~\n        PieceState State ~get;set;~\n        +bool Move(int startX,int startY, int endX, int endY)\n    }\n    class Piece{\n        PieceType Type ~get;set;~\n        PieceState State ~get;set;~\n        Piece(PieceType type)\n        bool Move(int startX, int startY, int endX, int endY) \n    }\n    class IPlayer{\n        <<interface>>\n        string Username ~get;~\n        PieceType PieceType ~get;~\n        bool MakeMove(IBoard board,Coordinate start, Coordinate end)\n    }\n    class Player{\n        +string Username ~get; private set;~\n        +PieceType PieceType ~get; private set;~\n        +int Score ~get; private set;~\n        +Player(string username, PieceType pieceType)\n        +bool MakeMove(IBoard board, Coordinate start,  Coordinate end)\n        +void AddScore(int poin)\n    }\n    \n    class Coordinate{\n        +int X ~get;set;~\n        +int Y ~get;set;~\n        +Coordinate(int x, int y)\n    }\n    class PieceState{\n        <<enumeration>>\n        Normal,\n        King\n    }\n    class PieceType{\n        <<enumeration>>\n        Empty,\n        White,\n        Black\n    }\n",
+  "content_size": 2886,
+  "collected_at": "2026-02-06T01:52:39.944732",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 +IBoard board\n        -IPlayer _player1\n        -IPlayer _player2\n        +IPlayer currentPlayer\n        List~IPlayer~ players\n        +List~Coordinate~ listCoordinateMove\n        +Dictionary ~IPlayer, List<Coordinate>~ movePlayerDict\n        -bool isRunning = false\n        -int maxScoreToWin=3\n\n        +GameController( 和 IPlayer user1, IPlayer user2 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '+IBoard board\n        -IPlayer _player1\n        -IPlayer _player2\n        +IPlayer currentPlayer\n        List~IPlayer~ players\n        +List~Coordinate~ listCoordinateMove\n        +Dictionary ~IPlayer, List<Coordinate>~ movePlayerDict\n        -bool isRunning = false\n        -int maxScoreToWin=3\n\n        +GameController( 和 IPlayer user1, IPlayer user2'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "GameController",
+        "SetPlayerData"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Coordinate x,Coordinate y 和 IPlayer player, List<Coordinate> coordinate 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Coordinate x,Coordinate y 和 IPlayer player, List<Coordinate> coordinate'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SaveListCoordinate",
+        "SaveDataPlayerMove"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 IPlayer player, Coordinate coordinate 和 <<interface>>\n        +void DisplayBoard( 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'IPlayer player, Coordinate coordinate 和 <<interface>>\n        +void DisplayBoard('。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SaveNewCoordinateToDict",
+        "IBoard"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Coordinate start, Coordinate end, PieceType pieceType, Player username 和 -const int _size\n        -IPiece[, 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Coordinate start, Coordinate end, PieceType pieceType, Player username 和 -const int _size\n        -IPiece[,'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MovePiece",
+        "Board"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Coordinate start, Coordinate end, PieceType pieceType, Player username 和 <<interface>>\n        PieceType Type ~get;set;~\n        PieceState State ~get;set;~\n        +bool Move(int startX,int startY, int endX, int endY 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Coordinate start, Coordinate end, PieceType pieceType, Player username 和 <<interface>>\n        PieceType Type ~get;set;~\n        PieceState State ~get;set;~\n        +bool Move(int startX,int startY, int endX, int endY'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MovePiece",
+        "IPiece"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 PieceType Type ~get;set;~\n        PieceState State ~get;set;~\n        Piece(PieceType type 和 int startX, int startY, int endX, int endY 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'PieceType Type ~get;set;~\n        PieceState State ~get;set;~\n        Piece(PieceType type 和 int startX, int startY, int endX, int endY'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Piece",
+        "Move"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 <<interface>>\n        string Username ~get;~\n        PieceType PieceType ~get;~\n        bool MakeMove(IBoard board,Coordinate start, Coordinate end 和 +string Username ~get; private set;~\n        +PieceType PieceType ~get; private set;~\n        +int Score ~get; private set;~\n        +Player(string username, PieceType pieceType 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '<<interface>>\n        string Username ~get;~\n        PieceType PieceType ~get;~\n        bool MakeMove(IBoard board,Coordinate start, Coordinate end 和 +string Username ~get; private set;~\n        +PieceType PieceType ~get; private set;~\n        +int Score ~get; private set;~\n        +Player(string username, PieceType pieceType'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "IPlayer",
+        "Player"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 IBoard board, Coordinate start,  Coordinate end 和 int poin 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'IBoard board, Coordinate start,  Coordinate end 和 int poin'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MakeMove",
+        "AddScore"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 +int X ~get;set;~\n        +int Y ~get;set;~\n        +Coordinate(int x, int y 和 <<enumeration>>\n        Normal,\n        King\n     的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '+int X ~get;set;~\n        +int Y ~get;set;~\n        +Coordinate(int x, int y 和 <<enumeration>>\n        Normal,\n        King\n    '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Coordinate",
+        "PieceState"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 <<enumeration>>\n        Empty,\n        White,\n        Black\n    。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 <<enumeration>>\n        Empty,\n        White,\n        Black\n    处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '<<enumeration>>\n        Empty,\n        White,\n        Black\n    处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PieceType"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 41,
+    "repair_count": 1,
+    "grounding_acts_count": 20,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

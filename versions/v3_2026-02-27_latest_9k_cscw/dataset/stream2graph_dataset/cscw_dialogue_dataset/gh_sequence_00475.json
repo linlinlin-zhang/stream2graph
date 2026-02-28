@@ -1,0 +1,306 @@
+{
+  "id": "gh_sequence_00475",
+  "source": "github",
+  "source_url": "https://github.com/DamienReichhart/ChatApp/blob/c4cc2ad171949d92ad0d8e0f12a4ddf246c319f3/documentation/uml/sequence/sequence-text-messaging-flow.mmd",
+  "github_repo": "DamienReichhart/ChatApp",
+  "github_file_path": "documentation/uml/sequence/sequence-text-messaging-flow.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    %% Participants\n    participant ClientUI as Client UI\n    participant ChatController as Chat Controller\n    participant WebSocketSvc as WebSocketService\n    participant WebSocketHandler as WebSocketHandler\n    participant MsgProcessor as WebSocketMessageProcessor\n    participant StompSession as STOMP Session\n    participant ClientDB as Client Database\n    participant MessageDAO as Message DAO\n    participant ServerEndpoint as Server WebSocket Endpoint\n    participant ServerController as Message Controller\n    participant SessionService as Chat Session Service\n\n    %% Sending a Text Message\n    ClientUI->>ChatController: sendMessage()\n    ChatController->>MessageDAO: create(message)\n    MessageDAO->>ClientDB: INSERT INTO messages\n    ClientDB-->>MessageDAO: message.id\n    MessageDAO-->>ChatController: savedMessage\n    \n    ChatController->>WebSocketSvc: sendMessage(savedMessage)\n    WebSocketSvc->>WebSocketHandler: sendMessage(savedMessage)\n    WebSocketHandler->>MsgProcessor: sendMessage(savedMessage)\n    \n    MsgProcessor->>MsgProcessor: Create WebSocketMessageDTO\n    MsgProcessor->>StompSession: send(chatTopic + \"/message\", messageDTO)\n    StompSession->>ServerEndpoint: /app/chat/{chatId}/message\n    \n    ServerEndpoint->>ServerController: sendChatMessage(chatId, message)\n    ServerController->>ServerController: validateMessage(message, chatId, true)\n    Note over ServerController: Check if user is a participant<br/>in session registry\n    \n    alt Valid Message\n        ServerController->>SessionService: getUsersInChat(chatId)\n        ServerController->>ServerEndpoint: send to /topic/chat/{chatId}/message\n        \n        %% Message broadcast to all subscribers (including sender)\n        ServerEndpoint-->>StompSession: broadcast message\n        StompSession-->>MsgProcessor: handleFrame(frame)\n        MsgProcessor->>MsgProcessor: processChatMessage(dto)\n        MsgProcessor->>WebSocketHandler: notifyMessageReceived(message)\n        WebSocketHandler->>WebSocketSvc: onMessageReceived(message)\n        WebSocketSvc->>ChatController: notify message listeners\n        ChatController->>ClientUI: update UI with new message\n    else Invalid Message\n        ServerController->>ServerController: Create error message\n        ServerController->>ServerEndpoint: return error message\n        ServerEndpoint-->>StompSession: send error\n        StompSession-->>MsgProcessor: handleFrame(error)\n        MsgProcessor->>WebSocketHandler: notifyError(errorMessage)\n        WebSocketHandler->>WebSocketSvc: onError(errorMessage)\n        WebSocketSvc->>ChatController: notify error listeners\n        ChatController->>ClientUI: display error\n    end\n",
+  "content_size": 2685,
+  "collected_at": "2026-02-06T01:32:50.165849",
+  "compilation_status": "failed",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 message 和 savedMessage。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'message 和 savedMessage'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "create",
+        "sendMessage"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 savedMessage 和 savedMessage 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'savedMessage 和 savedMessage'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "sendMessage",
+        "sendMessage"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 chatTopic + \"/message\", messageDTO 和 chatId, message 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'chatTopic + \"/message\", messageDTO 和 chatId, message'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "send",
+        "sendChatMessage"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 message, chatId, true 和 chatId。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'message, chatId, true 和 chatId'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "validateMessage",
+        "getUsersInChat"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 including sender 和 frame 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'including sender 和 frame'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "subscribers",
+        "handleFrame"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 dto 和 message。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'dto 和 message'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "processChatMessage",
+        "notifyMessageReceived"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 message 和 error 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'message 和 error'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "onMessageReceived",
+        "handleFrame"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 errorMessage 和 errorMessage 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'errorMessage 和 errorMessage'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "notifyError",
+        "onError"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 32,
+    "repair_count": 0,
+    "grounding_acts_count": 16,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "id": "aug_ot_stateDiagram_00206_Edu_4",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/stevendos1/analisis/blob/ebafb85c113efedcd9e64d8dcab8dc98cfb2a02a/docs/meta-ahorro-state-diagram.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "stevendos1/analisis",
+  "diagram_type": "stateDiagram",
+  "code": "%%{Education_StudentDB}}}%%\nstateDiagram-v2\n    direction LR\n    classDef lifecycle fill:#ffffff,stroke:#5d5fef,stroke-width:2px,color:#222\n\n    state \"En Progreso\\nEstaCompletada = false\\nMontoActual < MontoObjetivo\" as EnProgreso\n    state \"Completada\\nEstaCompletada = true\\nMontoActual ≥ MontoObjetivo\" as Completada\n    state \"Eliminada\\nRegistro físico borrado\" as Eliminada\n\n    class EnProgreso,Completada,Eliminada lifecycle\n\n    [Education_GradeSync] --> EnProgreso : CrearMeta(Education_ContentCDN) / inicializarMeta(Education_ClassroomService)\n    [Education_GradeSync] --> Completada : CrearMeta(Education_StudentDB) [Education_LMS_Portal] / inicializarMeta(Education_ContentCDN)\n\n    %% Ciclo natural de ahorro\n    EnProgreso --> EnProgreso : RegistrarTransaccion|Contribuir\\n[Education_StudentDB]\\n/ ActualizarMontos(Education_ClassroomService)\n    EnProgreso --> Completada : RegistrarTransaccion|Contribuir\\n[Education_GradeSync]\\n/ ActualizarMontos(Education_GradeSync)\n\n    Completada --> Completada : RegistrarTransaccion|Contribuir\\n[Education_LMS_Portal]\\n/ MantenerCierre(Education_GradeSync)\n    Completada --> EnProgreso : RegistrarTransaccion|Contribuir\\n[Education_LMS_Portal]\\n/ AjustarMontos(Education_GradeSync)\n\n    %% Actualizaciones manuales vía PUT\n    EnProgreso --> Completada : ActualizarMeta(Education_ContentCDN)\\n[Education_ContentCDN]\\n/ PersistirCambios(Education_LMS_Portal)\n    Completada --> EnProgreso : ActualizarMeta(Education_LMS_Portal)\\n[Education_LMS_Portal]\\n/ PersistirCambios(Education_ContentCDN)\n\n    %% Borrado definitivo\n    EnProgreso --> Eliminada : EliminarMeta(Education_StudentDB) / BorrarRegistro(Education_ClassroomService)\n    Completada --> Eliminada : EliminarMeta(Education_ContentCDN) / BorrarRegistro(Education_LMS_Portal)\n    Eliminada --> [Education_ContentCDN]\n\n    note right of EnProgreso\n        Estado operacional por defecto.\n        Las contribuciones suman al monto y\n        recalculan el progreso.\n    end note\n\n    note right of Completada\n        Se marca cuando MontoActual\n        alcanza o supera el objetivo.\n        Puede reabrirse con ajustes manuales.\n    end note\n",
+  "content_size": 2062,
+  "collected_at": "2026-02-06T10:39:09.939790",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Education",
+  "seed_id": "ot_stateDiagram_00206",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，Generic Diagram是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在Generic Diagram完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "root"
+      ],
+      "timestamp_offset": 45
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 3,
+    "speaker_distribution": {
+      "Speaker_B": 2,
+      "Speaker_A": 1
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "confirm": 1
+    },
+    "avg_turn_length": 25.666666666666668,
+    "dialogue_duration": 45
+  }
+}

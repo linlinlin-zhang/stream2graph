@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00563",
+  "source": "github",
+  "source_url": "https://github.com/pagopa/p4pa-doc/blob/7e7885cceb7021d36015482fc7455c44951d6b3f/design/auth/sequence_validateSession.mmd",
+  "github_repo": "pagopa/p4pa-doc",
+  "github_file_path": "design/auth/sequence_validateSession.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    actor Operatore\n    participant UserAgent\n    participant FE as FE_MyOperatore\n    participant BFF as BFF_MyOperatore\n    participant AUTH as P4PA_AUTH\n    participant IAM\n\n    note right of Operatore: Utente autenticato\n\n    Operatore ->> UserAgent: Naviga il portale\n\n    activate UserAgent\n        UserAgent ->> FE: #\n        activate FE\n            FE ->> BFF: Invoca API protetta\n            note over FE, BFF: Authorization: Bearer <accessToken>\n\n            activate BFF\n                BFF ->> AUTH: GET /userinfo\n                activate AUTH\n                    alt token valido e presente in cache\n                        AUTH ->> AUTH: Recupera l'ID Token dalla cache\n                        AUTH ->> AUTH: Recupera le relazioni ed i ruoli<BR />con gli enti dalla tabella Operators\n                        AUTH -->> BFF: Dati utente ed enti/ruoli\n                        note right of BFF: Richiesta autorizzata<BR />Processa richiesta\n                    else\n                        AUTH -->> BFF: Forbidden\n                    end\n                deactivate AUTH\n\n                BFF -->> FE: Esito richiesta\n            deactivate BFF\n\n            FE -->> UserAgent: Renderizza esito API\n        deactivate FE\n        UserAgent -->> Operatore: #\n    deactivate UserAgent",
+  "content_size": 1306,
+  "collected_at": "2026-02-06T01:33:59.919632",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

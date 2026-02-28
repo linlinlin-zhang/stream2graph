@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00637",
+  "source": "github",
+  "source_url": "https://github.com/NJU-cerulean/AscendC/blob/346da8f5417512ded7fed9f472c3dad34ac0fc11/report/report_addenda/add_lora_dataflow.mmd",
+  "github_repo": "NJU-cerulean/AscendC",
+  "github_file_path": "report/report_addenda/add_lora_dataflow.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\n  HostRead[\"Host: Read inputs & attrs\"] --> Tiling[\"Host: Check types & compute tiling\"]\n  Tiling --> Alloc[\"Host: Allocate workspace & write tilingData\"]\n  Alloc --> Launch[\"Launch kernel, pass GM pointers & workspace\"]\n\n  Launch --> Init[\"Kernel: InitVectorBuffers & map GM tensors\"]\n  Init --> BatchIdx[\"ComputeBatchIndiceCount: build batch->lora mapping\"]\n  BatchIdx --> Rearrange[\"xDataRearrange: reorder x -> mm1ResGm (GM)\"]\n\n  Rearrange --> SyncA[\"SyncAll barrier: wait all cores before A\"]\n\n  %% WeightA stage: produces mm1 in GM\n  SyncA --> WeightA[\"UpdateByWeightA (per-core loop)\"]\n  WeightA -->|GM: read xRearrange, waGm| CopyInA[\"CopyInL1A / CopyInL1BNd: GM -> L1 -> L0\"]\n  CopyInA --> SplitAB[\"SplitA / SplitB: layout -> A2/B2 local queues\"]\n  SplitAB --> MatmulA[\"doMatmul: L0A * L0B -> L0C\"]\n  MatmulA --> L0CtoUB1[\"CopyL0cToUb: L0C -> UB (mm1ResUb)\"]\n  L0CtoUB1 --> WriteMM1[\"CopyMm1ResOut: UB -> mm1ResGm (GM)\"]\n\n  WriteMM1 --> SyncAB[\"SyncAll barrier: ensure all mm1 in GM\"]\n\n  %% WeightB stage: consumes mm1 from GM and wbGm\n  SyncAB --> WeightB[\"UpdateByWeightB (per-core loop)\"]\n  WeightB -->|GM: read wbGm| CopyInB1[\"CopyInL1BNd: wbGm -> L1B -> L0B\"]\n  CopyInB1 --> SplitBtoLocal[\"SplitB: L1B->L0B (b2Local)\"]\n  SplitBtoLocal --> ForBatch[\"for each batchBlock: read mm1ResGm (GM)\"]\n  ForBatch --> CopyInAfromMM1[\"CopyInL1A: mm1ResGm -> L1A -> L0A\"]\n  CopyInAfromMM1 --> SplitAfromMM1[\"SplitA: L1A->L0A (a2Local)\"]\n  SplitAfromMM1 --> MatmulB[\"doMatmul: a2Local * b2Local -> L0C\"]\n  MatmulB --> L0CtoUB2[\"CopyL0cToUb: L0C -> UB (mm2ResUb)\"]\n  L0CtoUB2 --> Scale[\"Muls: scale mm2 UB\"]\n  Scale --> FinalCopy[\"CopyFinalResOutAdd: UB -> yGm (GM) with atomic add\"]\n\n  FinalCopy --> KernelEnd[\"Kernel end, return to Host\"]\n\n  %% Memory legend\n  subgraph GM[Global Memory]\n    xGm[xGm]\n    waGm[waGm]\n    wbGm[wbGm]\n    mm1Gm[mm1ResGm]\n    yGm[yGm]\n  end\n\n  subgraph Local[On-chip: L1/L0/UB]\n    L1[L1]\n    L0[L0]\n    UB[UB]\n  end\n\n  classDef gm fill:#fff5e6,stroke:#d97706;\n  classDef local fill:#e6ffed,stroke:#0a8a43;\n  class xGm,waGm,wbGm,mm1Gm,yGm gm\n  class L1,L0,UB local\n",
+  "content_size": 2107,
+  "collected_at": "2026-02-06T01:46:11.532083",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

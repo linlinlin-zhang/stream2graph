@@ -1,0 +1,100 @@
+{
+  "id": "ot_stateDiagram_00000",
+  "source": "other",
+  "source_url": "https://github.com/mrmidi/ASFireWire/blob/1b2dc823fe5b65d27bd90632fb2e11ba8d0c6914/documentation/stateDiagram-v2.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "mrmidi/ASFireWire",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    direction LR\n\n    %% Compact, readable bus-reset state machine: R0 left, R1 center, T0 right\n\n    powerReset: powerReset\n    resetDetected: resetDetected\n    ibrCond: ibr && !(phyResponse || immediatePhyRequest)\n    maxArbStateTimeout: maxArbStateTimeout()\n\n    R0: R0 — Reset Start\\nresetStartActions()\n    R1: R1 — Reset Wait\\nresetWaitActions()\n    T0: T0 — Tree ID Start\n\n    %% Triggers to R0 (left side)\n    powerReset --> R0: arbPowerReset()\n    resetDetected --> R0: initiatedReset = FALSE\n    ibrCond --> R0: initiatedReset = TRUE / resetDuration = RESET_TIME\n    maxArbStateTimeout --> R0: initiatedReset = TRUE / resetDuration = RESET_TIME; PH_EVENT_INDICATION\n\n    %% Core transitions\n    R0 --> R1: arbTimer >= resetDuration / resetStartActions()\n    R1 --> T0: resetComplete() / arbTimer = 0\n\n    %% Back-transition and timeout\n    R1 --> R0: arbTimer >= resetDuration + RESET_WAIT / resetDuration = RESET_TIME\n\n    note left of R0\n      External triggers to R0:\\n• powerReset (arbPowerReset())\\n• resetDetected (initiatedReset = FALSE)\\n• ibr && !(phyResponse || immediatePhyRequest) (initiatedReset = TRUE)\\n• maxArbStateTimeout() (initiatedReset = TRUE; resetDuration = RESET_TIME)\\n• from TX: Transmit → -TX:R0\n    end note\n\n    note right of R1\n      Timeout/Recovery:\\n• R1→R0 sets resetDuration = RESET_TIME\\n• R1→T0 on resetComplete() sets arbTimer = 0\n    end note",
+  "content_size": 1407,
+  "collected_at": "2026-02-06T10:36:36.652880",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 left side 和 arbPowerReset( 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'left side 和 arbPowerReset('。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "R0",
+        "powerReset"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 initiatedReset = FALSE 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 initiatedReset = FALSE处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'initiatedReset = FALSE处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "resetDetected"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 9,
+    "repair_count": 1,
+    "grounding_acts_count": 4,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

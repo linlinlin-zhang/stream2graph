@@ -1,0 +1,18 @@
+{
+  "id": "gh_class_01136",
+  "source": "github",
+  "source_url": "https://github.com/UAX-2025-26/Benchmark_Pablo_Javi/blob/15af6c89a753e98a7da44362dc50adadefc739c0/docs/clases-pruebas-rendimiento.mmd",
+  "github_repo": "UAX-2025-26/Benchmark_Pablo_Javi",
+  "github_file_path": "docs/clases-pruebas-rendimiento.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n    %% Paquete model\n    class BenchmarkResult {\n        +int totalTasks\n        +int threads\n        +String executorType\n        +List~ModeResult~ results\n        +String conclusion\n    }\n\n    class ModeResult {\n        +String mode\n        +long executionTimeMs\n        +double speedup\n        +double efficiency\n    }\n\n    BenchmarkResult --> ModeResult : contiene\n\n    %% Paquete task\n    class IntensiveTask {\n        -int iterations\n        +execute() void\n        -performCpuIntensiveWork() void\n    }\n\n    %% Paquete service\n    class BenchmarkService {\n        -IntensiveTask intensiveTask\n        -AsyncTaskService asyncTaskService\n        -ThreadPoolTaskExecutor customTaskExecutor\n        -BenchmarkResult lastResult\n        -AtomicBoolean running\n        +runBenchmark(int, int, String) BenchmarkResult\n        +getLastResult() BenchmarkResult\n        -runSequentialNs(int) long\n        -runWithExecutorServiceNs(int, int, String) long\n        -runWithSpringAsyncNs(int, int) long\n    }\n\n    class AsyncTaskService {\n        +executeTaskAsync(IntensiveTask) CompletableFuture~Void~\n    }\n\n    BenchmarkService --> IntensiveTask : ejecuta\n    BenchmarkService --> AsyncTaskService : usa\n    BenchmarkService --> BenchmarkResult : genera\n    BenchmarkService --> ModeResult : construye\n    AsyncTaskService --> IntensiveTask : ejecuta async\n\n    %% Paquete config\n    class AppConfig {\n        +customTaskExecutor() ThreadPoolTaskExecutor\n    }\n\n    AppConfig --> BenchmarkService : configura executor para\n\n    %% Paquete controller\n    class BenchmarkController {\n        -BenchmarkService benchmarkService\n        +startBenchmark(int, int, String) ResponseEntity\n        +getResult() ResponseEntity\n    }\n\n    BenchmarkController --> BenchmarkService : delega a\n    BenchmarkController --> BenchmarkResult : devuelve\n\n    %% Relaciones de concurrencia\n    class ThreadPoolTaskExecutor {\n        <<Spring>>\n    }\n\n    class ExecutorService {\n        <<Java>>\n    }\n\n    class CompletableFuture {\n        <<Java>>\n    }\n\n    BenchmarkService ..> ExecutorService : crea y usa\n    BenchmarkService --> ThreadPoolTaskExecutor : usa\n    AsyncTaskService ..> CompletableFuture : retorna\n\n",
+  "content_size": 2209,
+  "collected_at": "2026-02-06T01:53:29.786547",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

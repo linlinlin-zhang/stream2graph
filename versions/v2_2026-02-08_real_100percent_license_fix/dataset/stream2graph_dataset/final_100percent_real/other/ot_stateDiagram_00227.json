@@ -1,0 +1,15 @@
+{
+  "id": "ot_stateDiagram_00227",
+  "source": "other",
+  "source_url": "https://github.com/openbankingproject-ch/Open-API-Kundenbeziehung/blob/0117d87c5299ec17e19105263dc1fb9615d87c47/Dokumentation%20Fachliche%20Perspektive/Fachliche%20Conclusions%20Open%20API%20Kundenbeziehung/Resources/graphics/03-referenzprozess/process-state-machine.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "openbankingproject-ch/Open-API-Kundenbeziehung",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    [*] --> Initialized: Customer starts process\n    \n    Initialized --> ProductSelected: Select products/services\n    ProductSelected --> SelfDeclared: Complete regulatory forms\n    \n    SelfDeclared --> BasicDataCollected: Provide contact information\n    BasicDataCollected --> ExtendedDataCollected: Risk assessment data\n    \n    ExtendedDataCollected --> PendingIdentification: Start identity verification\n    \n    state PendingIdentification {\n        [*] --> VideoIdent\n        [*] --> EID_Integration  \n        [*] --> BiometricVerification\n        VideoIdent --> IdentityVerified\n        EID_Integration --> IdentityVerified\n        BiometricVerification --> IdentityVerified\n    }\n    \n    IdentityVerified --> KYC_Processing: Background checks\n    \n    state KYC_Processing {\n        [*] --> PEP_Check\n        [*] --> Sanctions_Check\n        [*] --> AML_Assessment\n        PEP_Check --> KYC_Complete\n        Sanctions_Check --> KYC_Complete\n        AML_Assessment --> KYC_Complete\n    }\n    \n    KYC_Complete --> ContractAccepted: Customer accepts terms\n    ContractAccepted --> PendingSignature: Prepare signature\n    \n    state PendingSignature {\n        [*] --> QES_Signature\n        [*] --> TwoFA_Signature\n        [*] --> Biometric_Signature\n        QES_Signature --> DocumentSigned\n        TwoFA_Signature --> DocumentSigned\n        Biometric_Signature --> DocumentSigned\n    }\n    \n    DocumentSigned --> AccountActivated: Process metadata & distribution\n    AccountActivated --> [*]: Customer onboarded\n    \n    %% Error states\n    ProductSelected --> Failed: Eligibility check failed\n    BasicDataCollected --> Failed: Data validation error\n    ExtendedDataCollected --> Failed: Risk assessment failed\n    PendingIdentification --> Failed: Identity verification failed\n    KYC_Processing --> Failed: KYC checks failed\n    PendingSignature --> Failed: Signature process failed\n    \n    Failed --> [*]: Process terminated",
+  "content_size": 1955,
+  "collected_at": "2026-02-06T10:39:25.291008",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

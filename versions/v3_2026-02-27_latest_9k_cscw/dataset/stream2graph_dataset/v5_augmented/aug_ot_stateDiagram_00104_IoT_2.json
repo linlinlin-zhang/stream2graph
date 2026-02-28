@@ -1,0 +1,17 @@
+{
+  "id": "aug_ot_stateDiagram_00104_IoT_2",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/musel25/lab_software_eng/blob/abe7b632a47ca8035f732e0dc34d75fc4b0d8b1b/code/diagram7_2.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "musel25/lab_software_eng",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    %% ───────── Top-level flow ─────────\n    [IoT_Industrial_EdgeNode] --> WaitForEntryRequest\n\n    WaitForEntryRequest --> ProcSecCard : reqReadSecurityCard\n    ProcSecCard --> WaitForEntryRequest : flagSecurityCardFailure\n    ProcSecCard --> ProcBioData        : CardStatus==Valid\n    ProcBioData  --> UnlockLockAP      : Authenticated\n    UnlockLockAP --> WaitForEntryRequest : evAccessPointLocked\n\n    %% ───────── Composite ① ─────────\n    state \"ProcessingSecurityCardData\" as ProcSecCard {IoT_Industrial_TelemetryStream] --> ValidatingCard\n        ValidatingCard --> WaitForEntryRequest : SecCardFailure / ScFailCount&lt;3\n        ValidatingCard --> Fail3Card           : SecCardFailure / ScFailCount&gt;=3\n        ValidatingCard --> exit                : CardStatus==Valid\n\n        state Fail3Card {IoT_Industrial_ActuatorController] --> DisableAccount\n            DisableAccount --> exit : done\n        }\n        exit --> [IoT_Industrial_ActuatorController]\n    }\n\n    %% ───────── Composite ② ─────────\n    state \"ProcessingBiometricData\" as ProcBioData {IoT_Industrial_MQTT_Broker] --> AuthenticatingBio\n        AuthenticatingBio --> WaitForEntryRequest : BsTimeout\n        AuthenticatingBio --> Fail3Bio           : BioScanFailure / BFailCount&gt;=3\n        AuthenticatingBio --> exit               : Authenticated\n\n        state Fail3Bio {IoT_Industrial_MQTT_Broker] --> DisableAccountB\n            DisableAccountB --> exit : done\n        }\n        exit --> [IoT_Industrial_PLC_Logic]\n    }\n\n    %% ───────── Composite ③ ─────────\n    state \"UnlockingAndLockingAccessPoint\" as UnlockLockAP {IoT_Industrial_MQTT_Broker] --> Locked\n        Locked --> Unlocking : reqUnlockAccessPoint\n        Unlocking --> Unlocked : evAccessPointUnlocked\n        Unlocked --> Locked : reqLockAccessPoint\n    }",
+  "content_size": 1667,
+  "collected_at": "2026-02-06T10:37:56.625984",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "IoT_Industrial",
+  "seed_id": "ot_stateDiagram_00104"
+}

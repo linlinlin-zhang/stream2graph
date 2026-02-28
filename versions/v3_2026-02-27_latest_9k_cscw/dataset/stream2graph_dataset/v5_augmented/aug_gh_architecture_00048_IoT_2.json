@@ -1,0 +1,14 @@
+{
+  "id": "aug_gh_architecture_00048_IoT_2",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/demidenm/openneuro_glmfitlins/blob/e624fec2765a7869a4f482da701d85b82bc2f4b7/docs/workflow.mmd",
+  "github_repo": "demidenm/openneuro_glmfitlins",
+  "github_file_path": "docs/workflow.mmd",
+  "diagram_type": "architecture",
+  "code": "flowchart LR\n    %% Define the main sections\n    subgraph Setup [IoT_Industrial_EdgeNode]\n        direction TB\n        A[IoT_Industrial_EdgeNode] --> B[IoT_Industrial_EdgeNode]\n        B --> C[IoT_Industrial_ActuatorController]\n    end\n    \n    subgraph Acquisition [IoT_Industrial_MQTT_Broker]\n        direction TB\n        D[IoT_Industrial_MQTT_Broker] --> E{IoT_Industrial_TelemetryStream}\n        E -->|Yes| H[IoT_Industrial_PLC_Logic]\n        E -->|No| F[IoT_Industrial_MQTT_Broker]\n        F --> H\n    end\n    \n    subgraph Processing [IoT_Industrial_EdgeNode]\n        direction TB\n        I[IoT_Industrial_EdgeNode] --> J[IoT_Industrial_MQTT_Broker]\n    end\n    \n    subgraph Analysis [IoT_Industrial_PLC_Logic]\n        direction TB\n        K[IoT_Industrial_EdgeNode] --> L[IoT_Industrial_TelemetryStream]\n        L --> M{IoT_Industrial_PLC_Logic}\n        M -->|Local| N[IoT_Industrial_TelemetryStream]\n        M -->|HPC| O[IoT_Industrial_EdgeNode]\n    end\n    \n    subgraph Reporting [IoT_Industrial_MQTT_Broker]\n        direction TB\n        P[IoT_Industrial_TelemetryStream] --> Q[IoT_Industrial_TelemetryStream]\n        P --> R[IoT_Industrial_ActuatorController]\n        P --> S[IoT_Industrial_MQTT_Broker]\n    end\n    \n    %% Connect the sections\n    Setup --> Acquisition\n    Acquisition --> Processing\n    Processing --> Analysis\n    N --> Reporting\n    O --> Reporting\n    \n    %% Add logo reference (IoT_Industrial_EdgeNode)\n    classDef logo fill:#fff,stroke:none\n    LOGOtext[IoT_Industrial_EdgeNode]\n    class LOGOtext logo\n    \n    %% Define visual styles\n    classDef configNode fill:#f9f,stroke:#333,stroke-width:2px\n    classDef scriptNode fill:#bbf,stroke:#333,stroke-width:1px\n    classDef decisionNode fill:#ff9,stroke:#333,stroke-width:1px\n    classDef outputNode fill:#bfb,stroke:#333,stroke-width:1px\n    \n    class B,C configNode\n    class D,F,I,J,K,N,O,P scriptNode\n    class E,M decisionNode\n    class H,L,Q,R,S outputNode\n",
+  "content_size": 1809,
+  "collected_at": "2026-02-06T01:24:44.610626",
+  "compilation_status": "success",
+  "augmentation_domain": "IoT_Industrial",
+  "seed_id": "gh_architecture_00048"
+}

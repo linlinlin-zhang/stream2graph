@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00418",
+  "source": "github",
+  "source_url": "https://github.com/thangqn88/smart-cv-filter/blob/ca57170925c719ad9937828012429c149493a116/charts/SequenceDiagram-Design-AddApplicant.mmd",
+  "github_repo": "thangqn88/smart-cv-filter",
+  "github_file_path": "charts/SequenceDiagram-Design-AddApplicant.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Client as Giao diện Web (Web/UI)\n    participant Ctrl as ApplicantsController\n    participant Svc as ApplicantService\n    participant DB as ApplicationDbContext (Database)\n\n    Note over Client,DB: Chức năng: Thêm Ứng viên (POST /api/jobposts/{id}/applicants)\n\n    Client->>Ctrl: 1. POST /jobposts/{jobPostId}/applicants (CreateApplicantRequest)\n    activate Ctrl\n    \n    Ctrl->>Ctrl: 2. ModelState.IsValid & Validate Request\n    \n    alt Validation Failed (Request body/Model invalid)\n        Ctrl--xClient: 2a. HTTP 400 Bad Request\n    end\n\n    Ctrl->>Svc: 3. CreateApplicantAsync(request, jobPostId)\n    activate Svc\n    \n    Svc->>DB: 4. FindAsync(jobPostId)\n    activate DB\n    DB-->>Svc: 5. Trả về JobPost (hoặc null)\n    deactivate DB\n    \n    alt JobPost Not Found (null)\n        Svc--xCtrl: 5a. Throw InvalidOperationException(\"Job post not found.\")\n    end\n    \n    Svc->>DB: 6. Add(new Applicant { ... })\n    activate DB\n    DB->>DB: 7. SaveChangesAsync()\n    DB-->>Svc: 8. Trả về Applicant.Id\n    deactivate DB\n    \n    Svc->>DB: 9. GetApplicantByIdAsync(applicant.Id, ...)\n    activate DB\n    DB-->>Svc: 10. Trả về ApplicantResponse (bao gồm JobTitle)\n    deactivate DB\n    \n    Svc-->>Ctrl: 11. Return ApplicantResponse\n    deactivate Svc\n\n    Ctrl-->>Client: 12. HTTP 201 Created (ApplicantResponse)\n    deactivate Ctrl",
+  "content_size": 1367,
+  "collected_at": "2026-02-06T01:32:03.100808",
+  "compilation_status": "failed",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

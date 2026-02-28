@@ -1,0 +1,15 @@
+{
+  "id": "ot_C4Context_01185",
+  "source": "other",
+  "source_url": "https://github.com/pagopa/p4pa-doc/blob/7e7885cceb7021d36015482fc7455c44951d6b3f/infra/pu/systemContext.mmd",
+  "source_type": "github_search",
+  "github_repo": "pagopa/p4pa-doc",
+  "diagram_type": "C4Context",
+  "code": "C4Context\n    title Piattaforma Unitaria\n\n    Person(op, \"Operatori enti\")\n    System_Ext(SIL, \"Sistema Informativo Locale\")\n    System_Ext(IAM, \"Identity and Access Management\")\n    System_Ext(PAGOPA, \"Servizi PagoPA\")\n\n    Enterprise_Boundary(PU, \"Piattaforma Unitaria\") {\n        Component(FE, \"Portale Piattaforma Unitaria\", \"Single Page Application\", \"Interfaccia utente\")\n        System(ms_in, \"Microservizi inbound\")\n        System(ms_inout, \"Microservizi inbound/oubound\")\n\n        Boundary(PU_priv, \"Rete privata\", \"\"){\n            System(ms_entities, \"Microservizi entità\")\n            System(ms_batch, \"Microservizi processi batch\")\n            System(ms_out_pagopa, \"Microservizi oubound PagoPA\")\n\n            Boundary(storage, \"Storage\", \"\"){\n                SystemDb(db_cache, \"Cache\", \"Redis\")\n                Container(share, \"File share\")\n                SystemDb(db_sql, \"SQL\", \"PostgreSQL\")\n                SystemDb(db_document, \"Document\", \"MongoDB\")\n            }\n\n            Boundary(queue, \"Queue\", \"\"){\n                SystemQueue(queue, \"Queue\", \"Kafka\")\n            }\n\n            Boundary(devops, \"DevOps\", \"\"){\n                Component(agent_devops_e2e, \"Test e2e\", \"postman\")\n                Component(agent_devops_soak, \"Test di carico\", \"K6\")\n                Component(agent_devops_feature_api, \"Test funzionali API\", \"Behave\")\n                Component(agent_devops_feature_ui, \"Test funzionali UI\", \"Cucumber + Playwright\")\n            }\n        }\n    }\n\n    Rel(op, FE, \"\", \"HTTPS\")\n    Rel(op, ms_in, \"\", \"HTTPS\")\n\n\n    Rel(SIL, ms_in, \"\", \"HTTPS\")\n    BiRel(SIL, ms_inout, \"\", \"HTTPS\")\n    Rel(ms_inout, IAM, \"\", \"HTTPS\")\n    Rel(ms_inout, share, \"\")\n\n    Rel(ms_out_pagopa, PAGOPA, \"\", \"HTTPS\")\n    BiRel(ms_inout, PAGOPA, \"\", \"HTTPS\")\n\n    Rel(ms_in, ms_entities, \"\", \"HTTPS\")\n    Rel(ms_in, share, \"\")\n\n    Rel(ms_entities, db_cache, \"\")\n    Rel(ms_entities, db_sql, \"\")\n    Rel(ms_entities, db_document, \"\")\n    Rel(ms_entities, queue, \"\")\n\n    Rel(queue, ms_batch, \"\")\n    Rel(ms_batch, ms_entities, \"\", \"HTTPS\")\n    Rel(ms_batch, ms_out_pagopa, \"\", \"HTTPS\")\n    Rel(ms_batch, ms_inout, \"\", \"HTTPS\")\n    Rel(ms_batch, share, \"\")",
+  "content_size": 2171,
+  "collected_at": "2026-02-06T11:06:49.260986",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

@@ -1,0 +1,129 @@
+{
+  "id": "aug_ot_stateDiagram_00052_Hea_1",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/timfornell/StockScreener/blob/c2207e1c48de8d77025e6ab50d872a68992d9f55/Doc/OverviewFlow.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "timfornell/StockScreener",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n\n    state ForkState <<fork>>\n    state JoinState <<join>>\n\n    GUIProcess: Process for displaying\n GUI is started\n    GUIInit: GUI initializes data interface\n and components\n    GUI: GUI is opened and shows\n list of stocks\n    ReadData: Data interface reads\n relevant pickle file\n    StockHandled: The data for the stock\n has been updated\n    FindStock: Find stock with mising data\n    DataGathererProcess: Process for gathering\n data is started\n    WriteData: Data is written to\n pickle file\n    DataGatherer: DataGatherer scrapes\n webpages\n    GatherData: Stock data is gathered\n\n    [HealthTech_HIPAA_Vault] --> ForkState: Program is started\n    ForkState --> GUIProcess\n    ForkState --> DataGathererProcess\n    GUIProcess --> JoinState\n    DataGathererProcess --> GatherData\n    GatherData --> WriteData\n    WriteData --> JoinState\n    JoinState --> GUIInit: Data exists in file\n    GUIInit --> ReadData: GUI requests data\n    ReadData --> GUI: Data interface returns data\n    GUI --> UpdateData: Every 500ms\n    GUI --> RefreshData: User requests data\n to be updated\n    GUI --> FilterData: User creates a filter\n    GUI --> SortData: User requests data\n to be sorted\n    GUI --> [HealthTech_EMR_Sync]: User closes GUI\n    StockHandled --> GUI: Tell the GUI that new\n data is available\n    RefreshButton --> GUI: Data interface\n returns data\n    Filter --> GUI: Data interface\n returns data\n    Sort --> GUI: Data interface\n returns data\n\n    state RefreshData {HealthTech_DiagnosticEngine] --> RefreshButton\n    }\n\n    state SortData {HealthTech_EMR_Sync] --> Sort: Send column and sort direction\n to data interface\n    }\n\n    state FilterData {HealthTech_PatientRecords] --> Filter: Send filter type to\n data interface\n    }\n\n    state UpdateData {HealthTech_LabAnalyzer] --> FindStock\n        FindStock --> [HealthTech_PatientRecords]: No stock found\n        FindStock --> DataGatherer: Send stock to data\n gathering process\n        DataGatherer --> StockHandled\n    }",
+  "content_size": 2102,
+  "collected_at": "2026-02-06T10:37:16.280414",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "HealthTech",
+  "seed_id": "ot_stateDiagram_00052",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 HealthTech_HIPAA_Vault 和 HealthTech_DiagnosticEngine 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'HealthTech_HIPAA_Vault 和 HealthTech_DiagnosticEngine'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "gathered",
+        "RefreshData"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 HealthTech_EMR_Sync 和 HealthTech_PatientRecords。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'HealthTech_EMR_Sync 和 HealthTech_PatientRecords'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SortData",
+        "FilterData"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 HealthTech_LabAnalyzer 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'HealthTech_LabAnalyzer'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "UpdateData"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 12,
+    "repair_count": 0,
+    "grounding_acts_count": 6,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

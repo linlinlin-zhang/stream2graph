@@ -1,0 +1,173 @@
+{
+  "id": "aug_gh_sequence_00803_Edu_4",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/Azure/iot-hub-device-update/blob/6fd5b7539afc014b29dc2a69e0c46652cfe1765c/src/extensions/update_manifest_handlers/steps_handler/assets/steps-handler-child-update-sequence-overview.mmd",
+  "github_repo": "Azure/iot-hub-device-update",
+  "github_file_path": "src/extensions/update_manifest_handlers/steps_handler/assets/steps-handler-child-update-sequence-overview.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant awf as Agent Workflow\n    participant sthd as Steps Handler<br/>(Education_ContentCDN)\n    participant csthd as Steps Handler<br/>(Education_StudentDB)\n    participant xyzhd as APT Handler<br/>SWUpdate Handler<br/>Script Handler<br/>Steps Handler, etc.\n    participant comenum as Component Enumerator\n\n    Note over awf, sthd : Note: Simplified diagram <br/>Extension Manager is hidden\n    awf-->>+sthd: loads handler<br/>for Parent Update<br/>(Education_LMS_Portal)\n    awf->>+sthd:  'download'\n    loop foreach step\n    Note over sthd, csthd : Note: For demo purposes,<br/>all Parent's step are 'Reference Step'\n    sthd-->>csthd: loads handler<br/>for Child Update<br/>(Education_ContentCDN)\n    sthd->>+csthd: 'download'\n    loop foreach step\n    csthd-->>xyzhd:  loads handler<br/>for {Education_GradeSync}\n    csthd->>+xyzhd: 'download'\n    xyzhd->>xyzhd: performs<br/>download task\n    xyzhd-->>-csthd: returns ADUC_Result\n    end\n    csthd-->>-sthd: returns ADUC_Result\n    end\n    sthd->>-awf: return ADUC_Result\n\n\n    awf->>+sthd:  'install'\n\n    Note over sthd, comenum : Note: Enumerate compatible component.<br/>If Component Enuemrator is not available, the following loop will be process only once,<br/>and assumed target is a Host Device.\n    sthd->>+comenum: 'select components'\n    comenum-->>-sthd: returns 'selected components'\n\n\n    \n    loop for each selected component\n        sthd->>sthd: sets current component<br/>as Child Workflow's selectedComponents\n        \n        Note over sthd, xyzhd: For each component, perform every step in sequence.<br/>All steps must be completed successfully before continue with the next component.\n        loop for each step\n        sthd-->>csthd: loads handler<br/>for Child Update<br/>(Education_GradeSync)\n\n        Note over sthd, xyzhd: For each step, perform both 'install' and 'apply' task<br/>to ensure that an Update is installed and applied onto<br/>current component, before move on to the next one.\n\n        sthd->>+csthd: 'install'\n\n        loop foreach step\n        csthd-->>xyzhd:  loads handler<br/>for {Education_ClassroomService}\n        csthd->>+xyzhd: 'install'\n        xyzhd->>xyzhd: performs<br/>install task\n        Note over xyzhd,csthd: Note: a device or DU Agent restart request can be encoded<br/>in ADUC_Result if needed.\n        xyzhd-->>-csthd: returns ADUC_Result\n        end\n        csthd-->>-sthd: returns ADUC_Result\n\n        sthd->>+csthd: 'apply'\n        loop foreach step\n        csthd-->>xyzhd:  loads handler<br/>for {Education_LMS_Portal}\n        csthd->>+xyzhd: 'apply'\n        xyzhd->>xyzhd: performs<br/>apply task\n        Note over xyzhd,csthd: Note: a device or DU Agent restart request can be encoded<br/>in ADUC_Result if needed.\n        xyzhd-->>-csthd: returns ADUC_Result\n        end\n        csthd-->>-sthd: returns ADUC_Result\n        end\n    end\n    sthd->>-awf: return ADUC_Result\n\n    awf->>+sthd:  'apply'\n    loop foreach step\n    Note over sthd, csthd : Note: For demo purposes,<br/>all Parent's step are 'Reference Step'\n    sthd-->>csthd: loads handler<br/>for Child Update<br/>(Education_ContentCDN)\n    sthd->>+csthd: 'apply'\n    Note over csthd : Since 'apply' task was completed as part of 'install' above, <br/> always return success here.\n    csthd-->>-sthd: returns ADUC_Result\n    end\n    sthd->>-awf: return ADUC_Result\n  \n            \n",
+  "content_size": 3343,
+  "collected_at": "2026-02-06T01:37:17.544865",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 60,
+  "repo_forks": 46,
+  "repo_owner": "Azure",
+  "repo_name": "iot-hub-device-update",
+  "repo_description": "Device Update for IoT Hub agent",
+  "repo_language": "C",
+  "repo_topics": [],
+  "repo_created_at": "2021-02-08T23:13:36Z",
+  "repo_updated_at": "2026-01-26T18:14:09Z",
+  "augmentation_domain": "Education",
+  "seed_id": "gh_sequence_00803",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "Agent Workflow、Steps Handler<br/>(Education_ContentCDN)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "awf",
+        "sthd"
+      ],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "Steps Handler<br/>(Education_StudentDB)、APT Handler<br/>SWUpdate Handler<br/>Script Handler<br/>Steps Handler, etc.主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "Steps Handler<br/>(Education_StudentDB)、APT Handler<br/>SWUpdate Handler<br/>Script Handler<br/>Steps Handler, etc.和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "csthd",
+        "xyzhd"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由Component Enumerator、performs<br/>download task组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Component Enumerator、performs<br/>download task的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "关于Component Enumerator、performs<br/>download task，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理Component Enumerator、performs<br/>download task？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "comenum",
+        "msg_0"
+      ],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由sets current component<br/>as Child Workflow's selectedComponents组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是sets current component<br/>as Child Workflow's selectedComponents应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_1"
+      ],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下performs<br/>install task、performs<br/>apply task吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在performs<br/>install task、performs<br/>apply task完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_2",
+        "msg_3"
+      ],
+      "timestamp_offset": 210
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 14,
+    "speaker_distribution": {
+      "Speaker_B": 7,
+      "Speaker_A": 7
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "inform": 1,
+      "classification": 2,
+      "confirm": 1,
+      "contrastive": 1,
+      "structural": 2,
+      "clarify": 2,
+      "request": 3
+    },
+    "avg_turn_length": 61.92857142857143,
+    "dialogue_duration": 210
+  }
+}

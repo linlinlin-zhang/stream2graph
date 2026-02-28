@@ -1,0 +1,242 @@
+{
+  "id": "gl_packet-beta_00392",
+  "source": "gitlab",
+  "source_url": "https://github.com/71suodrazaH/SattOnTable/blob/217f26cebe14e577ac7b72300076696dc5601a90/Software/Satbus_Commons_lib/docs/fault_injection_integration_flow.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "71suodrazaH/SattOnTable",
+  "diagram_type": "packet-beta",
+  "code": "%%{init: {'theme':'default', 'themeVariables': {'fontSize':'31px', 'actorBkg':'#f5f5f5', 'actorBorder':'#666', 'actorTextColor':'#000'}}}%%\nsequenceDiagram\n    participant GS as Local Machine\n    participant ESP as ESP32 Controller\n    participant TS as Target Subsystem\n    participant FM as FaultManager\n    participant TD as TransportDecorator\n    participant HAL as Platform HAL\n    \n    GS->>ESP: Design Fault Injection Campaign\n    ESP->>TS: SPI Fault Frame (26 bytes)\n    TS->>FM: Process SPI Frame\n    FM->>FM: Validate State Mask\n    FM->>FM: Configure Fault Parameters\n    \n    rect rgb(255, 255, 200)\n        Note over TS,FM: Normal Operation Continues\n    end\n    \n    TS->>FM: send(packet)\n    FM->>TD: isFaultActive(current_state)\n    \n    alt [Layer 1 (Transport) Fault]\n        rect rgb(255, 255, 200)\n            Note over TD: Active + Parameters\n        end\n        FM->>TD: Active + Parameters\n        TD->>TD: Apply Fault (drop/corrupt/delay)\n        TD-->>FM: TIMEOUT/CRC_ERROR\n    else [Layer 2 (HAL) Fault]\n        rect rgb(255, 255, 200)\n            Note over HAL: Active + Parameters\n        end\n        FM->>HAL: Active + Parameters\n        HAL->>HAL: injectFault(parameters)\n        HAL->>HAL: Hardware Manipulation\n        HAL-->>TD: Hardware Response\n        TD-->>FM: Modified Hardware Behavior\n    else [No Active Fault]\n        rect rgb(255, 255, 200)\n            Note over TD: Inactive\n        end\n        FM->>TD: Inactive\n        TD-->>TS: Normal Operation\n    end\n\n",
+  "content_size": 1501,
+  "collected_at": "2026-02-06T14:08:49.118743",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 26 bytes 和 255, 255, 200 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '26 bytes 和 255, 255, 200'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Frame",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 packet 和 current_state 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'packet 和 current_state'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "send",
+        "isFaultActive"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 Layer 1 (Transport 和 255, 255, 200 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 Layer 1 (Transport处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Layer 1 (Transport处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "alt",
+        "rgb"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 drop/corrupt/delay 和 Layer 2 (HAL 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'drop/corrupt/delay 和 Layer 2 (HAL'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Fault",
+        "else"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 255, 255, 200 和 parameters 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '255, 255, 200 和 parameters'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "rgb",
+        "injectFault"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 No Active Fault 和 255, 255, 200 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'No Active Fault 和 255, 255, 200'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "else",
+        "rgb"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 25,
+    "repair_count": 1,
+    "grounding_acts_count": 12,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

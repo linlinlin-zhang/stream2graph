@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01886",
+  "source": "github",
+  "source_url": "https://github.com/jwalsh/aws-architecture-decomposition-lab/blob/cbac85d144a52954f155029955d2bb60294de0a0/diagrams/etsy_ads.mmd",
+  "github_repo": "jwalsh/aws-architecture-decomposition-lab",
+  "github_file_path": "diagrams/etsy_ads.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TD\n    User[User] -->|Browse/Interact| WebApp[Etsy Web/Mobile App]\n    WebApp -->|Log Events| kinesis:streams[Kinesis Data Streams]\n    \n    kinesis:streams -->|Process Events| kinesis:firehose[Kinesis Data Firehose]\n    kinesis:streams -->|Real-time Processing| kinesis:analytics[Kinesis Data Analytics]\n    \n    kinesis:firehose -->|Store Raw Data| s3:datalake[S3 Data Lake]\n    kinesis:analytics -->|Update User Profiles| dynamodb:profiles[DynamoDB]\n    \n    s3:datalake -->|Batch Processing| emr:cluster[EMR]\n    emr:cluster -->|Train Models| sagemaker:training[SageMaker]\n    \n    WebApp -->|Ad Request| elb:adserver[Application Load Balancer]\n    elb:adserver -->|Route Request| AdServer[Ad Serving Engine]\n    \n    AdServer -->|Get User Profile| dynamodb:profiles\n    AdServer -->|Get Ad Candidates| elasticache:ads[ElastiCache]\n    AdServer -->|Rank Ads| sagemaker:inference[SageMaker]\n    \n    sagemaker:training -->|Deploy Models| AdServer\n    \n    AdServer -->|Serve Ad| WebApp\n    AdServer -->|Log Impression/Click| kinesis:streams\n    \n    cloudwatch:monitoring[CloudWatch] -->|Monitor| AdServer\n    cloudwatch:monitoring -->|Monitor| kinesis:streams\n    cloudwatch:monitoring -->|Monitor| sagemaker:training\n    \n    quicksight:analytics[QuickSight] -->|Visualize| s3:datalake\n    quicksight:analytics -->|Visualize| dynamodb:profiles\n    \n    subgraph \"Real-time Processing\"\n        kinesis:streams\n        kinesis:firehose\n        kinesis:analytics\n    end\n    \n    subgraph \"Machine Learning Pipeline\"\n        emr:cluster\n        sagemaker:training\n    end\n    \n    subgraph \"Ad Serving\"\n        elb:adserver\n        AdServer\n        elasticache:ads\n    end\n\n    classDef aws fill:#FF9900,stroke:#232F3E,stroke-width:2px,color:#232F3E;\n    class kinesis:streams,kinesis:firehose,kinesis:analytics,s3:datalake,dynamodb:profiles,emr:cluster,sagemaker:training,sagemaker:inference,elb:adserver,elasticache:ads,cloudwatch:monitoring,quicksight:analytics aws;",
+  "content_size": 1977,
+  "collected_at": "2026-02-06T02:04:33.944488",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License (Assumed)",
+  "license_url": null,
+  "repo_stars": 0,
+  "repo_forks": 0
+}

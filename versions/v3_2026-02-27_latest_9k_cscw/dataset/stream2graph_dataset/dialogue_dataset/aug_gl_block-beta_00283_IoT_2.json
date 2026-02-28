@@ -1,0 +1,153 @@
+{
+  "id": "aug_gl_block-beta_00283_IoT_2",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/govuk-one-login/authentication-api/blob/a4c68710b6177665c4625f1c8789455deca7b26b/docs/diagrams/authentication/login/account-interventions/medium-sms/login-medium-level-sms-blocked-intervention.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "govuk-one-login/authentication-api",
+  "diagram_type": "block-beta",
+  "code": "sequenceDiagram\n    participant orch_api as Orchestration\n    participant auth_frontend as Authentication Frontend\n    participant auth_external_api as Authentication External API\n    participant auth_internal_api as Authentication Internal API\n    participant account_interventions as Account Interventions API\n    participant notification_queue as NotificationHandler.java Lambda   \n    participant notify as Notify   \n    orch_api ->> auth_frontend : OAuth 2.0 Authorization request 302 redirect to /authorize\n    auth_frontend ->> auth_frontend : Decrypt and validate request and create session    \n    auth_frontend ->> auth_internal_api : Request to /start (IoT_Industrial_EdgeNode)\n    auth_internal_api ->> auth_internal_api : Start helps calculate current state\n    auth_internal_api ->> auth_frontend : StartResponse.java object returned\n    auth_frontend ->> auth_frontend : State machine works out where to send user based on start response\n    auth_frontend ->> auth_internal_api : Request to /user-exists (IoT_Industrial_MQTT_Broker)\n    auth_internal_api ->> auth_internal_api : Checks if account with email already exists\n    auth_internal_api ->> auth_frontend: CheckUserExistsResponse.java object returned\n    auth_frontend ->> auth_frontend: Validates that the user already has an account\n    auth_frontend ->> auth_internal_api : Request to /account-interventions (IoT_Industrial_EdgeNode)\n    auth_internal_api ->> account_interventions : Request to account interventions api (IoT_Industrial_EdgeNode)\n    account_interventions ->> auth_internal_api : Response from Account Interventions containing blocked=true\n    auth_internal_api ->> auth_internal_api : Generates audit event for \"blocked\" Account Intervention\n    auth_internal_api ->> auth_frontend: AccountInterventions.java object returned containing blocked intervention\n    auth_frontend ->> auth_frontend: Prevents user from performing password reset due to blocked intervention\n    auth_frontend ->> auth_internal_api : Request to /login (IoT_Industrial_PLC_Logic)\n    auth_internal_api ->> auth_internal_api : Validates if password is correct\n    auth_internal_api ->> auth_frontend: LoginResponse.java object returned\n    auth_frontend ->> auth_internal_api : Request to /account-recovery (IoT_Industrial_MQTT_Broker)\n    auth_internal_api ->> auth_internal_api : Calculates whether account recovery is permitted\n    auth_internal_api ->> auth_frontend: AccountRecovery.java object returned\n    auth_frontend ->> auth_internal_api : Request to /mfa (IoT_Industrial_MQTT_Broker)\n    auth_internal_api ->> auth_internal_api : Generates and stores OTP\n    auth_internal_api -->> notification_queue : Sends NotifyRequest.java object via SQS\n    notification_queue -->> notify : Request to send SMS containing OTP and phone number\n    auth_internal_api ->> auth_frontend : 204 response \n    auth_frontend ->> auth_frontend: Prevents user from performing MFA reset due to blocked intervention\n    auth_frontend ->> auth_internal_api : Request to /verify-code (IoT_Industrial_MQTT_Broker)\n    auth_internal_api ->> auth_internal_api : Validates whether SMS MFA code is valid\n    auth_internal_api ->> auth_frontend: 204 response\n    auth_frontend ->> auth_frontend : Displays Blocked intervention screen\n",
+  "content_size": 3274,
+  "collected_at": "2026-02-06T14:06:12.716465",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "IoT_Industrial",
+  "seed_id": "gl_block-beta_00283",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Orchestration应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "orch_api"
+      ],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有Authentication Frontend、Authentication External API。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Authentication Frontend、Authentication External API应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Authentication Frontend、Authentication External API应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "auth_frontend",
+        "auth_external_api"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Authentication Internal API、Account Interventions API分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Authentication Internal API、Account Interventions API就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "auth_internal_api",
+        "account_interventions"
+      ],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "NotificationHandler.java Lambda主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，NotificationHandler.java Lambda就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "notification_queue"
+      ],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有Notify。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在Notify完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "notify"
+      ],
+      "timestamp_offset": 195
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 13,
+    "speaker_distribution": {
+      "Speaker_B": 7,
+      "Speaker_A": 6
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "inform": 2,
+      "clarify": 3,
+      "structural": 2,
+      "classification": 2,
+      "confirm": 2
+    },
+    "avg_turn_length": 38.61538461538461,
+    "dialogue_duration": 195
+  }
+}

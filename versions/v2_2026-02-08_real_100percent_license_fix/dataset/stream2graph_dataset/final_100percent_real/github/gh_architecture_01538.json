@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01538",
+  "source": "github",
+  "source_url": "https://github.com/andreashappe/cochise/blob/06449a1ad0e13446b310893734c157f0faef266e/overview.mmd",
+  "github_repo": "andreashappe/cochise",
+  "github_file_path": "overview.mmd",
+  "diagram_type": "architecture",
+  "code": "---\nconfig:\n  theme: redux\n---\nflowchart TD\n subgraph planner[\"planner\"]\n        replan[\"Update Plan (o3-mini)\"]\n        next{\"Select Next Task (o3-mini)\"}\n        ptt[\"Pentest Task Tree\"]\n  end\n subgraph executor[\"executor\"]\n        execute[\"Perform Task (gpt-4o)\"]\n        execute_decide{\"Tool or Finished?\"}\n        tool_call@{shape: procs, lable: \"tool-call: SSH\"}\n        shell_history[\"Episodic Shell History\"]\n        message_history[\"Episodic Message History\"]\n  end\n\n    invalid_commands[\"Invalid Commands (cmd, descr, fix)\"]\n    findings@{ shape: lin-cyl, label: \"Target Environment Knowlege\"}\n\n    update_knowledge[\"Update Knowledge (o3-mini)\"]\n  \n  \n    start((\"Start\")) -- \"plan=None,task=None,summary='',knowledge='',leads=[]\" --> replan\n    replan <-. plan .-> ptt\n    ptt -. plan .-> next\n    replan --> next\n    next -- task, context --> execute\n    next --> finish(((\"done\")))\n    next -. task, context .-> summarizer[\"Summarizer (o3-mini)\"] & replan\n    execute --> execute_decide\n    execute_decide -- cmd --> tool_call\n    tool_call -- shell output --> execute_decide\n    execute_decide -- result --> summarizer\n    summarizer -. summary, leads .-> replan\n    summarizer -. invalid commands .-> invalid_commands\n    invalid_commands -. invalid commands and fixes .-> execute\n    findings -. knowledge .-> execute\n    findings -. knowledge .-> replan\n    findings -. knowledge .-> next\n    execute_decide <-. cmd, cmd output .-> message_history\n    execute_decide -. cmd, cmd output .-> shell_history\n    shell_history -. cmd, cmd_output .-> summarizer\n    ptt@{ shape: lin-cyl}\n    shell_history@{ shape: lin-cyl}\n    message_history@{ shape: lin-cyl}\n    invalid_commands@{ shape: lin-cyl}\n    summarizer -- new findings --> update_knowledge\n    update_knowledge <-. knowledge .-> findings\n    update_knowledge --> replan\n",
+  "content_size": 1844,
+  "collected_at": "2026-02-06T01:47:36.541696",
+  "license": "mit",
+  "license_name": "MIT License",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 37,
+  "repo_forks": 3
+}

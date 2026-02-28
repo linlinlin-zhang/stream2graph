@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00812",
+  "source": "github",
+  "source_url": "https://github.com/ASISaga/BusinessInfinity/blob/c7246363f428213ceed8fe97fec143fd09ccdfd5/docs/diagrams/flowchart.mmd",
+  "github_repo": "ASISaga/BusinessInfinity",
+  "github_file_path": "docs/diagrams/flowchart.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\n    %% === UI-Driven Agent Call Path ===\n    subgraph UIPath[UI‑Driven Agent Call (Production Inference)]\n        FE[Frontend (Boardroom UI)]\n        HOST[Host App<br/>(Azure Functions - Consumption)]\n        MCPUI[MCP‑UI Module<br/>(Manifest Loader)]\n        GOV[Governance / Validation]\n        SK[Semantic Kernel<br/>Multi‑Agents]\n        AMLMGR[AML Manager]\n        AML[Azure ML<br/>(LoRA Adapters)]\n        QUEUE[Azure Storage Queue]\n        TABLE[Azure Table Storage]\n    end\n\n    %% === Direct AML Control Path ===\n    subgraph AMLPath[Direct AML Control (Demo / Training)]\n        FE2[Frontend (Boardroom UI)]\n        HOST2[Host App]\n        GOV2[Governance / Validation]\n        AMLMGR2[AML Manager]\n        AML2[Azure ML]\n        REG[AML Model Registry]\n        SK2[Semantic Kernel<br/>Multi‑Agents]\n    end\n\n    %% UI Path connections\n    FE -->|Load dashboard| HOST --> MCPUI --> FE\n    FE -->|Trigger action| HOST --> GOV --> SK\n    SK --> AMLMGR --> AML --> AMLMGR --> SK\n    SK --> QUEUE --> HOST --> GOV --> TABLE\n    FE -->|Poll messages| HOST --> TABLE --> FE\n\n    %% AML Path connections\n    FE2 -->|Train/Infer request| HOST2 --> GOV2 --> AMLMGR2 --> AML2\n    AML2 -->|Register LoRA| REG --> SK2\n    AML2 --> AMLMGR2 --> HOST2 --> FE2\n\n    %% Cross-link: Registry updates SK in UI path\n    REG -.-> SK",
+  "content_size": 1334,
+  "collected_at": "2026-02-06T01:48:22.741541",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

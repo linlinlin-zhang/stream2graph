@@ -1,0 +1,18 @@
+{
+  "id": "gh_class_01221",
+  "source": "github",
+  "source_url": "https://github.com/rogerrocaarano/AuthService/blob/db6023ede4442748bb8129bc1624a1a5fb4df9e9/docs/domain/domain.mmd",
+  "github_repo": "rogerrocaarano/AuthService",
+  "github_file_path": "docs/domain/domain.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n    direction LR\n    class Identity {\n        <<AggregateRoot, Entity>>\n        %% Attributes\n        -Credentials: Credential[]\n        -Roles: Role[]\n        -Claims: Claim[]\n        -isActive: boolean\n        %% Public getters\n        +Credentials(): Credential[]\n        +Roles(): Role[]\n        +Claims(): Claim[]\n        +IsActive(): boolean\n        %% Methods\n        +AddCredential(credential: Credential)\n        +RemoveCredential(credential: Credential)\n        +ValidateCredential(credential: Credential): boolean\n        +AddRole(role: Role)\n        +RemoveRole(role: Role)\n        +AddClaim(claim: Claim)\n        +RemoveClaim(claim: Claim)\n        +Activate()\n        +Deactivate()\n    }\n    Identity \"1\" *-- \"1..*\" Credential\n    Identity \"1\" *-- \"0..*\" Role\n    Identity \"1\" *-- \"0..*\" Claim\n    Identity \"1\" -- \"0..*\" Session : has\n\n    class Credential {\n        <<IValueObject, inmutable>>\n        Type: string\n        Identifier: string\n        SecretHash: string\n        Salt: string\n    }\n\n    class Claim {\n        <<IValueObject, inmutable>>\n        Type: string\n        Value: string\n    }\n\n    class Role {\n        <<IValueObject, inmutable>>\n        Name: string\n    }\n\n    class Session {\n        <<AggregateRoot, Entity>>\n        %% Attributes\n        -_ownerId: Guid\n        -_expiresAt: DateTime\n        -_revokedAt: DateTime\n        %% Public getters\n        +OwnerId(): Guid\n        +ExpiresAt(): DateTime\n        +RevokedAt(): DateTime\n        %% Methods\n        +IsValid(): boolean\n        +Revoke()\n    }\n\n    class IIdentityRepository {\n        <<Interface, IRepository>>\n        +GetEntityWithRolesAsync(identityId: Guid, cancellationToken: CancellationToken): Identity\n    }\n    IIdentityRepository ..> Identity\n\n    class ISessionsRepository {\n        <<Interface, IRepository>>\n        +GetAllSessionsForIdentityAsync(identityId: Guid, cancellationToken: CancellationToken): Session[]\n    }\n    ISessionsRepository ..> Session\n    ",
+  "content_size": 1984,
+  "collected_at": "2026-02-06T01:54:44.766598",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "gpl-3.0",
+  "license_name": "GNU General Public License v3.0",
+  "license_url": "https://api.github.com/licenses/gpl-3.0",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

@@ -1,0 +1,31 @@
+{
+  "id": "gh_sequence_00977",
+  "source": "github",
+  "source_url": "https://github.com/forepath/agenstra/blob/6a2b5d1006fcb07aeb873ca3cd0c6f8e184b2b85/libs/domains/framework/backend/feature-agent-controller/docs/sequence-http-environment.mmd",
+  "github_repo": "forepath/agenstra",
+  "github_file_path": "libs/domains/framework/backend/feature-agent-controller/docs/sequence-http-environment.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Client as HTTP Client\n    participant API as ClientsController<br/>(/api/clients/:id/agents/:agentId/environment)\n    participant Proxy as ClientAgentEnvironmentVariablesProxyService\n    participant Repo as ClientsRepository\n    participant Service as ClientsService\n    participant Keycloak as KeycloakTokenService\n    participant Remote as Remote Agent-Manager<br/>(/api/agents/:agentId/environment)\n\n    Note over Client,Remote: HTTP API - Environment Variables Proxy Operations\n\n    rect rgb(255, 240, 230)\n        Note over Client,Remote: List Environment Variables (Proxied)\n        Client->>API: GET /api/clients/:id/agents/:agentId/environment?limit&offset\n        API->>Proxy: getEnvironmentVariables(clientId, agentId, limit, offset)\n        Proxy->>Repo: findByIdOrThrow(clientId)\n        Repo-->>Proxy: client entity\n        alt Authentication Type: API_KEY\n            Proxy->>Proxy: getAuthHeader(clientId)<br/>Returns: Bearer {apiKey}\n        else Authentication Type: KEYCLOAK\n            Proxy->>Service: getAccessToken(clientId)\n            Service->>Keycloak: getAccessToken(authServerUrl, realm, clientId, secret)\n            Keycloak-->>Service: JWT token\n            Service-->>Proxy: JWT token\n            Proxy->>Proxy: getAuthHeader(clientId)<br/>Returns: Bearer {token}\n        end\n        Proxy->>Proxy: buildAgentEnvironmentApiUrl(endpoint, agentId)\n        Proxy->>Remote: GET {endpoint}/api/agents/:agentId/environment?limit&offset<br/>Authorization: Bearer {token/apiKey}\n        Remote-->>Proxy: 200 OK<br/>[environment variables array]\n        Proxy-->>API: EnvironmentVariableResponseDto[]\n        API-->>Client: 200 OK<br/>[environment variables array]\n    end\n\n    rect rgb(255, 245, 230)\n        Note over Client,Remote: Count Environment Variables (Proxied)\n        Client->>API: GET /api/clients/:id/agents/:agentId/environment/count\n        API->>Proxy: countEnvironmentVariables(clientId, agentId)\n        Proxy->>Proxy: getAuthHeader(clientId)\n        Proxy->>Remote: GET {endpoint}/api/agents/:agentId/environment/count<br/>Authorization: Bearer {token/apiKey}\n        Remote-->>Proxy: 200 OK<br/>{count: number}\n        Proxy-->>API: {count: number}\n        API-->>Client: 200 OK<br/>{count: number}\n    end\n\n    rect rgb(230, 255, 240)\n        Note over Client,Remote: Create Environment Variable (Proxied)\n        Client->>API: POST /api/clients/:id/agents/:agentId/environment<br/>{variable, content}\n        API->>Proxy: createEnvironmentVariable(clientId, agentId, createDto)\n        Proxy->>Proxy: getAuthHeader(clientId)\n        Proxy->>Remote: POST {endpoint}/api/agents/:agentId/environment<br/>Authorization: Bearer {token/apiKey}<br/>{variable, content}\n        Remote-->>Proxy: 201 Created<br/>{id, agentId, variable, content, ...}\n        Proxy-->>API: EnvironmentVariableResponseDto\n        API-->>Client: 201 Created<br/>{environment variable}\n    end\n\n    rect rgb(240, 250, 255)\n        Note over Client,Remote: Update Environment Variable (Proxied)\n        Client->>API: PUT /api/clients/:id/agents/:agentId/environment/:envVarId<br/>{variable, content}\n        API->>Proxy: updateEnvironmentVariable(clientId, agentId, envVarId, updateDto)\n        Proxy->>Proxy: getAuthHeader(clientId)\n        Proxy->>Remote: PUT {endpoint}/api/agents/:agentId/environment/:envVarId<br/>Authorization: Bearer {token/apiKey}<br/>{variable, content}\n        Remote-->>Proxy: 200 OK<br/>{id, agentId, variable, content, ...}\n        Proxy-->>API: EnvironmentVariableResponseDto\n        API-->>Client: 200 OK<br/>{updated environment variable}\n    end\n\n    rect rgb(255, 240, 245)\n        Note over Client,Remote: Delete Environment Variable (Proxied)\n        Client->>API: DELETE /api/clients/:id/agents/:agentId/environment/:envVarId\n        API->>Proxy: deleteEnvironmentVariable(clientId, agentId, envVarId)\n        Proxy->>Proxy: getAuthHeader(clientId)\n        Proxy->>Remote: DELETE {endpoint}/api/agents/:agentId/environment/:envVarId<br/>Authorization: Bearer {token/apiKey}\n        Remote-->>Proxy: 204 No Content\n        Proxy-->>API: void\n        API-->>Client: 204 No Content\n    end\n\n    rect rgb(255, 230, 240)\n        Note over Client,Remote: Delete All Environment Variables (Proxied)\n        Client->>API: DELETE /api/clients/:id/agents/:agentId/environment\n        API->>Proxy: deleteAllEnvironmentVariables(clientId, agentId)\n        Proxy->>Proxy: getAuthHeader(clientId)\n        Proxy->>Remote: DELETE {endpoint}/api/agents/:agentId/environment<br/>Authorization: Bearer {token/apiKey}\n        Remote-->>Proxy: 200 OK<br/>{deletedCount: number}\n        Proxy-->>API: {deletedCount: number}\n        API-->>Client: 200 OK<br/>{deletedCount: number}\n    end\n",
+  "content_size": 4753,
+  "collected_at": "2026-02-06T01:51:26.603885",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License (Assumed)",
+  "license_url": null,
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "repo_owner": "forepath",
+  "repo_name": "agenstra",
+  "repo_description": "Centralized management platform for distributed AI agent infrastructure with real-time interaction, code editing, and automated provisioning.",
+  "repo_language": "TypeScript",
+  "repo_topics": [
+    "angular",
+    "bootstrap",
+    "clarity",
+    "forepath",
+    "framework"
+  ],
+  "repo_created_at": "2025-09-24T22:34:48Z",
+  "repo_updated_at": "2026-02-04T23:08:27Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

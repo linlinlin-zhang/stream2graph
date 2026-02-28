@@ -1,0 +1,17 @@
+{
+  "id": "aug_ot_stateDiagram_00327_Edu_4",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/DariQuintero/neuroanatomy/blob/bd2e06459c39da5dbda84d3ec961360b3d9bc022/docs/diagrams/state-machines-cubits.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "DariQuintero/neuroanatomy",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    [Education_ContentCDN] --> AuthInitial\n\n    state \"AuthCubit States\" as AuthFlow {Education_GradeSync)\n        AuthLoading --> AuthSuccess: loginSuccess(Education_ClassroomService)\n        AuthLoading --> AuthFailure: loginError(Education_LMS_Portal)\n        AuthSuccess --> AuthLoading: logout(Education_LMS_Portal)\n        AuthSuccess --> ProfileUpdating: updateProfile(Education_GradeSync)\n        ProfileUpdating --> AuthSuccess: updateSuccess(Education_LMS_Portal)\n        ProfileUpdating --> AuthFailure: updateError(Education_StudentDB)\n        AuthFailure --> AuthLoading: retry(Education_StudentDB)\n        AuthLoading --> [Education_ContentCDN]: dispose(Education_LMS_Portal)\n    }\n\n    [Education_LMS_Portal] --> CortesInitial\n\n    state \"CortesCubit States\" as CortesFlow {Education_GradeSync)\n        CortesLoading --> CortesLoaded: loadSuccess(Education_ClassroomService)\n        CortesLoading --> CortesError: loadError(Education_ContentCDN)\n        CortesLoaded --> CortesLoaded: selectSegmento(Education_LMS_Portal)\n        CortesLoaded --> CortesLoading: refreshCortes(Education_ClassroomService)\n        CortesError --> CortesLoading: retry(Education_ContentCDN)\n        CortesLoading --> [Education_ContentCDN]: dispose(Education_ContentCDN)\n    }\n\n    [Education_StudentDB] --> QuizInitial\n\n    state \"QuizCubit States\" as QuizFlow {Education_GradeSync)\n        QuizLoading --> QuizLoaded: quizGenerated(Education_ContentCDN)\n        QuizLoading --> QuizError: generationError(Education_ClassroomService)\n        QuizLoaded --> QuizLoaded: submitAnswer(Education_StudentDB)\n        QuizLoaded --> QuizFinished: completeQuiz(Education_ContentCDN)\n        QuizError --> QuizLoading: retry(Education_ClassroomService)\n        QuizFinished --> QuizInitial: reset(Education_LMS_Portal)\n        QuizLoading --> [Education_GradeSync]: dispose(Education_ClassroomService)\n    }\n",
+  "content_size": 1438,
+  "collected_at": "2026-02-06T10:40:44.328882",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Education",
+  "seed_id": "ot_stateDiagram_00327"
+}

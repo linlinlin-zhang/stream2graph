@@ -1,0 +1,294 @@
+{
+  "id": "gh_class_01334",
+  "source": "github",
+  "source_url": "https://github.com/SpillwaveSolutions/agent-brain/blob/2eec54ce3360ca998136da6cf8ccf3c3f51eb76d/docs/design/src/class-diagrams_chunking.mmd",
+  "github_repo": "SpillwaveSolutions/agent-brain",
+  "github_file_path": "docs/design/src/class-diagrams_chunking.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n    class ContextAwareChunker {\n        -int chunk_size\n        -int chunk_overlap\n        -Encoding tokenizer\n        -SentenceSplitter splitter\n\n        +count_tokens(text) int\n        +chunk_documents(documents, progress_callback) list~TextChunk~\n        +chunk_single_document(document) list~TextChunk~\n        +rechunk_with_config(documents, chunk_size, chunk_overlap) list~TextChunk~\n        +get_chunk_stats(chunks) dict\n    }\n\n    class CodeChunker {\n        -str language\n        -int chunk_lines\n        -int chunk_lines_overlap\n        -int max_chars\n        -bool generate_summaries\n        -CodeSplitter code_splitter\n        -Language ts_language\n        -Parser parser\n        -Encoding tokenizer\n\n        +count_tokens(text) int\n        +chunk_code_document(document) list~CodeChunk~\n        +get_code_chunk_stats(chunks) dict\n\n        -_setup_language() None\n        -_get_symbols(text) list~dict~\n        -_extract_xml_doc_comment(text, line) str\n    }\n\n    class TextChunk {\n        +str chunk_id\n        +str text\n        +str source\n        +int chunk_index\n        +int total_chunks\n        +int token_count\n        +ChunkMetadata metadata\n    }\n\n    class CodeChunk {\n        +str chunk_id\n        +str text\n        +str source\n        +int chunk_index\n        +int total_chunks\n        +int token_count\n        +ChunkMetadata metadata\n\n        +create(...)$ CodeChunk\n    }\n\n    class ChunkMetadata {\n        +str chunk_id\n        +str source\n        +str file_name\n        +int chunk_index\n        +int total_chunks\n        +str source_type\n        +datetime created_at\n        +str language\n        +str heading_path\n        +str section_title\n        +str content_type\n        +str symbol_name\n        +str symbol_kind\n        +int start_line\n        +int end_line\n        +str section_summary\n        +str prev_section_summary\n        +str docstring\n        +list~str~ parameters\n        +str return_type\n        +list~str~ decorators\n        +list~str~ imports\n        +dict extra\n\n        +to_dict() dict\n    }\n\n    ContextAwareChunker --> TextChunk : creates\n    CodeChunker --> CodeChunk : creates\n    TextChunk --> ChunkMetadata : contains\n    CodeChunk --> ChunkMetadata : contains",
+  "content_size": 2228,
+  "collected_at": "2026-02-06T01:56:23.911735",
+  "compilation_status": "failed",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 24,
+  "repo_forks": 5,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 -int chunk_size\n        -int chunk_overlap\n        -Encoding tokenizer\n        -SentenceSplitter splitter\n\n        +count_tokens(text 和 documents, progress_callback 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 -int chunk_size\n        -int chunk_overlap\n        -Encoding tokenizer\n        -SentenceSplitter splitter\n\n        +count_tokens(text处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '-int chunk_size\n        -int chunk_overlap\n        -Encoding tokenizer\n        -SentenceSplitter splitter\n\n        +count_tokens(text处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ContextAwareChunker",
+        "chunk_documents"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 document 和 documents, chunk_size, chunk_overlap 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'document 和 documents, chunk_size, chunk_overlap'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "chunk_single_document",
+        "rechunk_with_config"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 chunks 和 -str language\n        -int chunk_lines\n        -int chunk_lines_overlap\n        -int max_chars\n        -bool generate_summaries\n        -CodeSplitter code_splitter\n        -Language ts_language\n        -Parser parser\n        -Encoding tokenizer\n\n        +count_tokens(text 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 chunks处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'chunks处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "get_chunk_stats",
+        "CodeChunker"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 document 和 chunks 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'document 和 chunks'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "chunk_code_document",
+        "get_code_chunk_stats"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 text 和 text, line 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 text处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'text处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "_get_symbols",
+        "_extract_xml_doc_comment"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 +str chunk_id\n        +str text\n        +str source\n        +int chunk_index\n        +int total_chunks\n        +int token_count\n        +ChunkMetadata metadata\n     和 +str chunk_id\n        +str text\n        +str source\n        +int chunk_index\n        +int total_chunks\n        +int token_count\n        +ChunkMetadata metadata\n\n        +create(... 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '+str chunk_id\n        +str text\n        +str source\n        +int chunk_index\n        +int total_chunks\n        +int token_count\n        +ChunkMetadata metadata\n     和 +str chunk_id\n        +str text\n        +str source\n        +int chunk_index\n        +int total_chunks\n        +int token_count\n        +ChunkMetadata metadata\n\n        +create(...'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TextChunk",
+        "CodeChunk"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 +str chunk_id\n        +str source\n        +str file_name\n        +int chunk_index\n        +int total_chunks\n        +str source_type\n        +datetime created_at\n        +str language\n        +str heading_path\n        +str section_title\n        +str content_type\n        +str symbol_name\n        +str symbol_kind\n        +int start_line\n        +int end_line\n        +str section_summary\n        +str prev_section_summary\n        +str docstring\n        +list~str~ parameters\n        +str return_type\n        +list~str~ decorators\n        +list~str~ imports\n        +dict extra\n\n        +to_dict( 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '+str chunk_id\n        +str source\n        +str file_name\n        +int chunk_index\n        +int total_chunks\n        +str source_type\n        +datetime created_at\n        +str language\n        +str heading_path\n        +str section_title\n        +str content_type\n        +str symbol_name\n        +str symbol_kind\n        +int start_line\n        +int end_line\n        +str section_summary\n        +str prev_section_summary\n        +str docstring\n        +list~str~ parameters\n        +str return_type\n        +list~str~ decorators\n        +list~str~ imports\n        +dict extra\n\n        +to_dict('，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ChunkMetadata"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 31,
+    "repair_count": 3,
+    "grounding_acts_count": 14,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

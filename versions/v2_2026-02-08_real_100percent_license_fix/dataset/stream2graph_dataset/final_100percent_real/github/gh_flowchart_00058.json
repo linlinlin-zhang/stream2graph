@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00058",
+  "source": "github",
+  "source_url": "https://github.com/debox-network/FSKitBridge/blob/0b5bece374952dab46dab39b1304cf26954a1301/docs/arch.mmd",
+  "github_repo": "debox-network/FSKitBridge",
+  "github_file_path": "docs/arch.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart\n\n%% --- System side ---\n    subgraph OS[\"macOS\"]\n        PKD[\"PlugInKit / ExtensionKit<br/>(discovery, election, lifecycle)\"]\n        VFS[\"FSKit host (VFS side)\"]\n    end\n\n%% --- App bundle with nested appex ---\n    subgraph HostBundle[\"FSKitBridge.app\"]\n        Host[\"UI / enablement only\"]\n        subgraph AppeX[\"FSKitExt.appex - sandboxed\"]\n            FSOps[FSUnaryFileSystem + Operations]\n        end\n    end\n\n%% --- Backend process (your TCP server) ---\n    subgraph Backend[\"Custom.app - user process\"]\n        Rust[\"FS implementation (Rust/Python/etc.)<br/>TCP server + Protobuf\"]\n    end\n\n%% Registration / enablement path\n    Host -. \" Install / first launch<br/>(discovery, election) \" .-> PKD\n%% Runtime IPC paths\n    VFS <-->|\" XPC (FSKit operations) \"| FSOps\n    FSOps <-->|\" TCP (localhost) \"| Rust\n%% Lifecycle management\n    PKD -. \" Launch / manage appex<br/>(separate process at runtime) \" .-> AppeX\n",
+  "content_size": 930,
+  "collected_at": "2026-02-06T01:41:38.607136",
+  "compilation_status": "failed",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 8,
+  "repo_forks": 1,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

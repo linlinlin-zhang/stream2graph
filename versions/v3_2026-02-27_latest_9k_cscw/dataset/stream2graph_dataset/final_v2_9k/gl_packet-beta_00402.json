@@ -1,0 +1,16 @@
+{
+  "id": "gl_packet-beta_00402",
+  "source": "gitlab",
+  "source_url": "https://github.com/FrancoBre/mesh-routing-framework/blob/c4aa7b71d6bebf0c4c578f0be1d19f9f2c26c017/assets/diagrams/class_diagram.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "FrancoBre/mesh-routing-framework",
+  "diagram_type": "packet-beta",
+  "code": "---\nconfig:\n  layout: elk\n---\nclassDiagram\ndirection LR\n    class Main {\n\t    +Simulation\n\t    +main(args)\n    }\n    class TopologyType {\n\t    +GRID_6x6\n    }\n    class AlgorithmType {\n\t    +Q_ROUTING\n\t    +DIJKSTRA\n    }\n    class MetricType {\n\t    +AVG_DELIVERY_TIME\n    }\n    class ExportType {\n\t    +JSON\n\t    +CSV\n\t    +LOGS\n    }\n    class Simulation {\n\t    -config: SimulationConfig\n\t    -network: Network\n\t    -scheduler: Scheduler\n\t    -time: int\n\t    +tick()\n\t    +run()\n    }\n    class Registry {\n\t    +registerHop(Packet)\n\t    +registerReceived(Packet)\n    }\n    class Scheduler {\n\t    +pendingSends: List[Packet]\n\t    +flushPending()\n\t    +schedule(Packet, Node)\n    }\n    class SimulationConfig {\n\t    +topology: TopologyType\n\t    +algorithm: List[AlgorithmType]\n\t    +totalPackets: int\n\t    +packetInjectGap: int\n\t    +seed: long\n\t    +metrics: List[MetricType]\n\t    +exportTo: List[ExportType]\n    }\n    class Application {\n\t    +onTick()\n    }\n    class Network {\n\t    +nodes: List[Node]\n\t    +create(topology)\n\t    +sendPacket(Packet, NodeId)\n    }\n    class Packet {\n\t    +id: PacketId\n\t    +origin: Node\n\t    +destination: Node\n\t    +reachedDestination: bool\n\t    +timeInQueue: int\n    }\n    class Hop {\n\t    +packet: Packet\n\t    +from: NodeId\n\t    +to: NodeId\n\t    +sent: int\n\t    +received: int\n    }\n    class Node {\n\t    +id: NodeId\n\t    +neighbors: List\n\t    +application: Application\n\t    +queue: Queue[Packet]\n\t    +network: Network\n\t    +sendPacket(Packet, Node)\n\t    +receivePacket(Packet, Node)\n\t    +onTick()\n    }\n\t<<singleton>> Registry\n\t<<singleton>> Scheduler\n\t<<interface>> Application\n    Main --> Simulation\n    Simulation --> SimulationConfig\n    Simulation --> Network\n    Simulation --> Scheduler\n    Simulation --> Registry\n    Network --> Node\n    Node --> Packet\n    Node --> Application\n    Registry --> Hop\n    Scheduler --> Packet\n",
+  "content_size": 1878,
+  "collected_at": "2026-02-06T14:09:02.102103",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

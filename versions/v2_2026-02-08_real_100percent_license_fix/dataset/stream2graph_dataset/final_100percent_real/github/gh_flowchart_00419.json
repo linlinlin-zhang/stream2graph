@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00419",
+  "source": "github",
+  "source_url": "https://github.com/neonzoul/AutomateOS-v1.0/blob/095a6f5d942df11f8bc41ac73f7c7af62adf6c4d/docs/architecture/diagrams/data%20and%20secrets%20flow%20(infra).mmd",
+  "github_repo": "neonzoul/AutomateOS-v1.0",
+  "github_file_path": "docs/architecture/diagrams/data and secrets flow (infra).mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart LR\r\n  %% Classes\r\n  classDef svc fill:#f5f5f5,stroke:#888,stroke-width:1.5\r\n  classDef data fill:#fff,stroke:#555,stroke-dasharray:4 2\r\n  classDef sec fill:#fff,stroke:#7A1E1E,stroke-width:1.5,stroke-dasharray:3 3\r\n\r\n  %% Services\r\n  subgraph Backend Services - Node TS\r\n    APIGW[\"API Gateway\"]:::svc\r\n    WEBH[\"Webhook\"]:::svc\r\n    ORCH[\"Orchestrator\"]:::svc\r\n    WORK[\"Worker\"]:::svc\r\n  end\r\n\r\n  %% Data\r\n  subgraph Data Plane\r\n    DB[\"Postgres<br/><i>Workflows, runs</i>\"]:::data\r\n    Q[\"Redis / Queue<br/><i>Job scheduling</i>\"]:::data\r\n    LOGS[\"Run Logs<br/><i>Append-only</i>\"]:::data\r\n  end\r\n\r\n  %% Secrets\r\n  subgraph Secrets & Config\r\n    VAULT[\"Secret Manager / Env<br/><i>AES-GCM at rest</i>\"]:::sec\r\n  end\r\n\r\n  %% Data paths\r\n  APIGW --> DB\r\n  WORK  --> DB\r\n  ORCH --> Q\r\n  WEBH --> Q\r\n  WORK  --> Q\r\n  WORK  --> LOGS\r\n\r\n  %% Secrets reads (dotted red)\r\n  APIGW -.-> VAULT\r\n  ORCH -.-> VAULT\r\n  WORK  -.-> VAULT\r\n\r\n  %% Link coloring\r\n  linkStyle 0,1,2,3,4,5 stroke:#555,stroke-width:1.5px   %% Data accesses\r\n  linkStyle 6,7,8 stroke:#b91c1c,stroke-dasharray:3 3    %% Secrets\r\n\r\n  %% Legend\r\n  subgraph Legend\r\n    L1[\"⬛ Gray = data plane access\"]\r\n    L2[\"⬛ Dashed Red = secrets read\"]\r\n  end\r\n  class Legend svc\r\n",
+  "content_size": 1241,
+  "collected_at": "2026-02-06T01:43:58.885116",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

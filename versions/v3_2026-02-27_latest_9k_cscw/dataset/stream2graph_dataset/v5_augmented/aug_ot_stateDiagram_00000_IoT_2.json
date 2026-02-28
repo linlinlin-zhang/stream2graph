@@ -1,0 +1,17 @@
+{
+  "id": "aug_ot_stateDiagram_00000_IoT_2",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/mrmidi/ASFireWire/blob/1b2dc823fe5b65d27bd90632fb2e11ba8d0c6914/documentation/stateDiagram-v2.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "mrmidi/ASFireWire",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    direction LR\n\n    %% Compact, readable bus-reset state machine: R0 left, R1 center, T0 right\n\n    powerReset: powerReset\n    resetDetected: resetDetected\n    ibrCond: ibr && !(IoT_Industrial_MQTT_Broker)\n    maxArbStateTimeout: maxArbStateTimeout(IoT_Industrial_PLC_Logic)\n\n    R0: R0 — Reset Start\\nresetStartActions(IoT_Industrial_EdgeNode)\n    R1: R1 — Reset Wait\\nresetWaitActions(IoT_Industrial_EdgeNode)\n    T0: T0 — Tree ID Start\n\n    %% Triggers to R0 (IoT_Industrial_EdgeNode)\n    powerReset --> R0: arbPowerReset(IoT_Industrial_EdgeNode)\n    resetDetected --> R0: initiatedReset = FALSE\n    ibrCond --> R0: initiatedReset = TRUE / resetDuration = RESET_TIME\n    maxArbStateTimeout --> R0: initiatedReset = TRUE / resetDuration = RESET_TIME; PH_EVENT_INDICATION\n\n    %% Core transitions\n    R0 --> R1: arbTimer >= resetDuration / resetStartActions(IoT_Industrial_PLC_Logic)\n    R1 --> T0: resetComplete(IoT_Industrial_EdgeNode) / arbTimer = 0\n\n    %% Back-transition and timeout\n    R1 --> R0: arbTimer >= resetDuration + RESET_WAIT / resetDuration = RESET_TIME\n\n    note left of R0\n      External triggers to R0:\\n• powerReset (IoT_Industrial_MQTT_Broker))\\n• resetDetected (IoT_Industrial_ActuatorController)\\n• ibr && !(IoT_Industrial_PLC_Logic) (IoT_Industrial_MQTT_Broker)\\n• maxArbStateTimeout(IoT_Industrial_MQTT_Broker) (IoT_Industrial_TelemetryStream)\\n• from TX: Transmit → -TX:R0\n    end note\n\n    note right of R1\n      Timeout/Recovery:\\n• R1→R0 sets resetDuration = RESET_TIME\\n• R1→T0 on resetComplete(IoT_Industrial_MQTT_Broker) sets arbTimer = 0\n    end note",
+  "content_size": 1407,
+  "collected_at": "2026-02-06T10:36:36.652880",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "IoT_Industrial",
+  "seed_id": "ot_stateDiagram_00000"
+}

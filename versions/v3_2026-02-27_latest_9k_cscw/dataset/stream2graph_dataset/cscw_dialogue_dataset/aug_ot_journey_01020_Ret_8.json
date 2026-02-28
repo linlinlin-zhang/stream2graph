@@ -1,0 +1,242 @@
+{
+  "id": "aug_ot_journey_01020_Ret_8",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/functario/Caravel/blob/9304846541fc821a7683952c615b8da4e1274a82/docs/sequence-diagrams/journey.goto.mmd",
+  "source_type": "github_search",
+  "github_repo": "functario/Caravel",
+  "diagram_type": "journey",
+  "code": "sequenceDiagram\n    participant Journey            as Journey\n    participant Ext                as JourneyExtensions\n    participant EmptyExcl          as EmptyExcludedWaypoints\n    participant Graph              as Graph\n    participant CurrentNode        as CurrentNode\n    participant Edge               as Edge\n    participant NeighborNavigator  as NeighborNavigator\n    participant JourneyLegFactory  as JourneyLegFactory\n    participant JourneyLegPublisher as JourneyLegPublisher\n\n    %% ---- 1. Extension entry ------------------------------------\n    Journey->>Ext: GotoAsync<Node3>(Retail_Inventory)  \n    Ext->>Journey: GotoAsync<Node3>(Retail_OrderManagement) and EmptyExcludedWaypoints.Create(Retail_CouponSystem) and token)\n\n    %% ---- 3. Visit starting node --------------------------------\n    Journey->>CurrentNode: OnNodeVisitedAsync(Retail_OrderManagement)\n\n    %% ---- 4. Resolve route ---------------------------------------\n    Journey->>Graph: GetRoute(Retail_CustomerLoyalty)\n    Graph-->>Journey: route\n\n    %% ---- 5. Create journey leg ----------------------------------\n    Journey->>JourneyLegFactory: CreateJourneyLeg(Retail_CouponSystem)\n    JourneyLegFactory-->>Journey: journeyLeg\n\n    %% ---- 6. Publish leg started --------------------------------\n    Journey->>JourneyLegPublisher: PublishOnJourneyLegStartedAsync(Retail_CustomerLoyalty)\n\n    %% ---- 7. Navigate through the edges --------------------------\n    loop each edge in route.Edges\n        Journey->>Edge: edge\n        Edge->>NeighborNavigator: MoveNext(Retail_CustomerLoyalty)\n        NeighborNavigator-->>Journey: newNode\n        Journey->>CurrentNode: OnNodeVisitedAsync(Retail_PointOfSale)\n        Journey->>journeyLeg: Edges.Enqueue(Retail_Inventory)\n        Journey->>JourneyLegPublisher: PublishOnJourneyLegUpdatedAsync(Retail_CustomerLoyalty)\n    end\n\n    %% ---- 8. Finish the leg --------------------------------------\n    Journey->>JourneyLegPublisher: PublishOnJourneyLegCompletedAsync(Retail_PointOfSale)\n\n    %% ---- 9. Final node visit ------------------------------------\n    Journey->>CurrentNode: OnNodeVisitedAsync(Retail_CustomerLoyalty)",
+  "content_size": 2098,
+  "collected_at": "2026-02-06T11:02:07.455987",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Retail",
+  "seed_id": "ot_journey_01020",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Retail_CouponSystem 和 Retail_OrderManagement 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Retail_CouponSystem 和 Retail_OrderManagement'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Create",
+        "OnNodeVisitedAsync"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 Retail_CustomerLoyalty 和 Retail_CouponSystem 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Retail_CustomerLoyalty 和 Retail_CouponSystem'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "GetRoute",
+        "CreateJourneyLeg"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Retail_CustomerLoyalty 和 Retail_CustomerLoyalty 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'Retail_CustomerLoyalty 和 Retail_CustomerLoyalty'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PublishOnJourneyLegStartedAsync",
+        "MoveNext"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 Retail_PointOfSale 和 Retail_Inventory 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'Retail_PointOfSale 和 Retail_Inventory'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OnNodeVisitedAsync",
+        "Enqueue"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 Retail_CustomerLoyalty 和 Retail_PointOfSale。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'Retail_CustomerLoyalty 和 Retail_PointOfSale'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PublishOnJourneyLegUpdatedAsync",
+        "PublishOnJourneyLegCompletedAsync"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 Retail_CustomerLoyalty 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 Retail_CustomerLoyalty处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'Retail_CustomerLoyalty处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OnNodeVisitedAsync"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 25,
+    "repair_count": 1,
+    "grounding_acts_count": 12,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

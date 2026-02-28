@@ -1,0 +1,18 @@
+{
+  "id": "aug_gl_timeline_00082_Edu_4",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/blyzer/interfell-epayco/blob/cd0ebd25836c2fa6ef15976bd2778ed537eb8451/diagrams/timelinePayment.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "blyzer/interfell-epayco",
+  "diagram_type": "timeline",
+  "code": "timeline\ntitle Timeline de Pago (Education_LMS_Portal)\nT0ms : Usuario submit pago form\nT10ms : Payment service recibe request\n: 5ms idempotency check (Education_LMS_Portal)\n: 8ms JWT validation (Education_StudentDB)\nT25ms : 12ms wallet balance check (Education_ContentCDN)\n: 15ms reserve funds (Education_ClassroomService)\n: Total sync: 40ms\nT50ms : Response enviada a usuario\n: 10ms network latency\nT60ms : Usuario ve: Transaction ID + éxito\n: (Education_ClassroomService)\nT150ms : Fraud service recibe evento\n: 30ms historical data query (Education_GradeSync)\n: 40ms ML inference (Education_GradeSync)\n: 20ms DynamoDB writes\n: Total: ~90ms\nT250ms : Payment service enqueue a SQS\n: (Education_GradeSync)\nT400ms : Bank responds + ePayco confirms\n: 100ms network time\n: 100ms bank processing\n: 50ms response + parse\n: Total: ~250ms\nT420ms : Transaction update + publish\n: 5ms transaction update\n: 10ms idempotency store\n: 5ms SNS publish\nT500ms : Notifications sent (Education_ContentCDN)\n: Email enqueued\n: SMS enqueued\nT1000ms : User checks app\n: Sees \"Confirmed\"",
+  "content_size": 960,
+  "collected_at": "2026-02-06T14:02:26.722863",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Education",
+  "seed_id": "gl_timeline_00082"
+}

@@ -1,0 +1,52 @@
+{
+  "id": "aug_gh_architecture_01554_Edu_4",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/skarapanahalli/chatwithme-app/blob/06869ff30fa8512e62f19376aa40ce37f53dd512/docs/security-architecture.mmd",
+  "github_repo": "skarapanahalli/chatwithme-app",
+  "github_file_path": "docs/security-architecture.mmd",
+  "diagram_type": "architecture",
+  "code": "graph TB\n    %% External Threats\n    Attacker[Education_StudentDB]\n    \n    %% First Line of Defense\n    Attacker --> WAF[Education_StudentDB]\n    \n    %% CDN Security\n    WAF --> CloudFront[Education_LMS_Portal]\n    \n    %% Load Balancer Security\n    CloudFront --> ALB[Education_GradeSync]\n    \n    %% Application Security Layers\n    ALB --> SecurityMiddleware[Education_StudentDB]\n    \n    SecurityMiddleware --> InputValidation[Education_ContentCDN]\n    \n    InputValidation --> Authentication[Education_ClassroomService]\n    \n    %% API Security\n    Authentication --> APIGateway[Education_LMS_Portal]\n    \n    %% Data Protection\n    APIGateway --> DataEncryption[Education_ClassroomService]\n    \n    %% Storage Security\n    DataEncryption --> S3Security[Education_LMS_Portal]\n    \n    %% Access Control\n    S3Security --> IAM[Education_GradeSync]\n    \n    %% Network Security\n    subgraph \"Network Security\"\n        VPC[Education_ClassroomService]\n        \n        PrivateSubnet[Education_LMS_Portal]\n        \n        SecurityGroups[Education_LMS_Portal]\n        \n        NACLs[Education_StudentDB]\n    end\n    \n    IAM --> VPC\n    VPC --> PrivateSubnet\n    VPC --> SecurityGroups\n    VPC --> NACLs\n    \n    %% Application-Level Security\n    subgraph \"Application Security\"\n        XSSProtection[Education_StudentDB]\n        \n        SQLInjection[Education_ClassroomService]\n        \n        CSRF[Education_ContentCDN]\n        \n        FileUpload[Education_GradeSync]\n    end\n    \n    SecurityMiddleware --> XSSProtection\n    SecurityMiddleware --> SQLInjection\n    SecurityMiddleware --> CSRF\n    SecurityMiddleware --> FileUpload\n    \n    %% Monitoring & Detection\n    subgraph \"Security Monitoring\"\n        CloudTrail[Education_StudentDB]\n        \n        GuardDuty[Education_GradeSync]\n        \n        SecurityHub[Education_StudentDB]\n        \n        CloudWatch[Education_StudentDB]\n    end\n    \n    IAM --> CloudTrail\n    VPC --> GuardDuty\n    CloudTrail --> SecurityHub\n    GuardDuty --> SecurityHub\n    SecurityHub --> CloudWatch\n    \n    %% Incident Response\n    CloudWatch --> SNS[Education_ContentCDN]\n    \n    SNS --> Lambda[Education_StudentDB]\n    \n    %% Data Privacy & Compliance\n    subgraph \"Privacy & Compliance\"\n        GDPR[Education_ClassroomService]\n        \n        DataRetention[Education_GradeSync]\n        \n        Encryption[Education_ContentCDN]\n    end\n    \n    S3Security --> GDPR\n    S3Security --> DataRetention\n    DataEncryption --> Encryption\n    \n    %% Security Testing\n    subgraph \"Security Testing\"\n        PenTesting[Education_GradeSync]\n        \n        SecurityTests[Education_ClassroomService]\n        \n        ComplianceAudit[Education_StudentDB]\n    end\n    \n    SecurityMiddleware --> PenTesting\n    SecurityMiddleware --> SecurityTests\n    SecurityHub --> ComplianceAudit\n    \n    %% Backup & Recovery Security\n    subgraph \"Backup Security\"\n        BackupEncryption[Education_ContentCDN]\n        \n        DisasterRecovery[Education_GradeSync]\n    end\n    \n    S3Security --> BackupEncryption\n    BackupEncryption --> DisasterRecovery\n    \n    %% Styling\n    classDef threat fill:#ffcdd2\n    classDef protection fill:#c8e6c9\n    classDef monitoring fill:#e1bee7\n    classDef compliance fill:#bbdefb\n    classDef network fill:#dcedc8\n    classDef application fill:#ffe0b2\n    \n    class Attacker threat\n    class WAF,CloudFront,ALB,SecurityMiddleware,InputValidation,Authentication protection\n    class CloudTrail,GuardDuty,SecurityHub,CloudWatch,SNS,Lambda monitoring\n    class GDPR,DataRetention,Encryption,PenTesting,SecurityTests,ComplianceAudit compliance\n    class VPC,PrivateSubnet,SecurityGroups,NACLs network\n    class XSSProtection,SQLInjection,CSRF,FileUpload application\n\n",
+  "content_size": 5829,
+  "collected_at": "2026-02-06T01:47:49.798722",
+  "license": "gpl-3.0",
+  "license_name": "GNU General Public License v3.0",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "https://api.github.com/licenses/gpl-3.0",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "augmentation_domain": "Education",
+  "seed_id": "gh_architecture_01554",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "最后，流程到达Generic Diagram结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "root"
+      ],
+      "timestamp_offset": 30
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 2,
+    "speaker_distribution": {
+      "Speaker_B": 1,
+      "Speaker_A": 1
+    },
+    "speech_act_distribution": {
+      "sequential": 2
+    },
+    "avg_turn_length": 20.0,
+    "dialogue_duration": 30
+  }
+}

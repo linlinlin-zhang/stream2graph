@@ -1,0 +1,18 @@
+{
+  "id": "aug_gl_packet-beta_00374_IoT_2",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/mariovillacortagarcia/sistemas-distribuidos-2025/blob/2ff34175a81d58aa7da7faea5d2230905c7d7b43/remote-filesystem-with-sockets-example/sockets-client/sequence.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "mariovillacortagarcia/sistemas-distribuidos-2025",
+  "diagram_type": "packet-beta",
+  "code": "---\nconfig:\n  theme: default\ntitle: Sockets Client - Execution Flow\n---\n\nsequenceDiagram\n    autonumber\n    actor User\n    participant Main as SocketsClient\n    \n    box rgb(IoT_Industrial_EdgeNode) Middleware Layer\n        participant ClientAdapter as TCPClientAdapter\n        participant Network\n    end\n    \n    box rgb(IoT_Industrial_ActuatorController) App Layer - Application\n        participant UseCase as SendFileUseCase\n    end\n    \n    box rgb(IoT_Industrial_TelemetryStream) App Layer - Infrastructure\n        participant Repo as ConsoleFileRepository\n    end\n    \n    participant Console\n    \n    box rgb(IoT_Industrial_MQTT_Broker) Server Side\n        participant Server\n    end\n\n    User->>Main: Start client application\n    Main->>Repo: new ConsoleFileRepository(IoT_Industrial_ActuatorController)\n    Main->>UseCase: new SendFileUseCase(IoT_Industrial_EdgeNode)\n    Main->>ClientAdapter: new TCPClientAdapter(IoT_Industrial_PLC_Logic)\n    Main->>ClientAdapter: start(IoT_Industrial_TelemetryStream)\n\n    ClientAdapter->>Console: Print \"Connecting to localhost:1234\"\n    ClientAdapter->>Network: new Socket(IoT_Industrial_ActuatorController)\n    Network-->>ClientAdapter: Return connected socket\n    ClientAdapter->>Console: Print \"Connected to server\"\n\n    ClientAdapter->>UseCase: execute(IoT_Industrial_TelemetryStream)\n    UseCase->>Repo: getFileFromSrc(IoT_Industrial_PLC_Logic)\n    Repo->>Console: Print \"Enter content for 'message': \"\n    Console->>User: Display prompt\n    User->>Console: Type message and press Enter\n    Console-->>Repo: Return input string\n    Repo->>Repo: Create File entity\n    Repo-->>UseCase: Return File\n    UseCase->>UseCase: Extract content\n    UseCase-->>ClientAdapter: Return content string\n\n    ClientAdapter->>Network: write(IoT_Industrial_ActuatorController)\n    ClientAdapter->>Network: newLine(IoT_Industrial_TelemetryStream)\n    ClientAdapter->>Network: flush(IoT_Industrial_EdgeNode)\n    Network->>Server: Send data packet\n    ClientAdapter->>Console: Print \"Sent: [IoT_Industrial_EdgeNode]\"\n\n    ClientAdapter->>Network: Close socket\n    ClientAdapter->>Console: Print \"Connection closed\"\n    ClientAdapter-->>Main: Return\n    Main-->>User: Exit application\n\n",
+  "content_size": 1917,
+  "collected_at": "2026-02-06T14:08:28.614509",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "IoT_Industrial",
+  "seed_id": "gl_packet-beta_00374"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00298",
+  "source": "github",
+  "source_url": "https://github.com/ngdzu/qtapp/blob/e3a1c2bbd71821fc0388274ec7f2043532d8f8aa/project-dashboard/doc/legacy/architecture_and_design/15_CERTIFICATE_PROVISIONING_TRANSMISSION.mmd",
+  "github_repo": "ngdzu/qtapp",
+  "github_file_path": "project-dashboard/doc/legacy/architecture_and_design/15_CERTIFICATE_PROVISIONING_TRANSMISSION.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Device as Z Monitor Device\n    participant NetworkMgr as NetworkManager\n    participant TelemetryServer as ITelemetryServer\n    participant Server as Central Server\n    participant DB as Database\n\n    Note over Device,DB: Secure Data Transmission with Certificate Validation\n\n    Device->>NetworkMgr: 1. SendTelemetry(telemetryData)\n    NetworkMgr->>NetworkMgr: 2. Validate certificate (if not done)\n    NetworkMgr->>NetworkMgr: 3. Create digital signature<br/>(Sign: deviceId + timestamp + payload)\n    NetworkMgr->>NetworkMgr: 4. Add signature and nonce to payload\n    NetworkMgr->>TelemetryServer: 5. SendTelemetryAsync(signedData)\n    TelemetryServer->>Server: 6. Initiate mTLS connection\n    Server->>Server: 7. Request client certificate\n    TelemetryServer->>Server: 8. Send client certificate\n    Server->>Server: 9. Verify certificate chain\n    Server->>Server: 10. Extract device ID from certificate\n    Server->>Server: 11. Check device registration\n    Server->>Server: 12. Verify certificate not revoked\n    alt Certificate validation fails\n        Server-->>TelemetryServer: 13a. Reject connection\n        TelemetryServer->>DB: Log security event: Certificate validation failed\n        TelemetryServer-->>NetworkMgr: Connection failed\n    else Certificate validation succeeds\n        Server-->>TelemetryServer: 13b. mTLS handshake complete\n        TelemetryServer->>Server: 14. Send signed telemetry payload\n        Server->>Server: 15. Verify digital signature\n        Server->>Server: 16. Validate timestamp (replay prevention)\n        alt Signature invalid or replay detected\n            Server->>DB: Log security event: Invalid signature/replay\n            Server-->>TelemetryServer: Reject payload\n        else Signature valid and timestamp fresh\n            Server->>Server: 17. Process telemetry data\n            Server->>DB: Store telemetry data\n            Server-->>TelemetryServer: 18. Acknowledge receipt (with processed IDs)\n            TelemetryServer->>DB: Log security event: Successful transmission\n            TelemetryServer-->>NetworkMgr: Transmission successful\n            NetworkMgr->>DB: Mark data as synced\n        end\n    end\n\n",
+  "content_size": 2199,
+  "collected_at": "2026-02-06T01:30:23.391826",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

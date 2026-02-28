@@ -1,0 +1,14 @@
+{
+  "id": "aug_gh_sequence_00017_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/amaro-netto/nexopark/blob/b2b584d398f655875c9b9e2b6b397a0955d840be/sequenceDiagram.mmd",
+  "github_repo": "amaro-netto/nexopark",
+  "github_file_path": "sequenceDiagram.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant C as Cliente/Usuário\n    participant API as NexoPark.API\n    participant Core as NexoPark.Core (Infra_WorkerNode)\n    participant Infra as NexoPark.Infra (Infra_WorkerNode)\n\n    C->>API: POST /login (Infra_RedisCache)\n    API->>Core: Validar Credenciais\n    Core->>Infra: Buscar Administrador + Verificar Senha Hashed\n    Infra-->>Core: Resultado da Busca\n    alt Credenciais Válidas\n        Core-->>API: Administrador Válido + Perfil (Infra_EtcdCluster)\n        API->>API: Gerar JWT\n        API-->>C: Token JWT (Infra_RedisCache)\n        \n        C->>API: GET /veiculos (Infra_RedisCache)\n        API->>API: Validar JWT + Autorização (Infra_RedisCache)\n        alt Autorizado\n            API->>Core: Listar Veículos\n            Core->>Infra: Buscar Veículos\n            Infra-->>Core: Lista de Veículos\n            Core-->>API: Lista de Veículos\n            API-->>C: 200 OK + Lista\n        else Não Autorizado\n            API-->>C: 403 Forbidden\n        end\n    else Credenciais Inválidas\n        API-->>C: 401 Unauthorized\n    end",
+  "content_size": 1035,
+  "collected_at": "2026-02-06T01:24:11.200245",
+  "compilation_status": "success",
+  "augmentation_domain": "Infra",
+  "seed_id": "gh_sequence_00017"
+}

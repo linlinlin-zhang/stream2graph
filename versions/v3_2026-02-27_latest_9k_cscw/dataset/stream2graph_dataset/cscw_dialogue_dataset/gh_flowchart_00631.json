@@ -1,0 +1,1087 @@
+{
+  "id": "gh_flowchart_00631",
+  "source": "github",
+  "source_url": "https://github.com/floppyFK/kittyhack/blob/5b8d33fea90033a59f9e9312e571af1ebc0fc98a/doc/unlock-logic_de.mmd",
+  "github_repo": "floppyFK/kittyhack",
+  "github_file_path": "doc/unlock-logic_de.mmd",
+  "diagram_type": "flowchart",
+  "code": "---\nconfig:\n  layout: dagre\n  look: neo\n  theme: neutral\n---\n\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n%% NOTE: Render this file with https://www.mermaidchart.com\n%% to generate a flowchart diagram of the unlock logic.\n%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n\nflowchart TD\n  %% Modus: Alle Katzen mit RFID Chip\n  subgraph all_rfids[\"Modus: Alle Katzen mit RFID Chip\"]\n    direction TB\n    style all_rfids fill:transparent,stroke:none\n\n    all_motion[\"Bewegung außen erkannt? (durch PIR oder Kamera, je nach Konfiguration)\"] -- Nein --> all_no_action[\"Keine Aktion\"]\n    all_motion -- Ja --> all_has_rfid{\"RFID erkannt?\"}\n    all_has_rfid -- Nein --> all_no_action\n    all_has_rfid -- Ja --> all_prey_global{\"Globale Beuteerkennung aktiviert?\"}\n    all_prey_global -- Nein --> all_unlock_inside[\"Eingangsrichtung öffnen\"]\n    all_prey_global -- Ja --> all_prey_individual{\"Individuelle Beuteerkennung für diese Katze aktiviert?\"}\n    all_prey_individual -- Ja --> all_prey_ok{\"Beuteprüfung OK?\"}\n    all_prey_individual -- Nein --> all_unlock_inside\n    all_prey_ok -- Ja --> all_unlock_inside\n    all_prey_ok -- Nein --> all_keep_closed[\"Geschlossen lassen\"]\n  end\n\n  %% Modus: Nur registrierte Katzen\n  subgraph kn_known[\"Modus: Nur registrierte Katzen\"]\n    direction TB\n    style kn_known fill:transparent,stroke:none\n\n    kn_motion[\"Bewegung außen erkannt? (durch PIR oder Kamera, je nach Konfiguration)\"] -- Nein --> kn_no_action[\"Keine Aktion\"]\n    kn_motion -- Ja --> kn_identify{\"Katze identifizieren (per RFID oder Kamera, falls aktiviert)?\"}\n    kn_identify -- Nein --> kn_no_action\n    kn_identify -- Ja --> kn_in_db{\"Katze in der Datenbank?\"}\n    kn_in_db -- Nein --> kn_no_action\n    kn_in_db -- Ja --> kn_prey_global{\"Globale Beuteerkennung aktiviert?\"}\n    kn_prey_ok{\"Beuteprüfung OK?\"} -- Ja --> kn_unlock_inside[\"Eingangsrichtung öffnen\"]\n    kn_prey_ok -- Nein --> kn_keep_closed[\"Geschlossen lassen\"]\n    kn_prey_global -- Nein --> kn_unlock_inside\n    kn_prey_global -- Ja --> kn_prey_individual{\"Individuelle Beuteerkennung für diese Katze aktiviert?\"}\n    kn_prey_individual -- Ja --> kn_prey_ok\n    kn_prey_individual -- Nein --> kn_unlock_inside\n  end\n\n  %% Modus: Alle Katzen\n  subgraph al_all[\"Modus: Alle Katzen\"]\n    direction TB\n    style al_all fill:transparent,stroke:none\n\n    al_motion[\"Bewegung außen erkannt? (durch PIR oder Kamera, je nach Konfiguration)\"] -- Nein --> al_no_action[\"Keine Aktion\"]\n    al_motion -- Ja --> al_prey_global{\"Globale Beuteerkennung aktiviert?\"}\n    al_prey_global -- Nein --> al_unlock_inside[\"Eingangsrichtung öffnen\"]\n    al_prey_global -- Ja --> al_prey_ok{\"Beuteprüfung OK?\"}\n    al_prey_ok -- Ja --> al_unlock_inside\n    al_prey_ok -- Nein --> al_keep_closed[\"Geschlossen lassen\"]\n  end\n\n  %% Modus: Keine Katzen\n  subgraph no_none[\"Modus: Keine Katzen\"]\n    direction TB\n    style no_none fill:transparent,stroke:none\n\n    no_motion[\"Bewegung außen erkannt? (durch PIR oder Kamera, je nach Konfiguration)\"] -- Nein --> no_no_action[\"Keine Aktion\"]\n    no_motion -- Ja --> no_no_action\n  end\n\n  %% Modus: Individuelle Konfiguration je Katze\n  subgraph cfg_per_cat[\"Modus: Individuelle Konfiguration je Katze\"]\n    direction TB\n    style cfg_per_cat fill:transparent,stroke:none\n\n    cfg_motion[\"Bewegung außen erkannt? (durch PIR oder Kamera, je nach Konfiguration)\"] -- Nein --> cfg_no_action[\"Keine Aktion\"]\n    cfg_motion -- Ja --> cfg_identify{\"Katze identifizieren (per RFID oder Kamera, falls aktiviert)?\"}\n    cfg_identify -- Nein --> cfg_no_action\n    cfg_identify -- Ja --> cfg_in_db{\"Katze in der Datenbank?\"}\n    cfg_in_db -- Nein --> cfg_no_action\n    cfg_in_db -- Ja --> cfg_allow_entry{\"Ist der Zugang für diese Katze erlaubt?\"}\n    cfg_allow_entry -- Nein --> cfg_no_action\n    cfg_allow_entry -- Ja --> cfg_prey_global{\"Globale Beuteerkennung aktiviert?\"}\n    cfg_prey_global -- Nein --> cfg_unlock_inside[\"Eingangsrichtung öffnen\"]\n    cfg_prey_global -- Ja --> cfg_prey_individual{\"Individuelle Beuteerkennung für diese Katze aktiviert?\"}\n    cfg_prey_individual -- Nein --> cfg_unlock_inside\n    cfg_prey_individual -- Ja --> cfg_prey_ok{\"Beuteprüfung OK?\"}\n    cfg_prey_ok -- Ja --> cfg_unlock_inside\n    cfg_prey_ok -- Nein --> cfg_keep_closed[\"Geschlossen lassen\"]\n  end\n\n%% Modus: Ausgang erlauben\nsubgraph ex_allow[\"Modus: Ausgang erlauben\"]\n  direction TB\n  style ex_allow fill:transparent,stroke:none\n\n  ex_allow_motion[\"Bewegung innen erkannt? (durch PIR)\"] -- Nein --> ex_allow_no_action[\"Keine Aktion\"]\n  ex_allow_motion -- Ja --> ex_allow_time{\"Innerhalb der erlaubten Ausgangs-Zeitbereiche?\"}\n  ex_allow_time -- Nein --> ex_allow_denied[\"Ausgang nicht erlaubt\"]\n  ex_allow_time -- Ja --> ex_allow_unlock[\"Ausgangsrichtung öffnen\"]\nend\n\n%% Modus: Ausgang nicht erlauben\nsubgraph ex_deny[\"Modus: Ausgang nicht erlauben\"]\n  direction TB\n  style ex_deny fill:transparent,stroke:none\n\n  ex_deny_motion[\"Bewegung innen erkannt? (durch PIR)\"] -- Nein --> ex_deny_no_action[\"Keine Aktion\"]\n  ex_deny_motion -- Ja --> ex_deny_no_action\nend\n\n%% Modus: Individuelle Konfiguration je Katze (Ausgangsrichtung)\nsubgraph ex_cfg[\"Modus: Individuelle Konfiguration je Katze (Ausgangsrichtung)\"]\n  direction TB\n  style ex_cfg fill:transparent,stroke:none\n\n  ex_cfg_motion[\"Bewegung innen erkannt? (durch PIR)\"] -- Nein --> ex_cfg_no_action[\"Keine Aktion\"]\n  ex_cfg_motion -- Ja --> ex_cfg_time{\"Innerhalb der erlaubten Ausgangs-Zeitbereiche?\"}\n  ex_cfg_time -- Nein --> ex_cfg_denied[\"Ausgang nicht erlaubt\"]\n  ex_cfg_time -- Ja --> ex_cfg_identified{\"Katze per RFID identifiziert?\"}\n  ex_cfg_identified -- Nein --> ex_cfg_denied\n  ex_cfg_identified -- Ja --> ex_cfg_allowed{\"Ist der Ausgang für diese Katze erlaubt?\"}\n  ex_cfg_allowed -- Nein --> ex_cfg_denied\n  ex_cfg_allowed -- Ja --> ex_cfg_unlock[\"Ausgangsrichtung öffnen\"]\nend",
+  "content_size": 5857,
+  "collected_at": "2026-02-06T01:46:07.581292",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 17,
+  "repo_forks": 2,
+  "repo_owner": "floppyFK",
+  "repo_name": "kittyhack",
+  "repo_description": "Project to revive the KittyFlap: A web GUI that allows control of the cat flap on the local network without the official KittyFlap app.",
+  "repo_language": "Python",
+  "repo_topics": [],
+  "repo_created_at": "2024-11-10T23:31:48Z",
+  "repo_updated_at": "2026-01-17T16:02:37Z",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Modus: Alle Katzen mit RFID Chip\" 和 \"Bewegung außen erkannt? (durch PIR oder Kamera, je nach Konfiguration 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Modus: Alle Katzen mit RFID Chip\" 和 \"Bewegung außen erkannt? (durch PIR oder Kamera, je nach Konfiguration'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "all_rfids",
+        "all_motion"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Keine Aktion\" 和 \"RFID erkannt?\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Keine Aktion\" 和 \"RFID erkannt?\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "all_no_action",
+        "all_has_rfid"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Globale Beuteerkennung aktiviert?\" 和 \"Eingangsrichtung öffnen\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Globale Beuteerkennung aktiviert?\" 和 \"Eingangsrichtung öffnen\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "all_prey_global",
+        "all_unlock_inside"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Individuelle Beuteerkennung für diese Katze aktiviert?\" 和 \"Beuteprüfung OK?\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Individuelle Beuteerkennung für diese Katze aktiviert?\" 和 \"Beuteprüfung OK?\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "all_prey_individual",
+        "all_prey_ok"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Geschlossen lassen\" 和 \"Modus: Nur registrierte Katzen\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Geschlossen lassen\" 和 \"Modus: Nur registrierte Katzen\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "all_keep_closed",
+        "kn_known"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Bewegung außen erkannt? (durch PIR oder Kamera, je nach Konfiguration 和 \"Keine Aktion\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 \"Bewegung außen erkannt? (durch PIR oder Kamera, je nach Konfiguration处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Bewegung außen erkannt? (durch PIR oder Kamera, je nach Konfiguration处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "kn_motion",
+        "kn_no_action"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Katze identifizieren (per RFID oder Kamera, falls aktiviert 和 \"Katze in der Datenbank?\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"Katze identifizieren (per RFID oder Kamera, falls aktiviert处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Katze identifizieren (per RFID oder Kamera, falls aktiviert处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "kn_identify",
+        "kn_in_db"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Globale Beuteerkennung aktiviert?\" 和 \"Beuteprüfung OK?\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Globale Beuteerkennung aktiviert?\" 和 \"Beuteprüfung OK?\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "kn_prey_global",
+        "kn_prey_ok"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Eingangsrichtung öffnen\" 和 \"Geschlossen lassen\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"Eingangsrichtung öffnen\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Eingangsrichtung öffnen\"处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "kn_unlock_inside",
+        "kn_keep_closed"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Individuelle Beuteerkennung für diese Katze aktiviert?\" 和 \"Modus: Alle Katzen\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Individuelle Beuteerkennung für diese Katze aktiviert?\" 和 \"Modus: Alle Katzen\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "kn_prey_individual",
+        "al_all"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Bewegung außen erkannt? (durch PIR oder Kamera, je nach Konfiguration 和 \"Keine Aktion\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 \"Bewegung außen erkannt? (durch PIR oder Kamera, je nach Konfiguration处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Bewegung außen erkannt? (durch PIR oder Kamera, je nach Konfiguration处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "al_motion",
+        "al_no_action"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Globale Beuteerkennung aktiviert?\" 和 \"Eingangsrichtung öffnen\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Globale Beuteerkennung aktiviert?\" 和 \"Eingangsrichtung öffnen\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "al_prey_global",
+        "al_unlock_inside"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Beuteprüfung OK?\" 和 \"Geschlossen lassen\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Beuteprüfung OK?\" 和 \"Geschlossen lassen\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "al_prey_ok",
+        "al_keep_closed"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Modus: Keine Katzen\" 和 \"Bewegung außen erkannt? (durch PIR oder Kamera, je nach Konfiguration。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Modus: Keine Katzen\" 和 \"Bewegung außen erkannt? (durch PIR oder Kamera, je nach Konfiguration'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "no_none",
+        "no_motion"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Keine Aktion\" 和 \"Modus: Individuelle Konfiguration je Katze\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Keine Aktion\" 和 \"Modus: Individuelle Konfiguration je Katze\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "no_no_action",
+        "cfg_per_cat"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Bewegung außen erkannt? (durch PIR oder Kamera, je nach Konfiguration 和 \"Keine Aktion\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Bewegung außen erkannt? (durch PIR oder Kamera, je nach Konfiguration 和 \"Keine Aktion\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "cfg_motion",
+        "cfg_no_action"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Katze identifizieren (per RFID oder Kamera, falls aktiviert 和 \"Katze in der Datenbank?\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Katze identifizieren (per RFID oder Kamera, falls aktiviert 和 \"Katze in der Datenbank?\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "cfg_identify",
+        "cfg_in_db"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 73,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Ist der Zugang für diese Katze erlaubt?\" 和 \"Globale Beuteerkennung aktiviert?\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 74,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Ist der Zugang für diese Katze erlaubt?\" 和 \"Globale Beuteerkennung aktiviert?\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 75,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 76,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "cfg_allow_entry",
+        "cfg_prey_global"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 77,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Eingangsrichtung öffnen\" 和 \"Individuelle Beuteerkennung für diese Katze aktiviert?\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 78,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Eingangsrichtung öffnen\" 和 \"Individuelle Beuteerkennung für diese Katze aktiviert?\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 79,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 80,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "cfg_unlock_inside",
+        "cfg_prey_individual"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 81,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Beuteprüfung OK?\" 和 \"Geschlossen lassen\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 82,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Beuteprüfung OK?\" 和 \"Geschlossen lassen\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 83,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 84,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "cfg_prey_ok",
+        "cfg_keep_closed"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 85,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Modus: Ausgang erlauben\" 和 \"Bewegung innen erkannt? (durch PIR 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 86,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Modus: Ausgang erlauben\" 和 \"Bewegung innen erkannt? (durch PIR'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 87,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 88,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ex_allow",
+        "ex_allow_motion"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 89,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Keine Aktion\" 和 \"Innerhalb der erlaubten Ausgangs-Zeitbereiche?\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 90,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Keine Aktion\" 和 \"Innerhalb der erlaubten Ausgangs-Zeitbereiche?\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 91,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 92,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ex_allow_no_action",
+        "ex_allow_time"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 93,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Ausgang nicht erlaubt\" 和 \"Ausgangsrichtung öffnen\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 94,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Ausgang nicht erlaubt\" 和 \"Ausgangsrichtung öffnen\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 95,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 96,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ex_allow_denied",
+        "ex_allow_unlock"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 97,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Modus: Ausgang nicht erlauben\" 和 \"Bewegung innen erkannt? (durch PIR。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 98,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Modus: Ausgang nicht erlauben\" 和 \"Bewegung innen erkannt? (durch PIR'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 99,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 100,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ex_deny",
+        "ex_deny_motion"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 101,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Keine Aktion\" 和 Ausgangsrichtung 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 102,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"Keine Aktion\" 和 Ausgangsrichtung'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 103,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 104,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ex_deny_no_action",
+        "Katze"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 105,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Modus: Individuelle Konfiguration je Katze (Ausgangsrichtung 和 \"Bewegung innen erkannt? (durch PIR 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 106,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Modus: Individuelle Konfiguration je Katze (Ausgangsrichtung 和 \"Bewegung innen erkannt? (durch PIR'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 107,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 108,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ex_cfg",
+        "ex_cfg_motion"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 109,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Keine Aktion\" 和 \"Innerhalb der erlaubten Ausgangs-Zeitbereiche?\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 110,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Keine Aktion\" 和 \"Innerhalb der erlaubten Ausgangs-Zeitbereiche?\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 111,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 112,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ex_cfg_no_action",
+        "ex_cfg_time"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 113,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Ausgang nicht erlaubt\" 和 \"Katze per RFID identifiziert?\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 114,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 \"Ausgang nicht erlaubt\"处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 115,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Ausgang nicht erlaubt\"处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 116,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 117,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ex_cfg_denied",
+        "ex_cfg_identified"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 118,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Ist der Ausgang für diese Katze erlaubt?\" 和 \"Ausgangsrichtung öffnen\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 119,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Ist der Ausgang für diese Katze erlaubt?\" 和 \"Ausgangsrichtung öffnen\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 120,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 121,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ex_cfg_allowed",
+        "ex_cfg_unlock"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 121,
+    "repair_count": 5,
+    "grounding_acts_count": 58,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

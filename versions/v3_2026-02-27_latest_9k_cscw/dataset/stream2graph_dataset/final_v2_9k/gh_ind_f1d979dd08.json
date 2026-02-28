@@ -1,0 +1,9 @@
+{
+  "id": "gh_ind_f1d979dd08",
+  "source": "github_industrial",
+  "repo": "microsoft/DirectStorage",
+  "license": "mit",
+  "code": "%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#ffffff', 'nodeBorder':'#000000', 'clusterBorder':'#000000'}}}%%\n\nflowchart LR\n\nsubgraph SSD\n%%SSDSourceUncompressed[(\"Source\\n(uncompressed)\")]\n%%SSDSourceCustomCompressed[(\"Source\\n(custom compressed)\")]\nSSDSourceCompressed[(\"Source\\n(compressed)\")]\nend\n\nsubgraph SystemMemory\n StagingBuffer[Staging Buffer]\n SysMemDestination[[Destination]]\n UploadHeap[Upload Heap]\nend\n\nsubgraph VRAM\n VRAMDestination[[Destination]]\n InputStaging[Input Staging Buffer]\n OutputStaging[Output Staging Buffer]\nend\n\n%% Uncompressed\n%%SSDSourceUncompressed --IOP--> StagingBuffer -- memcpy --> SysMemDestination\n%%SSDSourceUncompressed --IOP--> UploadHeap -- GPUCopy ---> VRAMDestination\n\n%% Custom Compressed\n%%SSDSourceCustomCompressed --IOP--> StagingBuffer -- Decompress --> SysMemDestination\n%%StagingBuffer -- Decompress --> UploadHeap -- GPUCopy ---> VRAMDestination\n\n%% Compressed\nStagingBuffer -- \"Decompress\" --> SysMemDestination\nSSDSourceCompressed --IOP--> StagingBuffer\nSSDSourceCompressed --IOP--> UploadHeap -- GPUCopy ---> InputStaging -- Decompress --> OutputStaging -- GPUCopy --> VRAMDestination\n",
+  "diagram_type": "size:1000..1500",
+  "collected_at": "2026-02-27T03:26:01.097771"
+}

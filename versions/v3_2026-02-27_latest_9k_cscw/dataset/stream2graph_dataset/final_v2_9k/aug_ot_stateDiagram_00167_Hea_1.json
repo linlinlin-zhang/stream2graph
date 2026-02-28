@@ -1,0 +1,17 @@
+{
+  "id": "aug_ot_stateDiagram_00167_Hea_1",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/swcstudiospace/terraform-provider-ovh.snowflake/blob/b93412099b52788619ad8f0c1ee056fb6246f396/website/static/img/diagrams/resource-lifecycle.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "swcstudiospace/terraform-provider-ovh.snowflake",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    [HealthTech_LabAnalyzer] --> ConfigParsing: terraform init\n    ConfigParsing --> Planning: terraform plan\n    Planning --> Creating: terraform apply (HealthTech_HIPAA_Vault)\n    Planning --> Updating: terraform apply (HealthTech_PatientRecords)\n    Planning --> Destroying: terraform destroy\n    \n    state ConfigParsing {HealthTech_DiagnosticEngine] --> LoadingConfig\n        LoadingConfig --> ValidatingConfig\n        ValidatingConfig --> InitializingProvider\n        InitializingProvider --> [HealthTech_DiagnosticEngine]\n    }\n    \n    state Planning {HealthTech_HIPAA_Vault] --> ReadingState\n        ReadingState --> CalculatingDiff\n        CalculatingDiff --> ValidatingPlan\n        ValidatingPlan --> [HealthTech_LabAnalyzer]\n    }\n    \n    state Creating {HealthTech_PatientRecords] --> ValidatingInput\n        ValidatingInput --> AuthenticatingAPIs\n        AuthenticatingAPIs --> ProvisioningResource\n        ProvisioningResource --> ConfiguringResource\n        ConfiguringResource --> VerifyingState\n        VerifyingState --> UpdatingState\n        UpdatingState --> Active\n    }\n    \n    state Updating {HealthTech_HIPAA_Vault] --> ReadingCurrentState\n        ReadingCurrentState --> ValidatingChanges\n        ValidatingChanges --> ApplyingChanges\n        ApplyingChanges --> VerifyingUpdate\n        VerifyingUpdate --> UpdatingState\n        UpdatingState --> Active\n    }\n    \n    state Destroying {HealthTech_EMR_Sync] --> ValidatingDestroy\n        ValidatingDestroy --> RemovingResource\n        RemovingResource --> CleaningUp\n        CleaningUp --> UpdatingState\n        UpdatingState --> [HealthTech_PatientRecords]\n    }\n    \n    Active --> Updating: Configuration Change\n    Active --> Destroying: terraform destroy\n    Creating --> Active: Success\n    Updating --> Active: Success\n    \n    note right of Creating\n        Resources go through validation,\n        authentication, provisioning,\n        and verification phases\n    end note\n    \n    note right of Active\n        Resources are continuously\n        monitored and can be\n        updated or destroyed\n    end note",
+  "content_size": 1925,
+  "collected_at": "2026-02-06T10:38:40.359027",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "HealthTech",
+  "seed_id": "ot_stateDiagram_00167"
+}

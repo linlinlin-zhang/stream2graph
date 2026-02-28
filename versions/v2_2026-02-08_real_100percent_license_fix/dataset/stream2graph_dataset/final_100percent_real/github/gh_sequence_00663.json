@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00663",
+  "source": "github",
+  "source_url": "https://github.com/MarcoVD/Bolsa-de-trabajo-Documentaci-n/blob/666eb42a841f148e28b47ccfc634f76df2d7b3cf/Revisar/03-Desarrollar%20diagrama%20de%20secuencia%20basado%20en%20flujos%20de%20eventos%20y%20prototipo/05-Diagrama%20de%20secuencia:%20Gesti%C3%B3n%20de%20notificaciones.mmd",
+  "github_repo": "MarcoVD/Bolsa-de-trabajo-Documentaci-n",
+  "github_file_path": "Revisar/03-Desarrollar diagrama de secuencia basado en flujos de eventos y prototipo/05-Diagrama de secuencia: Gestión de notificaciones.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    actor UI as Usuario Interesado\n    participant S as Sistema\n    participant BD as Base de Datos\n    participant E as Servidor Email\n    participant R as Reclutador\n    \n    %% Configuración de notificaciones\n    UI->>S: Accede a configuración de notificaciones\n    S->>BD: Consulta preferencias actuales\n    BD->>S: Retorna preferencias\n    S->>UI: Muestra opciones de configuración\n    UI->>S: Actualiza preferencias de notificaciones\n    S->>BD: Guarda nuevas preferencias\n    BD->>S: Confirma guardado\n    S->>UI: Notifica actualización exitosa\n    \n    %% Notificación de nuevas vacantes (flujo automático)\n    Note over S,BD: Proceso programado (diario)\n    S->>BD: Consulta vacantes nuevas que coinciden con búsquedas guardadas\n    BD->>S: Retorna vacantes coincidentes\n    S->>BD: Consulta usuarios interesados con notificaciones activadas\n    BD->>S: Retorna lista de usuarios\n    S->>E: Solicita envío de correos con nuevas vacantes\n    E->>UI: Envía correo de notificación\n    \n    %% Notificación de cambio de estado en postulación\n    R->>S: Actualiza estado de postulación\n    S->>BD: Guarda nuevo estado\n    BD->>S: Confirma guardado\n    S->>BD: Consulta preferencias de notificación del usuario\n    BD->>S: Retorna preferencias\n    \n    alt Notificaciones activadas\n        S->>E: Solicita envío de correo de actualización\n        E->>UI: Envía correo de cambio de estado\n        S->>UI: Muestra notificación en plataforma\n    else Notificaciones desactivadas\n        S->>UI: Solo muestra notificación en plataforma\n    end\n    \n    %% Notificación de modificación de vacante postulada\n    R->>S: Modifica/Elimina vacante\n    S->>BD: Actualiza información de vacante\n    BD->>S: Confirma actualización\n    S->>BD: Consulta postulantes a la vacante\n    BD->>S: Retorna lista de postulantes\n    \n    loop Para cada postulante\n        S->>BD: Consulta preferencias de notificación\n        BD->>S: Retorna preferencias\n        \n        alt Notificaciones activadas\n            S->>E: Solicita envío de correo informativo\n            E->>UI: Envía correo de modificación/eliminación\n            S->>UI: Muestra notificación en plataforma\n        else Notificaciones desactivadas\n            S->>UI: Solo muestra notificación en plataforma\n        end\n    end",
+  "content_size": 2288,
+  "collected_at": "2026-02-06T01:35:22.298218",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

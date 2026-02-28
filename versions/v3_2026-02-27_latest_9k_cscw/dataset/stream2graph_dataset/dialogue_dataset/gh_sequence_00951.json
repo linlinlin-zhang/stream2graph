@@ -1,0 +1,514 @@
+{
+  "id": "gh_sequence_00951",
+  "source": "github",
+  "source_url": "https://github.com/jackwillis/attack-kg/blob/ad9435c5d2729a11dffd53bc059b3a1026b9b788/docs/architecture/data-flow.mmd",
+  "github_repo": "jackwillis/attack-kg",
+  "github_file_path": "docs/architecture/data-flow.mmd",
+  "diagram_type": "sequence",
+  "code": "%%{init: {'theme': 'base'}}%%\n\nsequenceDiagram\n    autonumber\n    participant User\n    participant CLI as CLI (main.py)\n    participant Router as FindingRouter\n    participant Hybrid as HybridQueryEngine\n    participant Vectors as ChromaDB\n    participant BM25 as KeywordSearch\n    participant Graph as Oxigraph\n    participant LLM as LLM Backend\n\n    Note over User,LLM: Query Flow: \"Found password spraying attack on Windows domain\"\n\n    User->>CLI: analyze \"Found password spraying attack on Windows domain\"\n    CLI->>Hybrid: query(finding, top_k=5)\n\n    rect rgb(240, 230, 255)\n        Note over Hybrid,Router: Step 1: Finding-Type Router (Deterministic)\n        Hybrid->>Router: route_finding(text)\n        Router-->>Hybrid: RoutingDecision<br/>type=attack_narrative, confidence=0.85<br/>platforms=[Windows], signals=[password, domain]\n        Note over Hybrid: Router adjusts retrieval weights:<br/>attack_narrative → co-occurrence ON, CWE boost 1.4x<br/>vulnerability → co-occurrence OFF, CWE boost 2.0x\n    end\n\n    rect rgb(230, 245, 255)\n        Note over Hybrid,BM25: Step 2: Hybrid Retrieval (RRF Fusion)<br/>Includes ATT&CK + LOLBAS + GTFOBins + CAPEC\n        Hybrid->>Vectors: embed(finding) via ATT&CK BERT\n        Vectors-->>Hybrid: semantic candidates + similarity scores\n        Hybrid->>BM25: tokenize + search(finding)\n        BM25-->>Hybrid: keyword candidates + BM25 scores\n        Note over Hybrid: Reciprocal Rank Fusion<br/>score = Σ 1/(k + rank)\n        Hybrid->>Graph: get_cooccurring_techniques(top_3)\n        Graph-->>Hybrid: co-occurring techniques (campaigns 1.5x, groups 1.0x)\n        Note over Hybrid: Boost by weighted co-occurrence<br/>with time-decay on campaign age\n        Hybrid-->>Hybrid: re-ranked candidates [T1110.003, T1078, ...]\n    end\n\n    rect rgb(255, 245, 230)\n        Note over Hybrid,Graph: Step 3: CWE/CAPEC + Vuln Keyword Injection\n        Hybrid->>Hybrid: Detect CWE-nnn patterns in finding text\n        Hybrid->>Graph: get_techniques_for_cwe(CWE-nnn)\n        Graph-->>Hybrid: CWE → CAPEC → ATT&CK techniques\n        Hybrid->>Hybrid: Match vuln keywords (39 patterns)<br/>e.g. \"authentication bypass\" → T1190, T1556\n        Note over Hybrid: CAPEC patterns also matched<br/>semantically via ChromaDB embeddings\n    end\n\n    rect rgb(244, 248, 255)\n        Note over Hybrid: Step 4: Platform Boosting\n        Note over Hybrid: Detected platforms: [Windows]<br/>Boost matching techniques by 1.2x\n    end\n\n    rect rgb(230, 255, 230)\n        Note over Hybrid,Graph: Step 5: Symbolic Enrichment (SPARQL)\n        loop For each candidate technique\n            Hybrid->>Graph: get_technique(id)\n            Graph-->>Hybrid: technique details + tactics\n            Hybrid->>Graph: get_software_for_technique(id)\n            Graph-->>Hybrid: [Cobalt Strike, Mimikatz, ...]\n            Hybrid->>Graph: get_mitigations_with_inheritance(id)\n            Graph-->>Hybrid: [M1032, M1027, ...] (direct + inherited)\n            Hybrid->>Graph: get_d3fend_for_technique(id)\n            Graph-->>Hybrid: [D3-MFA, D3-IOPR, ...]\n            Hybrid->>Graph: get_detection_strategies(id)\n            Hybrid->>Graph: get_data_sources(id)\n            Graph-->>Hybrid: detection approaches + data source names\n        end\n    end\n\n    Hybrid-->>CLI: EnrichedTechnique[]\n\n    rect rgb(255, 230, 230)\n        Note over CLI,LLM: Step 6: Single-Stage LLM Analysis\n        CLI->>CLI: Prune context (focus mitigations on top 3 techniques)\n        CLI->>CLI: Encode context (XML default, TOON, or JSON)<br/>Skip software for vulnerability findings\n        CLI->>LLM: analyze(finding, encoded_context)\n        Note right of LLM: Classify techniques + write remediation<br/>Constrained to provided candidates<br/>Output: techniques, mitigations, D3FEND, detections\n        LLM-->>CLI: AnalysisResult JSON\n        CLI->>CLI: Validate IDs + data source names<br/>against retrieval set\n    end\n\n    CLI-->>User: AnalysisResult<br/>{techniques, remediations, detections, d3fend}\n",
+  "content_size": 3995,
+  "collected_at": "2026-02-06T01:51:09.098117",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License (Assumed)",
+  "license_url": null,
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "repo_owner": "jackwillis",
+  "repo_name": "attack-kg",
+  "repo_description": "Query the MITRE ATT&CK framework from the command line.",
+  "repo_language": "Python",
+  "repo_topics": [],
+  "repo_created_at": "2026-01-29T01:33:31Z",
+  "repo_updated_at": "2026-02-05T17:09:59Z",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，CLI (main.py)的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下CLI (main.py)吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "CLI"
+      ],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "FindingRouter主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是FindingRouter应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "FindingRouter主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "Router"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "HybridQueryEngine、ChromaDB主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "Hybrid",
+        "Vectors"
+      ],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含KeywordSearch这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是KeywordSearch应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理KeywordSearch？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "BM25"
+      ],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含Oxigraph这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "Graph"
+      ],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下LLM Backend吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将LLM Backend分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "LLM"
+      ],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含analyze \"Found password spraying attack on Windows domain\"、query(finding, top_k=5)这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "analyze \"Found password spraying attack on Windows domain\"、query(finding, top_k=5)和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是analyze \"Found password spraying attack on Windows domain\"、query(finding, top_k=5)应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_0",
+        "msg_1"
+      ],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "route_finding(text)、embed(finding) via ATT&CK BERT主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，route_finding(text)、embed(finding) via ATT&CK BERT的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，route_finding(text)、embed(finding) via ATT&CK BERT的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_2",
+        "msg_3"
+      ],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将tokenize + search(finding)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，tokenize + search(finding)是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_4"
+      ],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有get_cooccurring_techniques(top_3)。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，get_cooccurring_techniques(top_3)的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含get_cooccurring_techniques(top_3)这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_5"
+      ],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理Detect CWE-nnn patterns in finding text？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Detect CWE-nnn patterns in finding text的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "Detect CWE-nnn patterns in finding text和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_6"
+      ],
+      "timestamp_offset": 495
+    },
+    {
+      "turn_id": 34,
+      "speaker": "Speaker_A",
+      "utterance": "关于get_techniques_for_cwe(CWE-nnn)、Match vuln keywords (39 patterns)<br/>e.g. \"authentication bypass\" → T1190, T1556，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 510
+    },
+    {
+      "turn_id": 35,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_7",
+        "msg_8"
+      ],
+      "timestamp_offset": 525
+    },
+    {
+      "turn_id": 36,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将get_technique(id)、get_software_for_technique(id)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 540
+    },
+    {
+      "turn_id": 37,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，get_technique(id)、get_software_for_technique(id)就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 555
+    },
+    {
+      "turn_id": 38,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是get_technique(id)、get_software_for_technique(id)应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_9",
+        "msg_10",
+        "msg_11"
+      ],
+      "timestamp_offset": 570
+    },
+    {
+      "turn_id": 39,
+      "speaker": "Speaker_B",
+      "utterance": "关于get_d3fend_for_technique(id)，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 585
+    },
+    {
+      "turn_id": 40,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 600
+    },
+    {
+      "turn_id": 41,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达get_d3fend_for_technique(id)结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_12"
+      ],
+      "timestamp_offset": 615
+    },
+    {
+      "turn_id": 42,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将get_detection_strategies(id)、get_data_sources(id)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 630
+    },
+    {
+      "turn_id": 43,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，get_detection_strategies(id)、get_data_sources(id)就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_13",
+        "msg_14",
+        "msg_15"
+      ],
+      "timestamp_offset": 645
+    },
+    {
+      "turn_id": 44,
+      "speaker": "Speaker_A",
+      "utterance": "Encode context (XML default, TOON, or JSON)<br/>Skip software for vulnerability findings主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 660
+    },
+    {
+      "turn_id": 45,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Encode context (XML default, TOON, or JSON)<br/>Skip software for vulnerability findings就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 675
+    },
+    {
+      "turn_id": 46,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_16"
+      ],
+      "timestamp_offset": 690
+    },
+    {
+      "turn_id": 47,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将analyze(finding, encoded_context)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 705
+    },
+    {
+      "turn_id": 48,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 720
+    },
+    {
+      "turn_id": 49,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由analyze(finding, encoded_context)组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_17"
+      ],
+      "timestamp_offset": 735
+    },
+    {
+      "turn_id": 50,
+      "speaker": "Speaker_A",
+      "utterance": "Validate IDs + data source names<br/>against retrieval set主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 750
+    },
+    {
+      "turn_id": 51,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 765
+    },
+    {
+      "turn_id": 52,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Validate IDs + data source names<br/>against retrieval set的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 780
+    },
+    {
+      "turn_id": 53,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达Validate IDs + data source names<br/>against retrieval set结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_18"
+      ],
+      "timestamp_offset": 795
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 53,
+    "speaker_distribution": {
+      "Speaker_B": 27,
+      "Speaker_A": 26
+    },
+    "speech_act_distribution": {
+      "sequential": 4,
+      "clarify": 10,
+      "request": 6,
+      "classification": 11,
+      "inform": 9,
+      "structural": 6,
+      "contrastive": 2,
+      "confirm": 5
+    },
+    "avg_turn_length": 42.37735849056604,
+    "dialogue_duration": 795
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "id": "gh_ind_1dae9ac055",
+  "source": "github_industrial",
+  "repo": "simplex-chat/simplex-chat",
+  "license": "agpl-3.0",
+  "code": "sequenceDiagram\n    participant Contact\n    participant UI\n    participant Core\n    participant DB\n    participant WL\n    note over Contact, WL: 1. Receive and initialize widget\n    Contact->>Core: widget code and initial state\n    Core->>DB: persist message with widget\n    Core->>UI: new message<br>(with widget placeholder)\n    Core->>WL: widget code + state\n    WL->>Core: new state + view\n    Core->>DB: persist new state\n    Core->>UI: view\n    note over Contact, WL: 2. Process user event\n    UI->>Core: widget user event<br>(UI \"gesture\")\n    DB->>Core: get code + state\n    Core->>WL: user event + code + state\n    WL->>Core: updated state + view + optional message\n    Core->>DB: updated state\n    Core->>UI: new widget view<br>(non-optional, for visual feedback)\n    Core->>Contact: optional event message \"from\" widget\n    note over Contact, WL: 3. Process user event\n    Contact->>Core: Message with event for widget\n    Core->>DB: persist message (to resume/retry)\n    DB->>Core: get code + state\n    Core->>WL: message event + code + state\n    WL->>Core: updated state + view\n    Core->>DB: updated state\n    Core->>UI: new widget view<br>(plus some visual indication)\n",
+  "diagram_type": "state size:900..1500",
+  "collected_at": "2026-02-27T04:24:12.733276"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01776",
+  "source": "github",
+  "source_url": "https://github.com/Pennyw0rth/NetExec-Lab/blob/de183e53950fdc1b637ceab6c62995e3aa301ea0/LeHack-2024/graph.mmd",
+  "github_repo": "Pennyw0rth/NetExec-Lab",
+  "github_file_path": "LeHack-2024/graph.mmd",
+  "diagram_type": "architecture",
+  "code": "---\nconfig:\n  theme: redux\n  themeVariables:\n    background: \"#ffffff\"\n    primaryColor: '#fff'\n    edgeLabelBackground: '#fff'\n    tertiaryColor: '#fff'\n  look: handDrawn\n  layout: dagre\n---\nflowchart TB\n subgraph Rome_Domain[\"🟥 ROME.LOCAL\"]\n        Babaorum(\"🏛️ Babaorum<br>(Domain Controller)\")\n        Metronum(\"🏰 Metronum<br>(FTP / Local Admin)\")\n        Referendum(\"📜 Referendum<br>(LAPS / Azure AD Sync)\")\n        MSOL_User(\"👤 User: MSOL_xxxx<br>(DCSync Rights)\")\n        musculus(\"👤 User: musculus<br>(Local Admin)\")\n        lapsus(\"👤 User: lapsus<br>(Read LAPS)\")\n        heftepix(\"👤 User: heftepix<br>(FTP Access)\")\n        localhix(\"👤 User: localix<br>(Local Admin)\")\n        Guest(\"👤 User: Guest<br>(Guest User)\")\n  end\n subgraph Armorique_Domain[\"🌲 ARMORIQUE.LOCAL\"]\n        Village(\"🏘️ Village<br>(Domain Controller)\")\n        User_Prolix(\"👤 User: Prolix<br>(Compromised via Spray)\")\n        User_Alambix(\"👤 User: Alambix<br>(Read gMSA)\")\n        gMSA_Obelix(\"⚙️ gMSA-Obelix$<br>(DCSync Rights)\")\n  end\n    Guest -- \"1. SMB Guest (Share)<br>Found: 'heftepix' creds\" --> Babaorum\n    Babaorum -- \"2. FTP Login heftepix<br>\" --> heftepix\n    heftepix -- \"3. Found: 'plans.txt' with a password\" --> localhix\n    Guest -- \"4. Rid Brute on Metronum <br>Found: 'localix' account\" --> localhix\n    localhix -- \"5. Dump LSASS\" --> Metronum\n    Metronum -- \"6. Found musculus\" --> musculus\n    musculus -- \"7. Dump DPAPI\" --> Metronum\n    Metronum -- \"8. Found lapsus\" --> lapsus\n    lapsus -- \"9. Local admin\" --> Referendum\n    Referendum -- \"10. Dump MSOL Password<br>(Azure AD Connect)\" --> MSOL_User\n    MSOL_User == \"11. DCSync Rome<br>(Dump NTDS)\" ==> Babaorum\n    Babaorum -- \"12. Cross-Domain Hash Spray<br>Rome Hashes -&gt; Armorique Users\" --> User_Prolix\n    User_Prolix -- \"13. Kerberoast<br>Crack: 'Alambix'\" --> User_Alambix\n    User_Alambix -- \"14. Read gMSA Password<br>Target: gMSA-Obelix$\" --> gMSA_Obelix\n    gMSA_Obelix == \"15. DCSync Armorique<br>(Game Over)\" ==> Village\n\n     Babaorum:::romead\n     Metronum:::rome\n     Referendum:::rome\n     MSOL_User:::loot\n     musculus:::loot\n     lapsus:::loot\n     heftepix:::loot\n     localhix:::loot\n     Guest:::loot\n     Village:::armorique\n     User_Prolix:::loot\n     User_Alambix:::loot\n     gMSA_Obelix:::loot\n    classDef attacker fill:#fab1a0,stroke:#333,stroke-width:2px\n    classDef rome fill:#ffcccc,stroke:#e74c3c,stroke-width:2px\n    classDef romead fill:#d1ccc0,stroke:#e74c3c,stroke-width:2px\n    classDef armorique fill:#d1ccc0,stroke:#27ae60,stroke-width:2px\n    classDef loot fill:#f9ca24,stroke:#f1c40f,stroke-width:2px,stroke-dasharray: 5 5\n    style Armorique_Domain fill:#C8E6C9\n    linkStyle 10 stroke:#D50000,fill:none\n    linkStyle 11 stroke:#000000,fill:none\n    linkStyle 14 stroke:#D50000,fill:none\n",
+  "content_size": 2798,
+  "collected_at": "2026-02-06T02:03:12.127367",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 487,
+  "repo_forks": 52
+}

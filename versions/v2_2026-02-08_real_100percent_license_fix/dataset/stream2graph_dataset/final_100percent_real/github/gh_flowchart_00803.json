@@ -1,0 +1,18 @@
+{
+  "id": "gh_flowchart_00803",
+  "source": "github",
+  "source_url": "https://github.com/waseem-akram-senarios/aris-rnd/blob/c7aaf98c2b1914f632b6ddaf60a3847fe29a6baf/diagrams/07_parser_fallback_strategy.mmd",
+  "github_repo": "waseem-akram-senarios/aris-rnd",
+  "github_file_path": "diagrams/07_parser_fallback_strategy.mmd",
+  "diagram_type": "flowchart",
+  "code": "flowchart TD\n    Start[\"PDF File Upload\"] --> CheckParser{\"Preferred Parser?\"}\n    \n    CheckParser -->|Auto| PyMuPDF[\"Try PyMuPDF Parser\"]\n    CheckParser -->|PyMuPDF| PyMuPDF\n    CheckParser -->|Docling| Docling[\"Try Docling Parser\"]\n    CheckParser -->|Textract| Textract[\"Try Textract Parser\"]\n    \n    PyMuPDF --> CheckResult1{\"Extraction >= 50%<br/>AND<br/>Confidence >= 0.7?\"}\n    CheckResult1 -->|Yes| Success1[\"✅ Return PyMuPDF Result\"]\n    CheckResult1 -->|No| StoreResult[\"Store as Candidate\"]\n    \n    StoreResult --> CheckExtraction{\"Extraction < 50%<br/>OR<br/>Confidence < 0.7?\"}\n    CheckExtraction -->|Yes| TryDocling[\"Try Docling Parser<br/>for structured content\"]\n    CheckExtraction -->|No| ReturnBest[\"Return Best Available Result\"]\n    \n    TryDocling --> CheckDocling{\"Docling<br/>Success?\"}\n    CheckDocling -->|Yes| CompareDocling{\"Docling Better<br/>than PyMuPDF?\"}\n    CheckDocling -->|Timeout/Error| CheckTextract{\"Extraction < 30%?\"}\n    \n    CompareDocling -->|Yes| Success3[\"✅ Return Docling Result\"]\n    CompareDocling -->|No| CheckTextract\n    \n    CheckTextract -->|Yes| CheckAWS{\"AWS Credentials<br/>Available?\"}\n    CheckTextract -->|No| ReturnBest\n    \n    CheckAWS -->|Yes| Textract\n    CheckAWS -->|No| FallbackPyMuPDF[\"Fallback to PyMuPDF Result\"]\n    \n    Textract --> CheckTextractResult{\"Textract<br/>Success?\"}\n    CheckTextractResult -->|Yes| CompareTextract{\"Textract Confidence<br/>> Best Result?\"}\n    CheckTextractResult -->|Timeout/Error| FallbackPyMuPDF\n    \n    CompareTextract -->|Yes| Success2[\"✅ Return Textract Result\"]\n    CompareTextract -->|No| ReturnBest\n    \n    Docling -->|Direct Selection| CheckDocling\n    Textract -->|Direct Selection| CheckTextractResult\n    \n    Success1 --> End[\"ParsedDocument\"]\n    Success2 --> End\n    Success3 --> End\n    ReturnBest --> End\n    FallbackPyMuPDF --> End\n    \n    style Success1 fill:#c8e6c9\n    style Success2 fill:#c8e6c9\n    style Success3 fill:#c8e6c9\n    style FallbackPyMuPDF fill:#fff9c4\n    style ReturnBest fill:#fff9c4\n    style Docling fill:#e3f2fd\n\n\n\n",
+  "content_size": 2068,
+  "collected_at": "2026-02-06T01:48:15.914598",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

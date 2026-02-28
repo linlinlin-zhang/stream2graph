@@ -1,0 +1,101 @@
+{
+  "id": "ot_stateDiagram_00192",
+  "source": "other",
+  "source_url": "https://github.com/JimmyyyChen/thuthesis/blob/4334f8c963d8b8816a04ba994135b5cb824d554d/figures/mcp_state.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "JimmyyyChen/thuthesis",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    [*] --> Host初始状态 : 启动应用\n    \n    state MCP客户端 {\n        Host初始状态 --> 未配置 : 检查配置\n        未配置 --> 配置中 : 用户添加配置\n        未配置 --> 基础对话模式 : 无MCP服务器对话\n        配置中 --> 连接初始化 : 创建MCP客户端\n    }\n    \n    state MCP服务器交互 {\n        连接初始化 --> 服务器连接中 : 根据传输类型连接\n        服务器连接中 --> 连接失败 : 服务器未响应\n        服务器连接中 --> 连接成功 : 握手成功\n        连接成功 --> 工具发现 : 获取可用工具\n        工具发现 --> 工具就绪 : 注册工具到系统\n    }\n    \n    state 对话流程 {\n        工具就绪 --> 增强对话模式 : 启用工具支持\n        增强对话模式 --> 工具选择 : AI决定使用工具\n        工具选择 --> 工具调用 : 发送调用请求\n        工具调用 --> 工具执行 : 服务器处理请求\n        工具执行 --> 结果返回 : 获取执行结果\n        结果返回 --> 增强对话模式 : 继续对话\n        工具选择 --> 增强对话模式 : 无需调用工具\n    }\n    \n    连接失败 --> 基础对话模式 : 降级到无工具模式\n    基础对话模式 --> 增强对话模式 : MCP连接恢复\n    \n    增强对话模式 --> 会话结束 : 用户结束会话\n    基础对话模式 --> 会话结束 : 用户结束会话\n    \n    工具调用 --> 调用失败 : 连接断开/超时\n    调用失败 --> 基础对话模式 : 降级处理\n    \n    会话结束 --> 连接保持 : 保持工具连接\n    连接保持 --> 连接关闭 : 会话超时/用户关闭\n    连接关闭 --> [*] : 退出应用\n    \n    Host初始状态 : bolt.SE应用启动\n    未配置 : 无MCP服务器配置\n    配置中 : 配置MCP服务器\n    连接初始化 : 创建MCP客户端实例\n    服务器连接中 : 连接到MCP服务器\n    连接失败 : 服务器连接失败\n    连接成功 : 服务器连接成功\n    工具发现 : 获取服务器提供的工具\n    工具就绪 : 工具加载完成\n    基础对话模式 : 无工具辅助对话\n    增强对话模式 : 工具辅助对话\n    工具选择 : AI决定使用哪个工具\n    工具调用 : 请求服务器执行工具\n    工具执行 : 服务器处理工具请求\n    结果返回 : 工具执行结果返回\n    调用失败 : 工具调用过程失败\n    会话结束 : 对话会话结束\n    连接保持 : 保持服务器连接状态\n    连接关闭 : 关闭所有MCP连接 ",
+  "content_size": 1329,
+  "collected_at": "2026-02-06T10:38:58.253002",
+  "compilation_status": "failed",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 * 和 Host初始状态 --> 未配置 : 检查配置\n        未配置 --> 配置中 : 用户添加配置\n        未配置 --> 基础对话模式 : 无MCP服务器对话\n        配置中 --> 连接初始化 : 创建MCP客户端\n     的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '* 和 Host初始状态 --> 未配置 : 检查配置\n        未配置 --> 配置中 : 用户添加配置\n        未配置 --> 基础对话模式 : 无MCP服务器对话\n        配置中 --> 连接初始化 : 创建MCP客户端\n    '，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "v2",
+        "MCP客户端"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 连接初始化 --> 服务器连接中 : 根据传输类型连接\n        服务器连接中 --> 连接失败 : 服务器未响应\n        服务器连接中 --> 连接成功 : 握手成功\n        连接成功 --> 工具发现 : 获取可用工具\n        工具发现 --> 工具就绪 : 注册工具到系统\n     和 工具就绪 --> 增强对话模式 : 启用工具支持\n        增强对话模式 --> 工具选择 : AI决定使用工具\n        工具选择 --> 工具调用 : 发送调用请求\n        工具调用 --> 工具执行 : 服务器处理请求\n        工具执行 --> 结果返回 : 获取执行结果\n        结果返回 --> 增强对话模式 : 继续对话\n        工具选择 --> 增强对话模式 : 无需调用工具\n     的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 连接初始化 --> 服务器连接中 : 根据传输类型连接\n        服务器连接中 --> 连接失败 : 服务器未响应\n        服务器连接中 --> 连接成功 : 握手成功\n        连接成功 --> 工具发现 : 获取可用工具\n        工具发现 --> 工具就绪 : 注册工具到系统\n    处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '连接初始化 --> 服务器连接中 : 根据传输类型连接\n        服务器连接中 --> 连接失败 : 服务器未响应\n        服务器连接中 --> 连接成功 : 握手成功\n        连接成功 --> 工具发现 : 获取可用工具\n        工具发现 --> 工具就绪 : 注册工具到系统\n    处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MCP服务器交互",
+        "对话流程"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 9,
+    "repair_count": 1,
+    "grounding_acts_count": 4,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

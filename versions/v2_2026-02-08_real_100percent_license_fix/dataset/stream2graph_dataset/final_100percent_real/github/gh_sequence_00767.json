@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00767",
+  "source": "github",
+  "source_url": "https://github.com/MOUSSA-info/holbertonschool-hbnb/blob/951ab4a7e34b4ccae869ec42e87e4a4cedd0abec/part1/API-Architectyre.mmd",
+  "github_repo": "MOUSSA-info/holbertonschool-hbnb",
+  "github_file_path": "part1/API-Architectyre.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    autonumber\n    participant Client\n    participant API_Layer\n    participant Facade\n    participant Models\n    participant Database\n\n    %% User Registration\n    rect rgb(216, 191, 216)\n    Client->>API_Layer: POST /api/users (email, password, name)\n    API_Layer->>Facade: create_user(email, password, name)\n    Facade->>Models: User(email, password, name)\n    Models->>Database: save(new_user)\n    Database-->>Models: success\n    Models-->>Facade: user_object\n    Facade-->>API_Layer: user_object\n    API_Layer-->>Client: 201 Created (user_data)\n    end\n\n    %% Place Creation\n    rect rgb(173, 216, 230)\n    Client->>API_Layer: POST /api/places (name, description, price, location)\n    API_Layer->>Facade: verify_user_auth()\n    Facade-->>API_Layer: auth_ok\n    API_Layer->>Facade: create_place(data)\n    Facade->>Models: Place(name, description, price, location)\n    Models->>Database: save(new_place)\n    Database-->>Models: success\n    Models-->>Facade: place_object\n    Facade-->>API_Layer: place_object\n    API_Layer-->>Client: 201 Created (place_data)\n    end\n\n    %% Review Submission\n    rect rgb(144, 238, 144)\n    Client->>API_Layer: POST /api/places/{id}/reviews (content, rating)\n    API_Layer->>Facade: verify_user_auth()\n    Facade-->>API_Layer: auth_ok\n    API_Layer->>Facade: get_place(place_id)\n    Facade->>Database: query(place_id)\n    Database-->>Facade: place_data\n    Facade-->>API_Layer: place_object\n    API_Layer->>Facade: create_review(place_id, content, rating)\n    Facade->>Models: Review(place_id, content, rating)\n    Models->>Database: save(new_review)\n    Database-->>Models: success\n    Models-->>Facade: review_object\n    Facade-->>API_Layer: review_object\n    API_Layer-->>Client: 201 Created (review_data)\n    end\n\n    %% Fetching Places List\n    rect rgb(255, 182, 193)\n    Client->>API_Layer: GET /api/places?filters\n    API_Layer->>Facade: get_places(filters)\n    Facade->>Database: query(filters)\n    Database-->>Facade: places_data\n    Facade->>Facade: build_places_list(places_data)\n    Facade-->>API_Layer: places_list\n    API_Layer-->>Client: 200 OK (places_list)\n    end\n",
+  "content_size": 2138,
+  "collected_at": "2026-02-06T01:36:44.228392",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 1,
+  "repo_forks": 1,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

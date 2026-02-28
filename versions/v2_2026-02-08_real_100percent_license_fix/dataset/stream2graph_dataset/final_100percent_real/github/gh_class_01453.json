@@ -1,0 +1,18 @@
+{
+  "id": "gh_class_01453",
+  "source": "github",
+  "source_url": "https://github.com/2025-2-SWEngineering/backend/blob/fd625e7b916a583fe5098660af6c9d38c12a09a1/classDiagram/reporter.mmd",
+  "github_repo": "2025-2-SWEngineering/backend",
+  "github_file_path": "classDiagram/reporter.mmd",
+  "diagram_type": "class",
+  "code": "%% Report Generation class diagram — focused on requests, jobs, generator, storage, exporters,\n%% data sources, scheduler, notifications, and cache\n%% Shows: Generalization, Composition, Aggregation, Association, Dependency\nclassDiagram\ndirection LR\n\nclass User {\n  +id\n  +email\n  +requestReport(type, params)\n}\n\nclass ReportRequest {\n  +id\n  +userId\n  +type\n  +params\n  +createdAt\n}\n\nclass ReportJob {\n  +id\n  +status\n  +createdAt\n  +run()\n}\n\nclass Report {\n  +id\n  +type\n  +format\n  +locationUrl\n  +size\n}\n\nclass PDFReport\nclass CSVReport\n\nclass ReportGenerator {\n  +generate(request)\n  +assembleData()\n}\n\nclass ReportRepository {\n  +save(report)\n  +findById(id)\n}\n\nclass ReportStorage {\n  +saveFile(buffer, path)\n  +getUrl(path)\n}\n\nclass TransactionsService {\n  +queryTransactions(q)\n}\n\nclass DuesService {\n  +queryDues(q)\n}\n\nclass UploadsService {\n  +getUploads(q)\n}\n\nclass PDFLib\nclass CsvExporter\n\nclass Scheduler {\n  +schedule(reportRequest)\n}\n\nclass NotificationService {\n  +notifyUser(userId, payload)\n}\n\nclass Cache {\n  +get(key)\n  +set(key, value)\n}\n\n%% Relationships (5 types)\n\n%% Association: User creates ReportRequest\nUser \"1\" --> \"0..*\" ReportRequest : creates\n\n%% Association: Scheduler triggers ReportJob from a ReportRequest\nScheduler \"1\" --> \"0..*\" ReportJob : schedules\n\n%% Composition: ReportJob composes Report (job lifecycle owns the generated report)\nReportJob \"1\" *-- \"0..1\" Report : generates\n\n%% Aggregation: ReportRepository aggregates Reports (persisted storage)\nReportRepository \"1\" o-- \"*\" Report : stores\n\n%% Dependency: ReportGenerator depends on Transactions/Dues/Uploads services\nReportGenerator ..> TransactionsService : depends on\nReportGenerator ..> DuesService : depends on\nReportGenerator ..> UploadsService : depends on\n\n%% Dependency: ReportGenerator uses exporters/libs\nReportGenerator ..> PDFLib : uses\nReportGenerator ..> CsvExporter : uses\n\n%% Generalization: PDFReport and CSVReport are specializations of Report\nReport <|-- PDFReport\nReport <|-- CSVReport\n\n%% Aggregation: ReportStorage is an external aggregated resource used to keep report files\nReport \"*\" o-- \"1\" ReportStorage : savedIn\n\n%% Association: After generation, NotificationService notifies User\nReportJob \"1\" --> \"1\" NotificationService : notifies\nNotificationService \"1\" --> \"1\" User : notifies\n\n%% Dependency: Generator and Scheduler use Cache for intermediate data\nReportGenerator ..> Cache : caches\nScheduler ..> Cache : caches\n\n%% Multiplicities and clarifying labels\nReportGenerator \"1\" -- \"1\" ReportJob : works-on\nReportStorage \"1\" -- \"1\" AwsS3 : implements\n\n%% External implementation hint (renderers/storage) — not full class definitions\nclass AwsS3\n\n%% End\n",
+  "content_size": 2681,
+  "collected_at": "2026-02-06T01:57:57.611945",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00638",
+  "source": "github",
+  "source_url": "https://github.com/lakkantha/IOT/blob/de6c5c7e8bdbd041c3d000beb50026056c31208b/docs/dataflow.mmd",
+  "github_repo": "lakkantha/IOT",
+  "github_file_path": "docs/dataflow.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Device as IoT Device\n    participant API as REST API<br/>(Controller)\n    participant Facade as IoTFacade<br/>(Facade Pattern)\n    participant AsyncSvc as AsyncNotificationService<br/>@Async\n    participant Producer as KafkaProducer\n    participant Kafka as Kafka Cluster\n    participant Consumer as KafkaConsumer\n    participant Service as Processing Service\n    participant Config as ApplicationConfig<br/>(Singleton)\n    participant Builder as Device Builder<br/>(Builder Pattern)\n    participant Repo as Repository\n    participant DB as Database\n\n    Note over Device,DB: Device Registration Flow\n    Device->>API: POST /api/devices<br/>{deviceId, type, location}\n    API->>Facade: registerNewDevice(dto)\n    Facade->>Builder: Device.builder()...build()\n    Builder-->>Facade: validated Device\n    Facade->>Service: registerDevice(dto)\n    Service->>Repo: save(device)\n    Repo->>DB: INSERT device\n    DB-->>Repo: device saved\n    Repo-->>Service: Device entity\n    Service-->>Facade: Device\n    Facade->>AsyncSvc: publishDeviceRegistration(dto)\n    Note right of Facade: returns immediately (async)\n    AsyncSvc->>Producer: sendDeviceRegistration(dto)\n    Producer->>Kafka: publish to device-registration topic\n    Facade-->>API: Device\n    API-->>Device: 200 OK {device}\n\n    Note over Device,DB: Sensor Data Processing Flow\n    Device->>API: POST /api/data<br/>{deviceId, measurements}\n    API->>Facade: processSensorData(dto)\n    Facade->>Service: validateSensorData(dto)\n    Service-->>Facade: validated\n    Facade->>Service: getDeviceById(deviceId)\n    Service->>Repo: findByDeviceId(deviceId)\n    Repo->>DB: SELECT device\n    DB-->>Repo: device data\n    Repo-->>Service: Device\n    Service-->>Facade: Device\n    Facade->>Service: processSensorData(dto, device)\n    Service->>Config: getDeviceBatchSize()\n    Config-->>Service: batch size\n    Service->>Service: assessDataQuality(dto)\n    Service-->>Facade: SensorData\n    Facade->>AsyncSvc: publishSensorData(dto)\n    Note right of Facade: returns immediately (async)\n    AsyncSvc->>Producer: sendSensorData(dto)\n    Producer->>Kafka: publish to sensor-data topic\n    Facade-->>API: success\n    API-->>Device: 202 Accepted\n\n    Note over Device,DB: Async Kafka Consumer Processing\n    Kafka->>Consumer: consume sensor-data batch\n    Consumer->>Service: processSensorData(batch)\n    Service->>Repo: saveAll(sensorData)\n    Repo->>DB: BATCH INSERT\n    DB-->>Repo: saved\n    Repo-->>Service: success\n    Service-->>Consumer: processed\n",
+  "content_size": 2525,
+  "collected_at": "2026-02-06T01:35:05.001350",
+  "compilation_status": "failed",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

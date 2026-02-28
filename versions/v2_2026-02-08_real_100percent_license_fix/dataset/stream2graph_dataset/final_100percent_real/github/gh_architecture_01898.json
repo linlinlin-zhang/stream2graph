@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01898",
+  "source": "github",
+  "source_url": "https://github.com/raktim-mondol/hist2RNA/blob/33fbe0205f35701cdc69e225af2e5275f4ab35f4/hist2scRNA/docs/diagrams/12_input_preprocessing_workflow.mmd",
+  "github_repo": "raktim-mondol/hist2RNA",
+  "github_file_path": "hist2scRNA/docs/diagrams/12_input_preprocessing_workflow.mmd",
+  "diagram_type": "architecture",
+  "code": "flowchart TD\n    subgraph \"Input Data\"\n        A1[Whole Slide Image<br/>WSI file .svs, .tiff]\n        A2[Spatial Transcriptomics<br/>10X Visium / Slide-seq]\n        A3[Gene Expression<br/>Count Matrix]\n    end\n\n    subgraph \"Step 1: Load Data\"\n        B1[Load WSI<br/>OpenSlide]\n        B2[Load Spot Coordinates<br/>tissue_positions_list.csv]\n        B3[Load Gene Expression<br/>filtered_feature_bc_matrix]\n\n        A1 --> B1\n        A2 --> B2\n        A3 --> B3\n    end\n\n    subgraph \"Step 2: Coordinate Alignment\"\n        C1[Read Scale Factors<br/>scalefactors_json.json]\n        C2{Coordinates<br/>Aligned?}\n        C3[Transform Coordinates<br/>Visium space → WSI space]\n        C4[Manual Alignment<br/>QuPath or fiducial markers]\n\n        B2 --> C1\n        C1 --> C2\n        C2 -->|Yes| D1\n        C2 -->|No| C3\n        C3 --> C4\n        C4 --> D1\n    end\n\n    subgraph \"Step 3: Quality Control\"\n        D1[Filter In-Tissue Spots<br/>in_tissue == 1]\n        D2[Check Spot Coverage<br/>% tissue in patch]\n        D3[Remove Low Quality<br/>Blank or folded tissue]\n\n        D1 --> D2\n        D2 --> D3\n    end\n\n    subgraph \"Step 4: Patch Extraction\"\n        E1[For Each Spot<br/>Get x, y coordinates]\n        E2[Calculate Patch Bounds<br/>center ± 112 pixels]\n        E3[Extract 224×224 Patch<br/>slide.read_region]\n        E4[Convert to RGB<br/>Remove alpha channel]\n        E5[Color Normalization<br/>Macenko method]\n\n        D3 --> E1\n        E1 --> E2\n        E2 --> E3\n        E3 --> E4\n        E4 --> E5\n    end\n\n    subgraph \"Step 5: Spatial Graph\"\n        F1[Build KDTree<br/>from coordinates]\n        F2[For Each Spot<br/>Find k=6 neighbors]\n        F3[Create Edge List<br/>source, target]\n        F4[Save Edges<br/>spatial_edges.csv]\n\n        E5 --> F1\n        F1 --> F2\n        F2 --> F3\n        F3 --> F4\n    end\n\n    subgraph \"Step 6: Save Dataset\"\n        G1[Save Patches<br/>patches/spot_*.png]\n        G2[Save Coordinates<br/>spatial_coordinates.csv]\n        G3[Save Expression<br/>gene_expression.csv]\n        G4[Save Metadata<br/>dataset_info.json]\n\n        E5 --> G1\n        F4 --> G2\n        B3 --> G3\n        G1 --> G4\n        G2 --> G4\n        G3 --> G4\n    end\n\n    subgraph \"Output: Ready for Training\"\n        H1[Complete Dataset<br/>patches/ + CSV files]\n        H2[Load in DataLoader<br/>SpatialTranscriptomicsDataset]\n        H3[Train hist2scRNA<br/>Model]\n\n        G4 --> H1\n        H1 --> H2\n        H2 --> H3\n    end\n\n    style A1 fill:#ffe1e1\n    style A2 fill:#ffe1e1\n    style B1 fill:#e1f5ff\n    style E5 fill:#fff4e1\n    style F4 fill:#ffe1f5\n    style H3 fill:#e1ffe1\n",
+  "content_size": 2606,
+  "collected_at": "2026-02-06T02:04:43.404658",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 7,
+  "repo_forks": 2
+}

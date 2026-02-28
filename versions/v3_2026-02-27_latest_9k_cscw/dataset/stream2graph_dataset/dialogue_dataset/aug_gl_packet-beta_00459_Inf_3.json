@@ -1,0 +1,826 @@
+{
+  "id": "aug_gl_packet-beta_00459_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/Lucascis/discord_bot/blob/3c98f8c01a7f4e2f2e4770f9209b19c752940a0f/docs/architecture/diagrams/sequence-play.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "Lucascis/discord_bot",
+  "diagram_type": "packet-beta",
+  "code": "%% Sequence Diagram: Play Command Flow\n%% Purpose: Shows the complete flow when a user executes /play command\n%% Author: Discord Bot Team\n%% Last Updated: 2025-11-03\n\nsequenceDiagram\n    autonumber\n\n    actor User as 👤 Discord User\n    participant Discord as Discord API\n    participant Gateway as Gateway Service\n    participant Redis as Redis Pub/Sub\n    participant Audio as Audio Service\n    participant DB as PostgreSQL\n    participant Lavalink as Lavalink\n    participant YouTube as YouTube API\n\n    Note over User,YouTube: User wants to play a song in voice channel\n\n    %% Command Initiation\n    User->>Discord: /play query: \"never gonna give you up\"\n    activate Discord\n    Discord->>Gateway: INTERACTION_CREATE event\n    activate Gateway\n\n    Note over Gateway: Validate interaction<br/>Check permissions\n\n    Gateway->>Discord: POST /interactions/{Infra_LoadBalancer}/callback<br/>(Infra_LoadBalancer)\n    Discord->>User: Show processing message\n    deactivate Discord\n\n    %% Command Processing\n    Gateway->>DB: SELECT * FROM guild_settings<br/>WHERE guildId = ?\n    activate DB\n    DB-->>Gateway: Guild settings (Infra_IngressController)\n    deactivate DB\n\n    Gateway->>Redis: PUBLISH discord-bot:commands<br/>{Infra_WorkerNode}\n    activate Redis\n    Note over Redis: Message queued in pub/sub\n\n    Redis->>Audio: Message delivered\n    deactivate Redis\n    activate Audio\n\n    %% Audio Service Processing\n    Note over Audio: Extract query and guild info\n\n    Audio->>DB: SELECT * FROM queue<br/>WHERE guildId = ?\n    activate DB\n    DB-->>Audio: Current queue (Infra_LoadBalancer)\n    deactivate DB\n\n    %% Search for Track\n    alt Query is YouTube URL\n        Note over Audio: Parse YouTube URL<br/>Extract video ID\n    else Query is search term\n        Audio->>Lavalink: GET /loadtracks?identifier=ytsearch:{Infra_IngressController}\n        activate Lavalink\n        Lavalink->>YouTube: Search API request\n        activate YouTube\n        YouTube-->>Lavalink: Search results\n        deactivate YouTube\n        Lavalink-->>Audio: Track results (Infra_LoadBalancer)\n        deactivate Lavalink\n        Note over Audio: Select first result\n    end\n\n    %% Cache Search Results\n    Audio->>Redis: SETEX search:{Infra_IngressController} 300 {Infra_IngressController}\n    activate Redis\n    Redis-->>Audio: OK\n    deactivate Redis\n\n    %% Add to Queue\n    alt Queue is empty\n        Note over Audio: This will be the first track\n        Audio->>DB: INSERT INTO queue<br/>(Infra_LoadBalancer)\n        activate DB\n        DB-->>Audio: Queue entry created (Infra_EtcdCluster)\n        deactivate DB\n\n        %% Start Playback\n        Audio->>Lavalink: POST /sessions/{Infra_EtcdCluster}/players/{Infra_WorkerNode}<br/>{Infra_LoadBalancer} }\n        activate Lavalink\n\n        Note over Lavalink: Create player<br/>Connect to voice channel\n\n        Lavalink->>Discord: Voice connection (Infra_RedisCache)\n        activate Discord\n        Discord-->>Lavalink: Voice connection established\n        deactivate Discord\n\n        Lavalink->>YouTube: Stream audio data\n        activate YouTube\n        Note over Lavalink: Download and encode audio\n        YouTube-->>Lavalink: Audio stream\n        deactivate YouTube\n\n        Lavalink->>Discord: Send opus packets (Infra_RedisCache)\n        activate Discord\n        Discord->>User: 🎵 Audio playback in voice channel\n        deactivate Discord\n\n        Lavalink-->>Audio: Player updated event\n        deactivate Lavalink\n\n    else Queue has tracks\n        Note over Audio: Add to end of queue\n        Audio->>DB: SELECT MAX(Infra_EtcdCluster) FROM queue<br/>WHERE guildId = ?\n        activate DB\n        DB-->>Audio: maxPosition\n        deactivate DB\n\n        Audio->>DB: INSERT INTO queue<br/>(Infra_EtcdCluster)\n        activate DB\n        DB-->>Audio: Queue entry created\n        deactivate DB\n    end\n\n    %% Update Cache\n    Audio->>Redis: SET queue:{Infra_IngressController} {Infra_WorkerNode}<br/>EX 3600\n    activate Redis\n    Redis-->>Audio: OK\n    deactivate Redis\n\n    %% Send UI Update\n    alt First track (Infra_WorkerNode)\n        Audio->>Redis: PUBLISH discord-bot:ui:now<br/>{Infra_LoadBalancer}, ... }\n        activate Redis\n        Redis->>Gateway: UI update message\n        deactivate Redis\n\n        Gateway->>Discord: POST /channels/{Infra_RedisCache}/messages<br/>{Infra_WorkerNode], components: [Infra_LoadBalancer] }\n        activate Discord\n        Discord->>User: 🎵 Now Playing: Song Title<br/>[Infra_IngressController]\n        deactivate Discord\n\n        Gateway->>Discord: DELETE /webhooks/{Infra_EtcdCluster}/messages/@original<br/>(Infra_EtcdCluster)\n        activate Discord\n        deactivate Discord\n\n    else Added to queue\n        Gateway->>Discord: POST /webhooks/{Infra_IngressController}/messages/@original<br/>{Infra_WorkerNode)\", ephemeral: true }\n        activate Discord\n        Discord->>User: ✅ Added to queue (Infra_LoadBalancer)\n        deactivate Discord\n    end\n\n    deactivate Gateway\n    deactivate Audio\n\n    Note over User,YouTube: User hears music playing in voice channel\n\n    %% Track Events\n    loop Every 5 seconds\n        Lavalink->>Audio: PlayerUpdate event<br/>{Infra_LoadBalancer}\n        activate Audio\n\n        Audio->>Redis: PUBLISH discord-bot:to-discord<br/>{Infra_WorkerNode}\n        activate Redis\n        Redis->>Gateway: Player update event\n        deactivate Redis\n\n        Note over Gateway: Update UI if needed<br/>(Infra_LoadBalancer)\n        deactivate Audio\n    end\n\n    %% Track End\n    Note over Lavalink,Audio: Track finishes playing\n\n    Lavalink->>Audio: TrackEnd event<br/>{Infra_WorkerNode}\n    activate Audio\n\n    Audio->>DB: DELETE FROM queue<br/>WHERE guildId = ? AND position = 0\n    activate DB\n    DB-->>Audio: Deleted\n    deactivate DB\n\n    Audio->>DB: UPDATE queue SET position = position - 1<br/>WHERE guildId = ?\n    activate DB\n    DB-->>Audio: Queue reindexed\n    deactivate DB\n\n    alt More tracks in queue\n        Audio->>DB: SELECT * FROM queue<br/>WHERE guildId = ? AND position = 0\n        activate DB\n        DB-->>Audio: Next track\n        deactivate DB\n\n        Note over Audio: Play next track<br/>(Infra_EtcdCluster)\n\n    else Queue empty and autoplay enabled\n        Note over Audio: Generate autoplay recommendation\n        Audio->>Audio: Get similar tracks<br/>based on last played\n        Note over Audio: Add to queue and play\n\n    else Queue empty and autoplay disabled\n        Audio->>Lavalink: DELETE /sessions/{Infra_EtcdCluster}/players/{Infra_RedisCache}\n        activate Lavalink\n        Lavalink-->>Audio: Player destroyed\n        deactivate Lavalink\n\n        Audio->>Redis: PUBLISH discord-bot:ui:now<br/>{Infra_LoadBalancer}\n        activate Redis\n        Redis->>Gateway: Queue empty event\n        deactivate Redis\n\n        Gateway->>Discord: PATCH /channels/{Infra_IngressController}/messages/{Infra_WorkerNode}<br/>{Infra_RedisCache] }\n        activate Discord\n        Discord->>User: Queue finished (Infra_EtcdCluster)\n        deactivate Discord\n    end\n\n    deactivate Audio\n\n    Note over User,YouTube: Flow complete\n",
+  "content_size": 6985,
+  "collected_at": "2026-02-06T14:10:10.289943",
+  "compilation_status": "failed",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "gl_packet-beta_00459",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，Discord API、Gateway Service是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下Discord API、Gateway Service吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "在Discord API、Gateway Service中，我们需要定义核心逻辑。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "Discord",
+        "Gateway"
+      ],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有Redis Pub/Sub。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Redis Pub/Sub的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "Redis"
+      ],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Audio Service、PostgreSQL分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，Audio Service、PostgreSQL是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Audio Service、PostgreSQL应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "Audio",
+        "DB"
+      ],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下Lavalink、YouTube API吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，Lavalink、YouTube API是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，Lavalink、YouTube API是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "Lavalink",
+        "YouTube"
+      ],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理/play query: \"never gonna give you up\"？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_0"
+      ],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理INTERACTION_CREATE event、POST /interactions/{Infra_LoadBalancer}/callback<br/>(Infra_LoadBalancer)？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，INTERACTION_CREATE event、POST /interactions/{Infra_LoadBalancer}/callback<br/>(Infra_LoadBalancer)是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_1",
+        "msg_2"
+      ],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下Show processing message、SELECT * FROM guild_settings<br/>WHERE guildId = ?吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_3",
+        "msg_4"
+      ],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由PUBLISH discord-bot:commands<br/>{Infra_WorkerNode}、Message delivered组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，PUBLISH discord-bot:commands<br/>{Infra_WorkerNode}、Message delivered是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，PUBLISH discord-bot:commands<br/>{Infra_WorkerNode}、Message delivered是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_5",
+        "msg_6",
+        "msg_7"
+      ],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理GET /loadtracks?identifier=ytsearch:{Infra_IngressController}、Search API request？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将GET /loadtracks?identifier=ytsearch:{Infra_IngressController}、Search API request分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "msg_8",
+        "msg_9",
+        "msg_10"
+      ],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将INSERT INTO queue<br/>(Infra_LoadBalancer)、POST /sessions/{Infra_EtcdCluster}/players/{Infra_WorkerNode}<br/>{Infra_LoadBalancer} }分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，INSERT INTO queue<br/>(Infra_LoadBalancer)、POST /sessions/{Infra_EtcdCluster}/players/{Infra_WorkerNode}<br/>{Infra_LoadBalancer} }就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "相较于方案A，INSERT INTO queue<br/>(Infra_LoadBalancer)、POST /sessions/{Infra_EtcdCluster}/players/{Infra_WorkerNode}<br/>{Infra_LoadBalancer} }有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "在INSERT INTO queue<br/>(Infra_LoadBalancer)、POST /sessions/{Infra_EtcdCluster}/players/{Infra_WorkerNode}<br/>{Infra_LoadBalancer} }中，我们需要定义核心逻辑。",
+      "speech_act": "structural",
+      "diagram_elements_added": [
+        "msg_11",
+        "msg_12"
+      ],
+      "timestamp_offset": 495
+    },
+    {
+      "turn_id": 34,
+      "speaker": "Speaker_A",
+      "utterance": "Voice connection (Infra_RedisCache)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 510
+    },
+    {
+      "turn_id": 35,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Voice connection (Infra_RedisCache)应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_13"
+      ],
+      "timestamp_offset": 525
+    },
+    {
+      "turn_id": 36,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下Stream audio data吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 540
+    },
+    {
+      "turn_id": 37,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，Stream audio data就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 555
+    },
+    {
+      "turn_id": 38,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在Stream audio data完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_14"
+      ],
+      "timestamp_offset": 570
+    },
+    {
+      "turn_id": 39,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Send opus packets (Infra_RedisCache)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 585
+    },
+    {
+      "turn_id": 40,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 600
+    },
+    {
+      "turn_id": 41,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Send opus packets (Infra_RedisCache)分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "msg_15"
+      ],
+      "timestamp_offset": 615
+    },
+    {
+      "turn_id": 42,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下🎵 Audio playback in voice channel吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 630
+    },
+    {
+      "turn_id": 43,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 645
+    },
+    {
+      "turn_id": 44,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理🎵 Audio playback in voice channel？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 660
+    },
+    {
+      "turn_id": 45,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是🎵 Audio playback in voice channel应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_16"
+      ],
+      "timestamp_offset": 675
+    },
+    {
+      "turn_id": 46,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下SELECT MAX(Infra_EtcdCluster) FROM queue<br/>WHERE guildId = ?、INSERT INTO queue<br/>(Infra_EtcdCluster)吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 690
+    },
+    {
+      "turn_id": 47,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，SELECT MAX(Infra_EtcdCluster) FROM queue<br/>WHERE guildId = ?、INSERT INTO queue<br/>(Infra_EtcdCluster)就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 705
+    },
+    {
+      "turn_id": 48,
+      "speaker": "Speaker_A",
+      "utterance": "这个系统主要由SELECT MAX(Infra_EtcdCluster) FROM queue<br/>WHERE guildId = ?、INSERT INTO queue<br/>(Infra_EtcdCluster)组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 720
+    },
+    {
+      "turn_id": 49,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，SELECT MAX(Infra_EtcdCluster) FROM queue<br/>WHERE guildId = ?、INSERT INTO queue<br/>(Infra_EtcdCluster)是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_17",
+        "msg_18"
+      ],
+      "timestamp_offset": 735
+    },
+    {
+      "turn_id": 50,
+      "speaker": "Speaker_A",
+      "utterance": "SET queue:{Infra_IngressController} {Infra_WorkerNode}<br/>EX 3600主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 750
+    },
+    {
+      "turn_id": 51,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，SET queue:{Infra_IngressController} {Infra_WorkerNode}<br/>EX 3600就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 765
+    },
+    {
+      "turn_id": 52,
+      "speaker": "Speaker_A",
+      "utterance": "相较于方案A，SET queue:{Infra_IngressController} {Infra_WorkerNode}<br/>EX 3600有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_19"
+      ],
+      "timestamp_offset": 780
+    },
+    {
+      "turn_id": 53,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理PUBLISH discord-bot:ui:now<br/>{Infra_LoadBalancer}, ... }？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 795
+    },
+    {
+      "turn_id": 54,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_20"
+      ],
+      "timestamp_offset": 810
+    },
+    {
+      "turn_id": 55,
+      "speaker": "Speaker_B",
+      "utterance": "UI update message、POST /channels/{Infra_RedisCache}/messages<br/>{Infra_WorkerNode], components: [Infra_LoadBalancer] }主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 825
+    },
+    {
+      "turn_id": 56,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，UI update message、POST /channels/{Infra_RedisCache}/messages<br/>{Infra_WorkerNode], components: [Infra_LoadBalancer] }的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 840
+    },
+    {
+      "turn_id": 57,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，UI update message、POST /channels/{Infra_RedisCache}/messages<br/>{Infra_WorkerNode], components: [Infra_LoadBalancer] }有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 855
+    },
+    {
+      "turn_id": 58,
+      "speaker": "Speaker_A",
+      "utterance": "首先，我们需要定义流程的起点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_21",
+        "msg_22",
+        "msg_23"
+      ],
+      "timestamp_offset": 870
+    },
+    {
+      "turn_id": 59,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有DELETE /webhooks/{Infra_EtcdCluster}/messages/@original<br/>(Infra_EtcdCluster)、POST /webhooks/{Infra_IngressController}/messages/@original<br/>{Infra_WorkerNode)\", ephemeral: true }。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 885
+    },
+    {
+      "turn_id": 60,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，DELETE /webhooks/{Infra_EtcdCluster}/messages/@original<br/>(Infra_EtcdCluster)、POST /webhooks/{Infra_IngressController}/messages/@original<br/>{Infra_WorkerNode)\", ephemeral: true }的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_24",
+        "msg_25"
+      ],
+      "timestamp_offset": 900
+    },
+    {
+      "turn_id": 61,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将✅ Added to queue (Infra_LoadBalancer)、PlayerUpdate event<br/>{Infra_LoadBalancer}分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 915
+    },
+    {
+      "turn_id": 62,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，✅ Added to queue (Infra_LoadBalancer)、PlayerUpdate event<br/>{Infra_LoadBalancer}是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_26",
+        "msg_27"
+      ],
+      "timestamp_offset": 930
+    },
+    {
+      "turn_id": 63,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理PUBLISH discord-bot:to-discord<br/>{Infra_WorkerNode}？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 945
+    },
+    {
+      "turn_id": 64,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 960
+    },
+    {
+      "turn_id": 65,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，PUBLISH discord-bot:to-discord<br/>{Infra_WorkerNode}就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 975
+    },
+    {
+      "turn_id": 66,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，PUBLISH discord-bot:to-discord<br/>{Infra_WorkerNode}的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_28"
+      ],
+      "timestamp_offset": 990
+    },
+    {
+      "turn_id": 67,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有Player update event。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1005
+    },
+    {
+      "turn_id": 68,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，Player update event是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_29"
+      ],
+      "timestamp_offset": 1020
+    },
+    {
+      "turn_id": 69,
+      "speaker": "Speaker_B",
+      "utterance": "TrackEnd event<br/>{Infra_WorkerNode}主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1035
+    },
+    {
+      "turn_id": 70,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1050
+    },
+    {
+      "turn_id": 71,
+      "speaker": "Speaker_B",
+      "utterance": "整体架构包含TrackEnd event<br/>{Infra_WorkerNode}这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1065
+    },
+    {
+      "turn_id": 72,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_30"
+      ],
+      "timestamp_offset": 1080
+    },
+    {
+      "turn_id": 73,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理DELETE FROM queue<br/>WHERE guildId = ? AND position = 0？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1095
+    },
+    {
+      "turn_id": 74,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，DELETE FROM queue<br/>WHERE guildId = ? AND position = 0的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1110
+    },
+    {
+      "turn_id": 75,
+      "speaker": "Speaker_B",
+      "utterance": "明白了，DELETE FROM queue<br/>WHERE guildId = ? AND position = 0就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1125
+    },
+    {
+      "turn_id": 76,
+      "speaker": "Speaker_A",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_31"
+      ],
+      "timestamp_offset": 1140
+    },
+    {
+      "turn_id": 77,
+      "speaker": "Speaker_B",
+      "utterance": "UPDATE queue SET position = position - 1<br/>WHERE guildId = ?、SELECT * FROM queue<br/>WHERE guildId = ? AND position = 0主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1155
+    },
+    {
+      "turn_id": 78,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1170
+    },
+    {
+      "turn_id": 79,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由UPDATE queue SET position = position - 1<br/>WHERE guildId = ?、SELECT * FROM queue<br/>WHERE guildId = ? AND position = 0组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1185
+    },
+    {
+      "turn_id": 80,
+      "speaker": "Speaker_A",
+      "utterance": "UPDATE queue SET position = position - 1<br/>WHERE guildId = ?、SELECT * FROM queue<br/>WHERE guildId = ? AND position = 0和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_32",
+        "msg_33"
+      ],
+      "timestamp_offset": 1200
+    },
+    {
+      "turn_id": 81,
+      "speaker": "Speaker_B",
+      "utterance": "关于Get similar tracks<br/>based on last played，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1215
+    },
+    {
+      "turn_id": 82,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1230
+    },
+    {
+      "turn_id": 83,
+      "speaker": "Speaker_B",
+      "utterance": "Get similar tracks<br/>based on last played和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_34"
+      ],
+      "timestamp_offset": 1245
+    },
+    {
+      "turn_id": 84,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将DELETE /sessions/{Infra_EtcdCluster}/players/{Infra_RedisCache}、PUBLISH discord-bot:ui:now<br/>{Infra_LoadBalancer}分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1260
+    },
+    {
+      "turn_id": 85,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_35",
+        "msg_36"
+      ],
+      "timestamp_offset": 1275
+    },
+    {
+      "turn_id": 86,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有Queue empty event、PATCH /channels/{Infra_IngressController}/messages/{Infra_WorkerNode}<br/>{Infra_RedisCache] }。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1290
+    },
+    {
+      "turn_id": 87,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Queue empty event、PATCH /channels/{Infra_IngressController}/messages/{Infra_WorkerNode}<br/>{Infra_RedisCache] }的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1305
+    },
+    {
+      "turn_id": 88,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Queue empty event、PATCH /channels/{Infra_IngressController}/messages/{Infra_WorkerNode}<br/>{Infra_RedisCache] }的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 1320
+    },
+    {
+      "turn_id": 89,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在Queue empty event、PATCH /channels/{Infra_IngressController}/messages/{Infra_WorkerNode}<br/>{Infra_RedisCache] }完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_37",
+        "msg_38",
+        "msg_39"
+      ],
+      "timestamp_offset": 1335
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 89,
+    "speaker_distribution": {
+      "Speaker_B": 45,
+      "Speaker_A": 44
+    },
+    "speech_act_distribution": {
+      "sequential": 5,
+      "confirm": 17,
+      "request": 14,
+      "structural": 10,
+      "clarify": 10,
+      "inform": 16,
+      "classification": 12,
+      "contrastive": 5
+    },
+    "avg_turn_length": 64.80898876404494,
+    "dialogue_duration": 1335
+  }
+}

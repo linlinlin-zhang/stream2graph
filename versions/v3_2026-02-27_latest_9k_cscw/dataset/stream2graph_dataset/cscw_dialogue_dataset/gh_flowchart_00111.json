@@ -1,0 +1,270 @@
+{
+  "id": "gh_flowchart_00111",
+  "source": "github",
+  "source_url": "https://github.com/guglxni/amplifi/blob/2b2cbbb17dc15f7b550940cdfe97d27ef858ab58/docs/diagrams/oracle-bridge-flow.mmd",
+  "github_repo": "guglxni/amplifi",
+  "github_file_path": "docs/diagrams/oracle-bridge-flow.mmd",
+  "diagram_type": "flowchart",
+  "code": "%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#667eea', 'secondaryColor': '#764ba2', 'tertiaryColor': '#1e1e2e', 'primaryTextColor': '#ffffff'}}}%%\n\nflowchart TB\n    subgraph BASE[\"BASE SEPOLIA - Chain 84532\"]\n        CL_USDC[\"Chainlink USDC/USD<br/>0xf3138B59...\"]\n    end\n\n    subgraph POLYGON[\"POLYGON AMOY - Chain 80002\"]\n        CL_EUR[\"Chainlink EUR/USD<br/>0xd8d927e5...\"]\n    end\n\n    subgraph LASNA[\"LASNA - REACTIVE NETWORK - Chain 5318007\"]\n        direction TB\n        \n        MIRROR_USDC[\"ChainlinkMirrorReactive<br/>0xA43DC30A...<br/>---<br/>Monitors: USDC/USD<br/>Subscribed: Base Sepolia\"]\n        \n        MIRROR_EUR[\"ChainlinkMirrorReactive<br/>0xd9a09674...<br/>---<br/>Monitors: EUR/USD<br/>Subscribed: Polygon Amoy\"]\n    end\n\n    subgraph SEPOLIA[\"ETHEREUM SEPOLIA - Chain 11155111\"]\n        direction TB\n        \n        PROXY_USDC[\"AbstractFeedProxy<br/>0x60d6a73A...<br/>---<br/>description: USDC-USD<br/>decimals: 8\"]\n        \n        PROXY_EUR[\"AbstractFeedProxy<br/>0x12c34372...<br/>---<br/>description: EUR-USD<br/>decimals: 8\"]\n        \n        CALLBACK[\"Callback Proxy<br/>0x33Bbb7D0...\"]\n        \n        UNIFIED[\"UnifiedPriceOracle<br/>---<br/>getPrice(USDT) -> USDC/USD<br/>getPrice(EURS) -> EUR/USD\"]\n    end\n\n    CL_USDC -->|AnswerUpdated Event| MIRROR_USDC\n    CL_EUR -->|AnswerUpdated Event| MIRROR_EUR\n    \n    MIRROR_USDC -->|emit Callback| CALLBACK\n    MIRROR_EUR -->|emit Callback| CALLBACK\n    \n    CALLBACK -->|updateFromBridge| PROXY_USDC\n    CALLBACK -->|updateFromBridge| PROXY_EUR\n    \n    PROXY_USDC -->|latestRoundData| UNIFIED\n    PROXY_EUR -->|latestRoundData| UNIFIED\n\n    classDef origin fill:#4a5568,stroke:#667eea,stroke-width:2px\n    classDef lasna fill:#764ba2,stroke:#ffffff,stroke-width:2px\n    classDef sepolia fill:#2d3748,stroke:#48bb78,stroke-width:2px\n    classDef unified fill:#667eea,stroke:#ffffff,stroke-width:3px\n\n    class CL_USDC,CL_EUR origin\n    class MIRROR_USDC,MIRROR_EUR lasna\n    class PROXY_USDC,PROXY_EUR,CALLBACK sepolia\n    class UNIFIED unified\n",
+  "content_size": 2048,
+  "collected_at": "2026-02-06T01:42:00.355393",
+  "compilation_status": "failed",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 1,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"BASE SEPOLIA - Chain 84532\" 和 \"Chainlink USDC/USD<br/>0xf3138B59...\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"BASE SEPOLIA - Chain 84532\" 和 \"Chainlink USDC/USD<br/>0xf3138B59...\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BASE",
+        "CL_USDC"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"POLYGON AMOY - Chain 80002\" 和 \"Chainlink EUR/USD<br/>0xd8d927e5...\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"POLYGON AMOY - Chain 80002\" 和 \"Chainlink EUR/USD<br/>0xd8d927e5...\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "POLYGON",
+        "CL_EUR"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"LASNA - REACTIVE NETWORK - Chain 5318007\" 和 \"ChainlinkMirrorReactive<br/>0xA43DC30A...<br/>---<br/>Monitors: USDC/USD<br/>Subscribed: Base Sepolia\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"LASNA - REACTIVE NETWORK - Chain 5318007\" 和 \"ChainlinkMirrorReactive<br/>0xA43DC30A...<br/>---<br/>Monitors: USDC/USD<br/>Subscribed: Base Sepolia\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "LASNA",
+        "MIRROR_USDC"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"ChainlinkMirrorReactive<br/>0xd9a09674...<br/>---<br/>Monitors: EUR/USD<br/>Subscribed: Polygon Amoy\" 和 \"ETHEREUM SEPOLIA - Chain 11155111\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"ChainlinkMirrorReactive<br/>0xd9a09674...<br/>---<br/>Monitors: EUR/USD<br/>Subscribed: Polygon Amoy\" 和 \"ETHEREUM SEPOLIA - Chain 11155111\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MIRROR_EUR",
+        "SEPOLIA"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"AbstractFeedProxy<br/>0x60d6a73A...<br/>---<br/>description: USDC-USD<br/>decimals: 8\" 和 \"AbstractFeedProxy<br/>0x12c34372...<br/>---<br/>description: EUR-USD<br/>decimals: 8\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"AbstractFeedProxy<br/>0x60d6a73A...<br/>---<br/>description: USDC-USD<br/>decimals: 8\" 和 \"AbstractFeedProxy<br/>0x12c34372...<br/>---<br/>description: EUR-USD<br/>decimals: 8\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PROXY_USDC",
+        "PROXY_EUR"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"Callback Proxy<br/>0x33Bbb7D0...\" 和 \"UnifiedPriceOracle<br/>---<br/>getPrice(USDT 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Callback Proxy<br/>0x33Bbb7D0...\" 和 \"UnifiedPriceOracle<br/>---<br/>getPrice(USDT'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CALLBACK",
+        "UNIFIED"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 EURS 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'EURS'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "getPrice"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 28,
+    "repair_count": 0,
+    "grounding_acts_count": 14,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "gh_class_01029",
+  "source": "github",
+  "source_url": "https://github.com/estiens/Orch3stra1Ag3nt/blob/ad62a22aeec43c21ce8a4d13b755cb3bca6fb242/app/arch_diagram.mmd",
+  "github_repo": "estiens/Orch3stra1Ag3nt",
+  "github_file_path": "app/arch_diagram.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n  ApplicationRecord <|-- Project\n  ApplicationRecord <|-- Task\n  ApplicationRecord <|-- AgentActivity\n  ApplicationRecord <|-- HumanInputRequest\n  ApplicationRecord <|-- HumanIntervention\n  ApplicationRecord <|-- LlmCall\n  ApplicationRecord <|-- VectorEmbedding\n  ApplicationRecord <|-- Event\n\n  Project \"1\" -- \"*\" Task : has_many\n  Project \"1\" -- \"*\" VectorEmbedding : has_many\n\n  Task \"1\" -- \"*\" AgentActivity : has_many\n  Task \"1\" -- \"*\" Task : parent\n  Task -- Event : emits (via AgentActivity)\n\n  AgentActivity \"1\" -- \"*\" LlmCall : has_many\n  AgentActivity \"1\" -- \"*\" Event : has_many\n  AgentActivity -- HumanInputRequest : triggers\n  AgentActivity -- HumanIntervention : triggers\n\n  HumanInputRequest -- Task : belongs_to\n  HumanInputRequest -- AgentActivity : belongs_to (optional)\n\n  HumanIntervention -- AgentActivity : belongs_to (optional)\n  HumanIntervention -- Task : has_one (via AgentActivity)\n\n  LlmCall -- AgentActivity : belongs_to\n\n  VectorEmbedding -- Task : belongs_to (optional)\n  VectorEmbedding -- Project : belongs_to (optional)\n\n  Event -- AgentActivity : belongs_to (optional)\n\n  class ApplicationRecord {\n    <<abstract>>\n  }\n\n  class Project {\n    +String name\n    +Text description\n    +String status\n    +JSONB settings\n    +JSONB metadata\n    +Integer priority\n    +kickoff!()\n    +pause!()\n    +resume!()\n    +search_knowledge()\n    +store_knowledge()\n    +llm_call_stats()\n  }\n\n  class Task {\n    +String title\n    +Text description\n    +String state\n    +String task_type\n    +JSONB metadata\n    +activate!()\n    +pause!()\n    +complete!()\n    +fail!()\n    +resume!()\n    +search_knowledge()\n    +store_knowledge()\n    +llm_call_stats()\n  }\n\n  class AgentActivity {\n    +String agent_type\n    +String status\n    +Text error_message\n    +pause!()\n    +resume!()\n    +mark_failed()\n  }\n\n  class HumanInputRequest {\n    +Text question\n    +Text response\n    +String status\n    +Boolean required\n    +answer!()\n    +ignore!()\n  }\n\n  class HumanIntervention {\n    +Text description\n    +String urgency\n    +String status\n    +Text resolution\n    +acknowledge!()\n    +resolve!()\n    +dismiss!()\n  }\n\n  class LlmCall {\n    +String provider\n    +String model\n    +Text prompt\n    +Text response\n    +Float cost\n    +Integer prompt_tokens\n    +Integer completion_tokens\n    +request_payload\n    +response_payload\n  }\n\n  class VectorEmbedding {\n    +Text content\n    +Float[] embedding\n    +String content_type\n    +String collection\n    +find_similar()\n    +generate_embedding()\n  }\n\n  class Event {\n    +String event_type\n    +JSON data\n    +Timestamp processed_at\n    +Integer priority\n    +publish()\n    +process()\n    +mark_processed!()\n  }\n\n",
+  "content_size": 2685,
+  "collected_at": "2026-02-06T01:52:03.354880",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

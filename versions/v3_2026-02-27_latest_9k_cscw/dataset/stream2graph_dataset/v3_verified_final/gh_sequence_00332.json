@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00332",
+  "source": "github",
+  "source_url": "https://github.com/wilberdelarosa/my-mail-hub/blob/a00a732b16ed74bc4ee9c855e933be0db6ddfb0c/archivos_no_proyecto/tesis/arquitectura/export/vista_d_idempotencia.mmd",
+  "github_repo": "wilberdelarosa/my-mail-hub",
+  "github_file_path": "archivos_no_proyecto/tesis/arquitectura/export/vista_d_idempotencia.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    autonumber\n    participant App as App Cliente (Offline)\n    participant OS as Offline Sync Service\n    participant DB as DB OfflineSync\n    participant EB as Event Bus\n    participant Core as Servicios Core\n\n    App->>App: Generar UUID unico\n    App->>App: Guardar en cache local\n\n    App->>OS: SubmitBatch(transacciones[])\n\n    loop Para cada transaccion\n        OS->>DB: Verificar IdempotencyKey\n        alt UUID nuevo\n            DB-->>OS: UUID valido\n            OS->>DB: Guardar UUID + timestamp\n            OS->>EB: Publicar eventos\n            EB-->>Core: Procesar eventos\n            Core-->>OS: Procesado\n        else UUID duplicado\n            DB-->>OS: UUID duplicado\n            OS->>OS: Log conflicto\n            OS-->>App: ConflictDetected\n        end\n    end\n\n    OS-->>App: Resultado final: aplicadas vs conflictos\n",
+  "content_size": 851,
+  "collected_at": "2026-02-06T01:30:48.908647",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

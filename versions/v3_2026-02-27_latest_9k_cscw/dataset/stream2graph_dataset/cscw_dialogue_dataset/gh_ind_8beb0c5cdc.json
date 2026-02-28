@@ -1,0 +1,383 @@
+{
+  "id": "gh_ind_8beb0c5cdc",
+  "source": "github_industrial",
+  "repo": "kylesnowschwartz/claude-bumper-lanes",
+  "license": "mit",
+  "code": "%% Enforcement Flow: Fuel gauge → stop → reset/pause/resume cycle\n%% Render: cat enforcement-sequence.mmd | mermaid-ascii -f -\n%% Focus: The core loop that constrains Claude's work\n\nsequenceDiagram\n    participant User\n    participant Claude\n    participant PTU as PostToolUse\n    participant Stop as Stop Hook\n    participant Sess as Session\n\n    %% === NORMAL OPERATION (under threshold) ===\n    User->>Claude: implement feature X\n    Claude->>Claude: Write file.ts\n    PTU->>Sess: calculate score from baseline\n    Sess-->>PTU: 150/400 (37%)\n    PTU->>PTU: (under 70% - silent)\n\n    %% === FUEL GAUGE WARNINGS ===\n    Claude->>Claude: Edit another.ts\n    PTU->>Sess: calculate score\n    Sess-->>PTU: 280/400 (70%)\n    PTU-->>Claude: stderr: NOTICE 70% - wrap up soon\n\n    Claude->>Claude: Write more.ts\n    PTU->>Sess: calculate score\n    Sess-->>PTU: 360/400 (90%)\n    PTU-->>Claude: stderr: WARNING 90% - complete work\n\n    %% === THRESHOLD EXCEEDED ===\n    Claude->>Stop: (tries to finish turn)\n    Stop->>Sess: check score vs threshold\n    Sess-->>Stop: 420/400 (105%)\n    Stop->>Sess: set stop_triggered: true\n    Stop-->>Claude: BLOCKED - threshold exceeded\n    Stop-->>User: score breakdown + review prompt\n\n    %% === USER REVIEW OPTIONS ===\n\n    %% Option A: Reset after review\n    User->>User: (reviews diff, commits)\n    User->>Claude: /bumper-reset\n    Claude->>Sess: capture new baseline\n    Claude->>Sess: score: 0, stop_triggered: false\n    Claude-->>User: Baseline reset. Score: 0/400\n\n    %% Option B: Pause enforcement\n    User->>Claude: /bumper-pause\n    Claude->>Sess: set paused: true\n    Claude-->>User: Enforcement paused. Changes tracked.\n\n    %% While paused - no blocking\n    Claude->>Claude: Write bigfile.ts\n    PTU->>Sess: calculate score\n    Sess-->>PTU: 600/400 (paused - no warning)\n    Claude->>Stop: (finish turn)\n    Stop->>Sess: check paused flag\n    Sess-->>Stop: paused: true\n    Stop->>Stop: (skip enforcement)\n\n    %% Resume enforcement\n    User->>Claude: /bumper-resume\n    Claude->>Sess: set paused: false\n    Claude-->>User: Enforcement resumed. Score: 600/400\n\n    %% Now blocked again\n    Claude->>Stop: (tries to finish)\n    Stop->>Sess: check score\n    Sess-->>Stop: 600/400 (150%)\n    Stop-->>Claude: BLOCKED\n\n    %% === AUTO-RECOVERY (v3.7.0+) ===\n    %% Option C: User reverts changes - automatic recovery\n    Note over User,Sess: Bidirectional State Transition (v3.7.0+)\n\n    %% Case 1: Stop hook auto-recovery (v3.7.0)\n    User->>Git: git checkout -- bigfile.ts\n    Git-->>User: file reverted\n    Claude->>Stop: (tries to finish)\n    Stop->>Sess: recalculate score from baseline\n    Sess-->>Stop: 350/400 (87% - under threshold!)\n    Stop->>Sess: clear stop_triggered flag\n    Stop-->>User: ✓ Auto-recovered (score: 350/400)\n    Stop-->>Claude: ALLOW - continue work\n\n    %% Case 2: PreToolUse auto-recovery (v3.8.0 - PR #3 fix)\n    Note over User,Sess: PreToolUse catches external changes before Stop\n    User->>Git: rm bigfile.ts (via IDE/terminal)\n    Git-->>User: file removed\n    Claude->>Claude: (attempts Write/Edit)\n    Note over Claude,Sess: PreToolUse fires BEFORE tool executes\n    Claude->>Sess: Load session (StopTriggered=true)\n    Sess->>Sess: recalculate score from baseline\n    Sess-->>Claude: 280/400 (70% - below threshold!)\n    Sess->>Sess: clear stop_triggered flag\n    Sess-->>Claude: ✓ Auto-recovered. External changes reduced diff.\n    Claude->>Claude: Write/Edit proceeds normally\n\n%% ============================================================\n%% VALIDATION REFERENCES\n%% ============================================================\n%% - PostToolUse tiers: internal/hooks/post_tool_use.go:119-128\n%% - Stop blocking: internal/hooks/stop.go:127-184\n%% - Stop auto-recovery: internal/hooks/stop.go:136-154 (v3.7.0)\n%% - PreToolUse auto-recovery: internal/hooks/pre_tool_use.go:112-142 (v3.8.0)\n%% - PreToolUse blocking: internal/hooks/pre_tool_use.go:145-154\n%% - Reset: internal/hooks/prompt_handler.go:96-115\n%% - Pause: internal/hooks/prompt_handler.go:118-131\n%% - Resume: internal/hooks/prompt_handler.go:134-147\n%%\n%% FUEL GAUGE TIERS\n%% - <70%: Silent\n%% - 70%: NOTICE - wrap up current task\n%% - 90%: WARNING - complete work, ask about checkpoint\n%%\n%% PAIN POINTS\n%% 1. Warnings visible but muted - status line could surface escalation better\n%% 2. Pause accumulates unbounded score - can be huge on resume\n%% 3. No partial reset - it's all-or-nothing baseline capture\n%% 4. Auto-reset on commit not shown (separate flow)\n%% 5. ~~Score can decrease if user reverts changes - not obvious~~ (FIXED v3.7.0: Stop auto-recovery, v3.8.0: PreToolUse auto-recovery)\n%%\n%% STATUS LINE TIERS (implemented)\n%% Status line now matches fuel gauge visibility:\n%% - 0-69%:  green  \"active\"\n%% - 70-89%: yellow \"NOTICE\"\n%% - 90-99%: orange \"WARNING\"\n%% - 100%+: red    \"TRIPPED\"\n",
+  "diagram_type": "sequence size:>1500",
+  "collected_at": "2026-02-27T03:40:32.970758",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 under threshold 和 37% 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'under threshold 和 37%'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OPERATION",
+        "400"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 70% 和 90% 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '70% 和 90%'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "400",
+        "400"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 105% 和 paused - no warning。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '105% 和 paused - no warning'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "400",
+        "400"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 150% 和 v3.7.0+ 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 150%处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '150%处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "400",
+        "RECOVERY"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 v3.7.0+ 和 v3.7.0 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 'v3.7.0+ 和 v3.7.0'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Transition",
+        "recovery"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 87% - under threshold! 和 score: 350/400。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '87% - under threshold! 和 score: 350/400'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "400",
+        "recovered"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 v3.8.0 - PR #3 fix 和 via IDE/terminal 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'v3.8.0 - PR #3 fix 和 via IDE/terminal'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "recovery",
+        "ts"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 StopTriggered=true 和 70% - below threshold! 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 'StopTriggered=true 和 70% - below threshold!'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "session",
+        "400"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 v3.7.0 和 v3.8.0 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'v3.7.0 和 v3.8.0'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "154",
+        "142"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 separate flow 和 implemented 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 separate flow处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'separate flow处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "shown",
+        "TIERS"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 42,
+    "repair_count": 2,
+    "grounding_acts_count": 20,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

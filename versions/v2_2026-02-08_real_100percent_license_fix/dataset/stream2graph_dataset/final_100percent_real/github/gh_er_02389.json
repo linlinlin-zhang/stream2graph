@@ -1,0 +1,18 @@
+{
+  "id": "gh_er_02389",
+  "source": "github",
+  "source_url": "https://github.com/gayagenius/payment-service-production/blob/9c0df6634dc986fd3b28ce60aefffce2b623cb40/docs/ERD.mmd",
+  "github_repo": "gayagenius/payment-service-production",
+  "github_file_path": "docs/ERD.mmd",
+  "diagram_type": "er",
+  "code": "erDiagram\n    USERS {\n        uuid id PK \"DEFAULT uuid_generate_v4()\"\n        varchar email \"NOT NULL, UNIQUE\"\n        varchar name \"NOT NULL\"\n        timestamptz created_at \"NOT NULL, DEFAULT now()\"\n        timestamptz updated_at \"NOT NULL, DEFAULT now()\"\n    }\n\n    -- Payment method tables removed - payment methods are now handled by the gateway directly\n\n\n    PAYMENTS {\n        uuid id PK \"DEFAULT uuid_generate_v4()\"\n        varchar user_id FK \"NOT NULL, REFERENCES USERS(id)\"\n        uuid order_id \"NOT NULL\"\n        integer amount \"NOT NULL, CHECK > 0\"\n        char currency \"NOT NULL, CHECK pattern\"\n        enum status \"NOT NULL, DEFAULT PENDING\"\n        jsonb gateway_response \"NOT NULL, DEFAULT '{}'\"\n        varchar idempotency_key \"NULL, UNIQUE\"\n        timestamptz created_at \"NOT NULL, DEFAULT now()\"\n        timestamptz updated_at \"NOT NULL, DEFAULT now()\"\n    }\n\n    REFUNDS {\n        uuid id PK \"DEFAULT uuid_generate_v4()\"\n        uuid payment_id FK \"NOT NULL, REFERENCES PAYMENTS(id)\"\n        integer amount \"NOT NULL, CHECK > 0\"\n        char currency \"NOT NULL, CHECK pattern\"\n        enum status \"NOT NULL, DEFAULT PENDING\"\n        text reason \"NULL, Refund reason\"\n        varchar idempotency_key \"NULL, UNIQUE\"\n        timestamptz created_at \"NOT NULL, DEFAULT now()\"\n        timestamptz updated_at \"NOT NULL, DEFAULT now()\"\n    }\n\n    -- User payment method relationship removed\n    USERS ||--o{ PAYMENTS : \"user_initiates_payment_transactions\"\n    -- Payment method relationships removed\n    PAYMENTS ||--o{ REFUNDS : \"payment_can_have_multiple_refund_requests\"",
+  "content_size": 1589,
+  "collected_at": "2026-02-06T02:12:04.645882",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

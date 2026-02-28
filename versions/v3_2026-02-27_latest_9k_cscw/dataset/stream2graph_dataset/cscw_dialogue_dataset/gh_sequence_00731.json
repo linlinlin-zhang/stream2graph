@@ -1,0 +1,66 @@
+{
+  "id": "gh_sequence_00731",
+  "source": "github",
+  "source_url": "https://github.com/KiritoMainBro88/kiritomainbro-monorepo/blob/f022137c7dc280db2b032ae9e3a88a305fa49167/docs/diagrams/close_month.mmd",
+  "github_repo": "KiritoMainBro88/kiritomainbro-monorepo",
+  "github_file_path": "docs/diagrams/close_month.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant C as Cron Job\n    participant A as API Server\n    participant D as Database\n    participant R as Redis\n    participant F as File Storage\n    participant E as Email Service\n    participant DI as Discord\n    \n    Note over C,DI: Monthly Close Process\n    \n    %% Start Close Month\n    C->>A: POST /admin/close-month\n    Note right of C: Triggered on 1st of month\n    \n    A->>D: Get pending payables\n    Note right of A: status: PENDING\n    D-->>A: List of pending payables\n    \n    A->>A: Calculate total amounts\n    Note right of A: Group by user, type\n    \n    A->>D: Create monthly report\n    Note right of A: status: GENERATING\n    D-->>A: Report created\n    \n    %% Generate Reports\n    A->>F: Generate Excel report\n    Note right of A: Payout summary, details\n    F-->>A: Report file path\n    \n    A->>F: Generate CSV export\n    Note right of A: For accounting system\n    F-->>A: CSV file path\n    \n    A->>D: Update report status\n    Note right of A: status: COMPLETED\n    D-->>A: Report updated\n    \n    %% Process Payouts\n    loop For each payable\n        A->>D: Update payable status\n        Note right of A: status: PROCESSING\n        D-->>A: Payable updated\n        \n        A->>A: Process payout\n        Note right of A: Bank transfer, etc.\n        \n        A->>D: Update payable status\n        Note right of A: status: COMPLETED\n        D-->>A: Payable updated\n        \n        A->>D: Create audit log\n        Note right of A: Payout processed\n        D-->>A: Audit log created\n    end\n    \n    %% Send Notifications\n    A->>E: Send email to users\n    Note right of A: Payout notifications\n    E-->>A: Emails sent\n    \n    A->>DI: Send Discord notification\n    Note right of A: Monthly summary\n    DI-->>A: Notification sent\n    \n    A->>D: Create notifications\n    Note right of A: In-app notifications\n    D-->>A: Notifications created\n    \n    %% Update Statistics\n    A->>D: Update monthly stats\n    Note right of A: Revenue, payouts, etc.\n    D-->>A: Stats updated\n    \n    A->>R: Cache monthly data\n    Note right of A: For dashboard\n    R-->>A: Data cached\n    \n    %% Cleanup\n    A->>D: Archive old data\n    Note right of A: Move to archive tables\n    D-->>A: Data archived\n    \n    A->>F: Cleanup temp files\n    Note right of A: Remove old exports\n    F-->>A: Files cleaned\n    \n    A-->>C: Close month completed\n    \n    %% Error Handling\n    Note over A,D: Error Handling\n    \n    alt Database Error\n        A->>D: Rollback transaction\n        D-->>A: Transaction rolled back\n        A->>E: Send error notification\n        E-->>A: Error notification sent\n        A-->>C: Close month failed\n    end\n    \n    alt File Generation Error\n        A->>F: Cleanup failed files\n        F-->>A: Files cleaned\n        A->>E: Send error notification\n        E-->>A: Error notification sent\n        A-->>C: Close month failed\n    end\n",
+  "content_size": 2877,
+  "collected_at": "2026-02-06T01:36:16.357680",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 2,
+  "repo_forks": 0,
+  "repo_owner": "KiritoMainBro88",
+  "repo_name": "kiritomainbro-monorepo",
+  "repo_description": "KMB monorepo (web + api) with Next.js, NestJS, Prisma, Turborepo, full security hardening and CI/CD",
+  "repo_language": "TypeScript",
+  "repo_topics": [],
+  "repo_created_at": "2025-10-09T16:51:12Z",
+  "repo_updated_at": "2025-10-24T07:26:58Z",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 主架构 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '主架构'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "root"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 4,
+    "repair_count": 0,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  }
+}

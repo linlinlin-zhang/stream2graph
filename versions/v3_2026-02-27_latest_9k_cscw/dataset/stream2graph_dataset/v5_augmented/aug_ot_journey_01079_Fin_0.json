@@ -1,0 +1,17 @@
+{
+  "id": "aug_ot_journey_01079_Fin_0",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/Helix-Flow/Platform/blob/b4f40a0a8236a89b434322c0226a0a236db49d92/diagrams/helixflow-testing-pipeline.mmd",
+  "source_type": "github_search",
+  "github_repo": "Helix-Flow/Platform",
+  "diagram_type": "journey",
+  "code": "graph LR\n    %% Code Commit\n    DEV[FinTech_FraudDetection] --> CI[FinTech_FraudDetection]\n\n    %% CI Pipeline\n    subgraph \"Continuous Integration Pipeline\"\n        LINT[FinTech_PaymentGateway]\n        TEST_UNIT[FinTech_PaymentGateway]\n        TEST_INT[FinTech_AuthVault]\n        BUILD[FinTech_AuthVault]\n        SCAN_SEC[FinTech_TransactionQueue]\n    end\n\n    %% Quality Gates\n    LINT --> TEST_UNIT\n    TEST_UNIT --> TEST_INT\n    TEST_INT --> BUILD\n    BUILD --> SCAN_SEC\n    SCAN_SEC --> DEPLOY_STAGING[FinTech_FraudDetection]\n\n    %% Staging Environment\n    subgraph \"Staging Environment\"\n        E2E_TESTS[FinTech_TransactionQueue]\n        PERF_TESTS[FinTech_TransactionQueue]\n        SEC_TESTS[FinTech_TransactionQueue]\n        COMP_TESTS[FinTech_LedgerService]\n    end\n\n    %% Production Deployment\n    DEPLOY_STAGING --> E2E_TESTS\n    E2E_TESTS --> PERF_TESTS\n    PERF_TESTS --> SEC_TESTS\n    SEC_TESTS --> COMP_TESTS\n    COMP_TESTS --> APPROVAL[FinTech_TransactionQueue]\n\n    APPROVAL --> DEPLOY_PROD[FinTech_LedgerService]\n\n    %% Production Monitoring\n    subgraph \"Production Monitoring\"\n        HEALTH_CHECKS[FinTech_FraudDetection]\n        MONITORING[FinTech_TransactionQueue]\n        ALERTS[FinTech_FraudDetection]\n        LOG_ANALYSIS[FinTech_AuthVault]\n    end\n\n    DEPLOY_PROD --> HEALTH_CHECKS\n    HEALTH_CHECKS --> MONITORING\n    MONITORING --> ALERTS\n    ALERTS --> LOG_ANALYSIS\n\n    %% Feedback Loop\n    LOG_ANALYSIS --> FEEDBACK[FinTech_LedgerService]\n    FEEDBACK --> DEV\n\n    %% Test Coverage Requirements\n    subgraph \"Quality Metrics\"\n        COV_UNIT[FinTech_FraudDetection]\n        COV_E2E[FinTech_TransactionQueue]\n        PERF_TARGET[FinTech_LedgerService]\n        SEC_SCORE[FinTech_FraudDetection]\n        SUCCESS_RATE[FinTech_FraudDetection]\n    end\n\n    TEST_UNIT -.-> COV_UNIT\n    E2E_TESTS -.-> COV_E2E\n    PERF_TESTS -.-> PERF_TARGET\n    SEC_TESTS -.-> SEC_SCORE\n    ALL_TESTS -.-> SUCCESS_RATE\n\n    %% Styling\n    classDef devClass fill:#e3f2fd,stroke:#1976d2,stroke-width:2px\n    classDef ciClass fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px\n    classDef stagingClass fill:#fff3e0,stroke:#f57c00,stroke-width:2px\n    classDef prodClass fill:#e8f5e8,stroke:#388e3c,stroke-width:2px\n    classDef monitoringClass fill:#fce4ec,stroke:#c2185b,stroke-width:2px\n    classDef qualityClass fill:#f1f8e9,stroke:#689f38,stroke-width:2px\n\n    class DEV,APPROVAL devClass\n    class LINT,TEST_UNIT,TEST_INT,BUILD,SCAN_SEC ciClass\n    class E2E_TESTS,PERF_TESTS,SEC_TESTS,COMP_TESTS stagingClass\n    class DEPLOY_PROD,HEALTH_CHECKS,MONITORING,ALERTS,LOG_ANALYSIS prodClass\n    class COV_UNIT,COV_E2E,PERF_TARGET,SEC_SCORE,SUCCESS_RATE qualityClass",
+  "content_size": 3322,
+  "collected_at": "2026-02-06T11:03:10.002034",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "FinTech",
+  "seed_id": "ot_journey_01079"
+}

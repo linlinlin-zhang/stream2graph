@@ -1,0 +1,273 @@
+{
+  "id": "gh_class_00945",
+  "source": "github",
+  "source_url": "https://github.com/gustavo-munhoz/rivu/blob/dee9bf0cd98e87660b7008fc4c4be22900b5686b/diagrams/core.mmd",
+  "github_repo": "gustavo-munhoz/rivu",
+  "github_file_path": "diagrams/core.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n\n  %% Instances\n  class InstanceHeader {\n    - relation_name: String\n    + attributes: Vec~Attribute~\n    - class_index: usize\n\n    + new~S~(relation_name: S, attributes: Vec~Attribute~, class_index: usize) Result~InstanceHeader, Error~\n    + relation_name() &str\n    + number_of_attributes() usize\n    + attribute_at_index(attribute_index: usize) Option~&Attribute~\n    + index_of_attribute(attribute: Attribute) Option~usize~\n    + class_index() usize\n    + class_attribute() Attribute\n    + number_of_classes() usize\n  }\n  InstanceHeader ..|> Serializable\n  InstanceHeader \"1\" --* \"many\" Attribute : contains\n  note for InstanceHeader \"S: Into<<x>String>\"\n\n  class Instance {\n    <<interface>>\n    + weight() f64\n    + set_weight(new_value: f64) Result~&#40&#41, Error~\n\n    + number_of_attributes() usize\n    + value_at_index(attribute_index: usize) Option~f64~\n    + set_value_at_index(attribute_index: usize, new_value: f64) Result~&#40&#41, Error~\n    + is_missing_at_index(attribute_index: usize) bool\n\n    + attribute_at_index(attribute_index: usize) Option~&Attribute~\n    + index_of_attribute(attribute: Attribute) Option~usize~\n\n    + class_index() usize\n    + class_value() f64\n    + set_class_value(new_value: f64) Result~&#40&#41, Error~\n    + is_class_missing() bool\n    + number_of_classes() usize\n\n    + to_vec() Vec~f64~\n\n    + header() &InstanceHeader\n  }\n  Instance ..|> Clone\n  Instance ..|> Copy\n  Instance ..|> Display\n\n  class DenseInstance {\n    - header: &InstanceHeader\n    - values: Vec~f64~\n    - weight: f64\n\n    + new(header: &InstanceHeader, values: Vec~f64~, weight: f64) Result~DenseInstance, Error~\n  }\n  DenseInstance ..|> Instance\n  DenseInstance \"many\" --o \"1\" InstanceHeader \n\n\n  %% Attributes\n  class Attribute {\n    <<interface>>\n\n    + name() &str\n    + as_any() &dyn Any\n    + arff_representation() String\n  }\n  note for NumericAttribute \"S: Into<<x>String>\"\n  Attribute ..|> Serializable\n  Attribute ..|> Display\n  Attribute ..|> Any\n  Attribute ..|> Send\n  Attribute ..|> Sync\n  \n\n  class NumericAttribute {\n    + name: String\n    + values: Vec~u32~\n    + new~S~(name: S) Result~NumericAttribute, Error~\n  }\n  NumericAttribute ..|> Attribute\n\n  class NominalAttribute {\n    - name: String\n    - values: Vec~String~\n    - label_to_index: HashMap~String, usize~\n\n    + new~S~(name: S) NominalAttribute\n    + with_values(name: S, values: Vec~String~, label_to_index: HashMap~String, usize~)\n    + get_attribute_values() Vec~String~\n    + index_of_value_mut(v: &str) Option~usize~\n    + enumerate_values() Iterator~&str~\n  }\n  NominalAttribute ..|> Attribute\n  note for NominalAttribute \"S: Into<<x>String>\"\n\n  <<interface>> Serializable\n  <<interface>> Copy\n  <<interface>> Clone\n",
+  "content_size": 2736,
+  "collected_at": "2026-02-06T01:39:11.489531",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "gpl-3.0",
+  "license_name": "GNU General Public License v3.0",
+  "license_url": "https://api.github.com/licenses/gpl-3.0",
+  "repo_stars": 3,
+  "repo_forks": 0,
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，InstanceHeader、Instance的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "InstanceHeader",
+        "Instance",
+        "DenseInstance"
+      ],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Attribute、NumericAttribute分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由Attribute、NumericAttribute组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "相较于方案A，Attribute、NumericAttribute有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "Attribute",
+        "NumericAttribute"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下NominalAttribute、..|>吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "NominalAttribute",
+        "rel_0",
+        "rel_1"
+      ],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由..|>、..|>组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "rel_2",
+        "rel_3"
+      ],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "关于..|>、..|>，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，..|>、..|>的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "..|>、..|>和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "rel_4",
+        "rel_5"
+      ],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将..|>、..|>分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是..|>、..|>应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "rel_6",
+        "rel_7",
+        "rel_8"
+      ],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "..|>、..|>主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是..|>、..|>应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "相较于方案A，..|>、..|>有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "rel_9",
+        "rel_10"
+      ],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "关于..|>，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是..|>应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在..|>完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "rel_11"
+      ],
+      "timestamp_offset": 390
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 26,
+    "speaker_distribution": {
+      "Speaker_B": 13,
+      "Speaker_A": 13
+    },
+    "speech_act_distribution": {
+      "sequential": 3,
+      "clarify": 5,
+      "classification": 3,
+      "confirm": 3,
+      "structural": 2,
+      "contrastive": 3,
+      "request": 3,
+      "inform": 4
+    },
+    "avg_turn_length": 20.653846153846153,
+    "dialogue_duration": 390
+  }
+}

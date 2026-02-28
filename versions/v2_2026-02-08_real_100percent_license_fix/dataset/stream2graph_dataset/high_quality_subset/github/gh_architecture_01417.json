@@ -1,0 +1,18 @@
+{
+  "id": "gh_architecture_01417",
+  "source": "github",
+  "source_url": "https://github.com/Oaz/itineraire_vacances_RNCP38919/blob/b4db70e3e120928cb0d5946cdf2b2cd0704ce4ce/dossier_projet/img/conteneurs.mmd",
+  "github_repo": "Oaz/itineraire_vacances_RNCP38919",
+  "github_file_path": "dossier_projet/img/conteneurs.mmd",
+  "diagram_type": "architecture",
+  "code": "flowchart TB\n    subgraph \"Infrastructure de données\"\n        pg[PostgreSQL] --- pgex[Postgres Exporter]\n        neo[Neo4j]\n        redis[Redis] --- redex[Redis Exporter]\n    end\n\n    subgraph \"Airflow ETL\"\n        web[Airflow Webserver]\n        sched[Airflow Scheduler]\n        worker[Airflow Worker]\n        flower[Airflow Flower]\n        init[Airflow Init]\n        airex[Airflow Exporter]\n\n        sched --> worker\n        web --> flower\n        init -.initialise.-> web\n        init -.initialise.-> sched\n        airex -.monitore.-> web\n        airex -.monitore.-> sched\n        airex -.monitore.-> worker\n    end\n\n    subgraph \"Applications\"\n        api[API FastAPI]\n        viz[DataViz Dash]\n    end\n\n    subgraph \"Monitoring\"\n        prom[Prometheus]\n        graf[Grafana]\n        bbox[Blackbox Exporter]\n\n        pgex --> prom\n        redex --> prom\n        airex --> prom\n        bbox --> prom\n        prom --> graf\n    end\n\n    pg --> api\n    neo --> api\n    pg --> worker\n    neo --> worker\n    redis --> worker\n    redis --> sched\n    neo --> viz\n    api --> bbox",
+  "content_size": 1075,
+  "collected_at": "2026-02-06T01:45:58.187189",
+  "license": "none",
+  "license_name": "No License",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

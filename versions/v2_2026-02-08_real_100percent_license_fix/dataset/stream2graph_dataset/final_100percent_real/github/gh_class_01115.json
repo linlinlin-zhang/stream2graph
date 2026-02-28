@@ -1,0 +1,18 @@
+{
+  "id": "gh_class_01115",
+  "source": "github",
+  "source_url": "https://github.com/iluvpomeranians/QNX-Real-time-ATC-Simulation/blob/18d76c6393440b888da1b762f208f9f1a62aa546/mermaid_scripts/aircraft_class_diagram.mmd",
+  "github_repo": "iluvpomeranians/QNX-Real-time-ATC-Simulation",
+  "github_file_path": "mermaid_scripts/aircraft_class_diagram.mmd",
+  "diagram_type": "class",
+  "code": "---\nconfig:\n  class:\n    hideEmptyMembersBox: true\n---\nclassDiagram\ndirection TB\n\nclass AirspaceSharedMemory {\n    +pthread_mutex_t lock\n    +int aircraft_count\n    +bool updated\n    +AircraftData aircraft_data[100]\n}\n\nclass AircraftData {\n    +int id\n    +int entryTime\n    +float x\n    +float y\n    +float z\n    +float speedX\n    +float speedY\n    +float speedZ\n}\n\nclass Aircraft {\n    -int id\n    -int entryTime\n    -int lastupdatedTime\n    -double x\n    -double y\n    -double z\n    -double speedX\n    -double speedY\n    -double speedZ\n    -bool running\n    -int shm_index\n    -char service_name[256]\n    -attach\n    -position_thread\n    -ipc_thread\n    @@ static Airspace* shared_memory\n    @@ static int aircraft_index\n    +Aircraft(int, int, double, double, double, double, double, double, Airspace*)\n    +void startThreads()\n    +void stopThreads()\n    +~Aircraft()\n    +void handle_operator_message(int, OperatorCommand*)\n    +void handle_radar_message(int, RadarMessage*)\n    +void send_terminator_message()\n    +static void* updatePositionThread(void*)\n    +static void* messageHandlerThread(void*)\n}\n\nclass AircraftManager {\n    +aircraft_queue\n    +active_aircrafts\n    +load_aircraft_data_from_file()\n    +init_shared_memory()\n    +spawn_aircrafts_by_time()\n    +verify_aircraft_data()\n}\n\n%% Relationships\nAircraft --> AircraftData : updates\nAircraft --> AirspaceSharedMemory : writes to\nAirspaceSharedMemory \"1\" *-- \"100\" AircraftData : contains\nAircraftManager --> Aircraft : spawns\nAircraftManager --> AirspaceSharedMemory : initializes\n",
+  "content_size": 1553,
+  "collected_at": "2026-02-06T01:53:10.481025",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

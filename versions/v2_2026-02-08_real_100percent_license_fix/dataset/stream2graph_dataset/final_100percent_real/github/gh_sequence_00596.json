@@ -1,0 +1,18 @@
+{
+  "id": "gh_sequence_00596",
+  "source": "github",
+  "source_url": "https://github.com/LuanFernandes23/RabbitMQ-Saga-Pattern/blob/99cc24fb07c7dbdab7c8221d3c69a33fe8a20e18/sequence_diagram.mmd",
+  "github_repo": "LuanFernandes23/RabbitMQ-Saga-Pattern",
+  "github_file_path": "sequence_diagram.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Cliente\n    participant Publisher\n    participant Exchange\n    participant SubPedido as Subscriber Pedido\n    participant SubPagamento as Subscriber Pagamento\n    participant SubEnvio as Subscriber Envio\n    \n    Cliente->>Publisher: Criar Pedido\n    \n    Publisher->>Exchange: Publicar PedidoCriado\n    Exchange->>SubPedido: PedidoCriado\n    Exchange->>SubPagamento: PedidoCriado\n    Exchange->>SubEnvio: PedidoCriado\n    \n    SubPedido->>SubPedido: Criar Pedido\n    SubPedido->>Publisher: PedidoCriado OK\n    \n    Publisher->>Exchange: Publicar ProcessarPagamento\n    Exchange->>SubPedido: ProcessarPagamento\n    Exchange->>SubPagamento: ProcessarPagamento\n    Exchange->>SubEnvio: ProcessarPagamento\n    \n    SubPagamento->>SubPagamento: Processar Pagamento\n    SubPagamento->>Publisher: PagamentoProcessado OK\n    \n    Publisher->>Exchange: Publicar ProcessarEnvio\n    Exchange->>SubPedido: ProcessarEnvio\n    Exchange->>SubPagamento: ProcessarEnvio\n    Exchange->>SubEnvio: ProcessarEnvio\n    \n    SubEnvio->>SubEnvio: Processar Envio\n    SubEnvio->>Publisher: EnvioProcessado OK\n    \n    alt Falha no Pagamento\n        SubPagamento->>Publisher: Falha no Pagamento\n        Publisher->>Exchange: Publicar CancelarPedido\n        Exchange->>SubPedido: CancelarPedido\n        SubPedido->>SubPedido: Cancelar Pedido\n    end\n    \n    alt Falha no Envio\n        SubEnvio->>Publisher: Falha no Envio\n        Publisher->>Exchange: Publicar EstornarPagamento\n        Exchange->>SubPagamento: EstornarPagamento\n        SubPagamento->>SubPagamento: Estornar Pagamento\n        Publisher->>Exchange: Publicar CancelarPedido\n        Exchange->>SubPedido: CancelarPedido\n        SubPedido->>SubPedido: Cancelar Pedido\n    end",
+  "content_size": 1746,
+  "collected_at": "2026-02-06T01:34:28.804582",
+  "compilation_status": "failed",
+  "license": "none",
+  "license_name": "No License",
+  "license_url": "",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

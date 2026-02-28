@@ -1,0 +1,290 @@
+{
+  "id": "gh_sequence_00340",
+  "source": "github",
+  "source_url": "https://github.com/MrChessman/Barangay-Santol-Document-Issuance-and-Backup-System-Documentations/blob/de2cbbd16572a9ede891cf89569937ef6b805680/docs/diagrams/sequence-issuance.mmd",
+  "github_repo": "MrChessman/Barangay-Santol-Document-Issuance-and-Backup-System-Documentations",
+  "github_file_path": "docs/diagrams/sequence-issuance.mmd",
+  "diagram_type": "sequence",
+  "code": "%% Sequence Diagram – Issue Document with Automated Backup & Opportunistic Cloud Sync\n%% Actors: Secretary (user), System services; aligns to Option B schema\n\nsequenceDiagram\n\tautonumber\n\tactor Secretary\n\tparticipant UI as User Interface\n\tparticipant Auth as AuthService\n\tparticipant Iss as IssuanceService\n\tparticipant PDF as PdfService\n\tparticipant FS as FileSystem\n\tparticipant Repo as DB/Repository\n\tparticipant Bkp as BackupService\n\tparticipant Cloud as CloudSyncService\n\n\tSecretary->>UI: Login(username, password)\n\tUI->>Auth: authenticate(credentials)\n\tAuth-->>UI: auth result\n\tUI-->>Secretary: login success\n\n\tNote over Secretary,UI: Start issuance\n\tSecretary->>UI: Enter requester details, type, purpose\n\tUI->>Iss: createIssuance(data)\n\tIss->>PDF: generate(issuance draft)\n\tPDF-->>Iss: PDF bytes/path\n\tIss->>FS: save PDF artifact\n\tFS-->>Iss: path + fileHash\n\tIss->>Repo: save IssuanceRecord + Artifact(meta)\n\tRepo-->>Iss: confirm IDs\n\tIss-->>UI: issuance created + artifact path\n\tUI-->>Secretary: show preview/print\n\n\tUI->>Bkp: queueLocal(artifact)\n\tBkp->>FS: copy to backup location\n\tFS-->>Bkp: copy OK\n\tBkp->>Repo: record BackupLog(status=SUCCESS)\n\tRepo-->>Bkp: logged\n\tBkp->>Cloud: upload(artifact)  \n\tNote over Cloud: If offline, enqueue and retry when online\n\tCloud-->>Bkp: result (SUCCESS/FAILED)\n\tBkp->>Repo: update BackupLog + Artifact.syncStatus\n\tRepo-->>Bkp: updated\n\tBkp-->>UI: backup status / alerts\n\tUI-->>Secretary: notify backup/cloud status\n\n\tNote over Secretary,Cloud: End of issuance flow\n",
+  "content_size": 1515,
+  "collected_at": "2026-02-06T01:30:55.121868",
+  "compilation_status": "success",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "repo_owner": "MrChessman",
+  "repo_name": "Barangay-Santol-Document-Issuance-and-Backup-System-Documentations",
+  "repo_description": "A transaction‑centric records and document issuance system for Barangay Santol (Silang, Cavite), designed for reliability on limited hardware, with automated local backup and opportunistic cloud sync ",
+  "repo_language": null,
+  "repo_topics": [],
+  "repo_created_at": "2025-11-11T10:17:29Z",
+  "repo_updated_at": "2025-11-11T10:26:46Z",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，User Interface、AuthService是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有User Interface、AuthService。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下User Interface、AuthService吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "UI",
+        "Auth",
+        "Iss"
+      ],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由PdfService、FileSystem组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是PdfService、FileSystem应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "PDF",
+        "FS"
+      ],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "关于DB/Repository，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，DB/Repository的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "最终，我们在DB/Repository完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "Repo"
+      ],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "关于BackupService、CloudSyncService，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "相较于方案A，BackupService、CloudSyncService有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "Bkp",
+        "Cloud",
+        "msg_0"
+      ],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下authenticate(credentials)吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是authenticate(credentials)应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，authenticate(credentials)的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_1"
+      ],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "关于Enter requester details, type, purpose、createIssuance(data)，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_2",
+        "msg_3",
+        "msg_4"
+      ],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "我们应该如何处理save PDF artifact、save IssuanceRecord + Artifact(meta)？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "你能详细说明一下save PDF artifact、save IssuanceRecord + Artifact(meta)吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "明白了，save PDF artifact、save IssuanceRecord + Artifact(meta)就这样设计。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_5",
+        "msg_6",
+        "msg_7"
+      ],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "copy to backup location、record BackupLog(status=SUCCESS)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_8",
+        "msg_9"
+      ],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将upload(artifact)、update BackupLog + Artifact.syncStatus分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，upload(artifact)、update BackupLog + Artifact.syncStatus是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达upload(artifact)、update BackupLog + Artifact.syncStatus结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_10",
+        "msg_11"
+      ],
+      "timestamp_offset": 405
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 27,
+    "speaker_distribution": {
+      "Speaker_B": 14,
+      "Speaker_A": 13
+    },
+    "speech_act_distribution": {
+      "sequential": 3,
+      "confirm": 3,
+      "structural": 2,
+      "request": 7,
+      "clarify": 4,
+      "inform": 5,
+      "contrastive": 1,
+      "classification": 2
+    },
+    "avg_turn_length": 39.2962962962963,
+    "dialogue_duration": 405
+  }
+}

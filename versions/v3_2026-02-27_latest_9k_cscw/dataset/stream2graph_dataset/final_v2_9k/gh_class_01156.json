@@ -1,0 +1,18 @@
+{
+  "id": "gh_class_01156",
+  "source": "github",
+  "source_url": "https://github.com/Teknowm3/Spring-Boot-Mikroservis-Projesi/blob/384cce6b923cb09715b2c253c0c32d1b798304c1/docs/object-diagrams/object-diagram-2-login.mmd",
+  "github_repo": "Teknowm3/Spring-Boot-Mikroservis-Projesi",
+  "github_file_path": "docs/object-diagrams/object-diagram-2-login.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n    class loginRequest[\"loginRequest: LoginRequest\"] {\n        username: \"admin\"\n        password: \"admin\"\n    }\n    \n    class existingUser[\"existingUser: User\"] {\n        id: 1\n        username: \"admin\"\n        password: \"$2a$10$abcdef... (BCrypt hash)\"\n        email: \"admin@example.com\"\n        role: \"ROLE_ADMIN\"\n    }\n    \n    class authentication[\"authentication: UsernamePasswordAuthenticationToken\"] {\n        principal: \"admin\"\n        credentials: \"admin\"\n        authenticated: \"false (before)\"\n        authorities: \"null\"\n    }\n    \n    class authenticatedToken[\"authenticatedToken: UsernamePasswordAuthenticationToken\"] {\n        principal: \"UserDetails(admin)\"\n        credentials: \"[PROTECTED]\"\n        authenticated: true\n        authorities: \"ROLE_ADMIN\"\n    }\n    \n    class jwtClaims[\"jwtClaims: Map\"] {\n        sub: \"admin\"\n        roles: \"ROLE_ADMIN\"\n        iat: 1735508400\n        exp: 1735594800\n    }\n    \n    class jwtToken[\"jwtToken: String\"] {\n        header: \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9\"\n        payload: \"eyJzdWIiOiJhZG1pbiIsInJvbGVzIjpbIlJPTEVfQURNSU4iXX0\"\n        signature: \"SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c\"\n    }\n    \n    class authResponse[\"authResponse: AuthResponse\"] {\n        token: \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n        type: \"Bearer\"\n        username: \"admin\"\n        message: \"Login successful\"\n    }\n    \n    class httpResponse[\"httpResponse: ResponseEntity\"] {\n        status: \"200 OK\"\n        headers: \"Content-Type: application/json\"\n        body: \"authResponse\"\n    }\n    \n    %% Alternative flow for regular user\n    class regularUser[\"regularUser: User\"] {\n        id: 3\n        username: \"john\"\n        password: \"$2a$10$xyz123...\"\n        email: \"john@example.com\"\n        role: \"ROLE_USER\"\n    }\n    \n    class regularAuthResponse[\"regularAuthResponse: AuthResponse\"] {\n        token: \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n        type: \"Bearer\"\n        username: \"john\"\n        message: \"Login successful\"\n    }\n    \n    %% Relationships - Admin Flow\n    loginRequest --> existingUser : \"finds in DB\"\n    loginRequest --> authentication : \"creates\"\n    authentication --> authenticatedToken : \"authenticated by AuthManager\"\n    existingUser --> jwtClaims : \"user data mapped to\"\n    jwtClaims --> jwtToken : \"encoded to\"\n    jwtToken --> authResponse : \"included in\"\n    authResponse --> httpResponse : \"wrapped in\"\n\n    regularUser ..> regularAuthResponse : \"generates for USER role\"\n    \n    note for loginRequest \"Input from Frontend\"\n    note for existingUser \"Retrieved from Auth DB\"\n    note for authenticatedToken \"Spring Security Context\"\n    note for httpResponse \"Sent to Frontend with token\"",
+  "content_size": 2707,
+  "collected_at": "2026-02-06T01:53:47.067175",
+  "compilation_status": "failed",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0
+}

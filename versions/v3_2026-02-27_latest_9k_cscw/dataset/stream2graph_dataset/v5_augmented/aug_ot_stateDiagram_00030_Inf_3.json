@@ -1,0 +1,17 @@
+{
+  "id": "aug_ot_stateDiagram_00030_Inf_3",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/openbankingproject-ch/Open-API-Kundenbeziehung/blob/0117d87c5299ec17e19105263dc1fb9615d87c47/Dokumentation%20Fachliche%20Perspektive/Fachliche%20Conclusions%20Open%20API%20Kundenbeziehung/Resources/graphics/06-consent-security/consent-lifecycle-management.mmd",
+  "source_type": "github_search_special",
+  "github_repo": "openbankingproject-ch/Open-API-Kundenbeziehung",
+  "diagram_type": "stateDiagram",
+  "code": "stateDiagram-v2\n    [Infra_WorkerNode] --> ConsentRequested: Customer service request\n    \n    ConsentRequested --> ConsentPresented: Show consent form\n    ConsentPresented --> ConsentGranted: Customer accepts\n    ConsentPresented --> ConsentRejected: Customer rejects\n    \n    ConsentGranted --> ConsentActive: Consent validated & active\n    ConsentRejected --> [Infra_EtcdCluster]: Process terminated\n    \n    ConsentActive --> DataAccess: Provider uses consent\n    DataAccess --> ConsentActive: Ongoing data access\n    \n    ConsentActive --> ConsentModified: Customer modifies scope\n    ConsentModified --> ConsentActive: Updated consent active\n    \n    ConsentActive --> ConsentExpiring: Approaching expiry\n    ConsentExpiring --> ConsentRenewed: Customer renews\n    ConsentExpiring --> ConsentExpired: Automatic expiry\n    ConsentRenewed --> ConsentActive: Renewed consent active\n    \n    ConsentActive --> ConsentRevoked: Customer revokes\n    ConsentExpired --> ConsentArchived: Archive expired consent\n    ConsentRevoked --> ConsentArchived: Archive revoked consent\n    \n    ConsentArchived --> [Infra_LoadBalancer]: End of lifecycle\n    \n    DataAccess --> AuditLog: Log every access\n    ConsentModified --> AuditLog: Log modifications\n    ConsentRevoked --> AuditLog: Log revocation\n    ConsentExpired --> AuditLog: Log expiry\n    \n    AuditLog --> ComplianceReport: Generate reports",
+  "content_size": 1344,
+  "collected_at": "2026-02-06T10:36:59.054291",
+  "compilation_status": "success",
+  "license": "other_source",
+  "license_name": "Other Source (GitHub-based)",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "augmentation_domain": "Infra",
+  "seed_id": "ot_stateDiagram_00030"
+}

@@ -1,0 +1,18 @@
+{
+  "id": "gh_class_01334",
+  "source": "github",
+  "source_url": "https://github.com/SpillwaveSolutions/agent-brain/blob/2eec54ce3360ca998136da6cf8ccf3c3f51eb76d/docs/design/src/class-diagrams_chunking.mmd",
+  "github_repo": "SpillwaveSolutions/agent-brain",
+  "github_file_path": "docs/design/src/class-diagrams_chunking.mmd",
+  "diagram_type": "class",
+  "code": "classDiagram\n    class ContextAwareChunker {\n        -int chunk_size\n        -int chunk_overlap\n        -Encoding tokenizer\n        -SentenceSplitter splitter\n\n        +count_tokens(text) int\n        +chunk_documents(documents, progress_callback) list~TextChunk~\n        +chunk_single_document(document) list~TextChunk~\n        +rechunk_with_config(documents, chunk_size, chunk_overlap) list~TextChunk~\n        +get_chunk_stats(chunks) dict\n    }\n\n    class CodeChunker {\n        -str language\n        -int chunk_lines\n        -int chunk_lines_overlap\n        -int max_chars\n        -bool generate_summaries\n        -CodeSplitter code_splitter\n        -Language ts_language\n        -Parser parser\n        -Encoding tokenizer\n\n        +count_tokens(text) int\n        +chunk_code_document(document) list~CodeChunk~\n        +get_code_chunk_stats(chunks) dict\n\n        -_setup_language() None\n        -_get_symbols(text) list~dict~\n        -_extract_xml_doc_comment(text, line) str\n    }\n\n    class TextChunk {\n        +str chunk_id\n        +str text\n        +str source\n        +int chunk_index\n        +int total_chunks\n        +int token_count\n        +ChunkMetadata metadata\n    }\n\n    class CodeChunk {\n        +str chunk_id\n        +str text\n        +str source\n        +int chunk_index\n        +int total_chunks\n        +int token_count\n        +ChunkMetadata metadata\n\n        +create(...)$ CodeChunk\n    }\n\n    class ChunkMetadata {\n        +str chunk_id\n        +str source\n        +str file_name\n        +int chunk_index\n        +int total_chunks\n        +str source_type\n        +datetime created_at\n        +str language\n        +str heading_path\n        +str section_title\n        +str content_type\n        +str symbol_name\n        +str symbol_kind\n        +int start_line\n        +int end_line\n        +str section_summary\n        +str prev_section_summary\n        +str docstring\n        +list~str~ parameters\n        +str return_type\n        +list~str~ decorators\n        +list~str~ imports\n        +dict extra\n\n        +to_dict() dict\n    }\n\n    ContextAwareChunker --> TextChunk : creates\n    CodeChunker --> CodeChunk : creates\n    TextChunk --> ChunkMetadata : contains\n    CodeChunk --> ChunkMetadata : contains",
+  "content_size": 2228,
+  "collected_at": "2026-02-06T01:56:23.911735",
+  "compilation_status": "failed",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 24,
+  "repo_forks": 5,
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。"
+}

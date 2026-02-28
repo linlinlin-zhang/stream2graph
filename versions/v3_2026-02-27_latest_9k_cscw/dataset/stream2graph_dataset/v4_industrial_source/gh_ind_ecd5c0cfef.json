@@ -1,0 +1,9 @@
+{
+  "id": "gh_ind_ecd5c0cfef",
+  "source": "github_industrial",
+  "repo": "fluxninja/aperture",
+  "license": "apache-2.0",
+  "code": "flowchart TD\n    blueprints[/\"Blueprints\"/]\n    policies[/\"Policies\"/]\n    subgraph controller[\"Aperture Controller\"]\n        circuit[\"Control Circuit\"]\n    end\n    subgraph databases[\"Aperture Databases\"]\n      prometheus[(\"Prometheus\")]\n      etcd[(\"etcd\")]\n    end\n    subgraph discoverydb[\"Discovery Databases\"]\n      k8sdiscovery[\"Kubernetes\"]\n      consul[\"Consul\"]\n    end\n    subgraph orchestrators[\"Orchestrators\"]\n      k8s[\"Kubernetes\"]\n    end\n    subgraph worker[\"Worker Node (Kubernetes/VM/Bare-metal)\"]\n      subgraph agent[\"Aperture Agent\"]\n          discovery[\"Discovery\"]\n          telemetry[\"Telemetry Collector\"]\n          flowcontrol[\"Flow Controller\"]\n          autoscaler[\"Auto Scaler\"]\n      end\n      subgraph serviceinstance[\"Service Instance\"]\n        servicelogic[\"Service Logic\"]\n        servicemesh[\"Service Mesh\"]\n      end\n      subgraph gateways[\"Gateways\"]\n        Kong[\"Kong\"]\n        Nginx[\"Nginx\"]\n      end\n    end\n    blueprints --> |aperturectl| policies\n    policies --> |Kubernetes Custom Resource| controller\n    controller<--> |Configuration/Telemetry/Flow Control| databases\n    databases<-->|Configuration/Telemetry/Flow Control|agent\n    agent <--->|SDK: Telemetry/Flow Control| servicelogic\n    agent <--->|Telemetry/Flow Control| servicemesh\n\t\tagent <--->|Telemetry/Flow Control| gateways\n    orchestrators <-->|Auto Scale| agent\n    discoverydb <-->|Discovery| agent\n",
+  "diagram_type": "node size:900..1500",
+  "collected_at": "2026-02-27T05:30:43.419327"
+}

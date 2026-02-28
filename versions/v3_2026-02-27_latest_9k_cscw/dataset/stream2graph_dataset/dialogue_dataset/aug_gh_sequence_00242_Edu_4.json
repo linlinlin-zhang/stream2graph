@@ -1,0 +1,251 @@
+{
+  "id": "aug_gh_sequence_00242_Edu_4",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/nduyhai/valjean/blob/58e2110f3dd9143576c1eed46c36c4dabcca65b3/docs/req.mmd",
+  "github_repo": "nduyhai/valjean",
+  "github_file_path": "docs/req.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant TG as Telegram\n    participant Web as Webhook Server (Education_ClassroomService)\n    participant App as UseCase: EvaluateMsg\n    participant LLM as LLM Client\n    participant MCP as MCP Client\n\n    TG->>Web: POST /webhook (Education_ContentCDN)\n    Web->>App: HandleUpdate(Education_LMS_Portal)\n    App->>App: Gate (Education_LMS_Portal)\n    App->>App: RateLimit & Moderation check\n    alt Engine = LLM\n        App->>LLM: Analyze(Education_StudentDB)\n        LLM-->>App: summary/eval\n    else Engine = MCP\n        App->>MCP: call tools (Education_LMS_Portal)\n        MCP-->>App: tool results\n    else Engine = Hybrid\n        App->>MCP: context snippets\n        MCP-->>App: evidence\n        App->>LLM: Synthesize(Education_GradeSync)\n        LLM-->>App: final answer\n    end\n    App-->>Web: reply text\n    Web-->>TG: sendMessage\n",
+  "content_size": 795,
+  "collected_at": "2026-02-06T01:29:35.564444",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 4,
+  "repo_forks": 0,
+  "repo_owner": "nduyhai",
+  "repo_name": "valjean",
+  "repo_description": "valjean bot",
+  "repo_language": "Go",
+  "repo_topics": [],
+  "repo_created_at": "2025-10-04T02:39:33Z",
+  "repo_updated_at": "2026-02-03T15:22:26Z",
+  "augmentation_domain": "Education",
+  "seed_id": "gh_sequence_00242",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "让我澄清一下，Telegram的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "TG"
+      ],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "Webhook Server (Education_ClassroomService)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "我的意思是Webhook Server (Education_ClassroomService)应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，Webhook Server (Education_ClassroomService)有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "Web"
+      ],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "UseCase: EvaluateMsg主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "App"
+      ],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有LLM Client、MCP Client。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "LLM",
+        "MCP"
+      ],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "POST /webhook (Education_ContentCDN)、HandleUpdate(Education_LMS_Portal)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，POST /webhook (Education_ContentCDN)、HandleUpdate(Education_LMS_Portal)的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "POST /webhook (Education_ContentCDN)、HandleUpdate(Education_LMS_Portal)和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_0",
+        "msg_1",
+        "msg_2"
+      ],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "RateLimit & Moderation check、Analyze(Education_StudentDB)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，RateLimit & Moderation check、Analyze(Education_StudentDB)的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "相较于方案A，RateLimit & Moderation check、Analyze(Education_StudentDB)有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，RateLimit & Moderation check、Analyze(Education_StudentDB)的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_3",
+        "msg_4",
+        "msg_5"
+      ],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "我们可以将context snippets分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，context snippets的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_6"
+      ],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "从结构上看，我们有Synthesize(Education_GradeSync)。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Synthesize(Education_GradeSync)的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "相较于方案A，Synthesize(Education_GradeSync)有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "最后，流程到达Synthesize(Education_GradeSync)结束。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_7"
+      ],
+      "timestamp_offset": 345
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 23,
+    "speaker_distribution": {
+      "Speaker_B": 12,
+      "Speaker_A": 11
+    },
+    "speech_act_distribution": {
+      "sequential": 2,
+      "clarify": 7,
+      "classification": 5,
+      "contrastive": 4,
+      "confirm": 1,
+      "structural": 2,
+      "inform": 2
+    },
+    "avg_turn_length": 46.04347826086956,
+    "dialogue_duration": 345
+  }
+}

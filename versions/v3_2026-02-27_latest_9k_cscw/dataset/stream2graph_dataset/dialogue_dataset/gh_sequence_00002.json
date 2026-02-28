@@ -1,0 +1,393 @@
+{
+  "id": "gh_sequence_00002",
+  "source": "github",
+  "source_url": "https://github.com/sumsv50/cinema-reservation/blob/368d4732c5a459aa1686a4076af81cba1b3cebfb/sequenceDiagram.mmd",
+  "github_repo": "sumsv50/cinema-reservation",
+  "github_file_path": "sequenceDiagram.mmd",
+  "diagram_type": "sequence",
+  "code": "sequenceDiagram\n    participant Client\n    participant API as Server API\n    participant DB as Database (PostgreSQL)\n    participant Redis\n\n    %% App Start\n    Note over Client, Redis: Sync existing reservations from the database to Redis on application startup\n    API ->> DB: Fetch all reservations for all cinemas\n    DB -->> API: Return reservation details\n    API ->> Redis: Store reservations using Redis pipeline\n    alt Redis storage successful  \n        Redis -->> API: OK  \n        API ->> API: Proceed to start application  \n    else Redis storage failed  \n        Redis -->> API: ERROR  \n        API ->> API: Abort application startup  \n    end\n\n    %% Configure Cinema Layout\n    Note over Client, Redis: 1. Configure Cinema Layout\n    Client->>API: POST /cinema/layout\n    API->>DB: Check if cinema name exists\n    DB-->>API: Return existence status\n    alt Cinema doesn't exist\n        API->>DB: Create cinema record\n        DB-->>API: Cinema created\n        API-->>Client: Success response with cinema data\n    else Cinema exists\n        API-->>Client: Error: Cinema already exists\n    end\n\n    %% Query Available Seats\n    Note over Client, Redis: 2. Query Available Seats\n    Client->>API: GET /cinema/{slug}/available?number_of_seats=N\n    API->>DB: Get cinema by slug\n    DB-->>API: Cinema details\n    API->>Redis: Get reserved seats (HGETALL cinema:ID:seats)\n    Redis-->>API: Reserved seats data\n    API->>API: Build heatmap & find safe blocks\n    API-->>Client: Available seat blocks\n\n    %% Check Available Seats\n    Note over Client, Redis: 3. Check Available Seats\n    Client->>API: POST /cinema/{slug}/check (with seat list)\n    API->>DB: Get cinema by slug\n    DB-->>API: Cinema details\n    API->>Redis: Get reserved seats (HGETALL cinema:ID:seats)\n    Redis-->>API: Reserved seats data\n    API->>API: Build heatmap & check specific seats\n    API-->>Client: Available seats from requested list\n\n    %% Reserve Seats\n    Note over Client, Redis: 4. Reserve Seats\n    Client->>API: POST /reservations (with cinema_slug & seats)\n    API->>DB: Get cinema by slug\n    DB-->>API: Cinema details\n    API->>API: Validate seat positions\n    API->>Redis: Execute Lua script for atomic reservation\n    Note over Redis: Lua script checks:<br/>- Seats not already taken<br/>- Social distancing rules<br/>- Reserves seats if valid\n    alt Reservation successful in Redis\n        Redis-->>API: \"OK\"\n        API->>DB: Create reservation record\n        DB-->>API: Reservation created\n        API-->>Client: Success with reservation data\n    else Reservation failed in Redis\n        Redis-->>API: Error (seats taken/distance violation)\n        API-->>Client: Error response\n    else DB creation failed\n        Redis-->>API: \"OK\"\n        API->>DB: Create reservation record\n        DB-->>API: Error\n        API->>Redis: Execute cancel Lua script (rollback)\n        Redis-->>API: Seats cancelled\n        API-->>Client: Error response\n    end\n\n    %% Cancel Reservation\n    Note over Client, Redis: 5. Cancel Reservation\n    Client->>API: POST /reservations/cancel (with cinema_slug & seats)\n    API->>DB: Get cinema by slug\n    DB-->>API: Cinema details\n    API->>API: Validate seat positions\n    API->>DB: Find reserved seats to cancel\n    DB-->>API: Reserved seat records\n    alt All seats are reserved\n        API->>DB: Soft delete reservation records\n        DB-->>API: Seats cancelled in DB\n        API->>Redis: Execute cancel Lua script\n        Redis-->>API: Seats removed from Redis\n        API-->>Client: Success response\n    else Some seats not reserved\n        API-->>Client: Error: Seats not reserved\n    end",
+  "content_size": 3628,
+  "collected_at": "2026-02-06T01:23:54.559146",
+  "compilation_status": "success",
+  "dialogue": [
+    {
+      "turn_id": 1,
+      "speaker": "Speaker_B",
+      "utterance": "让我们从头开始，先确定入口点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [],
+      "timestamp_offset": 15
+    },
+    {
+      "turn_id": 2,
+      "speaker": "Speaker_A",
+      "utterance": "确认一下，Server API是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 30
+    },
+    {
+      "turn_id": 3,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "API"
+      ],
+      "timestamp_offset": 45
+    },
+    {
+      "turn_id": 4,
+      "speaker": "Speaker_A",
+      "utterance": "关于Database (PostgreSQL)，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 60
+    },
+    {
+      "turn_id": 5,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 75
+    },
+    {
+      "turn_id": 6,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 90
+    },
+    {
+      "turn_id": 7,
+      "speaker": "Speaker_B",
+      "utterance": "我们来设计一下这个流程，首先需要一个开始节点。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "DB"
+      ],
+      "timestamp_offset": 105
+    },
+    {
+      "turn_id": 8,
+      "speaker": "Speaker_A",
+      "utterance": "关于POST /cinema/layout，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 120
+    },
+    {
+      "turn_id": 9,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_0"
+      ],
+      "timestamp_offset": 135
+    },
+    {
+      "turn_id": 10,
+      "speaker": "Speaker_A",
+      "utterance": "关于Check if cinema name exists、Create cinema record，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 150
+    },
+    {
+      "turn_id": 11,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，Check if cinema name exists、Create cinema record是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 165
+    },
+    {
+      "turn_id": 12,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_1",
+        "msg_2"
+      ],
+      "timestamp_offset": 180
+    },
+    {
+      "turn_id": 13,
+      "speaker": "Speaker_B",
+      "utterance": "关于GET /cinema/{slug}/available?number_of_seats=N、Get cinema by slug，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 195
+    },
+    {
+      "turn_id": 14,
+      "speaker": "Speaker_A",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_3",
+        "msg_4",
+        "msg_5"
+      ],
+      "timestamp_offset": 210
+    },
+    {
+      "turn_id": 15,
+      "speaker": "Speaker_B",
+      "utterance": "这个系统主要由Build heatmap & find safe blocks、POST /cinema/{slug}/check (with seat list)组成。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 225
+    },
+    {
+      "turn_id": 16,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 240
+    },
+    {
+      "turn_id": 17,
+      "speaker": "Speaker_B",
+      "utterance": "相较于方案A，Build heatmap & find safe blocks、POST /cinema/{slug}/check (with seat list)有更好的性能。",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [],
+      "timestamp_offset": 255
+    },
+    {
+      "turn_id": 18,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理Build heatmap & find safe blocks、POST /cinema/{slug}/check (with seat list)？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "msg_6",
+        "msg_7"
+      ],
+      "timestamp_offset": 270
+    },
+    {
+      "turn_id": 19,
+      "speaker": "Speaker_B",
+      "utterance": "Get cinema by slug、Get reserved seats (HGETALL cinema:ID:seats)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 285
+    },
+    {
+      "turn_id": 20,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 300
+    },
+    {
+      "turn_id": 21,
+      "speaker": "Speaker_B",
+      "utterance": "让我澄清一下，Get cinema by slug、Get reserved seats (HGETALL cinema:ID:seats)的作用是...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [
+        "msg_8",
+        "msg_9"
+      ],
+      "timestamp_offset": 315
+    },
+    {
+      "turn_id": 22,
+      "speaker": "Speaker_A",
+      "utterance": "关于Build heatmap & check specific seats，你有什么想法？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 330
+    },
+    {
+      "turn_id": 23,
+      "speaker": "Speaker_B",
+      "utterance": "确认一下，Build heatmap & check specific seats是正确的吧？",
+      "speech_act": "confirm",
+      "diagram_elements_added": [
+        "msg_10"
+      ],
+      "timestamp_offset": 345
+    },
+    {
+      "turn_id": 24,
+      "speaker": "Speaker_A",
+      "utterance": "整体架构包含POST /reservations (with cinema_slug & seats)、Get cinema by slug这几个部分。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 360
+    },
+    {
+      "turn_id": 25,
+      "speaker": "Speaker_B",
+      "utterance": "我们需要确保这个逻辑是正确的。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 375
+    },
+    {
+      "turn_id": 26,
+      "speaker": "Speaker_A",
+      "utterance": "POST /reservations (with cinema_slug & seats)、Get cinema by slug和另一个方案相比，优势在于...",
+      "speech_act": "contrastive",
+      "diagram_elements_added": [
+        "msg_11",
+        "msg_12",
+        "msg_13"
+      ],
+      "timestamp_offset": 390
+    },
+    {
+      "turn_id": 27,
+      "speaker": "Speaker_B",
+      "utterance": "Execute Lua script for atomic reservation、Create reservation record主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 405
+    },
+    {
+      "turn_id": 28,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 420
+    },
+    {
+      "turn_id": 29,
+      "speaker": "Speaker_B",
+      "utterance": "我们可以将Execute Lua script for atomic reservation、Create reservation record分为几个类型。",
+      "speech_act": "classification",
+      "diagram_elements_added": [
+        "msg_14",
+        "msg_15"
+      ],
+      "timestamp_offset": 435
+    },
+    {
+      "turn_id": 30,
+      "speaker": "Speaker_A",
+      "utterance": "Create reservation record、Execute cancel Lua script (rollback)主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 450
+    },
+    {
+      "turn_id": 31,
+      "speaker": "Speaker_B",
+      "utterance": "我同意这个观点。",
+      "speech_act": "inform",
+      "diagram_elements_added": [],
+      "timestamp_offset": 465
+    },
+    {
+      "turn_id": 32,
+      "speaker": "Speaker_A",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_16",
+        "msg_17"
+      ],
+      "timestamp_offset": 480
+    },
+    {
+      "turn_id": 33,
+      "speaker": "Speaker_B",
+      "utterance": "从结构上看，我们有POST /reservations/cancel (with cinema_slug & seats)、Get cinema by slug。",
+      "speech_act": "structural",
+      "diagram_elements_added": [],
+      "timestamp_offset": 495
+    },
+    {
+      "turn_id": 34,
+      "speaker": "Speaker_A",
+      "utterance": "好的，那就按这个方案。",
+      "speech_act": "confirm",
+      "diagram_elements_added": [],
+      "timestamp_offset": 510
+    },
+    {
+      "turn_id": 35,
+      "speaker": "Speaker_B",
+      "utterance": "这个设计看起来不错。",
+      "speech_act": "inform",
+      "diagram_elements_added": [
+        "msg_18",
+        "msg_19"
+      ],
+      "timestamp_offset": 525
+    },
+    {
+      "turn_id": 36,
+      "speaker": "Speaker_A",
+      "utterance": "我们应该如何处理Validate seat positions、Find reserved seats to cancel？",
+      "speech_act": "request",
+      "diagram_elements_added": [],
+      "timestamp_offset": 540
+    },
+    {
+      "turn_id": 37,
+      "speaker": "Speaker_B",
+      "utterance": "我的意思是Validate seat positions、Find reserved seats to cancel应该这样理解...",
+      "speech_act": "clarify",
+      "diagram_elements_added": [],
+      "timestamp_offset": 555
+    },
+    {
+      "turn_id": 38,
+      "speaker": "Speaker_A",
+      "utterance": "你能详细说明一下Validate seat positions、Find reserved seats to cancel吗？",
+      "speech_act": "request",
+      "diagram_elements_added": [
+        "msg_20",
+        "msg_21",
+        "msg_22"
+      ],
+      "timestamp_offset": 570
+    },
+    {
+      "turn_id": 39,
+      "speaker": "Speaker_B",
+      "utterance": "Execute cancel Lua script主要包含以下几类。",
+      "speech_act": "classification",
+      "diagram_elements_added": [],
+      "timestamp_offset": 585
+    },
+    {
+      "turn_id": 40,
+      "speaker": "Speaker_A",
+      "utterance": "最终，我们在Execute cancel Lua script完成整个流程。",
+      "speech_act": "sequential",
+      "diagram_elements_added": [
+        "msg_23"
+      ],
+      "timestamp_offset": 600
+    }
+  ],
+  "dialogue_stats": {
+    "total_turns": 40,
+    "speaker_distribution": {
+      "Speaker_B": 20,
+      "Speaker_A": 20
+    },
+    "speech_act_distribution": {
+      "sequential": 3,
+      "confirm": 5,
+      "inform": 12,
+      "request": 8,
+      "structural": 3,
+      "contrastive": 2,
+      "classification": 5,
+      "clarify": 2
+    },
+    "avg_turn_length": 42.0,
+    "dialogue_duration": 600
+  }
+}
