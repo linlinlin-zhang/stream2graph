@@ -12,6 +12,7 @@ BOOL_FIELDS = {
     "diagram_type_match",
     "compile_success",
     "realtime_eval_pass",
+    "parse_valid",
 }
 
 
