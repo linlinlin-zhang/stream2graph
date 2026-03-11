@@ -29,8 +29,16 @@ The platform is designed to support a rigorous paper workflow with:
   - Gemini-specific benchmark entrypoint for the official Google interface
 - `tools/eval/run_openai_compatible_benchmark.py`
   - benchmark entrypoint for official OpenAI-compatible providers such as Kimi, DeepSeek, MiniMax, Qwen DashScope, and SiliconFlow
+- `tools/eval/run_local_hf_benchmark.py`
+  - benchmark entrypoint for local or cloud-hosted open-weight models loaded via Hugging Face + optional LoRA adapters
+- `tools/eval/run_traditional_benchmark.py`
+  - heuristic / traditional baseline benchmark entrypoint that runs both offline and realtime evaluation
+- `tools/eval/materialize_experiment_matrix.py`
+  - materializes paper-oriented experiment matrices into per-run configs and can optionally execute them
 - `tools/eval/export_run_bundle.py`
   - exports selected run outputs into a git-trackable bundle under `reports/evaluation/published/`
+- `tools/eval/traditional_baselines.py`
+  - rule-based dialogue-to-diagram baseline built on the existing realtime heuristic pipeline
 - `tools/eval/common.py`
   - shared path and JSON helpers
 - `tools/eval/dataset.py`
@@ -67,6 +75,8 @@ The platform is designed to support a rigorous paper workflow with:
   - frontier API baseline
 - `static_jsonl`
   - reuse already-generated prediction files
+- `traditional_rule_based`
+  - heuristic baseline built from the existing intent engine and incremental renderer
 
 ## Actual evaluation flow
 
@@ -163,6 +173,41 @@ python tools/eval/run_openai_compatible_benchmark.py --config configs/evaluation
 python tools/eval/run_openai_compatible_benchmark.py --config configs/evaluation/siliconflow_benchmark.example.json
 ```
 
+### 9. Run a local Hugging Face benchmark
+
+```bash
+python tools/eval/run_local_hf_benchmark.py --config configs/evaluation/local_hf_qwen35_27b_base_benchmark.example.json
+```
+
+Use the SFT template when the adapter is already available:
+
+```bash
+python tools/eval/run_local_hf_benchmark.py --config configs/evaluation/local_hf_qwen35_27b_sft_benchmark.example.json
+```
+
+### 10. Run the traditional heuristic baseline
+
+```bash
+python tools/eval/run_traditional_benchmark.py --config configs/evaluation/traditional_benchmark_smoke.json
+```
+
+This produces:
+
+- a heuristic final Mermaid prediction file
+- offline structure-quality scores
+- realtime latency / stability scores
+- a combined report
+
+The current implementation can also inject a weak `diagram_type_proxy` intent label for
+diagnostic intent scoring. That proxy is useful for internal comparison, but should not be
+treated as a gold annotation in the paper.
+
+### 11. Materialize the paper comparison matrix
+
+```bash
+python tools/eval/materialize_experiment_matrix.py --config configs/evaluation/paper_matrix_icmi_smoke.json
+```
+
 ## Main offline metrics
 
 - normalized exact match
@@ -216,5 +261,11 @@ The repository includes smoke configs under `configs/evaluation/`:
 - `minimax_benchmark.example.json`
 - `qwen_dashscope_benchmark.example.json`
 - `siliconflow_benchmark.example.json`
+- `local_hf_qwen35_27b_base_benchmark.example.json`
+- `local_hf_qwen35_27b_sft_benchmark.example.json`
+- `traditional_benchmark_smoke.json`
+- `traditional_benchmark_full.example.json`
+- `paper_matrix_icmi_smoke.json`
+- `paper_matrix_icmi_main.example.json`
 
 These are intended to verify the pipeline without requiring model weights or API keys.

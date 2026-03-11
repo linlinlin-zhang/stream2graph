@@ -13,7 +13,7 @@
   - Realtime UI.
 - `configs/`
   - Runtime and training configuration files.
-  - `configs/evaluation/` contains benchmark and predictor config templates.
+  - `configs/evaluation/` contains benchmark, provider, local-HF, traditional-baseline, and paper-matrix config templates.
 - `reports/`
   - Canonical reports that belong to the project workflow.
   - `reports/evaluation/runs/` is for generated benchmark outputs and should not be committed.
@@ -47,6 +47,7 @@
 - New evaluation docs go in `docs/evaluation/`.
 - New shell helpers for environment setup go in `tools/ops/`.
 - New evaluation scripts go in `tools/eval/`.
+- New paper experiment matrix templates go in `configs/evaluation/`.
 - One-off probe outputs and temporary analysis artifacts should go to `workspace_archive/`, not the repository root.
 - Generated runtime logs belong in `reports/runtime/`.
 - Generated evaluation outputs belong in `reports/evaluation/runs/`, `artifacts/evaluation/`, or `data/evaluation/`.

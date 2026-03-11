@@ -124,7 +124,19 @@ def main() -> None:
 
     predictor_config = {
         key: raw_config[key]
-        for key in {"extra_body", "provider_name"}
+        for key in {
+            "extra_body",
+            "provider_name",
+            "turn_interval_ms",
+            "realtime",
+            "time_scale",
+            "max_chunks",
+            "min_wait_k",
+            "base_wait_k",
+            "max_wait_k",
+            "expected_intent_strategy",
+            "diagram_export_style",
+        }
         if key in raw_config
     }
     predictor_config.update(_predictor_config_from_args(args))

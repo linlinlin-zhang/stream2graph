@@ -21,6 +21,7 @@ from streaming_intent_engine import EngineConfig  # noqa: E402
 from tools.eval.common import resolve_path, utc_iso, write_json  # noqa: E402
 from tools.eval.dataset import DEFAULT_SOURCE_DIR, DEFAULT_SPLIT_DIR, load_evaluation_samples, sample_to_transcript_rows  # noqa: E402
 from tools.eval.reporting import aggregate_rows, dialogue_turn_bucket, group_rows, markdown_table, top_failure_examples, write_csv  # noqa: E402
+from tools.eval.traditional_baselines import proxy_intent_for_diagram_type  # noqa: E402
 
 
 REALTIME_METRIC_FIELDS = [
@@ -50,6 +51,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--min-wait-k", type=int, default=1)
     parser.add_argument("--base-wait-k", type=int, default=2)
     parser.add_argument("--max-wait-k", type=int, default=4)
+    parser.add_argument("--expected-intent-strategy", type=str, default="none", choices=["none", "diagram_type_proxy"])
     parser.add_argument("--latency-p95-threshold-ms", type=float, default=2000.0)
     parser.add_argument("--flicker-mean-threshold", type=float, default=6.0)
     parser.add_argument("--mental-map-min", type=float, default=0.85)
@@ -190,6 +192,14 @@ def main() -> None:
             interval_ms=args.turn_interval_ms,
             expected_intent_map=None,
         )
+        if args.expected_intent_strategy == "diagram_type_proxy":
+            proxy_intent = proxy_intent_for_diagram_type(sample.diagram_type)
+            for row in transcript_rows:
+                action_type = str(row.get("metadata", {}).get("action_type", ""))
+                if action_type in {"propose", "clarify", "execute", "repair"}:
+                    row["expected_intent"] = proxy_intent
+                else:
+                    row["expected_intent"] = None
         chunks = [
             ASRChunk(
                 timestamp_ms=int(row["timestamp_ms"]),
@@ -231,6 +241,7 @@ def main() -> None:
             "flicker_mean_threshold": args.flicker_mean_threshold,
             "mental_map_min": args.mental_map_min,
             "intent_acc_threshold": args.intent_acc_threshold,
+            "expected_intent_strategy": args.expected_intent_strategy,
         },
         "overall": aggregate_rows(detail_rows, REALTIME_METRIC_FIELDS),
         "slices": {

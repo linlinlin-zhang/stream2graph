@@ -11,6 +11,7 @@ from typing import Any, Optional
 
 from tools.eval.common import extract_mermaid_candidate
 from tools.eval.dataset import EvaluationSample, SYSTEM_PROMPT, build_messages
+from tools.eval.traditional_baselines import TraditionalBaselineRunner
 
 
 @dataclass
@@ -78,6 +79,45 @@ class StaticJsonlPredictor(Predictor):
             usage=row.get("usage", {}) if isinstance(row.get("usage"), dict) else {},
             error=row.get("error"),
         )
+
+
+class TraditionalRuleBasedPredictor(Predictor):
+    def __init__(self, config: dict[str, Any]) -> None:
+        self.provider = "traditional_rule_based"
+        self.model_name = str(config.get("model", "traditional_rule_based"))
+        self.runner = TraditionalBaselineRunner(
+            turn_interval_ms=int(config.get("turn_interval_ms", 450)),
+            realtime=bool(config.get("realtime", False)),
+            time_scale=float(config.get("time_scale", 1.0)),
+            max_chunks=int(config.get("max_chunks", 0)),
+            min_wait_k=int(config.get("min_wait_k", 1)),
+            base_wait_k=int(config.get("base_wait_k", 2)),
+            max_wait_k=int(config.get("max_wait_k", 4)),
+            expected_intent_strategy=str(config.get("expected_intent_strategy", "none")),
+            diagram_export_style=str(config.get("diagram_export_style", "auto")),
+        )
+
+    def predict(self, sample: EvaluationSample) -> PredictionResult:
+        try:
+            output = self.runner.run_sample(sample)
+            return PredictionResult(
+                provider=self.provider,
+                model_name=self.model_name,
+                generated_code=output.generated_code,
+                raw_output_text=output.raw_output_text,
+                latency_ms=output.latency_ms,
+                finish_reason="completed",
+                usage=output.metadata,
+            )
+        except Exception as exc:
+            return PredictionResult(
+                provider=self.provider,
+                model_name=self.model_name,
+                generated_code="",
+                raw_output_text="",
+                latency_ms=0.0,
+                error=str(exc),
+            )
 
 
 class LocalHFPredictor(Predictor):
@@ -543,6 +583,8 @@ def build_predictor(config: dict[str, Any], static_rows: Optional[list[dict]] = 
         return GoldReferencePredictor()
     if provider == "static_jsonl":
         return StaticJsonlPredictor(static_rows or [], provider_name=str(config.get("provider_name", provider)))
+    if provider == "traditional_rule_based":
+        return TraditionalRuleBasedPredictor(config)
     if provider == "huggingface_local":
         return LocalHFPredictor(config)
     if provider == "openai_responses":
