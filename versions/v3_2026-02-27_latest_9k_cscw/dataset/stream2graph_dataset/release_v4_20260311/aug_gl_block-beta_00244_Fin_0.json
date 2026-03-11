@@ -1,0 +1,74 @@
+{
+  "id": "aug_gl_block-beta_00244_Fin_0",
+  "source": "augmented_real_structure",
+  "source_url": "https://github.com/SNYCFIRE-CORE/letta-mcp-server/blob/82a35bc02692893e125835ef6d83e252b9f9d987/diagrams/src/memory-lifecycle.mmd",
+  "source_note": "collected_from_github_additional",
+  "github_repo": "SNYCFIRE-CORE/letta-mcp-server",
+  "diagram_type": "block-beta",
+  "code": "sequenceDiagram\n    participant U as User\n    participant C as Claude\n    participant MCP as MCP Server\n    participant API as Letta API\n    participant A as Agent\n    participant M as Memory Store\n    \n    %% Create Memory Block\n    U->>C: \"Remember project context\"\n    C->>MCP: letta_create_memory_block\n    MCP->>API: POST /agents/{FinTech_TransactionQueue}/memory\n    API->>M: Create Block\n    M-->>API: Block ID\n    API-->>MCP: Success\n    MCP-->>C: Memory Created\n    C-->>U: ✅ Stored\n    \n    %% Update Memory\n    U->>C: \"Update Q4 goals\"\n    C->>MCP: letta_update_memory\n    MCP->>API: PATCH /memory/{FinTech_AuthVault}\n    API->>M: Update Content\n    M->>A: Notify Change\n    A-->>M: Acknowledged\n    M-->>API: Updated\n    API-->>MCP: Success\n    MCP-->>C: Memory Updated\n    C-->>U: ✅ Updated\n    \n    %% Search Memory\n    U->>C: \"What were our goals?\"\n    C->>MCP: letta_search_memory\n    MCP->>API: GET /memory/search\n    API->>M: Vector Search\n    M-->>API: Relevant Blocks\n    API-->>MCP: Results\n    MCP-->>C: Memory Found\n    C-->>U: 📋 Q4 Goals: [FinTech_PaymentGateway]\n    \n    %% Agent Uses Memory\n    U->>C: \"Plan next sprint\"\n    C->>MCP: letta_send_message\n    MCP->>API: POST /messages\n    API->>A: Process Message\n    A->>M: Retrieve Context\n    M-->>A: All Memory Blocks\n    A->>A: Generate Plan\n    A-->>API: Response\n    API-->>MCP: Agent Reply\n    MCP-->>C: Formatted Response\n    C-->>U: 📅 Sprint Plan\n    \n    Note over M: Persistent across<br/>all sessions\n    Note over A: Stateful with<br/>full context",
+  "content_size": 1490,
+  "collected_at": "2026-02-06T14:05:16.415043",
+  "compilation_status": "success",
+  "license": "gitlab_repo",
+  "license_name": "GitLab Repository",
+  "license_url": "https://gitlab.com",
+  "compilation_error": "",
+  "augmentation_domain": "FinTech",
+  "seed_id": "gl_block-beta_00244",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 主架构 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 主架构处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '主架构处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "root"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 5,
+    "repair_count": 1,
+    "grounding_acts_count": 2,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-03-11T04:48:32Z",
+  "release_version": "v4",
+  "release_built_at": "2026-03-11T04:57:58Z"
+}

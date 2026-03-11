@@ -1,0 +1,401 @@
+{
+  "id": "gh_architecture_01391",
+  "source": "github",
+  "source_url": "https://github.com/hyperledger-cacti/cacti/blob/cf20a6aad1d7b9c1e1b7b923854ceaaf146b7f00/packages/cactus-plugin-satp-hermes/docs/diagrams/module-cross-chain.mmd",
+  "github_repo": "hyperledger-cacti/cacti",
+  "github_file_path": "packages/cactus-plugin-satp-hermes/docs/diagrams/module-cross-chain.mmd",
+  "diagram_type": "architecture",
+  "code": "%%{init: {'theme':'base', 'themeVariables': { 'fontSize':'16px', 'fontFamily':'Segoe UI, system-ui, sans-serif', 'primaryColor':'#22c55e','primaryTextColor':'#ffffff','primaryBorderColor':'#16a34a','lineColor':'#86efac','secondaryColor':'#4ade80','tertiaryColor':'#86efac', 'clusterBkg':'#f0fdf4', 'clusterBorder':'#22c55e', 'mainBkg':'#ffffff'}}}%%\ngraph TB\n    subgraph CrossChain[\"🔗 Cross-Chain Mechanisms Module\"]\n        direction TB\n        \n        CCManager[\"<b>Cross-Chain Manager</b><br/>satp-cc-manager.ts<br/>Bridge coordination<br/>Oracle orchestration<br/>Ontology resolution\"]\n        \n        subgraph Bridge[\"🌉 Bridge Component\"]\n            direction TB\n            BridgeCore[\"<b>Bridge Core</b><br/>bridge/<br/>Lock/unlock coordination<br/>Multi-ledger support<br/>State synchronization\"]\n            \n            subgraph BridgeImplementations[\"Bridge Implementations\"]\n                FabricBridge[\"<b>Fabric Bridge</b><br/>Hyperledger Fabric<br/>Chaincode interaction<br/>Channel management\"]\n                EVMBridge[\"<b>EVM Bridge</b><br/>Ethereum/Besu<br/>Smart contract calls<br/>Gas management\"]\n                BesuBridge[\"<b>Besu Bridge</b><br/>Hyperledger Besu<br/>Private transactions<br/>Permission management\"]\n            end\n            \n            Interfaces[\"<b>Bridge Interfaces</b><br/>interfaces/<br/>IBridge interface<br/>ILockable interface<br/>Contract standards\"]\n            \n            Leafs[\"<b>Leaf Implementations</b><br/>leafs/<br/>Specific ledger adapters<br/>Protocol translation<br/>Native API wrappers\"]\n            \n            Ontology[\"<b>Ontology Manager</b><br/>ontology/<br/>Asset type mapping<br/>Schema translation<br/>Semantic resolution\"]\n            \n            FabricContracts[\"<b>Fabric Contracts</b><br/>fabric-contracts/<br/>Asset lock chaincode<br/>Transfer logic<br/>Proof generation\"]\n        end\n        \n        subgraph Oracle[\"🔮 Oracle Component\"]\n            direction TB\n            OracleCore[\"<b>Oracle Core</b><br/>oracle/<br/>Event monitoring<br/>State verification<br/>Proof validation\"]\n            \n            OracleImpls[\"<b>Oracle Implementations</b><br/>implementations/<br/>Fabric event listener<br/>EVM event listener<br/>Block scanners\"]\n            \n            SmartContracts[\"<b>Smart Contracts</b><br/>smart-contracts/<br/>Oracle interfaces<br/>Callback handlers<br/>Event emitters\"]\n        end\n        \n        Common[\"<b>Common Utilities</b><br/>common/<br/>Shared types<br/>Helper functions<br/>Constants\"]\n    end\n    \n    %% Relationships within Cross-Chain\n    CCManager -->|coordinates| BridgeCore\n    CCManager -->|orchestrates| OracleCore\n    CCManager -->|uses| Ontology\n    CCManager -->|uses| Common\n    \n    BridgeCore -->|implements| Interfaces\n    BridgeCore -->|uses| Leafs\n    BridgeCore -->|delegates to| FabricBridge\n    BridgeCore -->|delegates to| EVMBridge\n    BridgeCore -->|delegates to| BesuBridge\n    \n    FabricBridge -->|deploys| FabricContracts\n    FabricBridge -->|uses| Leafs\n    EVMBridge -->|uses| Leafs\n    BesuBridge -->|uses| Leafs\n    \n    Ontology -->|translates for| BridgeCore\n    Ontology -->|uses| Common\n    \n    OracleCore -->|uses| OracleImpls\n    OracleCore -->|interacts with| SmartContracts\n    OracleCore -->|uses| Common\n    \n    OracleImpls -->|monitors| FabricContracts\n    OracleImpls -->|monitors| SmartContracts\n    \n    %% External connections\n    CCManager -.->|called by| CoreHandlers[\"Stage Handlers<br/>(Core Module)\"]\n    BridgeCore -.->|locks assets on| Blockchain[\"Source/Target<br/>Blockchains\"]\n    OracleCore -.->|verifies on| Blockchain\n    CCManager -.->|logs to| Persistence[\"Gateway Persistence<br/>(Database Module)\"]\n    \n    %% Styling\n    classDef managerClass fill:#22c55e,stroke:#16a34a,stroke-width:4px,color:#ffffff,rx:10,ry:10\n    classDef bridgeClass fill:#4ade80,stroke:#22c55e,stroke-width:4px,color:#065f46,rx:10,ry:10\n    classDef implClass fill:#86efac,stroke:#4ade80,stroke-width:4px,color:#065f46,rx:10,ry:10\n    classDef oracleClass fill:#bbf7d0,stroke:#86efac,stroke-width:4px,color:#065f46,rx:10,ry:10\n    classDef utilClass fill:#dcfce7,stroke:#bbf7d0,stroke-width:4px,color:#065f46,rx:10,ry:10\n    classDef externalClass fill:#f0fdf4,stroke:#86efac,stroke-width:2px,stroke-dasharray: 5 5,color:#065f46,rx:10,ry:10\n    \n    class CCManager managerClass\n    class BridgeCore,Interfaces,Leafs,Ontology bridgeClass\n    class FabricBridge,EVMBridge,BesuBridge,FabricContracts implClass\n    class OracleCore,OracleImpls,SmartContracts oracleClass\n    class Common utilClass\n    class CoreHandlers,Blockchain,Persistence externalClass\n",
+  "content_size": 4622,
+  "collected_at": "2026-02-06T01:45:38.453164",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 378,
+  "repo_forks": 306,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"🔗 Cross-Chain Mechanisms Module\" 和 \"<b>Cross-Chain Manager</b><br/>satp-cc-manager.ts<br/>Bridge coordination<br/>Oracle orchestration<br/>Ontology resolution\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"🔗 Cross-Chain Mechanisms Module\" 和 \"<b>Cross-Chain Manager</b><br/>satp-cc-manager.ts<br/>Bridge coordination<br/>Oracle orchestration<br/>Ontology resolution\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CrossChain",
+        "CCManager"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"🌉 Bridge Component\" 和 \"<b>Bridge Core</b><br/>bridge/<br/>Lock/unlock coordination<br/>Multi-ledger support<br/>State synchronization\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"🌉 Bridge Component\" 和 \"<b>Bridge Core</b><br/>bridge/<br/>Lock/unlock coordination<br/>Multi-ledger support<br/>State synchronization\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Bridge",
+        "BridgeCore"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Bridge Implementations\" 和 \"<b>Fabric Bridge</b><br/>Hyperledger Fabric<br/>Chaincode interaction<br/>Channel management\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Bridge Implementations\" 和 \"<b>Fabric Bridge</b><br/>Hyperledger Fabric<br/>Chaincode interaction<br/>Channel management\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BridgeImplementations",
+        "FabricBridge"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"<b>EVM Bridge</b><br/>Ethereum/Besu<br/>Smart contract calls<br/>Gas management\" 和 \"<b>Besu Bridge</b><br/>Hyperledger Besu<br/>Private transactions<br/>Permission management\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 \"<b>EVM Bridge</b><br/>Ethereum/Besu<br/>Smart contract calls<br/>Gas management\"处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 15,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"<b>EVM Bridge</b><br/>Ethereum/Besu<br/>Smart contract calls<br/>Gas management\"处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EVMBridge",
+        "BesuBridge"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"<b>Bridge Interfaces</b><br/>interfaces/<br/>IBridge interface<br/>ILockable interface<br/>Contract standards\" 和 \"<b>Leaf Implementations</b><br/>leafs/<br/>Specific ledger adapters<br/>Protocol translation<br/>Native API wrappers\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"<b>Bridge Interfaces</b><br/>interfaces/<br/>IBridge interface<br/>ILockable interface<br/>Contract standards\" 和 \"<b>Leaf Implementations</b><br/>leafs/<br/>Specific ledger adapters<br/>Protocol translation<br/>Native API wrappers\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Interfaces",
+        "Leafs"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"<b>Ontology Manager</b><br/>ontology/<br/>Asset type mapping<br/>Schema translation<br/>Semantic resolution\" 和 \"<b>Fabric Contracts</b><br/>fabric-contracts/<br/>Asset lock chaincode<br/>Transfer logic<br/>Proof generation\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"<b>Ontology Manager</b><br/>ontology/<br/>Asset type mapping<br/>Schema translation<br/>Semantic resolution\" 和 \"<b>Fabric Contracts</b><br/>fabric-contracts/<br/>Asset lock chaincode<br/>Transfer logic<br/>Proof generation\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Ontology",
+        "FabricContracts"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"🔮 Oracle Component\" 和 \"<b>Oracle Core</b><br/>oracle/<br/>Event monitoring<br/>State verification<br/>Proof validation\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"🔮 Oracle Component\" 和 \"<b>Oracle Core</b><br/>oracle/<br/>Event monitoring<br/>State verification<br/>Proof validation\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Oracle",
+        "OracleCore"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"<b>Oracle Implementations</b><br/>implementations/<br/>Fabric event listener<br/>EVM event listener<br/>Block scanners\" 和 \"<b>Smart Contracts</b><br/>smart-contracts/<br/>Oracle interfaces<br/>Callback handlers<br/>Event emitters\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"<b>Oracle Implementations</b><br/>implementations/<br/>Fabric event listener<br/>EVM event listener<br/>Block scanners\" 和 \"<b>Smart Contracts</b><br/>smart-contracts/<br/>Oracle interfaces<br/>Callback handlers<br/>Event emitters\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OracleImpls",
+        "SmartContracts"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"<b>Common Utilities</b><br/>common/<br/>Shared types<br/>Helper functions<br/>Constants\" 和 \"Stage Handlers<br/>(Core Module。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"<b>Common Utilities</b><br/>common/<br/>Shared types<br/>Helper functions<br/>Constants\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"<b>Common Utilities</b><br/>common/<br/>Shared types<br/>Helper functions<br/>Constants\"处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Common",
+        "CoreHandlers"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"Source/Target<br/>Blockchains\" 和 \"Gateway Persistence<br/>(Database Module 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 \"Source/Target<br/>Blockchains\"处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Source/Target<br/>Blockchains\"处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Blockchain",
+        "Persistence"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 43,
+    "repair_count": 3,
+    "grounding_acts_count": 20,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repaired_at": "2026-03-11T04:48:39Z"
+}

@@ -1,0 +1,970 @@
+{
+  "id": "gh_architecture_01732",
+  "source": "github",
+  "source_url": "https://github.com/bartytime4life/Kansas-Frontier-Matrix/blob/776d1174b0d3798fdd4d6414734be3874320cb7f/docs/architecture/diagrams/sources/60-ci-cd-devsecops.mmd",
+  "github_repo": "bartytime4life/Kansas-Frontier-Matrix",
+  "github_file_path": "docs/architecture/diagrams/sources/60-ci-cd-devsecops.mmd",
+  "diagram_type": "architecture",
+  "code": "%%---------------------------------------------------------------------------\n%% 📁 docs/architecture/diagrams/sources/60-ci-cd-devsecops.mmd\n%% 🧭 Kansas Frontier Matrix — CI/CD + DevSecOps (high-level pipeline)\n%% Source: \"Deployment Instructions\" (CI/CD + deployment) in:\n%%         Kansas Frontier Matrix Comprehensive System Documentation.pdf\n%%---------------------------------------------------------------------------\n\n%%{init: {\"flowchart\": {\"curve\": \"basis\"}} }%%\nflowchart TB\n\n  %% ===== Styles (kept subtle for GitHub light/dark) =====\n  classDef actor stroke-width:2px;\n  classDef ci stroke-width:1px;\n  classDef sec stroke-width:1px,stroke-dasharray: 3 3;\n  classDef artifact stroke-width:1px;\n  classDef gate stroke-width:2px,stroke-dasharray: 5 5;\n  classDef runtime stroke-width:1px;\n  classDef obs stroke-width:1px;\n\n  %%--------------------------------------------------------------------------\n  %% 🧑‍💻 SOURCE CONTROL & COLLABORATION\n  %%--------------------------------------------------------------------------\n  subgraph SOURCE[\"🧑‍💻 Source Control & Collaboration\"]\n    direction TB\n    DEV[\"🧑‍💻 Developer\"]\n    REPO[\"🐙 GitHub Repo<br/>Kansas-Frontier-Matrix\"]\n    PR[\"🔀 Pull Request<br/>review + merge\"]\n    DEV -->|git push| REPO\n    REPO -->|open PR| PR\n    PR -->|merge to main| REPO\n  end\n  class DEV,REPO,PR actor\n\n  %%--------------------------------------------------------------------------\n  %% ⚙️ CI — GITHUB ACTIONS\n  %%--------------------------------------------------------------------------\n  subgraph CI[\"⚙️ CI — GitHub Actions\"]\n    direction TB\n    CI_TRIGGER[\"⏱️ Workflows<br/>on: pull_request / push / schedule\"]\n    LINT[\"🔎 Lint + Format\"]\n    TESTS[\"✅ Automated Tests<br/>unit + integration\"]\n    SAST[\"🧯 SAST<br/>static code analysis\"]\n    SECRETSCAN[\"🕵️ Secrets Scan<br/>prevent credential leaks\"]\n    SCA[\"📦 Dependency / SCA Scan<br/>vulns + licenses\"]\n    IAC_SCAN[\"🏗️ IaC Scan<br/>compose / k8s / terraform\"]\n    BUILD[\"🐳 Build Docker Images<br/>api + web\"]\n    IMAGE_SCAN[\"🧫 Container/Image Scan<br/>vulns + misconfig\"]\n    SBOM[\"🧾 SBOM + Provenance<br/>SPDX/CycloneDX\"]\n    SIGN[\"🔏 Sign / Attest Artifacts<br/>(optional)\"]\n    PUSH[\"📤 Publish Images<br/>GHCR / Docker Hub\"]\n    GHA_SECRETS[\"🔐 GitHub Actions Secrets<br/>(SSH key, registry creds)\"]\n\n    CI_TRIGGER --> LINT --> TESTS --> SAST --> SECRETSCAN --> SCA --> IAC_SCAN --> BUILD --> IMAGE_SCAN --> SBOM --> SIGN --> PUSH\n  end\n  class CI_TRIGGER,LINT,TESTS,BUILD,SBOM,SIGN,PUSH ci\n  class SAST,SECRETSCAN,SCA,IAC_SCAN,IMAGE_SCAN sec\n\n  REPO -->|push / PR| CI_TRIGGER\n  GHA_SECRETS -.->|auth to registry| PUSH\n\n  %%--------------------------------------------------------------------------\n  %% 📦 ARTIFACTS & SUPPLY-CHAIN\n  %%--------------------------------------------------------------------------\n  subgraph ARTIFACTS[\"📦 Artifacts & Supply-Chain\"]\n    direction TB\n    REGISTRY[\"📦 Container Registry<br/>GHCR / Docker Hub\"]\n    SBOM_STORE[\"🧾 SBOM Store<br/>workflow artifact / release asset\"]\n    RELEASE[\"🏷️ Versioned Release<br/>tag + changelog\"]\n    PUSH --> REGISTRY\n    SBOM --> SBOM_STORE\n    PUSH --> RELEASE\n  end\n  class REGISTRY,SBOM_STORE,RELEASE artifact\n\n  %%--------------------------------------------------------------------------\n  %% 🚀 CD — DEPLOYMENT AUTOMATION\n  %%--------------------------------------------------------------------------\n  subgraph CD[\"🚀 CD — Deployment Automation\"]\n    direction TB\n    IAC_APPLY[\"🏗️ Provision / Configure Infra<br/>Terraform / CloudFormation / Ansible\"]\n    DEPLOY_STG[\"🚀 Deploy → Staging<br/>SSH pull + docker-compose up -d<br/>or apply K8s manifests\"]\n    SMOKE[\"🧪 Staging Verification<br/>• Web UI + map layers<br/>• /api + /graphql<br/>• Focus Mode (citations)<br/>• DB migrations/seeds\"]\n    DAST[\"🕷️ DAST (staging)<br/>API + UI attack-surface checks\"]\n    APPROVAL{\"🛑 Approval Gate<br/>manual + policy checks\"}\n    DEPLOY_PROD[\"🚀 Deploy → Production<br/>compose restart / rolling update\"]\n    POSTCHECK[\"✅ Post-Deploy Checks<br/>port scan (80/443)<br/>basic vuln scan + health checks\"]\n\n    IAC_APPLY --> DEPLOY_STG --> SMOKE --> DAST --> APPROVAL --> DEPLOY_PROD --> POSTCHECK\n  end\n  class DAST,POSTCHECK sec\n  class APPROVAL gate\n\n  REGISTRY -->|pull images| DEPLOY_STG\n  RELEASE -->|tag/version| DEPLOY_STG\n  GHA_SECRETS -.->|SSH deploy key| DEPLOY_STG\n\n  %%--------------------------------------------------------------------------\n  %% 🛰️ RUNTIME — KFM STACK\n  %%--------------------------------------------------------------------------\n  subgraph RUNTIME[\"🛰️ Runtime — KFM Stack (Docker Compose / ☸️ K8s)\"]\n    direction TB\n    HOST[\"🖥️ Ubuntu Server / Cloud VM<br/>public: 80/443\"]\n    PROXY[\"🌐 Nginx / Apache Reverse Proxy<br/>TLS (Let's Encrypt)<br/>security headers + caching\"]\n    ORCH[\"🐳 docker-compose.yml<br/>or ☸️ Kubernetes/ECS\"]\n\n    WEB[\"🖥️ web (React)<br/>static assets\"]\n    API[\"🧠 api (FastAPI + Uvicorn)<br/>REST / GraphQL / Focus Mode\"]\n    POSTGIS[\"🗺️ db-postgis<br/>PostgreSQL + PostGIS\"]\n    NEO4J[\"🕸️ db-neo4j<br/>Graph DB\"]\n    OLLAMA[\"🤖 ollama<br/>LLM service\"]\n    OPA[\"🛡️ opa (OPA)<br/>Policy-as-Code sidecar\"]\n    SECRETS_RT[\"🔑 Secrets + Env<br/>.env.example → prod .env<br/>Docker secrets\"]\n\n    HOST --> PROXY\n    HOST --> ORCH\n\n    PROXY --> WEB\n    PROXY --> API\n\n    ORCH --> WEB\n    ORCH --> API\n    ORCH --> POSTGIS\n    ORCH --> NEO4J\n    ORCH --> OLLAMA\n    ORCH --> OPA\n\n    API --> POSTGIS\n    API --> NEO4J\n    API --> OLLAMA\n    API --> OPA\n\n    SECRETS_RT --> API\n    SECRETS_RT --> POSTGIS\n    SECRETS_RT --> NEO4J\n    SECRETS_RT --> OLLAMA\n  end\n  class HOST,PROXY,ORCH,WEB,API,POSTGIS,NEO4J,OLLAMA,OPA,SECRETS_RT runtime\n\n  DEPLOY_PROD -->|restart/update| ORCH\n  DEPLOY_PROD -->|config/proxy reload| PROXY\n\n  %%--------------------------------------------------------------------------\n  %% 📈 OBSERVABILITY + OPS + FEEDBACK LOOP\n  %%--------------------------------------------------------------------------\n  subgraph OBS[\"📈 Observability, Ops, and Feedback\"]\n    direction TB\n    LOGS[\"🪵 Centralized Logs<br/>proxy + api + DB\"]\n    METRICS[\"📈 Metrics<br/>Prometheus\"]\n    DASH[\"📊 Dashboards<br/>Grafana\"]\n    ALERTS[\"🚨 Alerts<br/>on-call / email / chat\"]\n    BACKUPS[\"💾 Backups<br/>Postgres + Neo4j\"]\n    AUDIT[\"🧾 Audit Trails<br/>auth + data access\"]\n\n    LOGS --> DASH\n    METRICS --> DASH --> ALERTS\n\n    POSTGIS --> BACKUPS\n    NEO4J --> BACKUPS\n    API --> AUDIT\n  end\n  class LOGS,METRICS,DASH,ALERTS,BACKUPS,AUDIT obs\n\n  API --> LOGS\n  PROXY --> LOGS\n  API --> METRICS\n\n  %% 🔁 Continuous feedback into engineering\n  ALERTS -->|incident / bug report| REPO\n\n  %% 🧯 Recovery path (conceptual)\n  POSTCHECK -->|rollback → redeploy previous tag| DEPLOY_PROD\n\n",
+  "content_size": 6689,
+  "collected_at": "2026-02-06T02:02:39.396533",
+  "compilation_status": "success",
+  "compilation_error": "[WinError 2] 系统找不到指定的文件。",
+  "license": "apache-2.0",
+  "license_name": "Apache License 2.0",
+  "license_url": "https://api.github.com/licenses/apache-2.0",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 high-level pipeline 和 kept subtle for GitHub light/dark。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 'high-level pipeline 和 kept subtle for GitHub light/dark'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DevSecOps",
+        "Styles"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"🧑‍💻 Source Control & Collaboration\" 和 \"🧑‍💻 Developer\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"🧑‍💻 Source Control & Collaboration\" 和 \"🧑‍💻 Developer\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SOURCE",
+        "DEV"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"🐙 GitHub Repo<br/>Kansas-Frontier-Matrix\" 和 \"🔀 Pull Request<br/>review + merge\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"🐙 GitHub Repo<br/>Kansas-Frontier-Matrix\" 和 \"🔀 Pull Request<br/>review + merge\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "REPO",
+        "PR"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"⚙️ CI — GitHub Actions\" 和 \"⏱️ Workflows<br/>on: pull_request / push / schedule\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"⚙️ CI — GitHub Actions\" 和 \"⏱️ Workflows<br/>on: pull_request / push / schedule\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CI",
+        "CI_TRIGGER"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"🔎 Lint + Format\" 和 \"✅ Automated Tests<br/>unit + integration\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"🔎 Lint + Format\" 和 \"✅ Automated Tests<br/>unit + integration\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "LINT",
+        "TESTS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"🧯 SAST<br/>static code analysis\" 和 \"🕵️ Secrets Scan<br/>prevent credential leaks\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"🧯 SAST<br/>static code analysis\" 和 \"🕵️ Secrets Scan<br/>prevent credential leaks\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SAST",
+        "SECRETSCAN"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"📦 Dependency / SCA Scan<br/>vulns + licenses\" 和 \"🏗️ IaC Scan<br/>compose / k8s / terraform\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"📦 Dependency / SCA Scan<br/>vulns + licenses\" 和 \"🏗️ IaC Scan<br/>compose / k8s / terraform\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SCA",
+        "IAC_SCAN"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"🐳 Build Docker Images<br/>api + web\" 和 \"🧫 Container/Image Scan<br/>vulns + misconfig\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"🐳 Build Docker Images<br/>api + web\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 31,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"🐳 Build Docker Images<br/>api + web\"处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BUILD",
+        "IMAGE_SCAN"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"🧾 SBOM + Provenance<br/>SPDX/CycloneDX\" 和 \"🔏 Sign / Attest Artifacts<br/>(optional 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"🧾 SBOM + Provenance<br/>SPDX/CycloneDX\" 和 \"🔏 Sign / Attest Artifacts<br/>(optional'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SBOM",
+        "SIGN"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"📤 Publish Images<br/>GHCR / Docker Hub\" 和 \"🔐 GitHub Actions Secrets<br/>(SSH key, registry creds 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"📤 Publish Images<br/>GHCR / Docker Hub\" 和 \"🔐 GitHub Actions Secrets<br/>(SSH key, registry creds'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PUSH",
+        "GHA_SECRETS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"📦 Artifacts & Supply-Chain\" 和 \"📦 Container Registry<br/>GHCR / Docker Hub\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"📦 Artifacts & Supply-Chain\" 和 \"📦 Container Registry<br/>GHCR / Docker Hub\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ARTIFACTS",
+        "REGISTRY"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"🧾 SBOM Store<br/>workflow artifact / release asset\" 和 \"🏷️ Versioned Release<br/>tag + changelog\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"🧾 SBOM Store<br/>workflow artifact / release asset\" 和 \"🏷️ Versioned Release<br/>tag + changelog\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SBOM_STORE",
+        "RELEASE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"🚀 CD — Deployment Automation\" 和 \"🏗️ Provision / Configure Infra<br/>Terraform / CloudFormation / Ansible\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"🚀 CD — Deployment Automation\" 和 \"🏗️ Provision / Configure Infra<br/>Terraform / CloudFormation / Ansible\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CD",
+        "IAC_APPLY"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"🚀 Deploy → Staging<br/>SSH pull + docker-compose up -d<br/>or apply K8s manifests\" 和 \"🧪 Staging Verification<br/>• Web UI + map layers<br/>• /api + /graphql<br/>• Focus Mode (citations 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"🚀 Deploy → Staging<br/>SSH pull + docker-compose up -d<br/>or apply K8s manifests\" 和 \"🧪 Staging Verification<br/>• Web UI + map layers<br/>• /api + /graphql<br/>• Focus Mode (citations'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DEPLOY_STG",
+        "SMOKE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"🕷️ DAST (staging 和 \"🛑 Approval Gate<br/>manual + policy checks\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"🕷️ DAST (staging 和 \"🛑 Approval Gate<br/>manual + policy checks\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DAST",
+        "APPROVAL"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"🚀 Deploy → Production<br/>compose restart / rolling update\" 和 \"✅ Post-Deploy Checks<br/>port scan (80/443 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"🚀 Deploy → Production<br/>compose restart / rolling update\" 和 \"✅ Post-Deploy Checks<br/>port scan (80/443'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DEPLOY_PROD",
+        "POSTCHECK"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"🛰️ Runtime — KFM Stack (Docker Compose / ☸️ K8s 和 \"🖥️ Ubuntu Server / Cloud VM<br/>public: 80/443\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"🛰️ Runtime — KFM Stack (Docker Compose / ☸️ K8s 和 \"🖥️ Ubuntu Server / Cloud VM<br/>public: 80/443\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "RUNTIME",
+        "HOST"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"🌐 Nginx / Apache Reverse Proxy<br/>TLS (Let's Encrypt 和 \"🐳 docker-compose.yml<br/>or ☸️ Kubernetes/ECS\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"🌐 Nginx / Apache Reverse Proxy<br/>TLS (Let's Encrypt 和 \"🐳 docker-compose.yml<br/>or ☸️ Kubernetes/ECS\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 73,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PROXY",
+        "ORCH"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 74,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"🖥️ web (React 和 \"🧠 api (FastAPI + Uvicorn 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 75,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 \"🖥️ web (React处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 76,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"🖥️ web (React处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 77,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 78,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "WEB",
+        "API"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 79,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"🗺️ db-postgis<br/>PostgreSQL + PostGIS\" 和 \"🕸️ db-neo4j<br/>Graph DB\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 80,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"🗺️ db-postgis<br/>PostgreSQL + PostGIS\" 和 \"🕸️ db-neo4j<br/>Graph DB\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 81,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 82,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "POSTGIS",
+        "NEO4J"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 83,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"🤖 ollama<br/>LLM service\" 和 \"🛡️ opa (OPA。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 84,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"🤖 ollama<br/>LLM service\" 和 \"🛡️ opa (OPA'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 85,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 86,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OLLAMA",
+        "OPA"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 87,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"🔑 Secrets + Env<br/>.env.example → prod .env<br/>Docker secrets\" 和 \"📈 Observability, Ops, and Feedback\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 88,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"🔑 Secrets + Env<br/>.env.example → prod .env<br/>Docker secrets\" 和 \"📈 Observability, Ops, and Feedback\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 89,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 90,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SECRETS_RT",
+        "OBS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 91,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"🪵 Centralized Logs<br/>proxy + api + DB\" 和 \"📈 Metrics<br/>Prometheus\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 92,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"🪵 Centralized Logs<br/>proxy + api + DB\" 和 \"📈 Metrics<br/>Prometheus\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 93,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 94,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "LOGS",
+        "METRICS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 95,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"📊 Dashboards<br/>Grafana\" 和 \"🚨 Alerts<br/>on-call / email / chat\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 96,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"📊 Dashboards<br/>Grafana\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 97,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"📊 Dashboards<br/>Grafana\"处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 98,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 99,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DASH",
+        "ALERTS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 100,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"💾 Backups<br/>Postgres + Neo4j\" 和 \"🧾 Audit Trails<br/>auth + data access\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 101,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"💾 Backups<br/>Postgres + Neo4j\" 和 \"🧾 Audit Trails<br/>auth + data access\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 102,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 103,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "BACKUPS",
+        "AUDIT"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 104,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 conceptual 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 105,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 conceptual处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 106,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 'conceptual处理'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 107,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 108,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "path"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 108,
+    "repair_count": 4,
+    "grounding_acts_count": 52,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repaired_at": "2026-03-11T04:48:39Z",
+  "release_version": "v4",
+  "release_built_at": "2026-03-11T04:58:09Z"
+}

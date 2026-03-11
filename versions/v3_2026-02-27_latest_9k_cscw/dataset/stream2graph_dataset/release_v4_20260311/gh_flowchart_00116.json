@@ -1,0 +1,677 @@
+{
+  "id": "gh_flowchart_00116",
+  "source": "github",
+  "source_url": "https://github.com/aiexplorations/praval/blob/9a0737e0fa0bb7d18cd1213b12ae9766eade8c79/docs/architecture.mmd",
+  "github_repo": "aiexplorations/praval",
+  "github_file_path": "docs/architecture.mmd",
+  "diagram_type": "flowchart",
+  "code": "%%{init: {\"theme\": \"base\", \"themeVariables\": {\"primaryColor\": \"#ffffff\", \"primaryTextColor\": \"#1a202c\", \"primaryBorderColor\": \"#2d3748\", \"lineColor\": \"#2d3748\", \"fontFamily\": \"Arial, sans-serif\", \"fontSize\": \"16px\"}, \"flowchart\": {\"curve\": \"linear\"}}}%%\nflowchart TD\n    %% USER INTERFACE LAYER\n    subgraph UI[\" 👤 USER INTERFACE LAYER \"]\n        direction TB\n        UserCode[\"📝 User Code<br/>@agent decorators\"]\n        API[\"🔌 Praval API\"]\n        Examples[\"📚 Examples\"]\n        \n        UserCode --> API\n        Examples --> API\n    end\n\n    %% CORE FRAMEWORK LAYER\n    subgraph CORE[\" ⚙️ CORE FRAMEWORK LAYER \"]\n        direction TB\n        \n        %% Agent System\n        AgentClass[\"🤖 Agent Class\"]\n        Decorator[\"🎭 Agent Decorator\"] \n        Registry[\"📋 Agent Registry\"]\n        \n        %% Communication System\n        Reef[\"🪸 Reef Network\"]\n        Spore[\"💊 Spore Messages\"]\n        Channels[\"📡 Reef Channels\"]\n        \n        %% Memory System  \n        MemMgr[\"🧠 Memory Manager\"]\n        STM[\"⚡ Short-Term Memory\"]\n        LTM[\"💾 Long-Term Memory\"]\n        \n        %% Storage System\n        DataMgr[\"💽 Data Manager\"]\n        StorageReg[\"📁 Storage Registry\"]\n    end\n\n    %% LLM PROVIDER LAYER\n    subgraph LLM[\" 🤖 LLM PROVIDER LAYER \"]\n        direction TB\n        ProviderFactory[\"🏭 Provider Factory\"]\n        OpenAI[\"🧠 OpenAI Provider\"]\n        Anthropic[\"🎭 Anthropic Provider\"]\n        Cohere[\"⚡ Cohere Provider\"]\n        \n        ProviderFactory --> OpenAI\n        ProviderFactory --> Anthropic  \n        ProviderFactory --> Cohere\n    end\n\n    %% STORAGE PROVIDER LAYER\n    subgraph STORAGE[\" 🗄️ STORAGE PROVIDER LAYER \"]\n        direction TB\n        FileSystem[\"📁 FileSystem\"]\n        PostgreSQL[\"🐘 PostgreSQL\"]\n        Redis[\"⚡ Redis\"]\n        S3[\"☁️ S3\"]\n        Qdrant[\"🎯 Qdrant\"]\n    end\n\n    %% EXTERNAL SERVICES LAYER\n    subgraph EXTERNAL[\" 🌐 EXTERNAL SERVICES \"]\n        direction TB\n        OpenAIAPI[\"🔗 OpenAI API\"]\n        AnthropicAPI[\"🔗 Anthropic API\"] \n        CohereAPI[\"🔗 Cohere API\"]\n        QdrantDB[(\"🎯 Qdrant DB\")]\n        PostgresDB[(\"🐘 PostgreSQL\")]\n        RedisDB[(\"⚡ Redis\")]\n        S3Store[(\"☁️ S3 Storage\")]\n    end\n\n    %% VERTICAL CONNECTIONS BETWEEN LAYERS\n    \n    %% UI to Core Framework\n    API --> Decorator\n    API --> AgentClass\n    API --> MemMgr\n    API --> DataMgr\n    \n    %% Within Core Framework\n    Decorator --> AgentClass\n    Decorator --> Registry\n    AgentClass --> Reef\n    Reef --> Spore\n    Reef --> Channels\n    MemMgr --> STM\n    MemMgr --> LTM\n    DataMgr --> StorageReg\n    \n    %% Core to Providers\n    AgentClass --> ProviderFactory\n    StorageReg --> FileSystem\n    StorageReg --> PostgreSQL\n    StorageReg --> Redis\n    StorageReg --> S3\n    StorageReg --> Qdrant\n    LTM --> Qdrant\n    \n    %% Providers to External Services\n    OpenAI --> OpenAIAPI\n    Anthropic --> AnthropicAPI\n    Cohere --> CohereAPI\n    PostgreSQL --> PostgresDB\n    Redis --> RedisDB\n    S3 --> S3Store\n    Qdrant --> QdrantDB\n    FileSystem --> S3Store\n\n    %% PROFESSIONAL STYLING\n    classDef userLayer fill:#e3f2fd,stroke:#1976d2,stroke-width:3px,color:#0d47a1,font-size:16px\n    classDef coreLayer fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px,color:#4a148c,font-size:16px\n    classDef providerLayer fill:#e8f5e8,stroke:#388e3c,stroke-width:3px,color:#1b5e20,font-size:16px\n    classDef storageLayer fill:#fff3e0,stroke:#f57c00,stroke-width:3px,color:#e65100,font-size:16px\n    classDef externalLayer fill:#ffebee,stroke:#d32f2f,stroke-width:3px,color:#b71c1c,font-size:16px\n    \n    %% Apply styling to layers\n    class UI userLayer\n    class CORE coreLayer\n    class LLM providerLayer\n    class STORAGE storageLayer\n    class EXTERNAL externalLayer\n    \n    %% Apply styling to components\n    class UserCode,API,Examples userLayer\n    class AgentClass,Decorator,Registry,Reef,Spore,Channels,MemMgr,STM,LTM,DataMgr,StorageReg coreLayer\n    class ProviderFactory,OpenAI,Anthropic,Cohere providerLayer\n    class FileSystem,PostgreSQL,Redis,S3,Qdrant storageLayer\n    class OpenAIAPI,AnthropicAPI,CohereAPI,QdrantDB,PostgresDB,RedisDB,S3Store externalLayer",
+  "content_size": 4115,
+  "collected_at": "2026-02-06T01:42:02.632655",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 9,
+  "repo_forks": 0,
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \" 👤 USER INTERFACE LAYER \" 和 \"📝 User Code<br/>@agent decorators\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 \" 👤 USER INTERFACE LAYER \"处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 3,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\" 👤 USER INTERFACE LAYER \"处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "UI",
+        "UserCode"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"🔌 Praval API\" 和 \"📚 Examples\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"🔌 Praval API\" 和 \"📚 Examples\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "API",
+        "Examples"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \" ⚙️ CORE FRAMEWORK LAYER \" 和 \"🤖 Agent Class\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\" ⚙️ CORE FRAMEWORK LAYER \" 和 \"🤖 Agent Class\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CORE",
+        "AgentClass"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"🎭 Agent Decorator\" 和 \"📋 Agent Registry\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"🎭 Agent Decorator\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"🎭 Agent Decorator\"处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Decorator",
+        "Registry"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"🪸 Reef Network\" 和 \"💊 Spore Messages\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"🪸 Reef Network\" 和 \"💊 Spore Messages\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Reef",
+        "Spore"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"📡 Reef Channels\" 和 \"🧠 Memory Manager\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"📡 Reef Channels\" 和 \"🧠 Memory Manager\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Channels",
+        "MemMgr"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"⚡ Short-Term Memory\" 和 \"💾 Long-Term Memory\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"⚡ Short-Term Memory\" 和 \"💾 Long-Term Memory\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "STM",
+        "LTM"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"💽 Data Manager\" 和 \"📁 Storage Registry\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"💽 Data Manager\" 和 \"📁 Storage Registry\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DataMgr",
+        "StorageReg"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \" 🤖 LLM PROVIDER LAYER \" 和 \"🏭 Provider Factory\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\" 🤖 LLM PROVIDER LAYER \" 和 \"🏭 Provider Factory\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "LLM",
+        "ProviderFactory"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"🧠 OpenAI Provider\" 和 \"🎭 Anthropic Provider\" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"🧠 OpenAI Provider\" 和 \"🎭 Anthropic Provider\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 41,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OpenAI",
+        "Anthropic"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"⚡ Cohere Provider\" 和 \" 🗄️ STORAGE PROVIDER LAYER \" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"⚡ Cohere Provider\" 和 \" 🗄️ STORAGE PROVIDER LAYER \"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Cohere",
+        "STORAGE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"📁 FileSystem\" 和 \"🐘 PostgreSQL\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"📁 FileSystem\" 和 \"🐘 PostgreSQL\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "FileSystem",
+        "PostgreSQL"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"⚡ Redis\" 和 \"☁️ S3\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"⚡ Redis\" 和 \"☁️ S3\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Redis",
+        "S3"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "接下来是关于 \"🎯 Qdrant\" 和 \" 🌐 EXTERNAL SERVICES \" 的逻辑。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"🎯 Qdrant\" 和 \" 🌐 EXTERNAL SERVICES \"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "Qdrant",
+        "EXTERNAL"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"🔗 OpenAI API\" 和 \"🔗 Anthropic API\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"🔗 OpenAI API\" 和 \"🔗 Anthropic API\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "OpenAIAPI",
+        "AnthropicAPI"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"🔗 Cohere API\" 和 (\"🎯 Qdrant DB\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"🔗 Cohere API\" 和 (\"🎯 Qdrant DB\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CohereAPI",
+        "QdrantDB"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 (\"🐘 PostgreSQL\" 和 (\"⚡ Redis\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '(\"🐘 PostgreSQL\" 和 (\"⚡ Redis\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PostgresDB",
+        "RedisDB"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 (\"☁️ S3 Storage\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '(\"☁️ S3 Storage\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 73,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 74,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "S3Store"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 74,
+    "repair_count": 2,
+    "grounding_acts_count": 36,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-03-11T04:48:40Z",
+  "release_version": "v4",
+  "release_built_at": "2026-03-11T04:58:11Z"
+}

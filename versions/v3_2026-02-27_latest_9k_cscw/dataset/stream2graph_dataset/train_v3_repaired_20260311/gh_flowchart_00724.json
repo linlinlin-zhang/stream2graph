@@ -1,0 +1,902 @@
+{
+  "id": "gh_flowchart_00724",
+  "source": "github",
+  "source_url": "https://github.com/sdodlapati3/BioPipelines/blob/7bb603ade88cc7f3f8800fb72a7201db77b3b939/docs/diagrams/system_overview.mmd",
+  "github_repo": "sdodlapati3/BioPipelines",
+  "github_file_path": "docs/diagrams/system_overview.mmd",
+  "diagram_type": "flowchart",
+  "code": "%%{init: {'theme': 'base', 'themeVariables': { 'primaryColor': '#4a90d9', 'secondaryColor': '#f4f4f4', 'tertiaryColor': '#fff', 'primaryTextColor': '#333', 'lineColor': '#666'}}}%%\n\nflowchart TB\n    subgraph USER[\"👤 User Interface Layer\"]\n        CLI[\"🖥️ CLI<br/>cli.py\"]\n        WEB[\"🌐 Web Interface<br/>web/app.py\"]\n        API[\"📡 Programmatic API\"]\n    end\n\n    subgraph ORCHESTRATION[\"🤖 Orchestration Layer\"]\n        UA[\"🎯 UnifiedAgent<br/>unified_agent.py<br/>━━━━━━━━━━━━━━<br/>• Task Classification<br/>• Permission Control<br/>• Tool Dispatch<br/>• Response Building\"]\n        \n        COMPOSER[\"📋 Composer<br/>composer.py<br/>━━━━━━━━━━━━━━<br/>• Query Parsing<br/>• Tool Selection<br/>• Workflow Generation\"]\n    end\n\n    subgraph CAPABILITIES[\"⚡ Capability Layers\"]\n        direction TB\n        \n        subgraph TOOLS[\"🔧 Tools (32 total)\"]\n            T_DATA[\"📊 Data Discovery<br/>6 tools\"]\n            T_MGMT[\"📁 Data Management<br/>4 tools\"]\n            T_WF[\"📋 Workflow<br/>5 tools\"]\n            T_EXEC[\"⚡ Execution<br/>8 tools\"]\n            T_DIAG[\"🔍 Diagnostics<br/>5 tools\"]\n            T_EDU[\"📚 Education<br/>4 tools\"]\n        end\n\n        subgraph AUTONOMOUS[\"🔄 Autonomous System\"]\n            AUTO_AGENT[\"AutonomousAgent\"]\n            HEALTH[\"HealthChecker\"]\n            JOB_MON[\"JobMonitor\"]\n            RECOVERY[\"RecoveryManager\"]\n        end\n\n        subgraph EXECUTOR[\"🛡️ Executor Layer\"]\n            PERM[\"PermissionManager<br/>━━━━━━━━━━━━━━<br/>5 Autonomy Levels\"]\n            SANDBOX[\"CommandSandbox<br/>━━━━━━━━━━━━━━<br/>Safe Execution\"]\n            AUDIT[\"AuditLogger<br/>━━━━━━━━━━━━━━<br/>Complete Trail\"]\n            FILE_OPS[\"FileOperations\"]\n            PROC_MGR[\"ProcessManager\"]\n        end\n    end\n\n    subgraph SERVICES[\"📚 Core Services\"]\n        direction TB\n        \n        subgraph CORE[\"Core Processing\"]\n            QP[\"QueryParser\"]\n            TS[\"ToolSelector\"]\n            MM[\"ModuleMapper\"]\n            WG[\"WorkflowGenerator\"]\n        end\n\n        subgraph PROVIDERS[\"🧠 LLM Providers (6)\"]\n            P_OPENAI[\"OpenAI\"]\n            P_ANTHROPIC[\"Anthropic\"]\n            P_GEMINI[\"Gemini\"]\n            P_OLLAMA[\"Ollama\"]\n            P_VLLM[\"vLLM\"]\n            P_LIGHTNING[\"Lightning\"]\n        end\n\n        subgraph DATA[\"🗄️ Data Layer\"]\n            DISCOVERY[\"DataDiscovery\"]\n            DOWNLOAD[\"Downloader\"]\n            REF_MGR[\"ReferenceManager\"]\n            SCANNER[\"Scanner\"]\n        end\n    end\n\n    subgraph INFRASTRUCTURE[\"🏗️ Infrastructure\"]\n        SLURM[\"SLURM HPC\"]\n        CONTAINERS[\"Containers<br/>12 categories\"]\n        STORAGE[\"Storage<br/>Local/Cloud\"]\n    end\n\n    %% Connections - User to Orchestration\n    CLI --> UA\n    WEB --> UA\n    API --> UA\n    CLI --> COMPOSER\n    \n    %% Orchestration internal\n    UA <--> COMPOSER\n    \n    %% Orchestration to Capabilities\n    UA --> TOOLS\n    UA --> EXECUTOR\n    UA --> AUTONOMOUS\n    \n    %% Capabilities internal\n    TOOLS --> EXECUTOR\n    AUTONOMOUS --> EXECUTOR\n    AUTONOMOUS --> TOOLS\n    \n    %% Executor internal\n    PERM --> SANDBOX\n    SANDBOX --> AUDIT\n    SANDBOX --> FILE_OPS\n    SANDBOX --> PROC_MGR\n    \n    %% Capabilities to Services\n    TOOLS --> CORE\n    TOOLS --> DATA\n    COMPOSER --> CORE\n    CORE --> PROVIDERS\n    \n    %% Autonomous internal\n    AUTO_AGENT --> HEALTH\n    AUTO_AGENT --> JOB_MON\n    AUTO_AGENT --> RECOVERY\n    \n    %% Services to Infrastructure\n    CORE --> INFRASTRUCTURE\n    DATA --> STORAGE\n    EXECUTOR --> SLURM\n    EXECUTOR --> CONTAINERS\n\n    %% Styling\n    classDef userLayer fill:#e3f2fd,stroke:#1976d2,stroke-width:2px\n    classDef orchestration fill:#fff3e0,stroke:#f57c00,stroke-width:2px\n    classDef capabilities fill:#e8f5e9,stroke:#388e3c,stroke-width:2px\n    classDef services fill:#fce4ec,stroke:#c2185b,stroke-width:2px\n    classDef infra fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px\n\n    class CLI,WEB,API userLayer\n    class UA,COMPOSER orchestration\n    class TOOLS,AUTONOMOUS,EXECUTOR capabilities\n    class CORE,PROVIDERS,DATA services\n    class SLURM,CONTAINERS,STORAGE infra\n",
+  "content_size": 4059,
+  "collected_at": "2026-02-06T01:47:15.285567",
+  "compilation_status": "success",
+  "license": "mit",
+  "license_name": "MIT License",
+  "license_url": "https://api.github.com/licenses/mit",
+  "repo_stars": 0,
+  "repo_forks": 0,
+  "compilation_error": "",
+  "cscw_dialogue": [
+    {
+      "turn_id": 1,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"👤 User Interface Layer\" 和 \"🖥️ CLI<br/>cli.py\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 2,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"👤 User Interface Layer\" 和 \"🖥️ CLI<br/>cli.py\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 3,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 4,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "USER",
+        "CLI"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 5,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"🌐 Web Interface<br/>web/app.py\" 和 \"📡 Programmatic API\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 6,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"🌐 Web Interface<br/>web/app.py\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 7,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"🌐 Web Interface<br/>web/app.py\"处理'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 8,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 9,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "WEB",
+        "API"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 10,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"🤖 Orchestration Layer\" 和 \"🎯 UnifiedAgent<br/>unified_agent.py<br/>━━━━━━━━━━━━━━<br/>• Task Classification<br/>• Permission Control<br/>• Tool Dispatch<br/>• Response Building\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 11,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"🤖 Orchestration Layer\" 和 \"🎯 UnifiedAgent<br/>unified_agent.py<br/>━━━━━━━━━━━━━━<br/>• Task Classification<br/>• Permission Control<br/>• Tool Dispatch<br/>• Response Building\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 12,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 13,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "ORCHESTRATION",
+        "UA"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 14,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"📋 Composer<br/>composer.py<br/>━━━━━━━━━━━━━━<br/>• Query Parsing<br/>• Tool Selection<br/>• Workflow Generation\" 和 \"⚡ Capability Layers\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 15,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "等等，我重新想了一下，应该是 \"📋 Composer<br/>composer.py<br/>━━━━━━━━━━━━━━<br/>• Query Parsing<br/>• Tool Selection<br/>• Workflow Generation\"处理 才对。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 16,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"📋 Composer<br/>composer.py<br/>━━━━━━━━━━━━━━<br/>• Query Parsing<br/>• Tool Selection<br/>• Workflow Generation\"处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 17,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 18,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "COMPOSER",
+        "CAPABILITIES"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 19,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"🔧 Tools (32 total 和 \"📊 Data Discovery<br/>6 tools\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 20,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"🔧 Tools (32 total 和 \"📊 Data Discovery<br/>6 tools\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 21,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 22,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "TOOLS",
+        "T_DATA"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 23,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"📁 Data Management<br/>4 tools\" 和 \"📋 Workflow<br/>5 tools\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 24,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"📁 Data Management<br/>4 tools\" 和 \"📋 Workflow<br/>5 tools\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 25,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 26,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "T_MGMT",
+        "T_WF"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 27,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"⚡ Execution<br/>8 tools\" 和 \"🔍 Diagnostics<br/>5 tools\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 28,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"⚡ Execution<br/>8 tools\" 和 \"🔍 Diagnostics<br/>5 tools\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 29,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 30,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "T_EXEC",
+        "T_DIAG"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 31,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"📚 Education<br/>4 tools\" 和 \"🔄 Autonomous System\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 32,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"📚 Education<br/>4 tools\" 和 \"🔄 Autonomous System\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 33,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 34,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "T_EDU",
+        "AUTONOMOUS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 35,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"AutonomousAgent\" 和 \"HealthChecker\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 36,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"AutonomousAgent\" 和 \"HealthChecker\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 37,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 38,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "AUTO_AGENT",
+        "HEALTH"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 39,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"JobMonitor\" 和 \"RecoveryManager\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 40,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "抱歉，稍微改一下，把刚才那个改成 \"JobMonitor\"处理。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 41,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"JobMonitor\"处理'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 42,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 43,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "JOB_MON",
+        "RECOVERY"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 44,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"🛡️ Executor Layer\" 和 \"PermissionManager<br/>━━━━━━━━━━━━━━<br/>5 Autonomy Levels\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 45,
+      "role": "Domain_Expert",
+      "action_type": "repair",
+      "utterance": "不，其实叫 \"🛡️ Executor Layer\"处理 会更准确一点。",
+      "elements_involved": [],
+      "is_repair": true
+    },
+    {
+      "turn_id": 46,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"🛡️ Executor Layer\"处理'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 47,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 48,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "EXECUTOR",
+        "PERM"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 49,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"CommandSandbox<br/>━━━━━━━━━━━━━━<br/>Safe Execution\" 和 \"AuditLogger<br/>━━━━━━━━━━━━━━<br/>Complete Trail\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 50,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"CommandSandbox<br/>━━━━━━━━━━━━━━<br/>Safe Execution\" 和 \"AuditLogger<br/>━━━━━━━━━━━━━━<br/>Complete Trail\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 51,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 52,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SANDBOX",
+        "AUDIT"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 53,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"FileOperations\" 和 \"ProcessManager\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 54,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"FileOperations\" 和 \"ProcessManager\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 55,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "没问题。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 56,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "FILE_OPS",
+        "PROC_MGR"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 57,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"📚 Core Services\" 和 \"Core Processing\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 58,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"📚 Core Services\" 和 \"Core Processing\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 59,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 60,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "SERVICES",
+        "CORE"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 61,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"QueryParser\" 和 \"ToolSelector\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 62,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"QueryParser\" 和 \"ToolSelector\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 63,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 64,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "QP",
+        "TS"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 65,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "这里必须包含 \"ModuleMapper\" 和 \"WorkflowGenerator\" 这一块。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 66,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"ModuleMapper\" 和 \"WorkflowGenerator\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 67,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 68,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "MM",
+        "WG"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 69,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"🧠 LLM Providers (6 和 \"OpenAI\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 70,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"🧠 LLM Providers (6 和 \"OpenAI\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 71,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 72,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "PROVIDERS",
+        "P_OPENAI"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 73,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"Anthropic\" 和 \"Gemini\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 74,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Anthropic\" 和 \"Gemini\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 75,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 76,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "P_ANTHROPIC",
+        "P_GEMINI"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 77,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"Ollama\" 和 \"vLLM\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 78,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "明白，所以它是承接上一步的，内容是 '\"Ollama\" 和 \"vLLM\"'？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 79,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 80,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "P_OLLAMA",
+        "P_VLLM"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 81,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Lightning\" 和 \"🗄️ Data Layer\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 82,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "我把它加进去了，标签显示为 '\"Lightning\" 和 \"🗄️ Data Layer\"'，你看看合适吗？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 83,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "对的，就这样。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 84,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "P_LIGHTNING",
+        "DATA"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 85,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "我们需要加一个处理 \"DataDiscovery\" 和 \"Downloader\" 的环节。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 86,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "收到。这是不是一个判断条件？我暂时写成 '\"DataDiscovery\" 和 \"Downloader\"'。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 87,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 88,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "DISCOVERY",
+        "DOWNLOAD"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 89,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"ReferenceManager\" 和 \"Scanner\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 90,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"ReferenceManager\" 和 \"Scanner\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 91,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 92,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "REF_MGR",
+        "SCANNER"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 93,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "用户在这里会遇到 \"🏗️ Infrastructure\" 和 \"SLURM HPC\" 的分支。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 94,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"🏗️ Infrastructure\" 和 \"SLURM HPC\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 95,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "嗯，这样看起来很清晰。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 96,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "INFRASTRUCTURE",
+        "SLURM"
+      ],
+      "is_repair": false
+    },
+    {
+      "turn_id": 97,
+      "role": "Domain_Expert",
+      "action_type": "propose",
+      "utterance": "然后，流程会走到 \"Containers<br/>12 categories\" 和 \"Storage<br/>Local/Cloud\"。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 98,
+      "role": "Diagram_Editor",
+      "action_type": "clarify",
+      "utterance": "好的，我把它画成一个矩形框，名字叫 '\"Containers<br/>12 categories\" 和 \"Storage<br/>Local/Cloud\"'，对吧？",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 99,
+      "role": "Domain_Expert",
+      "action_type": "confirm",
+      "utterance": "可以，继续吧。",
+      "elements_involved": [],
+      "is_repair": false
+    },
+    {
+      "turn_id": 100,
+      "role": "Diagram_Editor",
+      "action_type": "execute",
+      "utterance": "[系统日志: Editor 更新了图表代码以反映上述结构]",
+      "elements_involved": [
+        "CONTAINERS",
+        "STORAGE"
+      ],
+      "is_repair": false
+    }
+  ],
+  "dialogue_metadata": {
+    "total_turns": 100,
+    "repair_count": 4,
+    "grounding_acts_count": 48,
+    "theoretical_framework": "Grounding in Communication (Clark & Brennan, 1991)"
+  },
+  "repair_log": [
+    "compilation_recovered_local_original"
+  ],
+  "repaired_at": "2026-03-11T04:48:40Z"
+}
