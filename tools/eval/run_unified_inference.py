@@ -47,6 +47,10 @@ def _predictor_config_from_args(args: argparse.Namespace) -> dict:
         "max_new_tokens": args.max_new_tokens,
         "max_output_tokens": args.max_new_tokens,
         "max_tokens": args.max_new_tokens,
+        "timeout_sec": args.timeout_sec,
+        "max_retries": args.max_retries,
+        "retry_backoff_sec": args.retry_backoff_sec,
+        "request_interval_sec": args.request_interval_sec,
         "use_4bit": args.use_4bit,
         "gpu_memory_limit_mib": args.gpu_memory_limit_mib,
         "cpu_memory_limit_gib": args.cpu_memory_limit_gib,
@@ -77,6 +81,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--top-p", type=float, default=1.0)
     parser.add_argument("--do-sample", action="store_true")
     parser.add_argument("--max-new-tokens", type=int, default=2048)
+    parser.add_argument("--timeout-sec", type=int, default=180)
+    parser.add_argument("--max-retries", type=int, default=5)
+    parser.add_argument("--retry-backoff-sec", type=float, default=3.0)
+    parser.add_argument("--request-interval-sec", type=float, default=0.0)
     parser.add_argument("--use-4bit", action="store_true")
     parser.add_argument("--gpu-memory-limit-mib", type=int, default=0)
     parser.add_argument("--cpu-memory-limit-gib", type=int, default=0)
@@ -126,7 +134,43 @@ def main() -> None:
         if sample.sample_id in completed_ids:
             skipped += 1
             continue
-        result = predictor.predict(sample)
+        try:
+            result = predictor.predict(sample)
+        except Exception as exc:
+            result_provider = str(predictor_config.get("provider", "unknown"))
+            result_model = str(
+                predictor_config.get("model_name_or_path")
+                or predictor_config.get("model")
+                or result_provider
+            )
+            row = {
+                "generated_at_utc": utc_iso(),
+                "sample_id": sample.sample_id,
+                "split": sample.split,
+                "diagram_type": sample.diagram_type,
+                "source_path": sample.source_path,
+                "dialogue_turns": sample.dialogue_turns,
+                "prompt": sample.prompt,
+                "reference_code": sample.reference_code,
+                "provider": result_provider,
+                "model_name": result_model,
+                "generated_code": "",
+                "raw_output_text": "",
+                "latency_ms": 0.0,
+                "finish_reason": "exception",
+                "usage": {},
+                "error": str(exc),
+            }
+            append_jsonl(output_jsonl, row)
+            processed += 1
+            failures += 1
+            print(
+                f"[eval-infer] sample={sample.sample_id} split={sample.split} "
+                f"provider={result_provider} model={result_model} "
+                f"latency_ms=0.00 error=True exception={exc}",
+                flush=True,
+            )
+            continue
         row = {
             "generated_at_utc": utc_iso(),
             "sample_id": sample.sample_id,

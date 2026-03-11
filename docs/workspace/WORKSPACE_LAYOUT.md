@@ -16,7 +16,8 @@
   - `configs/evaluation/` contains benchmark and predictor config templates.
 - `reports/`
   - Canonical reports that belong to the project workflow.
-  - `reports/evaluation/` is for generated benchmark outputs and should not be committed.
+  - `reports/evaluation/runs/` is for generated benchmark outputs and should not be committed.
+  - `reports/evaluation/published/` is for curated benchmark bundles that should be committed.
 - `data/`
   - Active derived datasets that may still be reused.
   - `data/evaluation/` is reserved for generated benchmark fixtures.
@@ -48,4 +49,5 @@
 - New evaluation scripts go in `tools/eval/`.
 - One-off probe outputs and temporary analysis artifacts should go to `workspace_archive/`, not the repository root.
 - Generated runtime logs belong in `reports/runtime/`.
-- Generated evaluation outputs belong in `reports/evaluation/`, `artifacts/evaluation/`, or `data/evaluation/`.
+- Generated evaluation outputs belong in `reports/evaluation/runs/`, `artifacts/evaluation/`, or `data/evaluation/`.
+- Commit-ready benchmark exports belong in `reports/evaluation/published/`.

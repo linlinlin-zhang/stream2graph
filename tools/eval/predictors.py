@@ -189,6 +189,10 @@ class JSONHttpPredictor(Predictor):
         self.endpoint = str(config["endpoint"])
         self.model_name = str(config["model"])
         self.timeout_sec = int(config.get("timeout_sec", 180))
+        self.max_retries = int(config.get("max_retries", 5))
+        self.retry_backoff_sec = float(config.get("retry_backoff_sec", 3.0))
+        self.request_interval_sec = float(config.get("request_interval_sec", 0.0))
+        self._last_request_started_at = 0.0
 
     def _post_json(self, payload: dict, headers: dict[str, str]) -> dict:
         body = json.dumps(payload).encode("utf-8")
@@ -198,12 +202,33 @@ class JSONHttpPredictor(Predictor):
             headers={"Content-Type": "application/json", **headers},
             method="POST",
         )
-        try:
-            with urllib.request.urlopen(request, timeout=self.timeout_sec) as response:
-                return json.loads(response.read().decode("utf-8"))
-        except urllib.error.HTTPError as exc:
-            detail = exc.read().decode("utf-8", errors="replace")
-            raise RuntimeError(f"HTTP {exc.code}: {detail}") from exc
+        retryable_status_codes = {408, 429, 500, 502, 503, 504}
+        last_error: Exception | None = None
+
+        for attempt in range(1, self.max_retries + 1):
+            wait_sec = self.request_interval_sec - (time.time() - self._last_request_started_at)
+            if wait_sec > 0:
+                time.sleep(wait_sec)
+            self._last_request_started_at = time.time()
+
+            try:
+                with urllib.request.urlopen(request, timeout=self.timeout_sec) as response:
+                    return json.loads(response.read().decode("utf-8"))
+            except urllib.error.HTTPError as exc:
+                detail = exc.read().decode("utf-8", errors="replace")
+                last_error = RuntimeError(f"HTTP {exc.code}: {detail}")
+                if exc.code in retryable_status_codes and attempt < self.max_retries:
+                    time.sleep(self.retry_backoff_sec * attempt)
+                    continue
+                raise last_error from exc
+            except urllib.error.URLError as exc:
+                last_error = RuntimeError(f"URL error: {exc.reason}")
+                if attempt < self.max_retries:
+                    time.sleep(self.retry_backoff_sec * attempt)
+                    continue
+                raise last_error from exc
+
+        raise RuntimeError(str(last_error) if last_error else "request failed without details")
 
 
 class OpenAIResponsesPredictor(JSONHttpPredictor):
@@ -229,35 +254,45 @@ class OpenAIResponsesPredictor(JSONHttpPredictor):
                 error=f"missing environment variable: {self.api_key_env}",
             )
 
-        messages = build_messages(sample)
-        payload = {
-            "model": self.model_name,
-            "input": [
-                {
-                    "role": messages[0]["role"],
-                    "content": [{"type": "input_text", "text": messages[0]["content"]}],
-                },
-                {
-                    "role": messages[1]["role"],
-                    "content": [{"type": "input_text", "text": messages[1]["content"]}],
-                },
-            ],
-            "max_output_tokens": self.max_output_tokens,
-            "temperature": self.temperature,
-        }
-        t0 = time.time()
-        response = self._post_json(payload, {"Authorization": f"Bearer {api_key}"})
-        latency_ms = (time.time() - t0) * 1000.0
-        raw_text = self._extract_text(response)
-        return PredictionResult(
-            provider=self.provider,
-            model_name=self.model_name,
-            generated_code=extract_mermaid_candidate(raw_text),
-            raw_output_text=raw_text,
-            latency_ms=round(latency_ms, 4),
-            finish_reason=response.get("status"),
-            usage=response.get("usage", {}) if isinstance(response.get("usage"), dict) else {},
-        )
+        try:
+            messages = build_messages(sample)
+            payload = {
+                "model": self.model_name,
+                "input": [
+                    {
+                        "role": messages[0]["role"],
+                        "content": [{"type": "input_text", "text": messages[0]["content"]}],
+                    },
+                    {
+                        "role": messages[1]["role"],
+                        "content": [{"type": "input_text", "text": messages[1]["content"]}],
+                    },
+                ],
+                "max_output_tokens": self.max_output_tokens,
+                "temperature": self.temperature,
+            }
+            t0 = time.time()
+            response = self._post_json(payload, {"Authorization": f"Bearer {api_key}"})
+            latency_ms = (time.time() - t0) * 1000.0
+            raw_text = self._extract_text(response)
+            return PredictionResult(
+                provider=self.provider,
+                model_name=self.model_name,
+                generated_code=extract_mermaid_candidate(raw_text),
+                raw_output_text=raw_text,
+                latency_ms=round(latency_ms, 4),
+                finish_reason=response.get("status"),
+                usage=response.get("usage", {}) if isinstance(response.get("usage"), dict) else {},
+            )
+        except Exception as exc:
+            return PredictionResult(
+                provider=self.provider,
+                model_name=self.model_name,
+                generated_code="",
+                raw_output_text="",
+                latency_ms=0.0,
+                error=str(exc),
+            )
 
     def _extract_text(self, response: dict[str, Any]) -> str:
         if isinstance(response.get("output_text"), str):
@@ -294,33 +329,43 @@ class AnthropicMessagesPredictor(JSONHttpPredictor):
                 latency_ms=0.0,
                 error=f"missing environment variable: {self.api_key_env}",
             )
-        payload = {
-            "model": self.model_name,
-            "system": SYSTEM_PROMPT,
-            "messages": [{"role": "user", "content": sample.prompt}],
-            "max_tokens": self.max_tokens,
-            "temperature": self.temperature,
-        }
-        t0 = time.time()
-        response = self._post_json(
-            payload,
-            {
-                "x-api-key": api_key,
-                "anthropic-version": self.api_version,
-            },
-        )
-        latency_ms = (time.time() - t0) * 1000.0
-        content_blocks = response.get("content", [])
-        raw_text = "\n".join(block.get("text", "") for block in content_blocks if isinstance(block, dict)).strip()
-        return PredictionResult(
-            provider=self.provider,
-            model_name=self.model_name,
-            generated_code=extract_mermaid_candidate(raw_text),
-            raw_output_text=raw_text,
-            latency_ms=round(latency_ms, 4),
-            finish_reason=response.get("stop_reason"),
-            usage=response.get("usage", {}) if isinstance(response.get("usage"), dict) else {},
-        )
+        try:
+            payload = {
+                "model": self.model_name,
+                "system": SYSTEM_PROMPT,
+                "messages": [{"role": "user", "content": sample.prompt}],
+                "max_tokens": self.max_tokens,
+                "temperature": self.temperature,
+            }
+            t0 = time.time()
+            response = self._post_json(
+                payload,
+                {
+                    "x-api-key": api_key,
+                    "anthropic-version": self.api_version,
+                },
+            )
+            latency_ms = (time.time() - t0) * 1000.0
+            content_blocks = response.get("content", [])
+            raw_text = "\n".join(block.get("text", "") for block in content_blocks if isinstance(block, dict)).strip()
+            return PredictionResult(
+                provider=self.provider,
+                model_name=self.model_name,
+                generated_code=extract_mermaid_candidate(raw_text),
+                raw_output_text=raw_text,
+                latency_ms=round(latency_ms, 4),
+                finish_reason=response.get("stop_reason"),
+                usage=response.get("usage", {}) if isinstance(response.get("usage"), dict) else {},
+            )
+        except Exception as exc:
+            return PredictionResult(
+                provider=self.provider,
+                model_name=self.model_name,
+                generated_code="",
+                raw_output_text="",
+                latency_ms=0.0,
+                error=str(exc),
+            )
 
 
 class GeminiGenerateContentPredictor(JSONHttpPredictor):
@@ -354,31 +399,41 @@ class GeminiGenerateContentPredictor(JSONHttpPredictor):
                 error=f"missing environment variable: {self.api_key_env}",
             )
 
-        payload = {
-            "systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]},
-            "contents": [{"role": "user", "parts": [{"text": sample.prompt}]}],
-            "generationConfig": {
-                "temperature": self.temperature,
-                "maxOutputTokens": self.max_output_tokens,
-            },
-        }
-        t0 = time.time()
-        response = self._post_json(payload, {})
-        latency_ms = (time.time() - t0) * 1000.0
-        raw_text = self._extract_text(response)
-        return PredictionResult(
-            provider=self.provider,
-            model_name=self.model_name,
-            generated_code=extract_mermaid_candidate(raw_text),
-            raw_output_text=raw_text,
-            latency_ms=round(latency_ms, 4),
-            finish_reason=(
-                response.get("candidates", [{}])[0].get("finishReason")
-                if isinstance(response.get("candidates"), list) and response.get("candidates")
-                else None
-            ),
-            usage=response.get("usageMetadata", {}) if isinstance(response.get("usageMetadata"), dict) else {},
-        )
+        try:
+            payload = {
+                "systemInstruction": {"parts": [{"text": SYSTEM_PROMPT}]},
+                "contents": [{"role": "user", "parts": [{"text": sample.prompt}]}],
+                "generationConfig": {
+                    "temperature": self.temperature,
+                    "maxOutputTokens": self.max_output_tokens,
+                },
+            }
+            t0 = time.time()
+            response = self._post_json(payload, {})
+            latency_ms = (time.time() - t0) * 1000.0
+            raw_text = self._extract_text(response)
+            return PredictionResult(
+                provider=self.provider,
+                model_name=self.model_name,
+                generated_code=extract_mermaid_candidate(raw_text),
+                raw_output_text=raw_text,
+                latency_ms=round(latency_ms, 4),
+                finish_reason=(
+                    response.get("candidates", [{}])[0].get("finishReason")
+                    if isinstance(response.get("candidates"), list) and response.get("candidates")
+                    else None
+                ),
+                usage=response.get("usageMetadata", {}) if isinstance(response.get("usageMetadata"), dict) else {},
+            )
+        except Exception as exc:
+            return PredictionResult(
+                provider=self.provider,
+                model_name=self.model_name,
+                generated_code="",
+                raw_output_text="",
+                latency_ms=0.0,
+                error=str(exc),
+            )
 
     def _extract_text(self, response: dict[str, Any]) -> str:
         chunks: list[str] = []

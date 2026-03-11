@@ -23,6 +23,10 @@ The platform is designed to support a rigorous paper workflow with:
   - merges offline and realtime summaries into one report
 - `tools/eval/run_eval_suite.py`
   - orchestration entrypoint that runs the full paper-style benchmark workflow
+- `tools/eval/run_openai_benchmark.py`
+  - GPT / OpenAI-specific benchmark entrypoint with retries, config materialization, and optional bundle publishing
+- `tools/eval/export_run_bundle.py`
+  - exports selected run outputs into a git-trackable bundle under `reports/evaluation/published/`
 - `tools/eval/common.py`
   - shared path and JSON helpers
 - `tools/eval/dataset.py`
@@ -42,6 +46,7 @@ The platform is designed to support a rigorous paper workflow with:
   - local or cloud-hosted open-weight models, with optional LoRA adapter
 - `openai_responses`
   - frontier API baseline
+  - supports timeout, retry, backoff, and request pacing controls
 - `anthropic_messages`
   - frontier API baseline
 - `google_generate_content`
@@ -107,6 +112,27 @@ python tools/eval/run_eval_suite.py --config configs/evaluation/eval_suite_relea
 
 This is the recommended paper workflow entrypoint once the per-step configs are ready.
 
+### 6. Run a GPT benchmark with one command
+
+Example:
+
+```bash
+python tools/eval/run_openai_benchmark.py --model gpt-4.1 --split test --max-samples 100
+```
+
+Or with a saved config:
+
+```bash
+python tools/eval/run_openai_benchmark.py --config configs/evaluation/openai_gpt_benchmark.example.json
+```
+
+This wrapper writes resolved configs, runs inference and offline metrics, builds a report,
+and can optionally publish a commit-ready bundle:
+
+```bash
+python tools/eval/run_openai_benchmark.py --model gpt-4.1 --split test --publish-bundle
+```
+
 ## Main offline metrics
 
 - normalized exact match
@@ -137,7 +163,12 @@ Generated evaluation artifacts should go under:
 - `artifacts/evaluation/`
 - `data/evaluation/`
 
-These paths are ignored by git.
+The recommended split is:
+
+- `reports/evaluation/runs/`
+  - raw local or cloud outputs, ignored by git
+- `reports/evaluation/published/`
+  - curated bundles that should be committed back into the repository
 
 ## Smoke verification configs
 
@@ -148,5 +179,6 @@ The repository includes smoke configs under `configs/evaluation/`:
 - `realtime_metrics_release_test_smoke.json`
 - `benchmark_report_release_test_smoke.json`
 - `eval_suite_release_test_smoke.json`
+- `openai_gpt_benchmark.example.json`
 
 These are intended to verify the pipeline without requiring model weights or API keys.
