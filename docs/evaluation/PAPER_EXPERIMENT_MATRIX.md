@@ -21,9 +21,9 @@ This document defines the intended paper-facing experiment groups for Stream2Gra
   - small materialization-only smoke matrix
 - `configs/evaluation/paper_matrix_icmi_main.example.json`
   - main ICMI-oriented comparison matrix template
-- `configs/evaluation/local_hf_qwen35_27b_base_benchmark.example.json`
+- `configs/evaluation/model_benchmarks/local_hf_qwen35_27b_base_benchmark.example.json`
   - dedicated local-HF base-model benchmark template
-- `configs/evaluation/local_hf_qwen35_27b_sft_benchmark.example.json`
+- `configs/evaluation/model_benchmarks/local_hf_qwen35_27b_sft_benchmark.example.json`
   - dedicated local-HF SFT benchmark template
 
 ## Matrix workflow

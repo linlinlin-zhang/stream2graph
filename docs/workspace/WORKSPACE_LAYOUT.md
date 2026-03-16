@@ -13,11 +13,19 @@
   - Realtime UI.
 - `configs/`
   - Runtime and training configuration files.
-  - `configs/evaluation/` contains benchmark, provider, local-HF, traditional-baseline, and paper-matrix config templates.
+  - `configs/evaluation/` contains smoke, inference, traditional-baseline, shard, and paper-matrix configs.
+  - `configs/evaluation/model_benchmarks/` contains the main large-model benchmark templates.
 - `reports/`
   - Canonical reports that belong to the project workflow.
   - `reports/evaluation/runs/` is for generated benchmark outputs and should not be committed.
   - `reports/evaluation/published/` is for curated benchmark bundles that should be committed.
+  - Evaluation run folders should prefer the normalized layout:
+    - `configs/`
+    - `inference/`
+    - `offline/`
+    - `realtime/` when applicable
+    - `report/`
+    - `suite/`
 - `data/`
   - Active derived datasets that may still be reused.
   - `data/evaluation/` is reserved for generated benchmark fixtures.
@@ -52,3 +60,5 @@
 - Generated runtime logs belong in `reports/runtime/`.
 - Generated evaluation outputs belong in `reports/evaluation/runs/`, `artifacts/evaluation/`, or `data/evaluation/`.
 - Commit-ready benchmark exports belong in `reports/evaluation/published/`.
+- Flat launch logs under `reports/evaluation/runs/_launches/` should be treated carefully because some launch manifests store absolute paths to those files.
+- If a provider folder accumulates loose one-off logs at its root, move them into a local `_orphan_logs/` subfolder instead of mixing them with normalized run directories.

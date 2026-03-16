@@ -27,6 +27,10 @@ The platform is designed to support a rigorous paper workflow with:
   - GPT / OpenAI-specific benchmark entrypoint with retries, config materialization, and optional bundle publishing
 - `tools/eval/run_gemini_benchmark.py`
   - Gemini-specific benchmark entrypoint for the official Google interface
+- `tools/eval/materialize_api_shards.py`
+  - generates shard-specific sample ID files and per-shard configs for quota-limited API models such as Gemini
+- `tools/eval/merge_prediction_shards.py`
+  - merges disjoint shard prediction JSONL files back into one ordered prediction file
 - `tools/eval/run_openai_compatible_benchmark.py`
   - benchmark entrypoint for official OpenAI-compatible providers such as Kimi, DeepSeek, MiniMax, Qwen DashScope, and SiliconFlow
 - `tools/eval/run_local_hf_benchmark.py`
@@ -147,7 +151,7 @@ python tools/eval/run_openai_benchmark.py --model gpt-4.1 --split test --max-sam
 Or with a saved config:
 
 ```bash
-python tools/eval/run_openai_benchmark.py --config configs/evaluation/openai_gpt_benchmark.example.json
+python tools/eval/run_openai_benchmark.py --config configs/evaluation/model_benchmarks/openai_gpt_benchmark.example.json
 ```
 
 This wrapper writes resolved configs, runs inference and offline metrics, builds a report,
@@ -157,32 +161,41 @@ and can optionally publish a commit-ready bundle:
 python tools/eval/run_openai_benchmark.py --model gpt-4.1 --split test --publish-bundle
 ```
 
-### 7. Run Gemini with the official Google interface
+### 7. Run Gemini 3 Flash with the official Google interface
 
 ```bash
-python tools/eval/run_gemini_benchmark.py --config configs/evaluation/gemini_benchmark.example.json
+python tools/eval/run_gemini_benchmark.py --config configs/evaluation/model_benchmarks/gemini_benchmark.example.json
 ```
 
-### 8. Run Kimi / DeepSeek / MiniMax / Qwen / SiliconFlow with OpenAI-compatible endpoints
+If you want a fully resolved single-key config first, materialize it from the helper template:
 
 ```bash
-python tools/eval/run_openai_compatible_benchmark.py --config configs/evaluation/deepseek_benchmark.example.json
-python tools/eval/run_openai_compatible_benchmark.py --config configs/evaluation/moonshot_kimi_benchmark.example.json
-python tools/eval/run_openai_compatible_benchmark.py --config configs/evaluation/minimax_benchmark.example.json
-python tools/eval/run_openai_compatible_benchmark.py --config configs/evaluation/qwen_dashscope_benchmark.example.json
-python tools/eval/run_openai_compatible_benchmark.py --config configs/evaluation/siliconflow_benchmark.example.json
+python tools/eval/materialize_api_shards.py --config configs/evaluation/gemini3flash_v7_single_key.example.json
+python tools/eval/run_gemini_benchmark.py --config configs/evaluation/generated_shards/gemini3flash_google_v7_single_key/gemini3flash_google_v7_test_shard01of01.config.json
+```
+
+### 8. Run Kimi / DeepSeek / MiniMax / Qwen / OpenRouter models with OpenAI-compatible endpoints
+
+```bash
+python tools/eval/run_openai_compatible_benchmark.py --config configs/evaluation/model_benchmarks/deepseek_benchmark.example.json
+python tools/eval/run_openai_compatible_benchmark.py --config configs/evaluation/model_benchmarks/moonshot_kimi_benchmark.example.json
+python tools/eval/run_openai_compatible_benchmark.py --config configs/evaluation/model_benchmarks/minimax_benchmark.example.json
+python tools/eval/run_openai_compatible_benchmark.py --config configs/evaluation/model_benchmarks/qwen_dashscope_benchmark.example.json
+python tools/eval/run_openai_compatible_benchmark.py --config configs/evaluation/model_benchmarks/qwen_dashscope_benchmark_thinking_on.example.json
+python tools/eval/run_openai_compatible_benchmark.py --config configs/evaluation/model_benchmarks/siliconflow_benchmark.example.json
+python tools/eval/run_openai_compatible_benchmark.py --config configs/evaluation/model_benchmarks/openrouter_gpt_benchmark.example.json
 ```
 
 ### 9. Run a local Hugging Face benchmark
 
 ```bash
-python tools/eval/run_local_hf_benchmark.py --config configs/evaluation/local_hf_qwen35_27b_base_benchmark.example.json
+python tools/eval/run_local_hf_benchmark.py --config configs/evaluation/model_benchmarks/local_hf_qwen35_27b_base_benchmark.example.json
 ```
 
 Use the SFT template when the adapter is already available:
 
 ```bash
-python tools/eval/run_local_hf_benchmark.py --config configs/evaluation/local_hf_qwen35_27b_sft_benchmark.example.json
+python tools/eval/run_local_hf_benchmark.py --config configs/evaluation/model_benchmarks/local_hf_qwen35_27b_sft_benchmark.example.json
 ```
 
 ### 10. Run the traditional heuristic baseline
@@ -207,6 +220,43 @@ treated as a gold annotation in the paper.
 ```bash
 python tools/eval/materialize_experiment_matrix.py --config configs/evaluation/paper_matrix_icmi_smoke.json
 ```
+
+### 12. Repair only failed API samples
+
+When an API run finishes with a small number of transport or quota failures, do not rerun the full split by default.
+Instead:
+
+1. Extract the failed sample IDs from the original prediction file.
+2. Rerun inference only for those sample IDs into a new JSONL.
+3. Merge the repaired JSONL in front of the original JSONL so repaired rows win by `sample_id`.
+4. Recompute offline metrics and the report on the merged file.
+
+Example:
+
+```bash
+python tools/eval/extract_failed_sample_ids.py \
+  --input-jsonl reports/evaluation/runs/anthropic/minimax_m25_v7_test_full/inference/predictions.jsonl \
+  --output-json reports/evaluation/runs/anthropic/minimax_m25_v7_test_full/repair/failed_sample_ids.json
+
+python tools/eval/run_unified_inference.py \
+  --config reports/evaluation/runs/anthropic/minimax_m25_v7_test_full/configs/inference.json \
+  --sample-ids-file reports/evaluation/runs/anthropic/minimax_m25_v7_test_full/repair/failed_sample_ids.json \
+  --output-jsonl reports/evaluation/runs/anthropic/minimax_m25_v7_test_full/repair/predictions.repaired.jsonl \
+  --manifest-output reports/evaluation/runs/anthropic/minimax_m25_v7_test_full/repair/manifest.repaired.json
+
+python tools/eval/merge_prediction_shards.py \
+  --output-jsonl reports/evaluation/runs/anthropic/minimax_m25_v7_test_full/repair/predictions.merged.jsonl \
+  --split-dir versions/v3_2026-02-27_latest_9k_cscw/dataset/stream2graph_dataset/release_v7_kimi_k25_fullregen_strict_20260313/splits \
+  --split test \
+  --input-jsonl reports/evaluation/runs/anthropic/minimax_m25_v7_test_full/repair/predictions.repaired.jsonl \
+  --input-jsonl reports/evaluation/runs/anthropic/minimax_m25_v7_test_full/inference/predictions.jsonl
+```
+
+Important:
+
+- write repaired outputs to a new JSONL, not the original `predictions.jsonl`
+- do not rely on `resume` against the old JSONL because previously failed `sample_id`s are still treated as completed rows
+- keep the repaired file first in `merge_prediction_shards.py` so the repaired rows override the old failures
 
 ## Main offline metrics
 
@@ -254,18 +304,28 @@ The repository includes smoke configs under `configs/evaluation/`:
 - `realtime_metrics_release_test_smoke.json`
 - `benchmark_report_release_test_smoke.json`
 - `eval_suite_release_test_smoke.json`
-- `openai_gpt_benchmark.example.json`
-- `gemini_benchmark.example.json`
-- `moonshot_kimi_benchmark.example.json`
-- `deepseek_benchmark.example.json`
-- `minimax_benchmark.example.json`
-- `qwen_dashscope_benchmark.example.json`
-- `siliconflow_benchmark.example.json`
-- `local_hf_qwen35_27b_base_benchmark.example.json`
-- `local_hf_qwen35_27b_sft_benchmark.example.json`
+- `model_benchmarks/openai_gpt_benchmark.example.json`
+- `model_benchmarks/openrouter_gpt_benchmark.example.json`
+- `model_benchmarks/gemini_benchmark.example.json`
+- `gemini3flash_v7_single_key.example.json`
+- `gemini31pro_v7_sharded_4way.example.json`
+  - legacy compatibility alias for the old multi-project helper name; now resolves to the single-key Gemini 3 Flash materialization setup
+- `model_benchmarks/moonshot_kimi_benchmark.example.json`
+- `model_benchmarks/deepseek_benchmark.example.json`
+- `model_benchmarks/minimax_benchmark.example.json`
+- `model_benchmarks/qwen_dashscope_benchmark.example.json`
+- `model_benchmarks/qwen_dashscope_benchmark_thinking_on.example.json`
+- `model_benchmarks/siliconflow_benchmark.example.json`
+- `model_benchmarks/local_hf_qwen35_27b_base_benchmark.example.json`
+- `model_benchmarks/local_hf_qwen35_27b_sft_benchmark.example.json`
 - `traditional_benchmark_smoke.json`
 - `traditional_benchmark_full.example.json`
 - `paper_matrix_icmi_smoke.json`
 - `paper_matrix_icmi_main.example.json`
 
 These are intended to verify the pipeline without requiring model weights or API keys.
+
+See also:
+
+- `docs/evaluation/GEMINI_GPT_TESTING_PLATFORM.md`
+  - GPT template notes plus the current direct-Google single-key workflow for Gemini
