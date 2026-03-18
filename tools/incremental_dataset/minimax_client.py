@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -51,6 +52,7 @@ class MiniMaxChatClient:
         self.max_retries = int(config.get("max_retries", 6))
         self.retry_backoff_sec = float(config.get("retry_backoff_sec", 5.0))
         self.request_interval_sec = float(config.get("request_interval_sec", 0.5))
+        self.rpm_limit = float(config.get("rpm_limit", 0))
         self.reasoning_split = bool(config.get("reasoning_split", True))
         self.extra_body = config.get("extra_body", {}) if isinstance(config.get("extra_body"), dict) else {}
         quota = config.get("quota", {}) if isinstance(config.get("quota"), dict) else {}
@@ -64,6 +66,7 @@ class MiniMaxChatClient:
         self.calls_since_quota_poll = 0
         self._last_request_started_at = 0.0
         self._last_quota_status = QuotaStatus()
+        self._state_lock = threading.Lock()
 
     def chat(self, messages: list[dict[str, str]]) -> MiniMaxResult:
         api_key = _resolve_api_key(self.api_key_env)
@@ -81,8 +84,6 @@ class MiniMaxChatClient:
         t0 = time.time()
         response = self._post_json(self.endpoint, payload, {"Authorization": f"Bearer {api_key}"})
         latency_ms = round((time.time() - t0) * 1000.0, 4)
-        self.calls_in_window += 1
-        self.calls_since_quota_poll += 1
         finish_reason = None
         if isinstance(response.get("choices"), list) and response["choices"]:
             finish_reason = response["choices"][0].get("finish_reason")
@@ -101,26 +102,35 @@ class MiniMaxChatClient:
     def _ensure_quota_available(self, api_key: str) -> None:
         if not self.quota_enabled:
             return
-        elapsed = time.time() - self.window_started_at
-        if elapsed >= self.window_hours * 3600:
-            self.window_started_at = time.time()
-            self.calls_in_window = 0
-            self.calls_since_quota_poll = 0
-        if self.max_calls_per_window > 0 and self.calls_in_window >= self.max_calls_per_window:
-            raise QuotaPauseRequested(
-                f"reached local MiniMax call budget ({self.max_calls_per_window}) inside the current {self.window_hours}h window"
-            )
-        if self.calls_since_quota_poll == 0 or self.calls_since_quota_poll >= self.poll_interval_calls:
-            self._last_quota_status = self._fetch_quota_status(api_key)
-            self.calls_since_quota_poll = 0
-        if self._last_quota_status.remaining is not None and self._last_quota_status.remaining <= self.min_remaining_prompts:
-            raise QuotaPauseRequested(
-                f"MiniMax coding plan remaining prompts is {self._last_quota_status.remaining}, below threshold {self.min_remaining_prompts}"
-            )
+        with self._state_lock:
+            elapsed = time.time() - self.window_started_at
+            if elapsed >= self.window_hours * 3600:
+                self.window_started_at = time.time()
+                self.calls_in_window = 0
+                self.calls_since_quota_poll = 0
+            if self.max_calls_per_window > 0 and self.calls_in_window >= self.max_calls_per_window:
+                raise QuotaPauseRequested(
+                    f"reached local MiniMax call budget ({self.max_calls_per_window}) inside the current {self.window_hours}h window"
+                )
+            if self.calls_since_quota_poll == 0 or self.calls_since_quota_poll >= self.poll_interval_calls:
+                self._last_quota_status = self._fetch_quota_status(api_key)
+                self.calls_since_quota_poll = 0
+            if self._last_quota_status.remaining is not None and self._last_quota_status.remaining <= self.min_remaining_prompts:
+                raise QuotaPauseRequested(
+                    f"MiniMax coding plan remaining prompts is {self._last_quota_status.remaining}, below threshold {self.min_remaining_prompts}"
+                )
+            self.calls_in_window += 1
+            self.calls_since_quota_poll += 1
 
     def _fetch_quota_status(self, api_key: str) -> QuotaStatus:
         try:
-            payload = self._request_json(self.remains_endpoint, None, {"Authorization": f"Bearer {api_key}"}, method="GET")
+            payload = self._request_json(
+                self.remains_endpoint,
+                None,
+                {"Authorization": f"Bearer {api_key}"},
+                method="GET",
+                apply_rate_limit=False,
+            )
             remaining = self._extract_remaining(payload)
             return QuotaStatus(
                 remaining=remaining,
@@ -180,6 +190,7 @@ class MiniMaxChatClient:
         payload: dict[str, Any] | None,
         headers: dict[str, str],
         method: str = "POST",
+        apply_rate_limit: bool = True,
     ) -> dict[str, Any]:
         body = json.dumps(payload).encode("utf-8") if payload is not None else None
         request = urllib.request.Request(
@@ -192,10 +203,8 @@ class MiniMaxChatClient:
         last_error: Exception | None = None
 
         for attempt in range(1, self.max_retries + 1):
-            wait_sec = self.request_interval_sec - (time.time() - self._last_request_started_at)
-            if wait_sec > 0:
-                time.sleep(wait_sec)
-            self._last_request_started_at = time.time()
+            if apply_rate_limit:
+                self._await_request_slot()
             try:
                 with urllib.request.urlopen(request, timeout=self.timeout_sec) as response:
                     return json.loads(response.read().decode("utf-8"))
@@ -213,6 +222,24 @@ class MiniMaxChatClient:
                     continue
                 raise last_error from exc
         raise RuntimeError(str(last_error) if last_error else "request failed without details")
+
+    def _await_request_slot(self) -> None:
+        min_interval = self._min_request_interval_sec()
+        if min_interval <= 0:
+            return
+        while True:
+            with self._state_lock:
+                now = time.time()
+                wait_sec = min_interval - (now - self._last_request_started_at)
+                if wait_sec <= 0:
+                    self._last_request_started_at = now
+                    return
+            time.sleep(min(wait_sec, 0.05))
+
+    def _min_request_interval_sec(self) -> float:
+        if self.rpm_limit > 0:
+            return max(0.0, 60.0 / self.rpm_limit)
+        return max(0.0, self.request_interval_sec)
 
     def _extract_text(self, response: dict[str, Any]) -> str:
         chunks: list[str] = []

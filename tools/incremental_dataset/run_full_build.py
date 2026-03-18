@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import json
 import os
 import sys
@@ -33,6 +34,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--force-structure", action="store_true")
     parser.add_argument("--agent-enabled", action="store_true")
     parser.add_argument("--agent-max-samples", type=int, default=0)
+    parser.add_argument("--parallel-workers", type=int, default=1)
     pre_args, _ = parser.parse_known_args()
     if pre_args.config:
         payload = json.loads(resolve_path(pre_args.config).read_text(encoding="utf-8"))
@@ -62,6 +64,7 @@ def main() -> None:
             "target_samples": args.target_samples,
             "agent_enabled": bool(args.agent_enabled),
             "agent_max_samples": args.agent_max_samples,
+            "parallel_workers": args.parallel_workers,
         },
     )
 
@@ -194,35 +197,75 @@ def run_agent_cluster(
     paused = False
     errors = 0
     sample_paths = sorted(structure_dir.glob("*.json"))
+    parallel_workers = max(1, int(args.parallel_workers))
     if args.agent_max_samples > 0:
         sample_paths = sample_paths[: args.agent_max_samples]
+    executor = concurrent.futures.ThreadPoolExecutor(max_workers=parallel_workers)
+    iterator = iter(sample_paths)
+    future_to_path: dict[concurrent.futures.Future, Path] = {}
 
-    for sample_path in sample_paths:
-        payload = read_json(sample_path)
-        try:
-            result = runner.run_sample(payload)
-            processed += 1
-            if result.get("status") == "error":
-                errors += 1
-        except QuotaPauseRequested as exc:
-            append_jsonl(
-                events_path,
-                {
-                    "event": "agent_cluster_paused_for_quota",
-                    "sample_id": payload.get("sample_id"),
-                    "reason": str(exc),
-                    "quota_status": client.current_quota_status().payload,
-                    "at_utc": utc_iso(),
-                },
+    try:
+        while True:
+            while not paused and len(future_to_path) < parallel_workers:
+                try:
+                    sample_path = next(iterator)
+                except StopIteration:
+                    break
+                future = executor.submit(_run_agent_sample_path, runner, sample_path)
+                future_to_path[future] = sample_path
+            if not future_to_path:
+                break
+
+            done, _ = concurrent.futures.wait(
+                list(future_to_path.keys()),
+                return_when=concurrent.futures.FIRST_COMPLETED,
             )
-            paused = True
-            break
+            for future in done:
+                sample_path = future_to_path.pop(future)
+                payload = read_json(sample_path)
+                try:
+                    result = future.result()
+                    processed += 1
+                    if result.get("status") == "error":
+                        errors += 1
+                except QuotaPauseRequested as exc:
+                    append_jsonl(
+                        events_path,
+                        {
+                            "event": "agent_cluster_paused_for_quota",
+                            "sample_id": payload.get("sample_id"),
+                            "reason": str(exc),
+                            "quota_status": client.current_quota_status().payload,
+                            "at_utc": utc_iso(),
+                        },
+                    )
+                    paused = True
+                except Exception as exc:
+                    errors += 1
+                    append_jsonl(
+                        events_path,
+                        {
+                            "event": "agent_cluster_worker_error",
+                            "sample_id": payload.get("sample_id"),
+                            "reason": str(exc),
+                            "at_utc": utc_iso(),
+                        },
+                    )
+                if paused:
+                    break
+            if paused:
+                for future in future_to_path:
+                    future.cancel()
+                break
+    finally:
+        executor.shutdown(wait=not paused, cancel_futures=paused)
 
     progress_report = build_agent_progress_report(agent_dir)
     progress_report["last_batch"] = {
         "processed_this_invocation": processed,
         "paused_for_quota": paused,
         "errors_this_invocation": errors,
+        "parallel_workers": parallel_workers,
     }
     progress_report["quota_status"] = client.current_quota_status().payload
     return progress_report
@@ -244,6 +287,11 @@ def _read_jsonl(path: Path) -> list[dict]:
                 continue
             rows.append(json.loads(line))
     return rows
+
+
+def _run_agent_sample_path(runner: AgentClusterRunner, sample_path: Path) -> dict:
+    payload = read_json(sample_path)
+    return runner.run_sample(payload)
 
 
 if __name__ == "__main__":
