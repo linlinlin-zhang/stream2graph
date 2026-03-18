@@ -48,6 +48,8 @@ class AgentClusterRunner:
             "status": "in_progress",
             "started_at_utc": utc_iso(),
         }
+        record["status"] = "in_progress"
+        record["updated_at_utc"] = utc_iso()
 
         try:
             if "stage_planner" not in record:
@@ -79,12 +81,15 @@ class AgentClusterRunner:
             record["final_dialogue"] = record["dialogue_writer"]["result"]
             record["final_alignment"] = record["turn_aligner"]["result"]
             record["verification_summary"] = verification
+            record.pop("error", None)
+            record.pop("warning", None)
             if "result" in record["verifier"]:
                 record["status"] = "completed"
             else:
                 record["status"] = "completed_with_warnings"
                 record["warning"] = record["verifier"].get("error", "verifier failed without a recorded message")
             record["completed_at_utc"] = utc_iso()
+            record["updated_at_utc"] = record["completed_at_utc"]
             write_json(target_path, record)
             return record
         except QuotaPauseRequested:

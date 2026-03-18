@@ -15,6 +15,7 @@ from tools.incremental_dataset.agent_cluster import AgentClusterRunner
 from tools.incremental_dataset.complexity import assign_complexity_buckets, build_profile
 from tools.incremental_dataset.mermaid_ir import parse_mermaid_to_graph_ir
 from tools.incremental_dataset.minimax_client import MiniMaxChatClient, QuotaPauseRequested
+from tools.incremental_dataset.progress import build_agent_progress_report
 from tools.incremental_dataset.selection import select_profiles
 from tools.incremental_dataset.source_dataset import DEFAULT_SOURCE_DIR, DEFAULT_SPLIT_DIR, load_source_samples
 from tools.incremental_dataset.staging import build_incremental_stages
@@ -166,6 +167,7 @@ def run_agent_cluster(
     agent_dir: Path,
     events_path: Path,
 ) -> dict:
+    progress_report = build_agent_progress_report(agent_dir)
     config_payload = json.loads(resolve_path(args.config).read_text(encoding="utf-8")) if args.config else {}
     minimax_config = config_payload.get("minimax", {})
     api_key_env = str(minimax_config.get("api_key_env", "MINIMAX_API_KEY"))
@@ -178,13 +180,14 @@ def run_agent_cluster(
                 "at_utc": utc_iso(),
             },
         )
-        return {
-            "processed": 0,
+        progress_report["last_batch"] = {
+            "processed_this_invocation": 0,
             "paused_for_quota": False,
-            "errors": 0,
-            "quota_status": {},
-            "preflight_error": f"missing environment variable: {api_key_env}",
+            "errors_this_invocation": 0,
         }
+        progress_report["quota_status"] = {}
+        progress_report["preflight_error"] = f"missing environment variable: {api_key_env}"
+        return progress_report
     client = MiniMaxChatClient(minimax_config)
     runner = AgentClusterRunner(client, agent_dir)
     processed = 0
@@ -215,12 +218,14 @@ def run_agent_cluster(
             paused = True
             break
 
-    return {
-        "processed": processed,
+    progress_report = build_agent_progress_report(agent_dir)
+    progress_report["last_batch"] = {
+        "processed_this_invocation": processed,
         "paused_for_quota": paused,
-        "errors": errors,
-        "quota_status": client.current_quota_status().payload,
+        "errors_this_invocation": errors,
     }
+    progress_report["quota_status"] = client.current_quota_status().payload
+    return progress_report
 
 
 def _write_split_files(split_dir: Path, selected_profiles: list[dict]) -> None:
