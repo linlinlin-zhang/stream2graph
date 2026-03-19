@@ -16,6 +16,20 @@ def _resolve_api_key(env_name: str) -> str:
     return os.environ.get(env_name, "")
 
 
+def resolve_configured_api_key(config: dict[str, Any]) -> str:
+    direct_key = str(config.get("api_key", "") or "").strip()
+    if direct_key:
+        return direct_key
+    api_key_file = str(config.get("api_key_file", "") or "").strip()
+    if api_key_file:
+        try:
+            return open(api_key_file, "r", encoding="utf-8").read().strip()
+        except OSError:
+            return ""
+    env_name = str(config.get("api_key_env", "MINIMAX_API_KEY"))
+    return _resolve_api_key(env_name)
+
+
 class QuotaPauseRequested(RuntimeError):
     pass
 
@@ -45,6 +59,7 @@ class MiniMaxChatClient:
             config.get("remains_endpoint", "https://www.minimaxi.com/v1/api/openplatform/coding_plan/remains")
         )
         self.api_key_env = str(config.get("api_key_env", "MINIMAX_API_KEY"))
+        self.api_key = resolve_configured_api_key(config)
         self.model = str(config.get("model", "MiniMax-M2.7"))
         self.max_tokens = int(config.get("max_tokens", 4096))
         self.temperature = float(config.get("temperature", 0.2))
@@ -69,9 +84,9 @@ class MiniMaxChatClient:
         self._state_lock = threading.Lock()
 
     def chat(self, messages: list[dict[str, str]]) -> MiniMaxResult:
-        api_key = _resolve_api_key(self.api_key_env)
+        api_key = self.api_key or _resolve_api_key(self.api_key_env)
         if not api_key:
-            raise RuntimeError(f"missing environment variable: {self.api_key_env}")
+            raise RuntimeError(f"missing MiniMax api key in config or environment variable: {self.api_key_env}")
         self._ensure_quota_available(api_key)
         payload = {
             "model": self.model,

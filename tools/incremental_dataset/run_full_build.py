@@ -15,7 +15,7 @@ from tools.eval.common import append_jsonl, read_json, resolve_path, utc_iso, wr
 from tools.incremental_dataset.agent_cluster import AgentClusterRunner
 from tools.incremental_dataset.complexity import assign_complexity_buckets, build_profile
 from tools.incremental_dataset.mermaid_ir import parse_mermaid_to_graph_ir
-from tools.incremental_dataset.minimax_client import MiniMaxChatClient, QuotaPauseRequested
+from tools.incremental_dataset.minimax_client import MiniMaxChatClient, QuotaPauseRequested, resolve_configured_api_key
 from tools.incremental_dataset.progress import build_agent_progress_report
 from tools.incremental_dataset.selection import select_profiles
 from tools.incremental_dataset.source_dataset import DEFAULT_SOURCE_DIR, DEFAULT_SPLIT_DIR, load_source_samples
@@ -174,7 +174,7 @@ def run_agent_cluster(
     config_payload = json.loads(resolve_path(args.config).read_text(encoding="utf-8")) if args.config else {}
     minimax_config = config_payload.get("minimax", {})
     api_key_env = str(minimax_config.get("api_key_env", "MINIMAX_API_KEY"))
-    if not os.environ.get(api_key_env):
+    if not resolve_configured_api_key(minimax_config):
         append_jsonl(
             events_path,
             {
@@ -187,9 +187,10 @@ def run_agent_cluster(
             "processed_this_invocation": 0,
             "paused_for_quota": False,
             "errors_this_invocation": 0,
+            "parallel_workers": max(1, int(args.parallel_workers)),
         }
         progress_report["quota_status"] = {}
-        progress_report["preflight_error"] = f"missing environment variable: {api_key_env}"
+        progress_report["preflight_error"] = f"missing MiniMax api key in config or environment variable: {api_key_env}"
         return progress_report
     client = MiniMaxChatClient(minimax_config)
     runner = AgentClusterRunner(client, agent_dir)
