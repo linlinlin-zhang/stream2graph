@@ -8,6 +8,10 @@ This folder is the canonical home for hand-authored large-model benchmark templa
   - Kimi 2.5, provider default reasoning, tuned to 80% of the current RPM/concurrency ceiling
 - `minimax_benchmark.example.json`
   - MiniMax 2.5, provider default reasoning
+- `incremental_minimax_siliconflow_gate_validation.example.json`
+  - Incremental-system validation smoke with SiliconFlow Qwen3.5-4B as the gate and MiniMax-M2.7 as the planner
+- `incremental_minimax_siliconflow_gate_test_full.example.json`
+  - Incremental-system full-test template with SiliconFlow Qwen3.5-4B as the gate and MiniMax-M2.7 as the planner
 - `gemini_benchmark.example.json`
   - Gemini 3 Flash Preview on the official Google interface, `thinkingLevel=high`, intended for the simplified single-key workflow
 - `qwen_dashscope_benchmark.example.json`
