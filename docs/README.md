@@ -8,6 +8,7 @@ This repository keeps operational and research notes under `docs/`.
   - Consolidated project playbooks, decision logs, and conference-oriented execution plans.
   - Includes both English and Chinese project playbooks.
   - Includes a Chinese project overview and a separate frontend/backend requirements handoff.
+  - Includes the formal platform runbook and a Chinese end-user guide.
   - Includes the incremental Stream2Graph pivot proposal in Chinese.
   - Includes the incremental dataset build system blueprint and MiniMax agent-cluster runbook in Chinese.
 - `evaluation/`

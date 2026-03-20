@@ -1,5 +1,39 @@
 # Stream2Graph Versioned Archive
 
+## 正式平台入口
+
+2026-03 起，仓库中已经新增一套绿色重写的正式平台：
+
+- 前端：`apps/web`
+- 后端：`apps/api`
+- 共享类型：`packages/contracts`
+- UI 组件：`packages/ui`
+
+建议优先阅读下面两份文档：
+
+- [正式平台运行手册](./docs/project/FORMAL_PLATFORM_RUNBOOK_ZH.md)
+- [正式平台使用指南](./docs/project/FORMAL_PLATFORM_USER_GUIDE_ZH.md)
+
+常用命令：
+
+```bash
+pnpm dev:up
+pnpm dev:status
+pnpm dev:down
+pnpm dev:web
+pnpm api:dev
+pnpm api:worker
+pnpm typecheck:web
+pnpm lint:web
+pnpm api:test
+```
+
+说明：
+
+- `pnpm dev:up` 会自动补 `.env`、尝试拉起 PostgreSQL、执行迁移，并后台启动 API / Web / worker
+- 进程日志默认写到 `var/log/`，PID 写到 `var/run/`
+- `pnpm api:*` 系列命令默认在已经激活 `.venv-platform` 的 shell 中执行
+
 这个仓库是对 `/home/lin-server/pictures` 的版本化整理结果，目的是把不同阶段的数据集与脚本分开保存，便于追溯与复现实验。
 
 ## 版本目录

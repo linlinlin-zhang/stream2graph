@@ -1,0 +1,146 @@
+import { z } from "zod";
+
+export const datasetVersionSummarySchema = z.object({
+  slug: z.string(),
+  display_name: z.string(),
+  sample_count: z.number(),
+  train_count: z.number(),
+  validation_count: z.number(),
+  test_count: z.number(),
+  is_default: z.boolean(),
+  dataset_dir: z.string(),
+  split_dir: z.string(),
+});
+
+export const datasetSplitSummarySchema = z.object({
+  split: z.string(),
+  count: z.number(),
+  example_ids: z.array(z.string()),
+});
+
+export const sampleListItemSchema = z.object({
+  sample_id: z.string(),
+  diagram_type: z.string(),
+  dialogue_turns: z.number(),
+  compilation_status: z.string().nullable().optional(),
+  release_version: z.string().nullable().optional(),
+  license_name: z.string().nullable().optional(),
+});
+
+export const sampleDetailSchema = z.object({
+  dataset_version: z.string(),
+  split: z.string(),
+  sample_id: z.string(),
+  diagram_type: z.string(),
+  code: z.string(),
+  dialogue: z.array(z.record(z.any())),
+  metadata: z.record(z.any()),
+});
+
+export const realtimeSessionSchema = z.object({
+  session_id: z.string(),
+  title: z.string(),
+  status: z.string(),
+  dataset_version_slug: z.string().nullable().optional(),
+  created_at: z.string(),
+  updated_at: z.string(),
+  summary: z.record(z.any()),
+});
+
+export const realtimeSnapshotSchema = z.object({
+  session_id: z.string(),
+  pipeline: z.record(z.any()),
+  evaluation: z.record(z.any()).nullable().optional(),
+});
+
+export const runJobSchema = z.object({
+  run_id: z.string(),
+  job_type: z.string(),
+  title: z.string(),
+  status: z.enum(["queued", "running", "succeeded", "failed", "cancelled"]),
+  dataset_version_slug: z.string().nullable().optional(),
+  split: z.string().nullable().optional(),
+  provider_name: z.string().nullable().optional(),
+  model_name: z.string().nullable().optional(),
+  config_snapshot: z.record(z.any()),
+  progress: z.record(z.any()),
+  result_payload: z.record(z.any()),
+  error_message: z.string().nullable().optional(),
+  artifact_root: z.string().nullable().optional(),
+  created_at: z.string(),
+  updated_at: z.string(),
+  started_at: z.string().nullable().optional(),
+  completed_at: z.string().nullable().optional(),
+});
+
+export const runArtifactSchema = z.object({
+  id: z.string(),
+  artifact_type: z.string(),
+  label: z.string(),
+  path: z.string(),
+  format: z.string(),
+  meta: z.record(z.any()),
+});
+
+export const studyTaskSchema = z.object({
+  task_id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  dataset_version_slug: z.string().nullable().optional(),
+  split: z.string().nullable().optional(),
+  sample_id: z.string().nullable().optional(),
+  default_condition: z.enum(["manual", "heuristic", "model_system"]),
+  materials: z.record(z.any()),
+  system_outputs: z.record(z.any()),
+  created_at: z.string(),
+});
+
+export const studySessionSchema = z.object({
+  session_id: z.string(),
+  participant_code: z.string(),
+  participant_id: z.string(),
+  task_id: z.string(),
+  study_condition: z.enum(["manual", "heuristic", "model_system"]),
+  status: z.string(),
+  task_title: z.string(),
+  task_description: z.string(),
+  materials: z.record(z.any()),
+  system_output: z.string().nullable().optional(),
+  draft_output: z.string().nullable().optional(),
+  final_output: z.string().nullable().optional(),
+  compile_success: z.boolean().nullable().optional(),
+  auto_metrics: z.record(z.any()),
+  started_at: z.string().nullable().optional(),
+  last_active_at: z.string().nullable().optional(),
+  ended_at: z.string().nullable().optional(),
+});
+
+export const reportSummarySchema = z.object({
+  report_id: z.string(),
+  report_type: z.string(),
+  title: z.string(),
+  status: z.string(),
+  summary: z.record(z.any()),
+  created_at: z.string(),
+  updated_at: z.string(),
+});
+
+export const reportDetailSchema = reportSummarySchema.extend({
+  payload: z.record(z.any()),
+  json_path: z.string().nullable().optional(),
+  csv_path: z.string().nullable().optional(),
+  markdown_path: z.string().nullable().optional(),
+});
+
+export type DatasetVersionSummary = z.infer<typeof datasetVersionSummarySchema>;
+export type DatasetSplitSummary = z.infer<typeof datasetSplitSummarySchema>;
+export type SampleListItem = z.infer<typeof sampleListItemSchema>;
+export type SampleDetail = z.infer<typeof sampleDetailSchema>;
+export type RealtimeSession = z.infer<typeof realtimeSessionSchema>;
+export type RealtimeSnapshot = z.infer<typeof realtimeSnapshotSchema>;
+export type RunJob = z.infer<typeof runJobSchema>;
+export type RunArtifact = z.infer<typeof runArtifactSchema>;
+export type StudyTask = z.infer<typeof studyTaskSchema>;
+export type StudySession = z.infer<typeof studySessionSchema>;
+export type ReportSummary = z.infer<typeof reportSummarySchema>;
+export type ReportDetail = z.infer<typeof reportDetailSchema>;
