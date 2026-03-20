@@ -15,6 +15,7 @@ RUN_NAME="qwen35_27b_incremental_planner_local_smoke"
 LOG_FILE="${LOG_DIR}/${RUN_NAME}.log"
 PID_FILE="${LOG_DIR}/${RUN_NAME}.pid"
 CONFIG_PATH="${ROOT_DIR}/configs/finetune/qwen35_27b_planner_local_smoke.json"
+FINETUNE_RUN_ROOT="${FINETUNE_RUN_ROOT:-$ROOT_DIR/data/incremental_dataset/runs/minimax_m27_incremental_full_v1_clean}"
 
 mkdir -p "$LOG_DIR" "$DATASET_DIR" "$TB_DIR" "$OUTPUT_DIR" "$OFFLOAD_DIR" "$RUNTIME_DIR"
 
@@ -32,6 +33,7 @@ export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:T
 cp "$ROOT_DIR/tools/finetune/train_qwen3_lora.py" "$TRAIN_SCRIPT"
 
 python "$ROOT_DIR/tools/incremental_finetune/prepare_planner_sft_dataset.py" \
+  --run-root "$FINETUNE_RUN_ROOT" \
   --output-dir "$DATASET_DIR" \
   --max-train-samples "${MAX_TRAIN_SAMPLES:-96}" \
   --max-validation-samples "${MAX_VALIDATION_SAMPLES:-24}" \

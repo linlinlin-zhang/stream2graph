@@ -9,6 +9,7 @@ RUN_NAME="qwen35_27b_incremental_planner_cloud_autodl"
 LOG_FILE="${LOG_DIR}/${RUN_NAME}.log"
 PID_FILE="${LOG_DIR}/${RUN_NAME}.pid"
 DATASET_DIR="${ROOT_DIR}/data/finetune/incremental_planner_sft_cloud"
+FINETUNE_RUN_ROOT="${FINETUNE_RUN_ROOT:-$ROOT_DIR/data/incremental_dataset/runs/minimax_m27_incremental_full_v1_clean}"
 
 mkdir -p "$LOG_DIR"
 
@@ -25,6 +26,7 @@ export TOKENIZERS_PARALLELISM=false
 export PYTORCH_CUDA_ALLOC_CONF="${PYTORCH_CUDA_ALLOC_CONF:-expandable_segments:True}"
 
 python "$ROOT_DIR/tools/incremental_finetune/prepare_planner_sft_dataset.py" \
+  --run-root "$FINETUNE_RUN_ROOT" \
   --output-dir "$DATASET_DIR"
 
 if [[ -f "$PID_FILE" ]] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then

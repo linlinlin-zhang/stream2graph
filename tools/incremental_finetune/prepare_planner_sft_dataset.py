@@ -9,8 +9,8 @@ from pathlib import Path
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from tools.eval.incremental_dataset import DEFAULT_INCREMENTAL_RUN_ROOT
 from tools.incremental_finetune.common import (
+    DEFAULT_INCREMENTAL_FINETUNE_RUN_ROOT,
     SplitLimit,
     dataset_manifest,
     iter_samples,
@@ -22,7 +22,7 @@ from tools.incremental_finetune.common import (
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Prepare incremental planner SFT data for Qwen3.5-27B.")
-    parser.add_argument("--run-root", type=str, default=DEFAULT_INCREMENTAL_RUN_ROOT)
+    parser.add_argument("--run-root", type=str, default=DEFAULT_INCREMENTAL_FINETUNE_RUN_ROOT)
     parser.add_argument("--output-dir", type=str, required=True)
     parser.add_argument("--max-train-samples", type=int, default=0)
     parser.add_argument("--max-validation-samples", type=int, default=0)

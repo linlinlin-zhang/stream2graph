@@ -155,10 +155,11 @@ def dataset_manifest(
     payload = {
         "generated_at_utc": utc_iso(),
         "task_name": task_name,
-        "run_root": str(resolve_path(run_root or DEFAULT_INCREMENTAL_RUN_ROOT)),
+        "run_root": str(resolve_path(run_root or DEFAULT_INCREMENTAL_FINETUNE_RUN_ROOT or DEFAULT_INCREMENTAL_RUN_ROOT)),
         "output_dir": str(resolve_path(output_dir)),
         "split_counts": split_counts,
     }
     if extra:
         payload.update(extra)
     return payload
+DEFAULT_INCREMENTAL_FINETUNE_RUN_ROOT = "data/incremental_dataset/runs/minimax_m27_incremental_full_v1_clean"

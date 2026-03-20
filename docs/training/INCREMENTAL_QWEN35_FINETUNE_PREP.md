@@ -9,6 +9,18 @@ This document freezes the current finetune preparation path for the incremental 
 
 The previous `Qwen3-14B` probe path is no longer the mainline for this project.
 
+## Finetune data source
+
+The benchmark-facing frozen dataset stays at:
+
+- `data/incremental_dataset/runs/minimax_m27_incremental_full_v1`
+
+The default finetune-preparation source now points to the clean derivative:
+
+- `data/incremental_dataset/runs/minimax_m27_incremental_full_v1_clean`
+
+This keeps benchmark reproducibility and training cleanliness separate.
+
 ## What is prepared
 
 - gate SFT dataset exporter:
