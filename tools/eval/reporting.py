@@ -15,6 +15,7 @@ BOOL_FIELDS = {
     "parse_valid",
     "completed_all_stages",
     "final_matches_reference",
+    "canonicalized_match",
     "exact_update_count_match",
 }
 

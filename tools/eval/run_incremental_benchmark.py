@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -10,7 +11,7 @@ from pathlib import Path
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from tools.eval.common import resolve_path, slugify, write_json
+from tools.eval.common import load_api_keys_config, resolve_path, slugify, write_json
 
 
 def parse_args() -> argparse.Namespace:
@@ -21,22 +22,41 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--max-samples", type=int, default=0)
     parser.add_argument("--sample-ids-file", type=str, default="")
     parser.add_argument("--max-concurrency", type=int, default=1)
-    parser.add_argument("--gate-kind", type=str, default="oracle", choices=["oracle", "openai_compatible"])
-    parser.add_argument("--planner-kind", type=str, default="oracle", choices=["oracle", "openai_compatible"])
+    parser.add_argument(
+        "--api-keys-config",
+        type=str,
+        default="configs/evaluation/model_benchmarks/api_keys.local.json",
+    )
+    parser.add_argument(
+        "--gate-kind",
+        type=str,
+        default="oracle",
+        choices=["oracle", "openai_compatible", "google_generate_content", "local_hf"],
+    )
+    parser.add_argument(
+        "--planner-kind",
+        type=str,
+        default="oracle",
+        choices=["oracle", "openai_compatible", "google_generate_content", "local_hf"],
+    )
     parser.add_argument("--gate-endpoint", type=str, default="")
     parser.add_argument("--gate-model", type=str, default="")
     parser.add_argument("--gate-api-key-env", type=str, default="OPENAI_API_KEY")
     parser.add_argument("--gate-api-key", type=str, default="")
+    parser.add_argument("--gate-omit-temperature", action="store_true")
     parser.add_argument("--gate-extra-body-json", type=str, default="")
     parser.add_argument("--planner-endpoint", type=str, default="")
     parser.add_argument("--planner-model", type=str, default="")
     parser.add_argument("--planner-api-key-env", type=str, default="OPENAI_API_KEY")
     parser.add_argument("--planner-api-key", type=str, default="")
+    parser.add_argument("--planner-omit-temperature", action="store_true")
     parser.add_argument("--planner-extra-body-json", type=str, default="")
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--timeout-sec", type=int, default=180)
     parser.add_argument("--max-retries", type=int, default=5)
     parser.add_argument("--retry-backoff-sec", type=float, default=3.0)
+    parser.add_argument("--gate-request-interval-sec", type=float, default=None)
+    parser.add_argument("--planner-request-interval-sec", type=float, default=None)
     parser.add_argument("--request-interval-sec", type=float, default=0.0)
     parser.add_argument("--run-name", type=str, default="")
     parser.add_argument("--output-root", type=str, default="reports/evaluation/runs/incremental_system")
@@ -48,13 +68,17 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def _run_script(script: str, config_path: Path) -> None:
+def _run_script(script: str, config_path: Path, env_overrides: dict[str, str] | None = None) -> None:
     command = [sys.executable, str(resolve_path(script)), "--config", str(config_path)]
-    subprocess.run(command, cwd=resolve_path("."), check=True)
+    env = os.environ.copy()
+    if env_overrides:
+        env.update(env_overrides)
+    subprocess.run(command, cwd=resolve_path("."), check=True, env=env)
 
 
 def main() -> None:
     args = parse_args()
+    api_keys = load_api_keys_config(args.api_keys_config)
     planner_label = args.planner_model or args.planner_kind
     gate_label = args.gate_model or args.gate_kind
     run_name = args.run_name or slugify(f"incremental_{gate_label}_{planner_label}_{args.split}")
@@ -63,6 +87,13 @@ def main() -> None:
     inference_dir = run_root / "inference"
     metrics_dir = run_root / "metrics"
     config_root.mkdir(parents=True, exist_ok=True)
+    child_env: dict[str, str] = {}
+    gate_api_key = args.gate_api_key or api_keys.get(args.gate_api_key_env, "")
+    planner_api_key = args.planner_api_key or api_keys.get(args.planner_api_key_env, "")
+    if args.gate_api_key_env and gate_api_key:
+        child_env[args.gate_api_key_env] = gate_api_key
+    if args.planner_api_key_env and planner_api_key:
+        child_env[args.planner_api_key_env] = planner_api_key
 
     inference_config = {
         "run_root": args.run_root,
@@ -70,6 +101,7 @@ def main() -> None:
         "max_samples": args.max_samples,
         "sample_ids_file": args.sample_ids_file,
         "resume": True,
+        "api_keys_config": args.api_keys_config,
         "output_jsonl": str(inference_dir / "predictions.jsonl"),
         "manifest_output": str(inference_dir / "manifest.json"),
         "details_dir": str(inference_dir / "details"),
@@ -79,22 +111,27 @@ def main() -> None:
         "gate_endpoint": args.gate_endpoint,
         "gate_model": args.gate_model,
         "gate_api_key_env": args.gate_api_key_env,
-        "gate_api_key": args.gate_api_key,
+        "gate_api_key": "",
+        "gate_omit_temperature": args.gate_omit_temperature,
         "gate_extra_body_json": args.gate_extra_body_json,
         "planner_endpoint": args.planner_endpoint,
         "planner_model": args.planner_model,
         "planner_api_key_env": args.planner_api_key_env,
-        "planner_api_key": args.planner_api_key,
+        "planner_api_key": "",
+        "planner_omit_temperature": args.planner_omit_temperature,
         "planner_extra_body_json": args.planner_extra_body_json,
         "temperature": args.temperature,
         "timeout_sec": args.timeout_sec,
         "max_retries": args.max_retries,
         "retry_backoff_sec": args.retry_backoff_sec,
+        "gate_request_interval_sec": args.gate_request_interval_sec,
+        "planner_request_interval_sec": args.planner_request_interval_sec,
         "request_interval_sec": args.request_interval_sec,
     }
     metrics_config = {
         "input_jsonl": str(inference_dir / "predictions.jsonl"),
         "output_dir": str(metrics_dir),
+        "run_root": args.run_root,
     }
 
     inference_config_path = config_root / "incremental_inference.json"
@@ -102,7 +139,7 @@ def main() -> None:
     write_json(inference_config_path, inference_config)
     write_json(metrics_config_path, metrics_config)
 
-    _run_script("tools/eval/run_incremental_inference.py", inference_config_path)
+    _run_script("tools/eval/run_incremental_inference.py", inference_config_path, env_overrides=child_env)
     _run_script("tools/eval/run_incremental_metrics.py", metrics_config_path)
 
     print(f"Run root: {run_root}")

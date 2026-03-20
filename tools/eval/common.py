@@ -42,6 +42,27 @@ def inject_api_key(api_key_env: str, api_key: str) -> None:
         os.environ[api_key_env] = api_key
 
 
+def load_api_keys_config(path: str | Path) -> dict[str, str]:
+    if not path:
+        return {}
+    candidate = resolve_path(path)
+    if not candidate.exists():
+        return {}
+    payload = read_json(candidate)
+    if not isinstance(payload, dict):
+        raise ValueError(f"API keys config must be a JSON object: {candidate}")
+    resolved: dict[str, str] = {}
+    for key, value in payload.items():
+        if not isinstance(key, str):
+            continue
+        if value is None:
+            continue
+        text = str(value).strip()
+        if text:
+            resolved[key] = text
+    return resolved
+
+
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     if not path.exists():

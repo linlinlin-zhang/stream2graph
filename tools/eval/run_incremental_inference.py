@@ -6,18 +6,31 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
 import sys
 from pathlib import Path
+import traceback
 
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from tools.eval.common import append_jsonl, inject_api_key, read_jsonl, resolve_path, utc_iso, write_json
+from tools.eval.common import (
+    append_jsonl,
+    inject_api_key,
+    load_api_keys_config,
+    read_jsonl,
+    resolve_path,
+    utc_iso,
+    write_json,
+)
 from tools.eval.incremental_dataset import (
     DEFAULT_INCREMENTAL_RUN_ROOT,
     load_incremental_entries,
     load_incremental_sample_ids,
 )
 from tools.incremental_system.algorithm import DeterministicAlgorithmLayer
-from tools.incremental_system.chat_clients import OpenAICompatibleChatClient
+from tools.incremental_system.chat_clients import (
+    GeminiGenerateContentChatClient,
+    LocalHFChatClient,
+    OpenAICompatibleChatClient,
+)
 from tools.incremental_system.loader import load_runtime_sample
 from tools.incremental_system.models import (
     LLMGateModel,
@@ -40,22 +53,41 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--sample-ids-file", type=str, default="")
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--max-concurrency", type=int, default=1)
-    parser.add_argument("--gate-kind", type=str, default="oracle", choices=["oracle", "openai_compatible"])
-    parser.add_argument("--planner-kind", type=str, default="oracle", choices=["oracle", "openai_compatible"])
+    parser.add_argument(
+        "--api-keys-config",
+        type=str,
+        default="configs/evaluation/model_benchmarks/api_keys.local.json",
+    )
+    parser.add_argument(
+        "--gate-kind",
+        type=str,
+        default="oracle",
+        choices=["oracle", "openai_compatible", "google_generate_content", "local_hf"],
+    )
+    parser.add_argument(
+        "--planner-kind",
+        type=str,
+        default="oracle",
+        choices=["oracle", "openai_compatible", "google_generate_content", "local_hf"],
+    )
     parser.add_argument("--gate-endpoint", type=str, default="")
     parser.add_argument("--gate-model", type=str, default="")
     parser.add_argument("--gate-api-key-env", type=str, default="OPENAI_API_KEY")
     parser.add_argument("--gate-api-key", type=str, default="")
+    parser.add_argument("--gate-omit-temperature", action="store_true")
     parser.add_argument("--gate-extra-body-json", type=str, default="")
     parser.add_argument("--planner-endpoint", type=str, default="")
     parser.add_argument("--planner-model", type=str, default="")
     parser.add_argument("--planner-api-key-env", type=str, default="OPENAI_API_KEY")
     parser.add_argument("--planner-api-key", type=str, default="")
+    parser.add_argument("--planner-omit-temperature", action="store_true")
     parser.add_argument("--planner-extra-body-json", type=str, default="")
     parser.add_argument("--temperature", type=float, default=0.0)
     parser.add_argument("--timeout-sec", type=int, default=180)
     parser.add_argument("--max-retries", type=int, default=5)
     parser.add_argument("--retry-backoff-sec", type=float, default=3.0)
+    parser.add_argument("--gate-request-interval-sec", type=float, default=None)
+    parser.add_argument("--planner-request-interval-sec", type=float, default=None)
     parser.add_argument("--request-interval-sec", type=float, default=0.0)
 
     pre_args, _ = parser.parse_known_args()
@@ -67,14 +99,24 @@ def parse_args() -> argparse.Namespace:
 
 def _make_client(
     *,
+    kind: str,
     endpoint: str,
     model: str,
     api_key_env: str,
     api_key: str,
     extra_body_json: str,
+    request_interval_sec: float,
+    omit_temperature: bool,
     args: argparse.Namespace,
-) -> OpenAICompatibleChatClient:
-    return OpenAICompatibleChatClient(
+):
+    client_cls = {
+        "openai_compatible": OpenAICompatibleChatClient,
+        "google_generate_content": GeminiGenerateContentChatClient,
+        "local_hf": LocalHFChatClient,
+    }.get(kind)
+    if client_cls is None:
+        raise ValueError(f"Unsupported incremental chat client kind: {kind}")
+    return client_cls(
         endpoint=endpoint,
         model=model,
         api_key=api_key,
@@ -82,8 +124,9 @@ def _make_client(
         timeout_sec=args.timeout_sec,
         max_retries=args.max_retries,
         retry_backoff_sec=args.retry_backoff_sec,
-        request_interval_sec=args.request_interval_sec,
+        request_interval_sec=request_interval_sec,
         extra_body=json.loads(extra_body_json) if extra_body_json else {},
+        omit_temperature=omit_temperature,
         temperature=args.temperature,
     )
 
@@ -94,11 +137,18 @@ def _build_runner(args: argparse.Namespace) -> IncrementalSystemRunner:
     else:
         gate_model = LLMGateModel(
             _make_client(
+                kind=args.gate_kind,
                 endpoint=args.gate_endpoint,
                 model=args.gate_model,
                 api_key_env=args.gate_api_key_env,
                 api_key=args.gate_api_key,
                 extra_body_json=args.gate_extra_body_json,
+                request_interval_sec=(
+                    args.gate_request_interval_sec
+                    if args.gate_request_interval_sec is not None
+                    else args.request_interval_sec
+                ),
+                omit_temperature=args.gate_omit_temperature,
                 args=args,
             )
         )
@@ -108,11 +158,18 @@ def _build_runner(args: argparse.Namespace) -> IncrementalSystemRunner:
     else:
         planner_model = LLMPlannerModel(
             _make_client(
+                kind=args.planner_kind,
                 endpoint=args.planner_endpoint,
                 model=args.planner_model,
                 api_key_env=args.planner_api_key_env,
                 api_key=args.planner_api_key,
                 extra_body_json=args.planner_extra_body_json,
+                request_interval_sec=(
+                    args.planner_request_interval_sec
+                    if args.planner_request_interval_sec is not None
+                    else args.request_interval_sec
+                ),
+                omit_temperature=args.planner_omit_temperature,
                 args=args,
             )
         )
@@ -176,7 +233,7 @@ def _row_from_payload(sample_entry, payload: dict, detail_path: Path) -> dict:
     }
 
 
-def _row_from_error(sample_entry, exc: Exception) -> dict:
+def _row_from_error(sample_entry, exc: Exception, detail_path: Path | None = None) -> dict:
     return {
         "generated_at_utc": utc_iso(),
         "sample_id": sample_entry.sample_id,
@@ -198,26 +255,37 @@ def _row_from_error(sample_entry, exc: Exception) -> dict:
         "gate_latency_mean_ms": None,
         "planner_latency_mean_ms": None,
         "total_model_latency_ms": None,
-        "detail_path": "",
+        "detail_path": str(detail_path) if detail_path else "",
         "error": str(exc),
     }
 
 
 def _run_entry(entry, args: argparse.Namespace, runner: IncrementalSystemRunner, details_dir: Path) -> tuple[object, dict]:
+    detail_path = details_dir / f"{entry.sample_id}.json"
     try:
         sample = load_runtime_sample(args.run_root, entry.sample_id)
         payload = runner.run_sample(sample)
-        detail_path = details_dir / f"{entry.sample_id}.json"
         write_json(detail_path, payload)
         return entry, _row_from_payload(entry, payload, detail_path)
     except Exception as exc:
-        return entry, _row_from_error(entry, exc)
+        write_json(
+            detail_path,
+            {
+                "sample_id": entry.sample_id,
+                "split": entry.split,
+                "diagram_type": entry.diagram_type,
+                "error": str(exc),
+                "traceback": traceback.format_exc(),
+            },
+        )
+        return entry, _row_from_error(entry, exc, detail_path)
 
 
 def main() -> None:
     args = parse_args()
-    inject_api_key(args.gate_api_key_env, args.gate_api_key)
-    inject_api_key(args.planner_api_key_env, args.planner_api_key)
+    api_keys = load_api_keys_config(args.api_keys_config)
+    inject_api_key(args.gate_api_key_env, args.gate_api_key or api_keys.get(args.gate_api_key_env, ""))
+    inject_api_key(args.planner_api_key_env, args.planner_api_key or api_keys.get(args.planner_api_key_env, ""))
 
     output_jsonl = resolve_path(args.output_jsonl)
     manifest_output = resolve_path(args.manifest_output) if args.manifest_output else output_jsonl.with_suffix(".manifest.json")

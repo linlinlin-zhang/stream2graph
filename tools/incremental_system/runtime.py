@@ -27,7 +27,32 @@ class IncrementalSystemRunner:
 
         for turn in sample.turns:
             observed_turns.append(turn)
+            if state.current_stage_index >= sample.total_stages:
+                events.append(
+                    {
+                        "turn": turn.to_payload(),
+                        "gate": {
+                            "action": "WAIT",
+                            "target_stage_index": sample.total_stages,
+                            "reason": "all stages already applied",
+                            "confidence": 1.0,
+                            "metadata": {"runtime_short_circuit": True},
+                        },
+                        "state_before": self.algorithm_layer.summarize_state(state),
+                    }
+                )
+                continue
             gate_decision = self.gate_model.decide(sample, state, observed_turns)
+            expected_stage_index = state.current_stage_index + 1
+            if gate_decision.action == "EMIT_UPDATE":
+                raw_target = gate_decision.target_stage_index
+                if raw_target != expected_stage_index:
+                    gate_decision.target_stage_index = expected_stage_index
+                    gate_decision.metadata = {
+                        **dict(gate_decision.metadata),
+                        "normalized_target_stage_index": expected_stage_index,
+                        "raw_target_stage_index": raw_target,
+                    }
             event: dict[str, Any] = {
                 "turn": turn.to_payload(),
                 "gate": gate_decision.to_payload(),
@@ -35,7 +60,21 @@ class IncrementalSystemRunner:
             }
 
             if gate_decision.action == "EMIT_UPDATE":
+                requested_stage_index = gate_decision.target_stage_index or expected_stage_index
+                if requested_stage_index <= state.current_stage_index or requested_stage_index > sample.total_stages:
+                    event["update"] = {
+                        "ignored": True,
+                        "reason": "gate requested an invalid or non-advancing stage",
+                    }
+                    events.append(event)
+                    continue
                 planner_output = self.planner_model.plan(sample, state, observed_turns, gate_decision)
+                if planner_output.target_stage_index != expected_stage_index:
+                    planner_output.target_stage_index = expected_stage_index
+                    planner_output.metadata = {
+                        **dict(planner_output.metadata),
+                        "normalized_target_stage_index": expected_stage_index,
+                    }
                 if planner_output.target_stage_index > state.current_stage_index:
                     state, update_payload = self.algorithm_layer.apply_planner_output(sample, state, planner_output)
                     updates_emitted += 1

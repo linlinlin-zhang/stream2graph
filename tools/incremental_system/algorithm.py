@@ -82,6 +82,27 @@ def graph_exact_match(left: GraphIR | None, right: GraphIR | None) -> bool:
     )
 
 
+def _coerce_scalar_text(value: Any, *, default: str = "") -> str:
+    if value is None:
+        return default
+    if isinstance(value, (str, int, float, bool)):
+        text = str(value).strip()
+        return text or default
+    return default
+
+
+def _coerce_optional_parent(value: Any) -> str | None:
+    text = _coerce_scalar_text(value, default="")
+    return text or None
+
+
+def _coerce_string_list(value: Any) -> list[str]:
+    if isinstance(value, list):
+        return [item for item in (_coerce_scalar_text(entry, default="") for entry in value) if item]
+    scalar_value = _coerce_scalar_text(value, default="")
+    return [scalar_value] if scalar_value else []
+
+
 def _apply_delta_ops(base: GraphIR, delta_ops: list[dict[str, Any]]) -> GraphIR:
     graph = _clone_graph_ir(base)
     node_ids = {node.id for node in graph.nodes}
@@ -94,46 +115,46 @@ def _apply_delta_ops(base: GraphIR, delta_ops: list[dict[str, Any]]) -> GraphIR:
     for op_index, op in enumerate(delta_ops, start=1):
         op_name = str(op.get("op") or op.get("type") or "").strip().lower()
         if op_name == "add_group":
-            group_id = str(op.get("group_id") or op.get("id") or "").strip()
+            group_id = _coerce_scalar_text(op.get("group_id") or op.get("id"), default="")
             if not group_id or group_id in group_ids:
                 continue
             graph.groups.append(
                 GraphGroup(
                     id=group_id,
-                    label=str(op.get("label", group_id)),
-                    parent=(str(op["parent"]) if op.get("parent") not in {None, ""} else None),
-                    member_ids=[str(item) for item in op.get("member_ids", [])],
+                    label=_coerce_scalar_text(op.get("label"), default=group_id),
+                    parent=_coerce_optional_parent(op.get("parent")),
+                    member_ids=_coerce_string_list(op.get("member_ids", [])),
                     source_index=next_group_index + op_index,
                     metadata={},
                 )
             )
             group_ids.add(group_id)
         elif op_name == "add_node":
-            node_id = str(op.get("node_id") or op.get("id") or "").strip()
+            node_id = _coerce_scalar_text(op.get("node_id") or op.get("id"), default="")
             if not node_id or node_id in node_ids:
                 continue
             graph.nodes.append(
                 GraphNode(
                     id=node_id,
-                    label=str(op.get("label", node_id)),
-                    kind=str(op.get("kind") or op.get("node_type") or "node"),
-                    parent=(str(op["parent"]) if op.get("parent") not in {None, ""} else None),
+                    label=_coerce_scalar_text(op.get("label"), default=node_id),
+                    kind=_coerce_scalar_text(op.get("kind") or op.get("node_type"), default="node"),
+                    parent=_coerce_optional_parent(op.get("parent")),
                     source_index=next_node_index + op_index,
                     metadata={},
                 )
             )
             node_ids.add(node_id)
         elif op_name == "add_edge":
-            edge_id = str(op.get("edge_id") or op.get("id") or "").strip()
+            edge_id = _coerce_scalar_text(op.get("edge_id") or op.get("id"), default="")
             if not edge_id or edge_id in edge_ids:
                 continue
             graph.edges.append(
                 GraphEdge(
                     id=edge_id,
-                    source=str(op.get("source", "")),
-                    target=str(op.get("target", "")),
-                    label=str(op.get("label", "")),
-                    kind=str(op.get("kind") or "edge"),
+                    source=_coerce_scalar_text(op.get("source"), default=""),
+                    target=_coerce_scalar_text(op.get("target"), default=""),
+                    label=_coerce_scalar_text(op.get("label"), default=""),
+                    kind=_coerce_scalar_text(op.get("kind"), default="edge"),
                     source_index=next_edge_index + op_index,
                     metadata={},
                 )
