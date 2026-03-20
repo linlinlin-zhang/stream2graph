@@ -32,11 +32,19 @@ The platform is designed to support a rigorous paper workflow with:
 - `tools/eval/merge_prediction_shards.py`
   - merges disjoint shard prediction JSONL files back into one ordered prediction file
 - `tools/eval/run_openai_compatible_benchmark.py`
-  - benchmark entrypoint for official OpenAI-compatible providers such as Kimi, DeepSeek, MiniMax, Qwen DashScope, and SiliconFlow
+  - benchmark entrypoint for official or gateway-based OpenAI-compatible providers such as Claude-compatible gateways, Kimi, DeepSeek, MiniMax, Qwen DashScope, and SiliconFlow
 - `tools/eval/run_local_hf_benchmark.py`
   - benchmark entrypoint for local or cloud-hosted open-weight models loaded via Hugging Face + optional LoRA adapters
 - `tools/eval/run_traditional_benchmark.py`
   - heuristic / traditional baseline benchmark entrypoint that runs both offline and realtime evaluation
+- `tools/eval/incremental_dataset.py`
+  - loads the new staged incremental dataset splits from `data/incremental_dataset/runs/.../selection/`
+- `tools/eval/run_incremental_inference.py`
+  - runs the new incremental core system on staged dialogue/state samples and stores one summary row plus one detailed JSON per sample
+- `tools/eval/run_incremental_metrics.py`
+  - aggregates incremental-system metrics such as stage coverage, final state match, and update-count accuracy
+- `tools/eval/run_incremental_benchmark.py`
+  - wrapper that materializes configs and runs incremental inference + incremental metrics in one command
 - `tools/eval/materialize_experiment_matrix.py`
   - materializes paper-oriented experiment matrices into per-run configs and can optionally execute them
 - `tools/eval/export_run_bundle.py`
@@ -73,6 +81,8 @@ The platform is designed to support a rigorous paper workflow with:
   - official Qwen DashScope OpenAI-compatible endpoint
 - `siliconflow_chat_completions`
   - SiliconFlow-hosted open-weight models via OpenAI-compatible endpoint
+- `claude_chat_completions`
+  - Claude-compatible chat-completions gateway using Anthropic-style model naming on an OpenAI-compatible endpoint
 - `anthropic_messages`
   - frontier API baseline
 - `google_generate_content`
@@ -83,6 +93,42 @@ The platform is designed to support a rigorous paper workflow with:
   - heuristic baseline built from the existing intent engine and incremental renderer
 
 ## Actual evaluation flow
+
+## Incremental system flow
+
+The legacy `tools/eval/dataset.py` path is still designed for the old task:
+
+- full dialogue -> final Mermaid
+
+For the new project direction, the recommended path is the incremental-system flow:
+
+- staged dataset sample -> continuous dialogue prefix replay -> gate decision -> planner update -> current graph state
+
+### A. Run a smoke benchmark on the new system
+
+```bash
+python tools/eval/run_incremental_benchmark.py --config configs/evaluation/incremental_oracle_smoke.example.json
+```
+
+### B. Test one advanced API planner while keeping the small model fixed
+
+This is the recommended first comparison setup for frontier API models:
+
+- keep the small gate model fixed
+- only replace the large planner model
+
+Example:
+
+```bash
+python tools/eval/run_incremental_benchmark.py --config configs/evaluation/model_benchmarks/incremental_openai_compatible_planner.example.json
+```
+
+The resulting run will contain:
+
+- `inference/predictions.jsonl`
+- `inference/details/*.json`
+- `metrics/incremental_metrics.summary.json`
+- `metrics/incremental_metrics.summary.md`
 
 ### 1. Run unified inference
 
@@ -174,9 +220,10 @@ python tools/eval/materialize_api_shards.py --config configs/evaluation/gemini3f
 python tools/eval/run_gemini_benchmark.py --config configs/evaluation/generated_shards/gemini3flash_google_v7_single_key/gemini3flash_google_v7_test_shard01of01.config.json
 ```
 
-### 8. Run Kimi / DeepSeek / MiniMax / Qwen / OpenRouter models with OpenAI-compatible endpoints
+### 8. Run Claude-compatible / Kimi / DeepSeek / MiniMax / Qwen / OpenRouter models with OpenAI-compatible endpoints
 
 ```bash
+python tools/eval/run_openai_compatible_benchmark.py --config configs/evaluation/model_benchmarks/claude_sonnet45_benchmark.example.json
 python tools/eval/run_openai_compatible_benchmark.py --config configs/evaluation/model_benchmarks/deepseek_benchmark.example.json
 python tools/eval/run_openai_compatible_benchmark.py --config configs/evaluation/model_benchmarks/moonshot_kimi_benchmark.example.json
 python tools/eval/run_openai_compatible_benchmark.py --config configs/evaluation/model_benchmarks/minimax_benchmark.example.json
