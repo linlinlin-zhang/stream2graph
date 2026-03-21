@@ -21,7 +21,7 @@ from tools.incremental_system.models import LLMGateModel, LLMPlannerModel, Oracl
 from tools.incremental_system.runtime import IncrementalSystemRunner
 
 
-DEFAULT_RUN_ROOT = "data/incremental_dataset/runs/minimax_m27_incremental_full_v1"
+DEFAULT_RUN_ROOT = "data/incremental_dataset/runs/incremental_open_balanced_v1_3360_public_clean"
 
 
 def parse_args() -> argparse.Namespace:

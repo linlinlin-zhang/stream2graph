@@ -81,3 +81,5 @@ This folder is the canonical home for hand-authored large-model benchmark templa
 - Incremental runner kinds now include `google_generate_content`, so Gemini can be evaluated in the same staged runtime and metrics pipeline as the OpenAI-compatible planners.
 - Incremental runner kinds now also include `local_hf`, so locally hosted or cloud-hosted Hugging Face adapters can be evaluated inside the same staged runtime and metrics pipeline.
 - Incremental benchmark summaries now expose layered quality signals: strict `final_matches_reference`, `canonicalized_match`, and semantic-structure F1 metrics in addition to stage-completion and latency metrics.
+- The current official incremental benchmark run root is `data/incremental_dataset/runs/incremental_open_balanced_v1_3360_public_clean`.
+- This official public-clean benchmark currently contains `3199` samples with near-balanced six-type coverage and fully clean structural self-checks.

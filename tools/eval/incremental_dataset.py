@@ -8,7 +8,7 @@ from typing import Optional
 from tools.eval.common import read_json, resolve_path
 
 
-DEFAULT_INCREMENTAL_RUN_ROOT = "data/incremental_dataset/runs/minimax_m27_incremental_full_v1"
+DEFAULT_INCREMENTAL_RUN_ROOT = "data/incremental_dataset/runs/incremental_open_balanced_v1_3360_public_clean"
 
 
 @dataclass

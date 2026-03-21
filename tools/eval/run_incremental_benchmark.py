@@ -17,7 +17,11 @@ from tools.eval.common import load_api_keys_config, resolve_path, slugify, write
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run the incremental Stream2Graph benchmark.")
     parser.add_argument("--config", type=str, default="")
-    parser.add_argument("--run-root", type=str, default="data/incremental_dataset/runs/minimax_m27_incremental_full_v1")
+    parser.add_argument(
+        "--run-root",
+        type=str,
+        default="data/incremental_dataset/runs/incremental_open_balanced_v1_3360_public_clean",
+    )
     parser.add_argument("--split", type=str, default="test", choices=["train", "validation", "test", "all"])
     parser.add_argument("--max-samples", type=int, default=0)
     parser.add_argument("--sample-ids-file", type=str, default="")
